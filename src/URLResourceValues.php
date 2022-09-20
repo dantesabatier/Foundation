@@ -1,0 +1,68 @@
+<?php
+
+namespace Sabatier\Foundation;
+
+use JetBrains\PhpStorm\ExpectedValues;
+
+/**
+ * Class URLResourceValues
+ * The properties supported by file system resources.
+ * @package Sabatier\Foundation
+ * @property-read bool|null $isDirectory True for directories.
+ * @property-read string|null $fileResourceType Returns the file system object type.
+ * @property-read int|null $fileSize Total file size in bytes.
+ * @property-read bool|null $isExecutable True if this process (as determined by EUID) can execute a file resource or search a directory resource.
+ * @property-read bool|null $isRegularFile True for regular files.
+ * @property-read Dictionary $allValues A loosely-typed dictionary containing all keys and values.
+ * @property-read Date|null $attributeModificationDate The time the resource's attributes were last modified.
+ * @property-read Date|null $creationDate The date the resource was created.
+ * @property-read bool|null $isAliasFile true if the resource is a Finder alias file or a symlink, false otherwise.
+ * @property-read bool|null $isHidden True for resources normally not displayed to users.
+ * @property-read bool|null $isReadable True if this process (as determined by EUID) can read the resource.
+ * @property-read bool|null $isSymbolicLink True for symlinks.
+ * @property-read bool|null $isWritable True if this process (as determined by EUID) can write to the resource.
+ * @property-read string|null $name The resource name provided by the file system.
+ * @property-read URL|null $parentDirectory The resource's parent directory, if any.
+ * @property-read string|null $path The URL's path as a file system path.
+ */
+class URLResourceValues extends ObjectClass
+{
+    /**
+     * @param Set<string> $keys
+     * @param Dictionary $values
+     */
+    public function __construct(private readonly Set $keys, private readonly Dictionary $values)
+    {
+    }
+
+    /** @internal */
+    public function contains(#[ExpectedValues(valuesFromClass: URLResourceKey::class)] string $key): bool
+    {
+        return $this->keys->containsElement($key);
+    }
+
+    public function __get(string $name)
+    {
+        if ($name === 'allValues') {
+            return $this->values;
+        } elseif ($name === 'isDirectory' || $name === 'fileResourceType' || $name === 'fileSize' || $name === 'isExecutable' || $name === 'isRegularFile' || $name === 'attributeModificationDate' || $name === 'creationDate' || $name === 'isAliasFile' || $name === 'isHidden' || $name === 'isReadable' || $name === 'isSymbolicLink' || $name === 'isWritable' || $name === 'name' || $name === 'parentDirectory' || $name === 'path') {
+            return $this->values[$name];
+        } else {
+            return $this->valueForUndefinedKey($name);
+        }
+    }
+
+    public function __set(string $name, mixed $value): void
+    {
+        if ($name === 'isDirectory' || $name === 'fileResourceType' || $name === 'fileSize' || $name === 'isExecutable' || $name === 'isRegularFile' || $name === 'attributeModificationDate' || $name === 'creationDate' || $name === 'isAliasFile' || $name === 'isHidden' || $name === 'isReadable' || $name === 'isSymbolicLink' || $name === 'isWritable' || $name === 'name' || $name === 'parentDirectory' || $name === 'path') {
+            $this->values->setValueForKey($value, $name);
+            if ($value !== null) {
+                $this->keys->append($name);
+            } else {
+                $this->keys->remove($name);
+            }
+        } else {
+            $this->setValueForUndefinedKey($value, $name);
+        }
+    }
+}

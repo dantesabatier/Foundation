@@ -1,0 +1,222 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Foundation\n"
+"POT-Creation-Date: 2022-05-03 10:51-0500\n"
+"PO-Revision-Date: 2022-05-03 11:03-0500\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 3.0.1\n"
+"X-Poedit-Basepath: ../src\n"
+"X-Poedit-KeywordsList: ;localized_string:1,\\\"No comment provided by "
+"engineer\\\"\n"
+"X-Poedit-SearchPath-0: .\n"
+
+#. No comment provided by engineer
+#: HTTPURLResponse.php:92
+msgid "Continue"
+msgstr "Continuar"
+
+#. No comment provided by engineer
+#: HTTPURLResponse.php:93
+msgid "Switching protocols"
+msgstr "Cambiando protocolos"
+
+#. No comment provided by engineer
+#: HTTPURLResponse.php:94
+msgid "OK"
+msgstr "Okay"
+
+#. No comment provided by engineer
+#: HTTPURLResponse.php:95
+msgid "Created"
+msgstr "Creado"
+
+#. No comment provided by engineer
+#: HTTPURLResponse.php:96
+msgid "Accepted"
+msgstr "Aceptado"
+
+#. No comment provided by engineer
+#: HTTPURLResponse.php:97
+msgid "Non authoritative information"
+msgstr "Información sin autorización"
+
+#. No comment provided by engineer
+#: HTTPURLResponse.php:98
+msgid "No content"
+msgstr "No hay contenido"
+
+#. No comment provided by engineer
+#: HTTPURLResponse.php:99
+msgid "Reset content"
+msgstr "Restablecer contenido"
+
+#. No comment provided by engineer
+#: HTTPURLResponse.php:100
+msgid "Partial content"
+msgstr "Contenido parcial"
+
+#. No comment provided by engineer
+#: HTTPURLResponse.php:101
+msgid "Multiple choices"
+msgstr "Selecciones múltiples"
+
+#. No comment provided by engineer
+#: HTTPURLResponse.php:102
+msgid "Moved permanently"
+msgstr "Se ha desplazado de forma permanente"
+
+#. No comment provided by engineer
+#: HTTPURLResponse.php:103
+msgid "Found"
+msgstr "Encontrado"
+
+#. No comment provided by engineer
+#: HTTPURLResponse.php:104
+msgid "See other"
+msgstr "Ver otro"
+
+#. No comment provided by engineer
+#: HTTPURLResponse.php:105
+msgid "Not modified"
+msgstr "No se ha modificado"
+
+#. No comment provided by engineer
+#: HTTPURLResponse.php:106
+msgid "Temporary redirect"
+msgstr "Redirigido temporalmente"
+
+#. No comment provided by engineer
+#: HTTPURLResponse.php:107
+msgid "Bad request"
+msgstr "Petición incorrecta"
+
+#. No comment provided by engineer
+#: HTTPURLResponse.php:108
+msgid "Unauthorized"
+msgstr "Sin autorización"
+
+#. No comment provided by engineer
+#: HTTPURLResponse.php:109
+msgid "Payment required"
+msgstr "Pago requerido"
+
+#. No comment provided by engineer
+#: HTTPURLResponse.php:110
+msgid "Forbidden"
+msgstr "Prohibido"
+
+#. No comment provided by engineer
+#: HTTPURLResponse.php:111
+msgid "Not found"
+msgstr "No encontrado"
+
+#. No comment provided by engineer
+#: HTTPURLResponse.php:112
+msgid "Method not allowed"
+msgstr "Método no permitido"
+
+#. No comment provided by engineer
+#: HTTPURLResponse.php:113
+msgid "Unacceptable"
+msgstr "Inaceptable"
+
+#. No comment provided by engineer
+#: HTTPURLResponse.php:114
+msgid "Proxy authentication required"
+msgstr "Se requiere autenticación de proxy"
+
+#. No comment provided by engineer
+#: HTTPURLResponse.php:115
+msgid "Request time out"
+msgstr "Agotado el tiempo para la solicitud"
+
+#. No comment provided by engineer
+#: HTTPURLResponse.php:116
+msgid "Conflict"
+msgstr "Conflicto"
+
+#. No comment provided by engineer
+#: HTTPURLResponse.php:117
+msgid "Length required"
+msgstr "Longitud necesaria"
+
+#. No comment provided by engineer
+#: HTTPURLResponse.php:118
+msgid "Precondition failed"
+msgstr "Ha fallado la condición previa"
+
+#. No comment provided by engineer
+#: HTTPURLResponse.php:119
+msgid "Request too large"
+msgstr "Solicitud demasiado extensa"
+
+#. No comment provided by engineer
+#: HTTPURLResponse.php:120
+msgid "Requested URL too long"
+msgstr "La URL solicitada es demasiado larga"
+
+#. No comment provided by engineer
+#: HTTPURLResponse.php:121
+msgid "Unsupported media type"
+msgstr "Formato incompatible"
+
+#. No comment provided by engineer
+#: HTTPURLResponse.php:122
+msgid "Requested range not satisfiable"
+msgstr "El intervalo solicitado no puede obtenerse"
+
+#. No comment provided by engineer
+#: HTTPURLResponse.php:123
+msgid "Expectation failed"
+msgstr "Error en los datos esperados"
+
+#. No comment provided by engineer
+#: HTTPURLResponse.php:124
+msgid "Internal server error"
+msgstr "Error interno del servidor"
+
+#. No comment provided by engineer
+#: HTTPURLResponse.php:125
+msgid "Not implemented"
+msgstr "No implementado"
+
+#. No comment provided by engineer
+#: HTTPURLResponse.php:126
+msgid "Bad gateway"
+msgstr "“Gateway” incorrecto"
+
+#. No comment provided by engineer
+#: HTTPURLResponse.php:127
+msgid "Service unavailable"
+msgstr "Servicio no disponible"
+
+#. No comment provided by engineer
+#: HTTPURLResponse.php:128
+msgid "Gateway time out"
+msgstr "Tiempo de conexión a “gateway” excedido"
+
+#. No comment provided by engineer
+#: HTTPURLResponse.php:129
+msgid "Unsupported version"
+msgstr "Versión incompatible"
+
+#. No comment provided by engineer
+#: HTTPURLResponse.php:130
+msgid "Unexpected error"
+msgstr "Error inesperado"
+
+#. No comment provided by engineer
+#: URLSession.php:172
+msgid "An unexpected error has occurred"
+msgstr "Ha ocurrido un error inesperado"
+
+#. No comment provided by engineer
+#: URLSession.php:177 URLSessionTask.php:181
+msgid "User cancelled"
+msgstr "Cancelado por el usuario"

@@ -1,0 +1,196 @@
+<?php
+
+/**
+ * @author Dante Sabatier <dantesabatier@me.com>
+ * @version 1.0
+ * @package Sabatier\Foundation
+ */
+
+namespace Sabatier\Foundation;
+
+use BackedEnum;
+use Closure;
+use ErrorException;
+use Exception;
+use InvalidArgumentException;
+use JetBrains\PhpStorm\Deprecated;
+use JetBrains\PhpStorm\Pure;
+use Stringable;
+
+function target_os_win(): bool
+{
+    return string_has_prefix(PHP_OS, 'Win', CompareOptions::caseInsensitive);
+}
+
+function is_running_from_cli(): bool
+{
+    return ((PHP_SAPI === 'cli') || (stristr(PHP_SAPI, 'cgi') && getenv('TERM')));
+}
+
+function debuglog(string $string): void
+{
+    print $string . PHP_EOL;
+}
+
+#[Deprecated("since Foundation 0.1, use debuglog() instead", "\Sabatier\Foundation\debuglog(%parametersList%)")]
+function cli_log(string $string): void
+{
+    trigger_error(sprintf("%s() is deprecated, use debuglog() instead", __FUNCTION__), E_USER_DEPRECATED);
+    debuglog($string);
+}
+
+function escape_sequence(string $string, EscapeSequenceTextAttribute $textAttribute = EscapeSequenceTextAttribute::normal, EscapeSequenceColor $foregroundColor = EscapeSequenceColor::white, EscapeSequenceColor $backgroundColor = EscapeSequenceColor::black): string
+{
+    return sprintf("\e[%s;%s;%sm%s\e[0m", $textAttribute->value, $foregroundColor->value, $backgroundColor->value + EscapeSequenceBackgroundColorAddition, $string);
+}
+
+function has_escape_sequences(): bool
+{
+    if (target_os_win()) {
+        return getenv('ANSICON') !== false || getenv('ConEmuANSI') === 'ON';
+    }
+    return function_exists('posix_isatty') && posix_isatty(STDOUT);
+}
+
+function typeof(mixed $value): string
+{
+    return is_object($value) ? get_class($value) : gettype($value);
+}
+
+function human_readable_value(mixed $value): string
+{
+    if (is_string($value)) {
+        return $value;
+    } elseif (is_null($value)) {
+        return 'NULL';
+    } elseif (is_bool($value)) {
+        return $value ? 'TRUE' : 'FALSE';
+    } elseif (is_array($value)) {
+        return "[" . implode(', ', array_map(fn(mixed $index, mixed $element): string => sprintf("%s: %s", $index, human_readable_value($element)), array_keys($value), array_values($value))) . "]";
+    } elseif (is_scalar($value)) {
+        return strval($value);
+    } elseif (is_object($value)) {
+        if ($value instanceof Stringable) {
+            return strval($value);
+        } elseif ($value instanceof BackedEnum) {
+            return sprintf("%s::%s", $value::class, $value->name);
+        }
+    }
+    return typeof($value);
+}
+
+#[Pure]
+function human_readable_time(float $interval): string
+{
+    $s = (int)$interval % 60;
+    $m = (int)floor(((int)$interval % 3600) / 60);
+    $h = (int)floor(((int)$interval % 86400) / 3600);
+    $d = (int)floor(((int)$interval % 2592000) / 86400);
+    $M = (int)floor((int)$interval / 2592000);
+    $string = '';
+    if ($M) {
+        $string .= sprintf('%d month%s', $M, ($M > 1) ? 's' : '');
+        $string .= ' ';
+        $interval -= $M * 2592000;
+    }
+    if ($d) {
+        $string .= sprintf('%d day%s', $d, ($d > 1) ? 's' : '');
+        $string .= ' ';
+        $interval -= $d * 86400;
+    }
+    if ($h) {
+        $string .= sprintf('%d hour%s', $h, ($h > 1) ? 's' : '');
+        $string .= ' ';
+        $interval -= $h * 3600;
+    }
+    if ($m) {
+        $string .= sprintf('%d minute%s', $m, ($m > 1) ? 's' : '');
+        $string .= ' ';
+        $interval -= $m * 60;
+    }
+    if ($s) {
+        $string .= sprintf('%d second%s', $s, ($s > 1) ? 's' : '');
+        $string .= ' ';
+        $interval -= $s;
+    }
+    $string .= sprintf('%.f seconds', $interval);
+    return $string;
+}
+
+/**
+ * @param string|Closure(): string $message The string to print. The default is an empty string.
+ * @param string $file The file name to print with message. The default is the file where fatal_error() is called.
+ * @param int $line The line number to print along with message. The default is the file where fatal_error() is called.
+ * @return never
+ * @throws Exception
+ */
+function fatal_error(string|Closure $message = '', string $file = '', int $line = 0): never
+{
+    if ($message instanceof Closure) {
+        $message = $message();
+    }
+    if (!$file || !$line) {
+        $backtrace = debug_backtrace()[0] ?? [];
+        if (isset($backtrace['file'])) {
+            $file = $backtrace['file'];
+        }
+        if (isset($backtrace['line'])) {
+            $line = $backtrace['line'];
+        }
+    }
+    throw new ErrorException($message, 0, 0, $file, $line);
+}
+
+function request_concrete_implementation(object|string $objectOrClass, string $cmd): never
+{
+    throw new InvalidArgumentException(sprintf("%s %s() requires a subclass implementation", is_object($objectOrClass) ? $objectOrClass::class : $objectOrClass, $cmd));
+}
+
+function invalid_mutation(): never
+{
+    throw new InternalInconsistencyException("attempting to mutate an immutable object");
+}
+
+function unsafe_value(Closure $block): mixed
+{
+    set_error_handler(/** @throws ErrorException */ fn(int $severity, string $message, string $file, int $line): bool => throw new ErrorException($message, 0, $severity, $file, $line)); // @phpstan-ignore-line
+    $value = $block();
+    restore_error_handler();
+    return $value;
+}
+
+/**
+ * Return the name of the given class
+ * @param class-string $class
+ * @return string
+ */
+function class_name(string $class): string
+{
+    if (in_string($class, "\\")) {
+        $class = array_last(explode("\\", $class));
+        assert($class !== null);
+    }
+    return $class;
+}
+
+/**
+ * Returns the calling class of the current method (if any).
+ * @return class-string|null
+ */
+function get_calling_class(): ?string
+{
+    $backtrace = debug_backtrace();
+    $object = $backtrace[1]['object'] ?? null;
+    for ($i = 1; $i < count($backtrace); $i++) {
+        if (isset($backtrace[$i])) {
+            $current = $backtrace[$i]['object'] ?? null;
+            if ($object != $current) {
+                if (is_object($current)) {
+                    $current = $current::class;
+                }
+                return $current;
+            }
+        }
+    }
+    return null;
+}

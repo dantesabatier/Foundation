@@ -1,0 +1,44 @@
+<?php
+
+namespace Sabatier\Foundation;
+
+use IteratorAggregate;
+
+/**
+ * Class DirectoryEnumerator
+ * An object that enumerates the contents of a directory.
+ * You obtain a directory enumerator using FileManager's {@see FileManager::enumerator()} method. The enumeration provides the pathnames of all files and directories contained within that directory. These pathnames are relative to the directory. An enumeration is recursive, including the files of all subdirectories, and crosses device boundaries. An enumeration does not resolve symbolic links, or attempt to traverse symbolic links that point to directories.
+ * @package Sabatier\Foundation
+ */
+abstract class DirectoryEnumerator implements IteratorAggregate
+{
+    /**
+     * A dictionary with the attributes of the directory at which enumeration started.
+     * @return Dictionary|null
+     */
+    abstract public function directoryAttributes(): ?Dictionary;
+
+    /**
+     * A dictionary with the attributes of the most recently returned file or subdirectory (as referenced by the pathname).
+     * @return Dictionary|null
+     */
+    abstract public function fileAttributes(): ?Dictionary;
+
+    /**
+     * The number of levels deep the current object is in the directory hierarchy being enumerated.
+     * @return int
+     */
+    abstract public function level(): int;
+
+    /**
+     * Causes the receiver to skip recursion into the most recently obtained subdirectory.
+     */
+    abstract public function skipDescendents(): void;
+
+    /**
+     * Causes the receiver to skip recursion into the most recently obtained subdirectory.
+     */
+    abstract public function skipDescendants(): void;
+
+    abstract public function isEnumeratingDirectoryPostOrder(): bool;
+}
