@@ -12,11 +12,11 @@ Now this statement is true most of the time and it's pretty basic stuff, right? 
 
 The maxim became, if you find something repetitive and/or boring, make a program and let the program complete the task  for you, that way you will have more time to think about other more creative things. To be efficient before throwing any code to the canvas, do the abstraction, make the design, implement the layers (of abstraction) and avoid repeating yourself.
 
-Years ago I got the opportunity to work on a project for iOS (before Swift) that required building a web service, at that time I didn't have much experience doing web development but I had a lot of experience building desktop applications so I took the job, everything went fine, end of story, well not really, over the years, more and more opportunities to do web development arrived and I started to use more and more web service's frameworks and now suddenly, I wanted to automate some things.
+Years ago I got the opportunity to work on a project for iOS (long before Swift) that required building a web service, at that time I didn't have much experience doing web development but I had a lot of experience building desktop applications so I took the job, everything went fine, end of story, well not really, over the years, more and more opportunities to do web development arrived and I started to use more and more web service's frameworks and now suddenly, I wanted to automate some things.
 
-One thing you can notice about these kind of frameworks is that (even if is not on purpose and regardless the language) most APIs look a like, witch is a good thing because implementing things from one framework (or/and language) to another is less problematic.
+One thing you can notice about these kind of frameworks is that (even if is not on purpose and regardless the language) most APIs look a like (like a standard or by convention), witch is a good thing because implementing things from one framework (or/and language) to another is less problematic.
 
-But the problem is, between projects that only thing that really changes is the model of the business you're working with but the essence of the implementation is virtually the same and you end up (at some level) making the same service over and over.
+But the problem is, between projects that the only thing that really changes is the model of the business you're working with but the essence of the implementation is virtually the same and you end up (at some level) making the same service over and over.
 
 I started building something very primitive to help me deal with the repetitive part, something that I internally called *The singularity*, an sketch of *[Sabatier's Service](https://github.com/dantesabatier/Service)*, a utility that helped me to generate the necessary code to create web services in a bit.
 
