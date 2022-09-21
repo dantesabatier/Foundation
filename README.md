@@ -4,7 +4,7 @@ The Foundation framework defines a base layer of functionality that is required 
 
 We've implemented:
 
-- Collections, array, set, dictionary, slice, range, flattened sequence, etc., and sort descriptors.
+- Collections, array, set, dictionary, slice, range, flattened sequence, etc., and sort descriptor.
 - Expressions and predicates, this is somewhat similar to using the relational model to search (using mathematical logic) in collections.
 - File system, a more efficient way to read, write and iterate through folders and document no matter what OS you are on (Windows, Linux, Mac) using a file manager.
 - The url loading system, url request, url response, url session, data, download, upload tasks, etc.

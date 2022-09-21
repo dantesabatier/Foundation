@@ -11,7 +11,6 @@ namespace Sabatier\Foundation;
 use BackedEnum;
 use Closure;
 use ErrorException;
-use Exception;
 use InvalidArgumentException;
 use JetBrains\PhpStorm\Deprecated;
 use JetBrains\PhpStorm\Pure;
@@ -46,10 +45,10 @@ function escape_sequence(string $string, EscapeSequenceTextAttribute $textAttrib
 
 function has_escape_sequences(): bool
 {
-    if (target_os_win()) {
-        return getenv('ANSICON') !== false || getenv('ConEmuANSI') === 'ON';
+    if (function_exists('posix_isatty')) {
+        return posix_isatty(STDOUT);
     }
-    return function_exists('posix_isatty') && posix_isatty(STDOUT);
+    return getenv('ANSICON') !== false || getenv('ConEmuANSI') === 'ON';
 }
 
 function typeof(mixed $value): string
@@ -118,17 +117,14 @@ function human_readable_time(float $interval): string
 }
 
 /**
- * @param string|Closure(): string $message The string to print. The default is an empty string.
+ * @param string $message The string to print. The default is an empty string.
  * @param string $file The file name to print with message. The default is the file where fatal_error() is called.
  * @param int $line The line number to print along with message. The default is the file where fatal_error() is called.
  * @return never
- * @throws Exception
+ * @throws ErrorException
  */
-function fatal_error(string|Closure $message = '', string $file = '', int $line = 0): never
+function fatal_error(string $message = '', string $file = '', int $line = 0): never
 {
-    if ($message instanceof Closure) {
-        $message = $message();
-    }
     if (!$file || !$line) {
         $backtrace = debug_backtrace()[0] ?? [];
         if (isset($backtrace['file'])) {
