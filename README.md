@@ -20,20 +20,20 @@ But the problem is, between projects that only thing that really changes is the 
 
 I started building something very primitive to help me deal with the repetitive part, something that I internally called *The singularity*, an sketch of *[Sabatier's Service](https://github.com/dantesabatier/Service)*, a utility that helped me to generate the necessary code to create web services in a bit.
 
-But I wanted something more abstract and effective to manage the data part of the framework, I wanted something I little more like *[Apple's Core Data](https://developer.apple.com/documentation/coredata)* (a wonderful, very complex and beautifully designed framework), but in order to use *[Sabatier's Core Data](https://github.com/dantesabatier/CoreData)* I needed to implement my very own version of *[Apple's Foundation](https://developer.apple.com/documentation/foundation)* and, this friends is the reason of the existence of this framework.
+But I wanted something more abstract and effective to manage the data part of the framework, I wanted something I little more like *[Apple's Core Data](https://developer.apple.com/documentation/coredata)* (a wonderful, very complex and beautifully designed framework), but in order to use *[Sabatier's Core Data](https://github.com/dantesabatier/CoreData)* (yes, we already have it), I needed to implement my very own version of *[Apple's Foundation](https://developer.apple.com/documentation/foundation)* and, this friends is the reason of the existence of this framework.
 
 ## What is Foundation?
 
 The Foundation framework defines a base layer of functionality that is required for almost all applications.
-This implementation is (sort of) a mixture between the Objective C and Swift frameworks.
+This implementation is (sort of) a mixture between the Objective C and Swift implementations.
 
-### What have we implemented?
+### What is implemented?
 
 I implemented a lot but not everything (Foundation is a big boy), I implemented only what is necessary (maybe a little more) to meet our goal.
 
 Here is a list of the main areas:
 
-- Collections, array, set, dictionary, slice, range, flattened sequence, etc., and sort descriptor.
+- Collections (array, set, dictionary, slice, range, flattened sequence, etc.) and sort descriptor.
 
 ```php
 <?php
@@ -62,7 +62,7 @@ $predicate = $predicate->withSubstitutionVariables(new Dictionary([
 $result = $result->filtered($predicate);
 ```
 
-- File system, a more efficient way to read, write and iterate through folders and document no matter what OS you are on (Windows, Linux, Mac) using a file manager.
+- File system, a more efficient way to read, write and iterate through folders and document no matter what OS you are on (Windows, Linux, Mac), in the example we use  FileManager to iterate over the contents of a folder.
 
 ```php
 <?php
@@ -142,11 +142,11 @@ if (string_is_equal('publicación', 'Publicacion', CompareOptions::caseInsensiti
 
 ## Dependencies
 
-Foundation has no dependencies, however we use the static analyzers [Psalm](https://psalm.dev/) and [PHPStan](https://phpstan.org/) and in the near future I plan to make it available via composer.
+Foundation has no dependencies, however we use the static analyzers [Psalm](https://psalm.dev/) and [PHPStan](https://phpstan.org/) (which by the way are great) and in the near future I plan to make it available via composer so you'll have a vendor folder.
 
 ## Prerequisites
 
-The code is well documented (I wrote most of the documentation so I can implement classes and methods), but it's best if you have macOS and/or iOS development experience.
+The code is well documented (I wrote most of the documentation so I can implement classes and methods) but, it's best if you have some Cocoa development experience.
 
 ## Contributing
 
