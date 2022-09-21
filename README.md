@@ -14,7 +14,7 @@ The maxim became, if you find something repetitive and/or boring, make a program
 
 Years ago I got the opportunity to work on a project for iOS (long before Swift) that required building a web service, at that time I didn't have much experience doing web development but I had a lot of experience building desktop applications so I took the job, everything went fine, end of story, well not really, over the years, more and more opportunities to do web development arrived and I started to use more and more web service's frameworks and now suddenly, I wanted to automate some things.
 
-One thing you can notice about these kind of frameworks is that (even if is not on purpose and regardless the language) most APIs look a like (like a standard or by convention), witch is a good thing because implementing things from one framework (or/and language) to another is less problematic.
+One thing you can notice about these kind of frameworks is that (even if is not on purpose and regardless the language) most APIs look a like, witch is a good thing because implementing things from one framework (or/and language) to another is less problematic.
 
 But the problem is, between projects that the only thing that really changes is the model of the business you're working with but the essence of the implementation is virtually the same and you end up (at some level) making the same service over and over.
 
