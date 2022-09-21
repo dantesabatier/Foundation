@@ -2,13 +2,15 @@
 
 ## Justification
 
-A long time ago, while I was creating one of my applications for Mac OS X , I wanted to give the application the ability to "speak" AppleScript, make it scriptable. To understand a little bit more what I was about to do, I made myself of a couple of books, one *AppleScript: The Definitive Guide* has a chapter called *Calculation and Repetition*.
+A long time ago, while I was creating one of my applications for Mac OS X , I wanted to give the application the ability to "speak" AppleScript, make it scriptable.
+
+In order to understand a little bit more what I was about to do, I made myself of a couple of books, one *AppleScript: The Definitive Guide* has a chapter called *Calculation and Repetition* and it starts like this.
 
 >"Computers are good at calculation and repetition which happen to be exactly the things humans are not good at. Humans are liable to calculate inaccurately, and repetitive activity can make them careless and bored. The whole idea of having a computer is to have it take over in these situations."
 
-Now, this is pretty basic stuff, right? Well, yes, in a sense but, some how from there on this statement changed my perspective about software development forever.
+Now this statement is true most of the time and it's pretty basic stuff, right? Well, yes, in a sense, but somehow from there my perspective on software development changed.
 
-The maxim became, if you find something repetitive and/or boring, make a program and let the program complete the task  for you, that way you will have more time to think about other more creative things. But in order to be efficient before throwing any code to the canvas, do the abstraction, make the design, implement the layers (of abstraction) and avoid repeating yourself.
+The maxim became, if you find something repetitive and/or boring, make a program and let the program complete the task  for you, that way you will have more time to think about other more creative things. To be efficient before throwing any code to the canvas, do the abstraction, make the design, implement the layers (of abstraction) and avoid repeating yourself.
 
 Years ago I got the opportunity to work on a project for iOS (before Swift) that required building a web service, at that time I didn't have much experience doing web development but I had a lot of experience building desktop applications so I took the job, everything went fine, end of story, well not really, over the years, more and more opportunities to do web development arrived and I started to use more and more web service's frameworks and now suddenly, I wanted to automate some things.
 
