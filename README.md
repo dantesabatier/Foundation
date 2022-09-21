@@ -38,9 +38,9 @@ Here is a list of the main areas:
 ```php
 <?php
 
-/** @var Set<ManagedObject> $objects */
-$objects = new Set();
-$objects = $objects->sorted([new SortDescriptor('name')]);
+/** @var Set<ManagedObject> $result */
+$result = new Set();
+$result = $result->sorted([new SortDescriptor('name')]);
 ```
 
 - The (profoundly beautiful) expressions and predicates, this is somewhat similar to using the relational model to filter (using mathematical logic) collections.
@@ -50,19 +50,33 @@ $objects = $objects->sorted([new SortDescriptor('name')]);
 
 /** @var Set<ManagedObject> $result */
 $result = new Set();
-//normally you don't define predicates this complex but you can, if you need to
-if (!($predicate = Predicate::format("((\$AGE := 3 > 1) && (%K BETWEEN \$DATES) && (SOME addresses.city.name BEGINSWITH[cd] %s) && (NONE addresses.street CONTAINS[cd] %s) && (10%3 >= 1) && (deposits.amount.value.@sum < 1.1*3.6) && (3+3.1 < 0.2**10) && (2-1.1 < 1001/11.1) && ({999.6, 1001}[1] > savings.value) && (SUBQUERY(addresses, \$address, \$address.street ENDSWITH[cd] %s).@count = %i) && (1 IN {0, 1, 2, 3, 5, 8} UNION {2, 4, 6, 10}) && (%K < TERNARY(%K MATCHES[c] %s, 30, 40)) && (FUNCTION(%s, 'validate', \$ID) != false) && (%s = %s))", new ArrayClass(['creationDate', 'Ángeles', 'Melrose', 'street', 1, 'age', 'name', 'jane', new Validator(), true, Expression::expressionForBlock(fn() => true)])))) {
+//normally you don't define predicates this complex but (if you need to), you can
+if (!($predicate = Predicate::format("
+(
+    (%K BETWEEN \$DATES) && 
+    (SOME addresses.city.name BEGINSWITH[cd] %s) && 
+    (NONE addresses.street CONTAINS[cd] %s) && 
+    (10%3 >= 1) && 
+    (deposits.amount.value.@sum < 1.1*3.6) && 
+    (3+3.1 < 0.2**10) && 
+    (2-1.1 < 1001/11.1) && 
+    ({999.6, 1001}[1] > savings.value) && 
+    (SUBQUERY(addresses, \$address, \$address.street ENDSWITH[cd] %s).@count = %i) && 
+    (1 IN {0, 1, 2, 3, 5, 8} UNION {2, 4, 6, 10}) && 
+    (%K < TERNARY(%K MATCHES[c] %s, 30, 40)) && 
+    (FUNCTION(%s, 'validate', \$ID) != false) && 
+    (%s = %s)
+)", new ArrayClass(['creationDate', 'Ángeles', 'Melrose', 'street', 1, 'age', 'name', 'jane', new Validator(), true, Expression::expressionForBlock(fn() => true)])))) {
     fatal_error("Oops, something went wrong");
 }
 $predicate = $predicate->withSubstitutionVariables(new Dictionary([
-    "\$AGE" => Expression::expressionForVariable("\$AGE"),
     "\$DATES" => new ArrayClass([Date::distantPast(), Date::distantFuture()]),
     "\$ID" => $person->hash()
 ]));
 $result = $result->filtered($predicate);
 ```
 
-- File system, a more efficient way to read, write and iterate through folders and document no matter what OS you are on (Windows, Linux, Mac), in the example we use  FileManager to iterate over the contents of a folder.
+- File system, a more efficient way to read, write and iterate through folders and document no matter what OS you are on (Windows, Linux, Mac), in the example we use FileManager to iterate over the contents of a folder.
 
 ```php
 <?php
@@ -84,7 +98,7 @@ $request = new URLRequest($url);
 $request->httpMethod = HTTPRequestMethod::post;
 $request->setValueForHttpHeaderField('application/json', 'Content-Type');
 $request->setValueForHttpHeaderField('key=SECRET', 'Authorization');
-$request->httpBody = json_encode(['notification' => ['title' => 'Lorem Ipsum', 'body' => "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed facilisis nec turpis interdum egestas."], 'to' => 'KEY']);
+$request->httpBody = json_encode(['notification' => ['title' => 'Lorem Ipsum', 'body' => "Lorem ipsum dolor sit amet."], 'to' => 'KEY']);
 $task = URLSession::shared()->dataTaskWithRequest($request, function (?string $data, ?URLResponse $response, ?Error $error) use ($time) {
     if ($error) {
         fatal_error("Failed to post notification: $error");
