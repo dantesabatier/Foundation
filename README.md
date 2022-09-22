@@ -43,7 +43,7 @@ $result = new Set();
 $result = $result->sorted([new SortDescriptor('name')]);
 ```
 
-- The (profoundly beautiful) expressions and predicates, this is somewhat similar to using the relational model to filter collections using an enriched by code, pseudo language based on mathematical logic, predicate logic or first-order logic.
+- The (profoundly beautiful) expressions and predicates, this is somewhat similar to using the relational model to filter collections using a code-enriched pseudo language based on mathematical logic, predicate logic or first-order logic.
 
 ```php
 <?php
