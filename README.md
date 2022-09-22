@@ -156,7 +156,7 @@ if (string_is_equal('publicación', 'Publicacion', CompareOptions::caseInsensiti
 
 ## Dependencies
 
-Foundation has no dependencies, however we use the static analyzers [Psalm](https://psalm.dev/) and [PHPStan](https://phpstan.org/) (which by the way are great) and in the near future I plan to make it available via composer so you'll have a vendor folder.
+Foundation has no dependencies, however, uses the static analyzers [Psalm](https://psalm.dev/) and [PHPStan](https://phpstan.org/) (which by the way are great) and in the near future I plan to make it available via composer so you'll have a vendor folder.
 
 ## Prerequisites
 
