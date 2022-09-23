@@ -10,9 +10,7 @@
   "authors": [
     {
       "name": ":dantesabatier",
-      "email": "dantesabatier@me.com",
-      "homepage": "https://github.com/dantesabatier",
-      "role": "Developer"
+      "homepage": "https://github.com/dantesabatier"
     }
   ],
   "require": {
