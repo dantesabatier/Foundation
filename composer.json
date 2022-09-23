@@ -3,14 +3,19 @@
   "description": "The Foundation framework defines a base layer of functionality that is required for almost all applications. ",
   "keywords": [
     "sabatier",
-    "foundation"
+    "foundation",
+    "predicate",
+    "expression",
+    "logic",
+    "kvc",
+    "kvo"
   ],
   "homepage": "https://github.com/dantesabatier/foundation",
   "license": "MIT",
   "authors": [
     {
       "name": "dantesabatier",
-      "homepage": "https://github.com/dantesabatier"
+      "email": "dantesabatier@me.com"
     }
   ],
   "require": {
