@@ -51,22 +51,7 @@ $result = $result->sorted([new SortDescriptor('name')]);
 /** @var Set<ManagedObject> $result */
 $result = new Set();
 //normally you don't define predicates this complex but (if you need to), you can
-if (!($predicate = Predicate::format("
-(
-    (%K BETWEEN \$DATES) && 
-    (SOME addresses.city.name BEGINSWITH[cd] %s) && 
-    (NONE addresses.street CONTAINS[cd] %s) && 
-    (10%3 >= 1) && 
-    (deposits.amount.value.@sum < 1.1*3.6) && 
-    (3+3.1 < 0.2**10) && 
-    (2-1.1 < 1001/11.1) && 
-    ({999.6, 1001}[1] > savings.value) && 
-    (SUBQUERY(addresses, \$address, \$address.street ENDSWITH[cd] %s).@count = %i) && 
-    (1 IN {0, 1, 2, 3, 5, 8} UNION {2, 4, 6, 10}) && 
-    (%K < TERNARY(%K MATCHES[c] %s, 30, 40)) && 
-    (FUNCTION(%s, 'validate', \$ID) != false) && 
-    (%s = %s)
-)", new ArrayClass(['creationDate', 'Ángeles', 'Melrose', 'street', 1, 'age', 'name', 'jane', new Validator(), true, Expression::expressionForBlock(fn() => true)])))) {
+if (!($predicate = Predicate::format("((%K BETWEEN \$DATES) && (SOME addresses.city.name BEGINSWITH[cd] %s) && (NONE addresses.street CONTAINS[cd] %s) && (10%3 >= 1) && (deposits.amount.value.@sum < 1.1*3.6) && (3+3.1 < 0.2**10) && (2-1.1 < 1001/11.1) && ({999.6, 1001}[1] > savings.value) && (SUBQUERY(addresses, \$address, \$address.street ENDSWITH[cd] %s).@count = %i) && (1 IN {0, 1, 2, 3, 5, 8} UNION {2, 4, 6, 10}) && (%K < TERNARY(%K MATCHES[c] %s, 30, 40)) && (FUNCTION(%s, 'validate', \$ID) != false) && (%s = %s))", new ArrayClass(['creationDate', 'Ángeles', 'Melrose', 'street', 1, 'age', 'name', 'jane', new Validator(), true, Expression::expressionForBlock(fn() => true)])))) {
     fatal_error("Oops, something went wrong");
 }
 $predicate = $predicate->withSubstitutionVariables(new Dictionary([
@@ -153,23 +138,6 @@ if (string_is_equal('publicación', 'Publicacion', CompareOptions::caseInsensiti
     //implementation continues
 }
 ```
-
-## Dependencies
-
-Foundation has no dependencies, however, uses the static analyzers [Psalm](https://psalm.dev/) and [PHPStan](https://phpstan.org/) (which by the way are great) and in the near future I plan to make it available via composer so you'll have a vendor folder.
-
-## Prerequisites
-
-The code is well documented (I wrote most of the documentation so I can implement classes and methods) but, it's best if you have some Cocoa development experience.
-
-## Contributing
-
-Please see [CONTRIBUTING](https://github.com/dantesabatier/foundation/blob/master/CONTRIBUTING.md) for details.
-
-## Credits
-
-- [Dante Sabatier](https://github.com/dantesabatier)
-- [All Contributors](https://github.com/dantesabatier/foundation/contributors)
 
 ## License
 

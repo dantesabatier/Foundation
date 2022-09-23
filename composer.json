@@ -69,7 +69,5 @@
   },
   "scripts": {
     "psalm": "vendor/bin/psalm --config=psalm.xml"
-  },
-  "optimize-autoloader": true,
-  "classmap-authoritative": true
+  }
 }
