@@ -43,13 +43,11 @@ class URLResourceValues extends ObjectClass
 
     public function __get(string $name)
     {
-        if ($name === 'allValues') {
-            return $this->values;
-        } elseif ($name === 'isDirectory' || $name === 'fileResourceType' || $name === 'fileSize' || $name === 'isExecutable' || $name === 'isRegularFile' || $name === 'attributeModificationDate' || $name === 'creationDate' || $name === 'isAliasFile' || $name === 'isHidden' || $name === 'isReadable' || $name === 'isSymbolicLink' || $name === 'isWritable' || $name === 'name' || $name === 'parentDirectory' || $name === 'path') {
-            return $this->values[$name];
-        } else {
-            return $this->valueForUndefinedKey($name);
-        }
+        return match ($name) {
+            'allValues' => $this->values,
+            'isDirectory', 'fileResourceType', 'fileSize', 'isExecutable', 'isRegularFile', 'attributeModificationDate', 'creationDate', 'isAliasFile', 'isHidden', 'isReadable', 'isSymbolicLink', 'isWritable', 'name', 'parentDirectory', 'path' => $this->values[$name],
+            default => $this->valueForUndefinedKey($name)
+        };
     }
 
     public function __set(string $name, mixed $value): void

@@ -42,14 +42,14 @@ interface Collection extends Sequence, Countable, ArrayAccess
 
     /**
      * Returns the position immediately after the given index.
-     * @param int $i A valid index of the collection. i must be less than endIndex.
-     * @return int The index value immediately after i.
+     * @param int $i A valid index of the collection. $i must be less than endIndex.
+     * @return int The index value immediately after $i.
      */
     public function indexAfter(int $i): int;
 
     /**
      * Replaces the given index with its successor.
-     * @param int $i A valid index of the collection. i must be less than endIndex.
+     * @param int $i A valid index of the collection. $i must be less than endIndex.
      */
     public function formIndexAfter(int &$i): void;
 

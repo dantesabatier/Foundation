@@ -13,7 +13,7 @@ use JetBrains\PhpStorm\Immutable;
 class URLCredential
 {
     /**
-     * Creates a URL credential instance initialized with a given user name and password, using a given persistence setting.
+     * Creates a URL credential instance initialized with a given username and password, using a given persistence setting.
      * @param string $user The user for the credential.
      * @param string|null $password The password for user.
      * @param URLCredentialPersistence $persistence A {@see URLCredentialPersistence} value indicating whether the credential should be stored permanently, for the duration of the current session, or not at all.

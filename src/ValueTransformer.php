@@ -100,7 +100,7 @@ abstract class ValueTransformer extends ObjectClass
     /**
      * Returns the result of the reverse transformation of a given value.
      * The default implementation raises an exception if {@see allowsReverseTransformation()} returns false; otherwise it will invoke {@see transformedValue()} with value.
-     * A subclass should override this method if they require a reverse transformation that is not the same as simply reapplying the original transform (as would be the case with negation, for example). For example, if a value transformer converts a value in Fahrenheit to Celsius, this method would converts a value from Celsius to Fahrenheit.
+     * A subclass should override this method if they require a reverse transformation that is not the same as simply reapplying the original transform (as would be the case with negation, for example). For example, if a value transformer converts a value in Fahrenheit to Celsius, this method would convert a value from Celsius to Fahrenheit.
      * @param mixed $value The value to reverse transform.
      * @return mixed The reverse transformation of value.
      */

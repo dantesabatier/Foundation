@@ -106,9 +106,9 @@ class Expression extends ObjectClass
 
     /**
      * Returns a new Expression object that represent the union of a given set and collection.
-     * @param Expression $left An expression that evaluates to an Set object.
+     * @param Expression $left An expression that evaluates to a Set object.
      * @param Expression $right An expression that evaluates to a collection object.
-     * @return Expression An new Expression object that represents the union of left and right.
+     * @return Expression A new Expression object that represents the union of left and right.
      */
     #[Pure]
     public static function expressionForUnionSet(Expression $left, Expression $right): Expression
@@ -118,7 +118,7 @@ class Expression extends ObjectClass
 
     /**
      * Returns a new Expression object that represent the intersection of a given set and collection.
-     * @param Expression $left An expression that evaluates to an Set object.
+     * @param Expression $left An expression that evaluates to a Set object.
      * @param Expression $right An expression that evaluates to a collection object.
      * @return Expression A new Expression object that represents the intersection of left and right.
      */
@@ -130,7 +130,7 @@ class Expression extends ObjectClass
 
     /**
      * Returns a new Expression object that represent the subtraction of a given collection from a given set.
-     * @param Expression $left An expression that evaluates to an Set object.
+     * @param Expression $left An expression that evaluates to a Set object.
      * @param Expression $right An expression that evaluates to a collection object.
      * @return Expression A new Expression object that represents the subtraction of right from left.
      */

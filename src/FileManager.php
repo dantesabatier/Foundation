@@ -144,7 +144,7 @@ final class FileManager extends ObjectClass
      * The supported values are described in {@see SearchPathDirectory}.
      * @param int $domain The file system domain to search.
      * The value for this parameter is one of the constants described in {@see SearchPathDomainMask}.
-     * You should specify only one domain for your search and you may not specify the {@see SearchPathDomainMask::all} constant for this parameter.
+     * You should specify only one domain for your search, and you may not specify the {@see SearchPathDomainMask::all} constant for this parameter.
      * @param URL|null $url The file URL used to determine the location of the returned URL.
      * Only the volume of this parameter is used.
      * This parameter is ignored unless the directory parameter contains the value {@see SearchPathDirectory::itemReplacement} and the domain parameter contains the value {@see SearchPathDomainMask::user}.

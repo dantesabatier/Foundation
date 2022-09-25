@@ -20,7 +20,7 @@ class URLRequest
     /** @var string The HTTP request method. */
     #[ExpectedValues(valuesFromClass: HTTPRequestMethod::class)]
     public string $httpMethod = HTTPRequestMethod::get;
-    /** @var Dictionary<string>|null A dictionary containing all of the HTTP header fields for a request. */
+    /** @var Dictionary<string>|null A dictionary containing all the HTTP header fields for a request. */
     public ?Dictionary $allHTTPHeaderFields = null;
     /** @var string|null The data sent as the message body of a request, such as for an HTTP POST request. */
     public ?string $httpBody = null;
@@ -47,7 +47,7 @@ class URLRequest
      * Adds a value to the header field.
      * This method provides the ability to add values to header fields incrementally. If a value was previously set for the specified field, the supplied value is appended to the existing value using the appropriate field delimiter (a comma).
      * @param string $value The value for the header field.
-     * @param string $field The name of the header field. In keeping with the HTTP RFC, HTTP header field names are case insensitive.
+     * @param string $field The name of the header field. In keeping with the HTTP RFC, HTTP header field names are case-insensitive.
      */
     public function addValueForHttpHeaderField(string $value, string $field): void
     {

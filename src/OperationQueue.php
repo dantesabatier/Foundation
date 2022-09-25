@@ -137,7 +137,7 @@ final class OperationQueue extends ObjectClass
      * This method throws an InvalidArgumentException exception if any of those error conditions are true for any of the operations in the $operations parameter.
      * Once added, the specified operation remains in the queue until its isFinished method returns true.
      * @param ArrayClass<Operation> $operations The operations to be added to the queue.
-     * @param bool $waitUntilFinished If true, the current thread is blocked until all of the specified operations finish executing. If false, the operations are added to the queue and control returns immediately to the caller.
+     * @param bool $waitUntilFinished If true, the current thread is blocked until all the specified operations finish executing. If false, the operations are added to the queue and control returns immediately to the caller.
      */
     public function addOperations(ArrayClass $operations, bool $waitUntilFinished = false): void
     {

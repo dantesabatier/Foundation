@@ -244,13 +244,13 @@ final class Bundle extends ObjectClass
     }
 
     /**
-     * Returns an array of all of the application's bundles that represent frameworks.
-     * @return ArrayClass<Bundle> An array of all of the application's bundles that represent frameworks.
+     * Returns an array of all the application's bundles that represent frameworks.
+     * @return ArrayClass<Bundle> An array of all the application's bundles that represent frameworks.
      * Only frameworks with one or more classes in them are included.
      */
     public static function allFrameworks(): ArrayClass
     {
-        return self::loadedBundles()->filter(fn(Bundle $bundle): bool => $bundle->object(kCFBundlePackageTypeKey) == 'FMWK')->values;
+        return self::loadedBundles()->filter(fn(Bundle $bundle): bool => $bundle->object(kCFBundlePackageTypeKey) === 'FMWK')->values;
     }
 
     /**
@@ -318,7 +318,7 @@ final class Bundle extends ObjectClass
     /**
      * Returns an array containing the file URLs for all bundle resources having the specified filename extension, residing in the specified resource subdirectory, and limited to global resources and those associated with the specified localization.
      * @param string|null $extension The filename extension of the files to locate.
-     * If you specify an empty string or nil, the extension is assumed not to exist and all of the files in subpath are returned.
+     * If you specify an empty string or nil, the extension is assumed not to exist and all the files in subpath are returned.
      * @param string|null $subpath The name of the bundle subdirectory to search.
      * @param string|null $localization The language ID for the localization.
      * This parameter should correspond to the name of one of the bundle's language-specific resource directories.

@@ -14,8 +14,7 @@ use JetBrains\PhpStorm\Pure;
 /**
  * Class CompoundPredicate
  * A specialized predicate that evaluates logical combinations of other predicates.
- * Use CompoundPredicate to create an AND or OR compound predicate of zero or more other predicates,
- * or the NOT of a single predicate. For the logical AND and OR operations:
+ * Use CompoundPredicate to create an AND or OR compound predicate of zero or more other predicates, or the NOT of a single predicate. For the logical AND and OR operations:
  * An AND predicate with no subpredicates evaluates to true.
  * An OR predicate with no subpredicates evaluates to false.
  * A compound predicate with one or more subpredicates evaluates to the truth of its subpredicates.
