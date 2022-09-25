@@ -84,7 +84,7 @@ $request->httpMethod = HTTPRequestMethod::post;
 $request->setValueForHttpHeaderField('application/json', 'Content-Type');
 $request->setValueForHttpHeaderField('key=SECRET', 'Authorization');
 $request->httpBody = json_encode(['notification' => ['title' => 'Lorem Ipsum', 'body' => "Lorem ipsum dolor sit amet."], 'to' => 'KEY']);
-$task = URLSession::shared()->dataTaskWithRequest($request, function (?string $data, ?URLResponse $response, ?Error $error) use ($time) {
+$task = URLSession::shared()->dataTaskWithRequest($request, function (?string $data, ?URLResponse $response, ?Error $error): void {
     if ($error) {
         fatal_error("Failed to post notification: $error");
     }

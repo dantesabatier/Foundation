@@ -21,7 +21,7 @@ trait SequenceAlgorithms
 
     public function containsElement(mixed $element): bool
     {
-        return $this->contains(fn(mixed $e): bool => $e instanceof Equatable ? $e->isEqual($element) : $e === $element);
+        return $this->contains(fn(mixed $e): bool => equivalent($e, $element));
     }
 
     public function first(Closure $where = null): mixed
