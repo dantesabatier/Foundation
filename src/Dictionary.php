@@ -81,6 +81,11 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
         };
     }
 
+    public function __isset($name): bool
+    {
+        return isset($this->reserved[$name]);
+    }
+
     public static function dictionaryWithArray(array $array): Dictionary
     {
         return ArrayConverter::dictionaryWithArray($array);

@@ -23,6 +23,7 @@ class PredicateScanner extends Scanner
     public function __construct(string $format, private readonly ArrayClass $arguments)
     {
         parent::__construct($format);
+        $this->charactersToBeSkipped = " \n";
     }
 
     private function scanKeyword(string $keyword): bool
@@ -84,7 +85,7 @@ class PredicateScanner extends Scanner
                 $left->subpredicates->append($right);
             } else {
                 /** @psalm-suppress InvalidArgument */
-                $left = CompoundPredicate::andPredicateWithSubpredicates(new ArrayClass([$left, $right])); // @phpstan-ignore-line
+                $left = CompoundPredicate::andPredicateWithSubpredicates(new ArrayClass([$left, $right]));
             }
         }
         return $left;
@@ -136,7 +137,7 @@ class PredicateScanner extends Scanner
                 $left->subpredicates->append($right);
             } else {
                 /** @psalm-suppress InvalidArgument */
-                $left = CompoundPredicate::orPredicateWithSubpredicates(new ArrayClass([$left, $right])); // @phpstan-ignore-line
+                $left = CompoundPredicate::orPredicateWithSubpredicates(new ArrayClass([$left, $right]));
             }
         }
         return $left;
@@ -240,7 +241,7 @@ class PredicateScanner extends Scanner
         }
         if ($this->scanString('-')) {
             /** @psalm-suppress InvalidArgument */
-            return Expression::expressionForFunction('chs:', new ArrayClass([$this->parseExpression()])); // @phpstan-ignore-line
+            return Expression::expressionForFunction('chs:', new ArrayClass([$this->parseExpression()]));
         }
         if ($this->scanString('(')) {
             $expression = $this->parseExpression();
@@ -462,16 +463,16 @@ class PredicateScanner extends Scanner
             } elseif ($this->scanString('[')) {
                 if ($this->scanKeyword('FIRST')) {
                     /** @psalm-suppress InvalidArgument */
-                    $left = Expression::expressionForFunction('first:', new ArrayClass([$left])); // @phpstan-ignore-line
+                    $left = Expression::expressionForFunction('first:', new ArrayClass([$left]));
                 } elseif ($this->scanKeyword('LAST')) {
                     /** @psalm-suppress InvalidArgument */
-                    $left = Expression::expressionForFunction('last:', new ArrayClass([$left])); // @phpstan-ignore-line
+                    $left = Expression::expressionForFunction('last:', new ArrayClass([$left]));
                 } elseif ($this->scanKeyword('SIZE')) {
                     /** @psalm-suppress InvalidArgument */
-                    $left = Expression::expressionForFunction('size:', new ArrayClass([$left])); // @phpstan-ignore-line
+                    $left = Expression::expressionForFunction('size:', new ArrayClass([$left]));
                 } else {
                     /** @psalm-suppress InvalidArgument */
-                    $left = Expression::expressionForFunction('index:', new ArrayClass([$left, $this->parseExpression()])); // @phpstan-ignore-line
+                    $left = Expression::expressionForFunction('index:', new ArrayClass([$left, $this->parseExpression()]));
                 }
                 if (!$this->scanString(']', $string)) {
                     throw new InvalidArgumentException("invalid argument: missing closing \"]\" at index $this->scanLocation");
@@ -528,7 +529,7 @@ class PredicateScanner extends Scanner
             if ($this->scanString('%')) {
                 $right = $this->parseFunctionalExpression();
                 /** @psalm-suppress InvalidArgument */
-                $left = Expression::expressionForFunction('modulus:by:', new ArrayClass([$left, $right])); // @phpstan-ignore-line
+                $left = Expression::expressionForFunction('modulus:by:', new ArrayClass([$left, $right]));
             } else {
                 return $left;
             }
@@ -545,7 +546,7 @@ class PredicateScanner extends Scanner
             if ($this->scanString('**')) {
                 $right = $this->parseModulusExpression();
                 /** @psalm-suppress InvalidArgument */
-                $left = Expression::expressionForFunction('raise:toPower:', new ArrayClass([$left, $right])); // @phpstan-ignore-line
+                $left = Expression::expressionForFunction('raise:toPower:', new ArrayClass([$left, $right]));
             } else {
                 return $left;
             }
@@ -562,11 +563,11 @@ class PredicateScanner extends Scanner
             if ($this->scanString('*')) {
                 $right = $this->parsePowerExpression();
                 /** @psalm-suppress InvalidArgument */
-                $left = Expression::expressionForFunction('multiply:by:', new ArrayClass([$left, $right])); // @phpstan-ignore-line
+                $left = Expression::expressionForFunction('multiply:by:', new ArrayClass([$left, $right]));
             } elseif ($this->scanString('/')) {
                 $right = $this->parsePowerExpression();
                 /** @psalm-suppress InvalidArgument */
-                $left = Expression::expressionForFunction('divide:by:', new ArrayClass([$left, $right])); // @phpstan-ignore-line
+                $left = Expression::expressionForFunction('divide:by:', new ArrayClass([$left, $right]));
             } else {
                 return $left;
             }
@@ -583,11 +584,11 @@ class PredicateScanner extends Scanner
             if ($this->scanString('+')) {
                 $right = $this->parseMultiplicationExpression();
                 /** @psalm-suppress InvalidArgument */
-                $left = Expression::expressionForFunction('add:to:', new ArrayClass([$left, $right])); // @phpstan-ignore-line
+                $left = Expression::expressionForFunction('add:to:', new ArrayClass([$left, $right]));
             } elseif ($this->scanString('-')) {
                 $right = $this->parseMultiplicationExpression();
                 /** @psalm-suppress InvalidArgument */
-                $left = Expression::expressionForFunction('from:subtract:', new ArrayClass([$left, $right])); // @phpstan-ignore-line
+                $left = Expression::expressionForFunction('from:subtract:', new ArrayClass([$left, $right]));
             } else {
                 return $left;
             }

@@ -52,7 +52,7 @@ class URLResourceValues extends ObjectClass
 
     public function __set(string $name, mixed $value): void
     {
-        if ($name === 'isDirectory' || $name === 'fileResourceType' || $name === 'fileSize' || $name === 'isExecutable' || $name === 'isRegularFile' || $name === 'attributeModificationDate' || $name === 'creationDate' || $name === 'isAliasFile' || $name === 'isHidden' || $name === 'isReadable' || $name === 'isSymbolicLink' || $name === 'isWritable' || $name === 'name' || $name === 'parentDirectory' || $name === 'path') {
+        if ($name == 'isDirectory' || $name == 'fileResourceType' || $name == 'fileSize' || $name == 'isExecutable' || $name == 'isRegularFile' || $name == 'attributeModificationDate' || $name == 'creationDate' || $name == 'isAliasFile' || $name == 'isHidden' || $name == 'isReadable' || $name == 'isSymbolicLink' || $name == 'isWritable' || $name == 'name' || $name == 'parentDirectory' || $name == 'path') {
             $this->values->setValueForKey($value, $name);
             if ($value !== null) {
                 $this->keys->append($name);
@@ -62,5 +62,10 @@ class URLResourceValues extends ObjectClass
         } else {
             $this->setValueForUndefinedKey($value, $name);
         }
+    }
+
+    public function __isset($name): bool
+    {
+        return isset($this->values[$name]);
     }
 }

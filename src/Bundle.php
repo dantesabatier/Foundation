@@ -219,6 +219,8 @@ final class Bundle extends ObjectClass
                 if (string_is_equal($directoryUrl->lastPathComponent, 'Contents', CompareOptions::caseInsensitive) ||
                     string_is_equal($directoryUrl->lastPathComponent, 'src', CompareOptions::caseInsensitive)) {
                     $bundle = self::bundleWithURL($directoryUrl->deleteLastPathComponent());
+                } elseif (string_is_equal($directoryUrl->lastPathComponent, 'OS', CompareOptions::caseInsensitive)) {
+                    $bundle = self::bundleWithURL($directoryUrl->deletingLastPathComponent()->deleteLastPathComponent());
                 } else {
                     $bundle = self::bundleWithURL($directoryUrl);
                 }
@@ -444,7 +446,7 @@ final class Bundle extends ObjectClass
     {
         $name = array_last(explode("\\", $className)) ?? $className;
         $fileManager = FileManager::default();
-        $urls = $fileManager->contentsOfDirectory($this->contentsURL, null, DirectoryEnumerationOptions::skipsHiddenFiles);
+        $urls = $fileManager->contentsOfDirectory($this->contentsURL->appendingPathComponent('OS'), null, DirectoryEnumerationOptions::skipsHiddenFiles);
         foreach ($urls as $url) {
             $path = $url->path;
             if (string_is_equal($url->pathExtension, 'php', CompareOptions::caseInsensitive) && string_is_equal(pathinfo($path, PATHINFO_FILENAME), $name, CompareOptions::caseInsensitive)) {

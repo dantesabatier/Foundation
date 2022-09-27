@@ -4,6 +4,7 @@ namespace Sabatier\Foundation;
 
 use Collator;
 use Exception;
+use JetBrains\PhpStorm\Deprecated;
 use JetBrains\PhpStorm\ExpectedValues;
 use JetBrains\PhpStorm\Pure;
 use RuntimeException;
@@ -273,18 +274,6 @@ function string_from_binary(string $string): string
     return implode('', array_map(fn(string $c): string => pack('H*', dechex((int)bindec($c))), explode(' ', $string)));
 }
 
-function url_encode(string $url, string $endpoint, array $parameters = []): string
-{
-    if (!string_has_suffix($url, '/')) {
-        $url .= '/';
-    }
-    $url .= $endpoint;
-    if (!empty($parameters)) {
-        $url .= "?" . http_build_query($parameters);
-    }
-    return $url;
-}
-
 /**
  * Returns a localized version of the string designated by the specified key and residing in the specified table.
  * @param string $string The key for a string in the specified table.
@@ -313,64 +302,16 @@ function localized_string(string $string, string $domain = 'Localizable', string
     return gettext($string);
 }
 
-function is_serialized(mixed $value, bool $strict = true): bool
+function url_encode(string $url, string $endpoint, array $parameters = []): string
 {
-    // If it isn't a string, it isn't serialized.
-    if (!is_string($value)) {
-        return false;
+    if (!string_has_suffix($url, '/')) {
+        $url .= '/';
     }
-    $value = trim($value);
-    if ('N;' === $value) {
-        return true;
+    $url .= $endpoint;
+    if (!empty($parameters)) {
+        $url .= "?" . http_build_query($parameters);
     }
-    if (strlen($value) < 4) {
-        return false;
-    }
-    if (':' !== $value[1]) {
-        return false;
-    }
-    if ($strict) {
-        $last = substr($value, -1);
-        if (';' !== $last && '}' !== $last) {
-            return false;
-        }
-    } else {
-        $semicolon = strpos($value, ';');
-        $brace = strpos($value, '}');
-        // Either ; or } must exist.
-        if (false === $semicolon && false === $brace) {
-            return false;
-        }
-        // But neither must be in the first X characters.
-        if (false !== $semicolon && $semicolon < 3) {
-            return false;
-        }
-        if (false !== $brace && $brace < 4) {
-            return false;
-        }
-    }
-    $token = $value[0];
-    switch ($token) {
-        case 's':
-            if ($strict) {
-                if ('"' !== substr($value, -2, 1)) {
-                    return false;
-                }
-            } elseif (!str_contains($value, '"')) {
-                return false;
-            }
-            break;
-        // Or else fall through.
-        case 'a':
-        case 'O':
-            return (bool)preg_match("/^$token:\d+:/s", $value);
-        case 'b':
-        case 'i':
-        case 'd':
-            $end = $strict ? '$' : '';
-            return (bool)preg_match("/^$token:[\d.E+-]+;$end/", $value);
-    }
-    return false;
+    return $url;
 }
 
 function document_root_directory(): string
@@ -437,6 +378,66 @@ function is_hidden(string $filename): bool
         }
     endif;
     return string_has_prefix($filename, '.');
+}
+
+function is_serialized(mixed $value, bool $strict = true): bool
+{
+    // If it isn't a string, it isn't serialized.
+    if (!is_string($value)) {
+        return false;
+    }
+    $value = trim($value);
+    if ('N;' === $value) {
+        return true;
+    }
+    if (strlen($value) < 4) {
+        return false;
+    }
+    if (':' !== $value[1]) {
+        return false;
+    }
+    if ($strict) {
+        $last = substr($value, -1);
+        if (';' !== $last && '}' !== $last) {
+            return false;
+        }
+    } else {
+        $semicolon = strpos($value, ';');
+        $brace = strpos($value, '}');
+        // Either ; or } must exist.
+        if (false === $semicolon && false === $brace) {
+            return false;
+        }
+        // But neither must be in the first X characters.
+        if (false !== $semicolon && $semicolon < 3) {
+            return false;
+        }
+        if (false !== $brace && $brace < 4) {
+            return false;
+        }
+    }
+    $token = $value[0];
+    switch ($token) {
+        case 's':
+            if ($strict) {
+                if ('"' !== substr($value, -2, 1)) {
+                    return false;
+                }
+            } elseif (!str_contains($value, '"')) {
+                return false;
+            }
+            break;
+        // Or else fall through.
+        case 'a':
+        case 'O':
+            return (bool)preg_match("/^$token:\d+:/s", $value);
+        case 'b':
+        case 'i':
+        case 'd':
+            $end = $strict ? '$' : '';
+            return (bool)preg_match("/^$token:[\d.E+-]+;$end/", $value);
+    }
+    return false;
 }
 
 /**

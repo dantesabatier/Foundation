@@ -81,6 +81,11 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
         $this->reserved = $data;
     }
 
+    public function __isset($name): bool
+    {
+        return isset($this->reserved[$name]);
+    }
+
     public static function arrayWithArray(array $array): ArrayClass
     {
         return ArrayConverter::arrayWithArray($array);
