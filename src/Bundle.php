@@ -48,7 +48,7 @@ final class Bundle extends ObjectClass
     public readonly ?string $developmentLocalization;
     /** @var Dictionary<mixed>|null A dictionary with the keys from the bundle's localized property list. This property uses the preferred localization for the current user when determining which resources to include. If the preferred localization is not available, this property chooses the most appropriate localization found in the bundle. */
     public readonly ?Dictionary $localizedInfoDictionary;
-    /** @var string|null class-string|null $principalClass The bundle's principal class. */
+    /** @var class-string|null $principalClass The bundle's principal class. */
     public readonly ?string $principalClass;
     /** @var URL The full URL of the receiver's bundle directory. */
     public readonly URL $bundleURL;
@@ -216,10 +216,10 @@ final class Bundle extends ObjectClass
         try {
             if (($path = (new ReflectionClass($class))->getFileName())) {
                 $directoryUrl = URL::fileURL($path)->deleteLastPathComponent();
-                if (string_is_equal($directoryUrl->lastPathComponent, 'Contents', CompareOptions::caseInsensitive) ||
-                    string_is_equal($directoryUrl->lastPathComponent, 'src', CompareOptions::caseInsensitive)) {
+                $fileName = $directoryUrl->lastPathComponent;
+                if (string_is_equal($fileName, 'src', CompareOptions::caseInsensitive)) {
                     $bundle = self::bundleWithURL($directoryUrl->deleteLastPathComponent());
-                } elseif (string_is_equal($directoryUrl->lastPathComponent, 'OS', CompareOptions::caseInsensitive)) {
+                } elseif (string_is_equal($fileName, 'OS', CompareOptions::caseInsensitive)) {
                     $bundle = self::bundleWithURL($directoryUrl->deletingLastPathComponent()->deleteLastPathComponent());
                 } else {
                     $bundle = self::bundleWithURL($directoryUrl);

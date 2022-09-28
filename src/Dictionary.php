@@ -81,7 +81,7 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
         };
     }
 
-    public function __isset($name): bool
+    public function __isset(string $name): bool
     {
         return isset($this->reserved[$name]);
     }

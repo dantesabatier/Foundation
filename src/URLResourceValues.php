@@ -64,7 +64,7 @@ class URLResourceValues extends ObjectClass
         }
     }
 
-    public function __isset($name): bool
+    public function __isset(string $name): bool
     {
         return isset($this->values[$name]);
     }

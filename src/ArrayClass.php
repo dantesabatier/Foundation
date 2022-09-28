@@ -81,7 +81,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
         $this->reserved = $data;
     }
 
-    public function __isset($name): bool
+    public function __isset(string $name): bool
     {
         return isset($this->reserved[$name]);
     }
