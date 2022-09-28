@@ -68,4 +68,9 @@ class URLResourceValues extends ObjectClass
     {
         return isset($this->values[$name]);
     }
+
+    public function __unset(string $name): void
+    {
+        unset($this->values[$name]);
+    }
 }

@@ -6,6 +6,8 @@ namespace Sabatier\Foundation;
  * Class URLComponents
  * This structure parses and constructs URLs.
  * @package Sabatier\Foundation
+ * @property-read URL|null $url A URL created from the components.
+ * @property-read string|null $string A URL derived from the components object, in string form.
  * @property ArrayClass<URLQueryItem>|null $queryItems An array of query items for the URL in the order in which they appear in the original query string. Each URLQueryItem represents a single key-value pair, Note that a name may appear more than once in a single query string, so the name values are not guaranteed to be unique. If the URLComponents has an empty query component, returns an empty array. If the URLComponents has no query component, returns nil. The setter combines an array containing any number of URLQueryItems, each of which represents a single key-value pair, into a query string and sets the URLComponents query property. Passing an empty array sets the query component of the URLComponents to an empty string. Passing nil removes the query component of the URLComponents.
  */
 class URLComponents extends ObjectClass
@@ -26,15 +28,9 @@ class URLComponents extends ObjectClass
     public ?string $scheme = null;
     /** @var string|null The user subcomponent of the URL. */
     public ?string $user = null;
-    /** @var URL|null A URL created from the components. */
-    public readonly ?URL $url;
-    /** @var string|null A URL derived from the components object, in string form. */
-    public readonly ?string $string;
 
     public function __construct(?string $string = null)
     {
-        unset($this->url);
-        unset($this->string);
         if ($string) {
             $components = parse_url($string);
             foreach ($components as $key => $value) {
@@ -47,10 +43,9 @@ class URLComponents extends ObjectClass
 
     public function __get(string $name)
     {
-        if ($name === 'url') {
-            $this->$name = $this->urlRelativeTo(null);
-            return $this->$name;
-        } elseif ($name === 'string') {
+        if ($name == 'url') {
+            return $this->urlRelativeTo(null);
+        } elseif ($name == 'string') {
             $scheme = $this->scheme;
             if (!empty($scheme)) {
                 $scheme .= '://';
@@ -87,9 +82,8 @@ class URLComponents extends ObjectClass
                 $fragment = '#' . $fragment;
             }
             $string = (new ArrayClass([$scheme, $user, $password, $host, $port, $path, $query, $fragment]))->compactMap(fn(mixed $element): mixed => $element)->join('');
-            $this->$name = empty($string) ? null : $string;
-            return $this->$name;
-        } elseif ($name === 'queryItems') {
+            return empty($string) ? null : $string;
+        } elseif ($name == 'queryItems') {
             return ($this->query === null) ? null : (new ArrayClass(explode('&', $this->query)))->map(function (string $pair): URLQueryItem {
                 $components = explode('=', $pair);
                 $name = $components[0];
@@ -103,11 +97,9 @@ class URLComponents extends ObjectClass
 
     public function __set(string $name, mixed $value): void
     {
-        if ($name === 'url' || $name === 'string') {
-            $this->$name = $value;
-        } elseif ($name === 'pass') {
+        if ($name == 'pass') {
             $this->password = $value;
-        } elseif ($name === 'queryItems') {
+        } elseif ($name == 'queryItems') {
             if ($value === null) {
                 $this->query = null;
             } else {
@@ -123,13 +115,13 @@ class URLComponents extends ObjectClass
      * If the URLComponents has an authority component (user, password, host or port) and a path component,
      * then the path must either begin with “/” or be an empty string.
      * If the URLComponents does not have an authority component (user, password, host or port) and has a path component, the path component must not start with “//”. If those requirements are not met, nil is returned.
-     * @param URL|null $baseUrl
+     * @param URL|null $baseURL
      * @return URL|null
      */
-    public function urlRelativeTo(?URL $baseUrl): ?URL
+    public function urlRelativeTo(?URL $baseURL): ?URL
     {
         if ($string = $this->string) {
-            return new URL($string, $baseUrl);
+            return new URL($string, $baseURL);
         }
         return null;
     }

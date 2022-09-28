@@ -86,6 +86,11 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
         return isset($this->reserved[$name]);
     }
 
+    public function __unset(string $name): void
+    {
+        unset($this->reserved[$name]);
+    }
+
     public static function arrayWithArray(array $array): ArrayClass
     {
         return ArrayConverter::arrayWithArray($array);

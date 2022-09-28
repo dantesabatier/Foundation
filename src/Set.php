@@ -85,6 +85,11 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
         return isset($this->reserved[$name]);
     }
 
+    public function __unset(string $name): void
+    {
+        unset($this->reserved[$name]);
+    }
+
     /**
      * Returns a Boolean value indicating whether the sequence contains an element that satisfies the given predicate.
      * @param Closure(Element, int): bool $predicate A closure that takes an element of the sequence as its argument and returns a Boolean value that indicates whether the passed element represents a match.
