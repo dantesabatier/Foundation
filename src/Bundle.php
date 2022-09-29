@@ -215,16 +215,14 @@ final class Bundle extends ObjectClass
     {
         try {
             if (($path = (new ReflectionClass($class))->getFileName())) {
-                $directoryUrl = URL::fileURL($path)->deleteLastPathComponent();
-                $fileName = $directoryUrl->lastPathComponent;
-                if (string_is_equal($fileName, 'src', CompareOptions::caseInsensitive)) {
-                    $bundle = self::bundleWithURL($directoryUrl->deleteLastPathComponent());
-                } elseif (string_is_equal($fileName, 'OS', CompareOptions::caseInsensitive)) {
-                    $bundle = self::bundleWithURL($directoryUrl->deletingLastPathComponent()->deleteLastPathComponent());
-                } else {
-                    $bundle = self::bundleWithURL($directoryUrl);
+                $url = URL::fileURL($path)->deleteLastPathComponent();
+                $name = $url->lastPathComponent;
+                if (string_is_equal($name, 'src', CompareOptions::caseInsensitive)) {
+                    $url->deleteLastPathComponent();
+                } elseif (string_is_equal($name, 'OS', CompareOptions::caseInsensitive)) {
+                    $url->deleteLastPathComponent()->deleteLastPathComponent();
                 }
-                return $bundle;
+                return self::bundleWithURL($url);
             }
             return null;
         } catch (Exception $exception) {
