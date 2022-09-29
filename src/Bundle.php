@@ -8,10 +8,10 @@
 
 namespace Sabatier\Foundation;
 
-use Exception;
 use GdImage;
 use InvalidArgumentException;
 use ReflectionClass;
+use Throwable;
 
 /**
  * Class Bundle
@@ -225,8 +225,9 @@ final class Bundle extends ObjectClass
                 return self::bundleWithURL($url);
             }
             return null;
-        } catch (Exception $exception) {
-            throw new InvalidArgumentException($exception->getMessage());
+        } catch (Throwable $throwable) {
+            $throwableClass = $throwable::class;
+            throw new $throwableClass($throwable->getMessage(), $throwable->getCode());
         }
     }
 
@@ -292,8 +293,9 @@ final class Bundle extends ObjectClass
                 return null;
             }
             return $resources;
-        } catch (Exception $exception) {
-            throw new InternalInconsistencyException((string)$exception);
+        } catch (Throwable $throwable) {
+            $throwableClass = $throwable::class;
+            throw new $throwableClass($throwable->getMessage(), $throwable->getCode());
         }
     }
 

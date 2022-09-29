@@ -10,7 +10,6 @@ namespace Sabatier\Foundation;
 
 use Closure;
 use Fiber;
-use InvalidArgumentException;
 use Throwable;
 
 /**
@@ -82,7 +81,8 @@ class Operation extends ObjectClass
                 $fiber->resume();
             }
         } catch (Throwable $throwable) {
-            throw new InvalidArgumentException($throwable->getMessage(), (int)$throwable->getCode(), $throwable);
+            $throwableClass = $throwable::class;
+            throw new $throwableClass($throwable->getMessage(), $throwable->getCode());
         }
     }
 

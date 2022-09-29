@@ -48,11 +48,12 @@ class PredicateScanner extends Scanner
         try {
             return $this->parsePredicate();
         } catch (Throwable $throwable) {
-            $message = sprintf("%s Unable to parse predicate \"%s\" %s:%s", $this->debugDescription(), $this->string, typeof($throwable), (string)$throwable);
+            $message = sprintf("Unable to parse predicate \"%s\" %s:%s", $this->string, typeof($throwable), human_readable_value($throwable));
             if (!$this->isAtEnd) {
                 $message .= sprintf(" - Format string contains extra characters \"%s***%s***\"", substring_to_index($this->string, $this->scanLocation), substring_from_index($this->string, $this->scanLocation));
             }
-            throw new InternalInconsistencyException($message);
+            $throwableClass = $throwable::class;
+            throw new $throwableClass($message, $throwable->getCode());
         }
     }
 
