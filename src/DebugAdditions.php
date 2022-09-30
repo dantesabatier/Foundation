@@ -61,9 +61,9 @@ function human_readable_value(mixed $value): string
     if (is_string($value)) {
         return $value;
     } elseif (is_null($value)) {
-        return 'NULL';
+        return 'null';
     } elseif (is_bool($value)) {
-        return $value ? 'TRUE' : 'FALSE';
+        return $value ? 'true' : 'false';
     } elseif (is_array($value)) {
         return "[" . implode(', ', array_map(fn(mixed $index, mixed $element): string => sprintf("%s: %s", $index, human_readable_value($element)), array_keys($value), array_values($value))) . "]";
     } elseif (is_scalar($value)) {
