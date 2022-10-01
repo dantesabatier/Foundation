@@ -532,7 +532,7 @@ class Data extends ObjectClass implements RangeReplaceableCollection, Iterator
      * Reverses the elements of the collection in place.
      * @return Data
      */
-    public function reverse(): self
+    public function reverse(): Data
     {
         $this->reserved = implode(array_reverse(str_split($this->reserved)));
         return $this;

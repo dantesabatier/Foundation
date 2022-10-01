@@ -445,10 +445,23 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
     }
 
     /**
+     * Removes and returns the last element of the collection.
+     * Calling this method may invalidate all saved indices of this collection. Do not rely on a previously stored index value after altering a collection with any operation that can change its length.
+     * @return Element|null The last element of the collection if the collection is not empty; otherwise, nil.
+     */
+    public function popLast()
+    {
+        if ($this->isEmpty()) {
+            return null;
+        }
+        return $this->removeAt($this->indexBefore($this->endIndex()));
+    }
+
+    /**
      * Reverses the elements of the collection in place.
      * @return ArrayClass<Element>
      */
-    public function reverse(): self
+    public function reverse(): ArrayClass
     {
         $this->reserved = array_reverse($this->reserved);
         return $this;

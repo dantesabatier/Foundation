@@ -40,7 +40,7 @@ trait SequenceAlgorithms
     {
         $min = null;
         foreach ($this as $e) {
-            if ($min === null || (($e instanceof Number) ? ($e->compare(!$min) === ComparisonResult::orderedAscending) : ($e < $min))) {
+            if ($min === null || (($e instanceof Number) ? ($e->compare($min) === ComparisonResult::orderedAscending) : ($e < $min))) {
                 $min = $e;
             }
         }
@@ -51,7 +51,7 @@ trait SequenceAlgorithms
     {
         $max = null;
         foreach ($this as $e) {
-            if ($max === null || (($e instanceof Number) ? ($e->compare(!$max) === ComparisonResult::orderedDescending) : ($e > $max))) {
+            if ($max === null || (($e instanceof Number) ? ($e->compare($max) === ComparisonResult::orderedDescending) : ($e > $max))) {
                 $max = $e;
             }
         }

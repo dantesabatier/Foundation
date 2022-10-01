@@ -644,7 +644,7 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
      * Reverses the elements of the collection in place.
      * @return Set<Element>
      */
-    public function reverse(): self
+    public function reverse(): Set
     {
         $this->reserved = array_reverse($this->reserved);
         return $this;

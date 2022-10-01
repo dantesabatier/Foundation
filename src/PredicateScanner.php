@@ -52,8 +52,7 @@ class PredicateScanner extends Scanner
             if (!$this->isAtEnd) {
                 $message .= sprintf(" - Format string contains extra characters \"%s***%s***\"", substring_to_index($this->string, $this->scanLocation), substring_from_index($this->string, $this->scanLocation));
             }
-            $throwableClass = $throwable::class;
-            throw new $throwableClass($message, $throwable->getCode());
+            throw new InvalidArgumentException($message, (int)$throwable->getCode());
         }
     }
 

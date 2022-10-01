@@ -363,7 +363,7 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
      * Reverses the elements of the collection in place.
      * @return Dictionary<Element>
      */
-    public function reverse(): self
+    public function reverse(): Dictionary
     {
         $this->reserved = array_reverse($this->reserved);
         return $this;

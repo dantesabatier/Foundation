@@ -61,7 +61,7 @@ trait CollectionAlgorithms
 
     public function indexOf(mixed $element): mixed
     {
-        return $this->firstIndex(fn(mixed $e): bool => $e instanceof Equatable ? $e->isEqual($element) : $e === $element);
+        return $this->firstIndex(fn(mixed $e): bool => equivalent($e, $element));
     }
 
     public function distance(int $start, int $end): int
