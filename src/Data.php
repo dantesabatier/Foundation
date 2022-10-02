@@ -720,7 +720,6 @@ class Data extends ObjectClass implements RangeReplaceableCollection, Iterator
         return $this->position;
     }
 
-    #[Pure]
     public function valid(): bool
     {
         return $this->offsetExists($this->key());
@@ -740,7 +739,6 @@ class Data extends ObjectClass implements RangeReplaceableCollection, Iterator
      * @param int $offset
      * @return bool
      */
-    #[Pure]
     public function offsetExists(mixed $offset): bool
     {
         return in_range($offset, $this->startIndex(), $this->endIndex());

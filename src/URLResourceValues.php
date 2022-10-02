@@ -45,14 +45,14 @@ class URLResourceValues extends ObjectClass
     {
         return match ($name) {
             'allValues' => $this->values,
-            'isDirectory', 'fileResourceType', 'fileSize', 'isExecutable', 'isRegularFile', 'attributeModificationDate', 'creationDate', 'isAliasFile', 'isHidden', 'isReadable', 'isSymbolicLink', 'isWritable', 'name', 'parentDirectory', 'path' => $this->values[$name],
+            URLResourceKey::isApplicationKey, URLResourceKey::isDirectoryKey, URLResourceKey::parentDirectoryURLKey, URLResourceKey::fileResourceTypeKey, URLResourceKey::fileSizeKey, URLResourceKey::isExecutableKey, URLResourceKey::isRegularFileKey, URLResourceKey::attributeModificationDateKey, URLResourceKey::creationDateKey, URLResourceKey::isAliasFileKey, URLResourceKey::isHiddenKey, URLResourceKey::isReadableKey, URLResourceKey::isSymbolicLinkKey, URLResourceKey::isWritableKey, URLResourceKey::nameKey, URLResourceKey::pathKey => $this->values[$name],
             default => $this->valueForUndefinedKey($name)
         };
     }
 
     public function __set(string $name, mixed $value): void
     {
-        if ($name == 'isDirectory' || $name == 'fileResourceType' || $name == 'fileSize' || $name == 'isExecutable' || $name == 'isRegularFile' || $name == 'attributeModificationDate' || $name == 'creationDate' || $name == 'isAliasFile' || $name == 'isHidden' || $name == 'isReadable' || $name == 'isSymbolicLink' || $name == 'isWritable' || $name == 'name' || $name == 'parentDirectory' || $name == 'path') {
+        if ($name == URLResourceKey::isApplicationKey || $name == URLResourceKey::isDirectoryKey || $name == URLResourceKey::parentDirectoryURLKey || $name == URLResourceKey::fileResourceTypeKey || $name == URLResourceKey::fileSizeKey || $name == URLResourceKey::isExecutableKey || $name == URLResourceKey::isRegularFileKey || $name == URLResourceKey::attributeModificationDateKey || $name == URLResourceKey::creationDateKey || $name == URLResourceKey::isAliasFileKey || $name == URLResourceKey::isHiddenKey || $name == URLResourceKey::isReadableKey || $name == URLResourceKey::isSymbolicLinkKey || $name == URLResourceKey::isWritableKey || $name == URLResourceKey::nameKey || $name == URLResourceKey::pathKey) {
             $this->values->setValueForKey($value, $name);
             if ($value !== null) {
                 $this->keys->append($name);

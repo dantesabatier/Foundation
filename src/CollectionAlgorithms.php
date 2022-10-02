@@ -24,7 +24,6 @@ trait CollectionAlgorithms
         return 0;
     }
 
-    #[Pure]
     public function endIndex(): int
     {
         return $this->count();
@@ -69,11 +68,6 @@ trait CollectionAlgorithms
         return $end - $start;
     }
 
-    /**
-     *
-     *
-     * @noinspection PhpPureAttributeCanBeAddedInspection
-     */
     public function isEmpty(): bool
     {
         return $this->startIndex() == $this->endIndex();
@@ -91,11 +85,7 @@ trait CollectionAlgorithms
                     $instance[] = $e;
                 }
             }
-            /**
-             *
-             *
-             * @psalm-suppress TypeDoesNotContainType
-             */
+            /** @psalm-suppress TypeDoesNotContainType */
             if ($stop) {
                 break;
             }
@@ -114,11 +104,7 @@ trait CollectionAlgorithms
         $instance->sort(
             function (mixed $e1, mixed $e2) use ($descriptors): int {
                 $result = ComparisonResult::orderedSame;
-                /**
-                 *
-                 *
-                 * @var SortDescriptor $descriptor
-                 */
+                /** @var SortDescriptor $descriptor */
                 foreach ($descriptors as $descriptor) {
                     if (($result = $descriptor->compareObject($e1, $e2)) !== ComparisonResult::orderedSame) {
                         break;

@@ -53,7 +53,6 @@ final class Bundle extends ObjectClass
     public readonly ?string $principalClass;
     /** @var URL The full URL of the receiver's bundle directory. */
     public readonly URL $bundleURL;
-    private readonly URL $contentsURL;
 
     /**
      * Returns a Bundle object initialized to correspond to the specified file URL.
@@ -74,7 +73,6 @@ final class Bundle extends ObjectClass
         unset($this->developmentLocalization);
         unset($this->localizedInfoDictionary);
         unset($this->principalClass);
-        unset($this->contentsURL);
         if (!$url->isFileURL || !$url->hasDirectoryPath) {
             throw new InvalidArgumentException("Invalid bundle url \"$url\"");
         }
@@ -88,42 +86,34 @@ final class Bundle extends ObjectClass
 
     public function __get(string $name)
     {
-        if ($name == 'contentsURL') {
+        if ($name == 'resourceURL') {
             $bundleURL = $this->bundleURL;
-            $contentsURL = $bundleURL->appendingPathComponent('Contents');
-            if (!FileManager::default()->fileExists($contentsURL->path, $isDirectory) || !$isDirectory) {
-                $contentsURL = $bundleURL;
-            }
-            $this->$name = $contentsURL;
-            return $this->$name;
-        } elseif ($name == 'resourceURL') {
-            $contentsURL = $this->contentsURL;
-            $resourcesURL = $contentsURL->appendingPathComponent('Resources');
+            $resourcesURL = $bundleURL->appendingPathComponent('Resources');
             if (!FileManager::default()->fileExists($resourcesURL->path, $isDirectory) || !$isDirectory) {
-                $resourcesURL = $contentsURL;
+                $resourcesURL = $bundleURL;
             }
             $this->$name = $resourcesURL;
             return $this->$name;
         } elseif ($name == 'executableURL') {
-            $this->$name = $this->contentsURL->appendingPathComponent('OS')->appendingPathComponent($this->object(kCFBundleExecutableKey) ?? $this->object(kCFBundleNameKey) ?? '');
+            $this->$name = $this->bundleURL->appendingPathComponent($this->object(kCFBundleExecutableKey) ?? $this->object(kCFBundleNameKey) ?? '');
             return $this->$name;
         } elseif ($name == 'privateFrameworksURL') {
-            $this->$name = $this->contentsURL->appendingPathComponent('PrivateFrameworks');
+            $this->$name = $this->bundleURL->appendingPathComponent('PrivateFrameworks');
             return $this->$name;
         } elseif ($name == 'sharedFrameworksURL') {
-            $this->$name = $this->contentsURL->appendingPathComponent('Frameworks');
+            $this->$name = $this->bundleURL->appendingPathComponent('Frameworks');
             return $this->$name;
         } elseif ($name == 'builtInPlugInsURL') {
-            $this->$name = $this->contentsURL->appendingPathComponent('Plugins');
+            $this->$name = $this->bundleURL->appendingPathComponent('Plugins');
             return $this->$name;
         } elseif ($name == 'sharedSupportURL') {
-            $this->$name = $this->contentsURL->appendingPathComponent('SharedSupport');
+            $this->$name = $this->bundleURL->appendingPathComponent('SharedSupport');
             return $this->$name;
         } elseif ($name == 'bundleIdentifier') {
             $this->$name = $this->object(kCFBundleIdentifierKey);
             return $this->$name;
         } elseif ($name == 'infoDictionary') {
-            $infoUrl = $this->contentsURL->appendingPathComponent('Info')->appendingPathExtension('plist');
+            $infoUrl = $this->bundleURL->appendingPathComponent('Info')->appendingPathExtension('plist');
             $this->$name = FileManager::default()->fileExists($infoUrl->path) ? PropertyListSerialization::propertyListWithURL($infoUrl) : null;
             return $this->$name;
         } elseif ($name == 'localizations') {
@@ -220,8 +210,6 @@ final class Bundle extends ObjectClass
                 $name = $url->lastPathComponent;
                 if (string_is_equal($name, 'src', CompareOptions::caseInsensitive)) {
                     $url->deleteLastPathComponent();
-                } elseif (string_is_equal($name, 'OS', CompareOptions::caseInsensitive)) {
-                    $url->deleteLastPathComponent()->deleteLastPathComponent();
                 }
                 return self::bundleWithURL($url);
             }
@@ -446,15 +434,16 @@ final class Bundle extends ObjectClass
     public function classNamed(string $className): ?string
     {
         $name = array_last(explode("\\", $className)) ?? $className;
-        $fileManager = FileManager::default();
-        $urls = $fileManager->contentsOfDirectory($this->contentsURL->appendingPathComponent('OS'), null, DirectoryEnumerationOptions::skipsHiddenFiles);
-        foreach ($urls as $url) {
-            $path = $url->path;
-            if (string_is_equal($url->pathExtension, 'php', CompareOptions::caseInsensitive) && string_is_equal(pathinfo($path, PATHINFO_FILENAME), $name, CompareOptions::caseInsensitive)) {
-                require_once $path;
-                if (($class = array_last(get_declared_classes(), fn(string $class): bool => string_has_suffix($class, $className))) && class_exists($class)) {
-                    NotificationCenter::default()->postNotificationName(self::didLoadNotification, $this, new Dictionary([LoadedClasses => new ArrayClass([$class])]));
-                    return $class;
+        $enumerator = FileManager::default()->enumerator($this->bundleURL->appendingPathComponent('src'), null, DirectoryEnumerationOptions::skipsHiddenFiles);
+        if ($enumerator) {
+            foreach ($enumerator as $url) {
+                $path = $url->path;
+                if (string_is_equal($url->pathExtension, 'php', CompareOptions::caseInsensitive) && string_is_equal(pathinfo($path, PATHINFO_FILENAME), $name, CompareOptions::caseInsensitive)) {
+                    require_once $path;
+                    if (($class = array_last(get_declared_classes(), fn(string $class): bool => string_has_suffix($class, $className))) && class_exists($class)) {
+                        NotificationCenter::default()->postNotificationName(self::didLoadNotification, $this, new Dictionary([LoadedClasses => new ArrayClass([$class])]));
+                        return $class;
+                    }
                 }
             }
         }

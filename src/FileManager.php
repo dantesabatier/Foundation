@@ -201,13 +201,13 @@ final class FileManager extends ObjectClass
      * You can use the {@see URL::resolvingSymlinksInPath} method to resolve any symlinks in the URL.
      * @param ArrayClass<string>|null $keys An array of keys that identify the properties that you want pre-fetched for each item in the enumeration. The values for these keys are cached in the corresponding URL objects. You may specify nil for this parameter.
      * @param int $options Options for the enumeration. For a list of valid options, see {@see DirectoryEnumerationOptions}.
-     * @param Closure(URL): bool|null $handler An optional error handler block for the file manager to call when an error occurs. The handler block should return true if you want the enumeration to continue or false if you want the enumeration to stop.
-     * @return DirectoryEnumerator|null A directory enumerator object that enumerates the contents of the directory at url.
+     * @param Closure(URL, Error): bool|null $errorHandler An optional error handler block for the file manager to call when an error occurs. The handler block should return true if you want the enumeration to continue or false if you want the enumeration to stop.
+     * @return DirectoryEnumerator<URL>|null A directory enumerator object that enumerates the contents of the directory at url.
      */
-    public function enumerator(URL $url, ?ArrayClass $keys = null, #[ExpectedValues(flagsFromClass: DirectoryEnumerationOptions::class)] int $options = 0, ?Closure $handler = null): ?DirectoryEnumerator
+    public function enumerator(URL $url, ?ArrayClass $keys = null, #[ExpectedValues(flagsFromClass: DirectoryEnumerationOptions::class)] int $options = 0, ?Closure $errorHandler = null): ?DirectoryEnumerator
     {
         if ($this->fileExists($url->path, $isDirectory) && $isDirectory) {
-            return new URLDirectoryEnumerator($url, $keys, $options, $handler);
+            return new URLDirectoryEnumerator($url, $keys, $options, $errorHandler);
         }
         return null;
     }

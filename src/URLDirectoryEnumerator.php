@@ -3,6 +3,7 @@
 namespace Sabatier\Foundation;
 
 use Closure;
+use Exception;
 use FilesystemIterator;
 use Generator;
 use JetBrains\PhpStorm\ExpectedValues;
@@ -11,8 +12,12 @@ use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use SplFileInfo;
 use Traversable;
+use UnexpectedValueException;
 
-/** @internal */
+/**
+ * @extends DirectoryEnumerator<URL>
+ * @internal
+ */
 class URLDirectoryEnumerator extends DirectoryEnumerator
 {
     private RecursiveIteratorIterator $iterator;
@@ -20,7 +25,7 @@ class URLDirectoryEnumerator extends DirectoryEnumerator
     private bool $shouldContinue = false;
     private bool $isPostOrderDirectory = false;
 
-    public function __construct(private readonly URL $url, private readonly ?ArrayClass $keys = null, #[ExpectedValues(flagsFromClass: DirectoryEnumerationOptions::class)] private readonly int $options = DirectoryEnumerationOptions::skipsHiddenFiles, private readonly ?Closure $handler = null)
+    public function __construct(private readonly URL $url, private readonly ?ArrayClass $keys = null, #[ExpectedValues(flagsFromClass: DirectoryEnumerationOptions::class)] private readonly int $options = DirectoryEnumerationOptions::skipsHiddenFiles, private readonly ?Closure $errorHandler = null)
     {
         $directoryIterator = new RecursiveDirectoryIterator($this->url->path, FilesystemIterator::CURRENT_AS_FILEINFO | FilesystemIterator::SKIP_DOTS | FilesystemIterator::UNIX_PATHS);
         /** @psalm-suppress InvalidArgument */
@@ -66,25 +71,42 @@ class URLDirectoryEnumerator extends DirectoryEnumerator
     public function getIterator(): Traversable
     {
         return (function (): Generator {
-            /** @var SplFileInfo $info */
-            foreach ($this->iterator as $info) {
-                $url = URL::fileURL($info->getPathname());
-                if (($handler = $this->handler) && !$handler($url)) {
-                    break;
+            $handle = function (Exception $exception): bool {
+                if ($errorHandler = $this->errorHandler) {
+                    $code = NotFound;
+                    if ($exception instanceof UnexpectedValueException) {
+                        $code = FileReadNoPermissionError;
+                    }
+                    return $errorHandler($this->current, new Error(CocoaErrorDomain, $code, new Dictionary([URLErrorKey => $this->current])));
                 }
-                if ($this->shouldContinue) {
-                    $this->isPostOrderDirectory = $info->isDir();
-                    continue;
-                }
-                if ($keys = $this->keys) {
-                    $values = $url->resourceValues(new Set($keys));
-                    foreach ($values->allValues as $key => $value) {
-                        $url->setTemporaryResourceValue($value, $key);
+                return false;
+            };
+            try {
+                /** @var SplFileInfo $fileInfo */
+                foreach ($this->iterator as $fileInfo) {
+                    try {
+                        $url = URL::fileURL($fileInfo->getPathname());
+                        if ($this->shouldContinue) {
+                            $this->isPostOrderDirectory = $url->hasDirectoryPath;
+                            continue;
+                        }
+                        if ($keys = $this->keys) {
+                            $values = $url->resourceValues(new Set($keys));
+                            foreach ($values->allValues as $key => $value) {
+                                $url->setTemporaryResourceValue($value, $key);
+                            }
+                        }
+                        $this->current = $url;
+                        yield $url;
+                        $this->shouldContinue = $this->isEnumeratingDirectoryPostOrder();
+                    } catch (Exception $exception) {
+                        if (!$handle($exception)) {
+                            break;
+                        }
                     }
                 }
-                $this->current = $url;
-                yield $url;
-                $this->shouldContinue = $this->isEnumeratingDirectoryPostOrder();
+            } catch (Exception $exception) {
+                $handle($exception);
             }
         })();
     }

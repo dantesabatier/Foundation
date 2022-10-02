@@ -11,6 +11,7 @@ namespace Sabatier\Foundation;
 
 use Closure;
 use Exception;
+use InvalidArgumentException;
 use JetBrains\PhpStorm\ArrayShape;
 use JetBrains\PhpStorm\ExpectedValues;
 use JetBrains\PhpStorm\Pure;
@@ -202,9 +203,11 @@ final class URL extends ObjectClass
         }
         $scheme = parse_url($path, PHP_URL_SCHEME);
         if (empty($scheme)) {
-            $string .= URLScheme::file . ":";
-        } elseif ($scheme !== URLScheme::file) {
-            trigger_error(sprintf("%s %s invalid url scheme \"%s\"", self::class, __FUNCTION__, $scheme));
+            $scheme = URLScheme::file;
+            $string .= "$scheme:";
+        }
+        if ($scheme !== URLScheme::file) {
+            throw new InvalidArgumentException("Invalid url scheme \"$scheme\"");
         }
         $string .= "//$path";
         return new URL($string);

@@ -84,6 +84,7 @@ class Error extends ObjectClass
                         };
                         break;
                     case POSIXErrorDomain:
+                        /** @noinspection SpellCheckingInspection */
                         if (function_exists('posix_strerror')) {
                             $localizedFailureReason = posix_strerror($this->code);
                         }
