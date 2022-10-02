@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Created by PhpStorm.
  * User: dante
@@ -24,7 +25,7 @@ interface RangeReplaceableCollection extends MutableCollection
      * @return RangeReplaceableCollection
      */
     public static function repeating(mixed $value, int $count): self;
-    
+
     /**
      * Inserts the value into the collection at the specified position.
      * The new element is inserted before the element currently at the specified index.

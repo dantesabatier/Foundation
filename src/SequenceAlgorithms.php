@@ -21,7 +21,7 @@ trait SequenceAlgorithms
 
     public function containsElement(mixed $element): bool
     {
-        return $this->contains(fn(mixed $e): bool => equivalent($e, $element));
+        return $this->contains(fn (mixed $e): bool => equivalent($e, $element));
     }
 
     public function first(Closure $where = null): mixed
@@ -106,9 +106,9 @@ trait SequenceAlgorithms
 
     public function elementsEqual(Sequence $sequence, ?Closure $areEquivalent = null): bool
     {
-        $areEquivalent ??= fn(mixed $e1, mixed $e2): bool => equivalent($e1, $e2);
+        $areEquivalent ??= fn (mixed $e1, mixed $e2): bool => equivalent($e1, $e2);
         foreach ($this as $i => $e) {
-            if (!$areEquivalent($e, $sequence->first(fn(mixed $v, string|int $k): bool => $k === $i))) {
+            if (!$areEquivalent($e, $sequence->first(fn (mixed $v, string|int $k): bool => $k === $i))) {
                 return false;
             }
         }

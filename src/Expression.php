@@ -249,7 +249,7 @@ class Expression extends ObjectClass
      * The function for the expression.
      * @return string Accessing this property raises an exception if it is not applicable to the expression.
      */
-    public function function (): string
+    public function function(): string
     {
         request_concrete_implementation($this, __FUNCTION__);
     }

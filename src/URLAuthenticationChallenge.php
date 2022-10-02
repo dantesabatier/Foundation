@@ -2,7 +2,6 @@
 
 namespace Sabatier\Foundation;
 
-
 /**
  * Class URLAuthenticationChallenge
  * A challenge from a server requiring authentication from the client.

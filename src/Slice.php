@@ -20,7 +20,7 @@ use Traversable;
 class Slice extends ObjectClass implements ExpressibleByArrayLiteral, IteratorAggregate, Countable
 {
     /** @var Base $base */
-    public readonly Collection $base;
+    public readonly mixed $base;
     public readonly int $startIndex;
     public readonly int $endIndex;
 
@@ -30,7 +30,7 @@ class Slice extends ObjectClass implements ExpressibleByArrayLiteral, IteratorAg
      * @param Range $bounds The range of indices to allow access to in the new slice.
      */
     #[Pure]
-    public function __construct(Collection $base, Range $bounds)
+    public function __construct(mixed $base, Range $bounds)
     {
         $this->base = $base;
         $this->startIndex = $bounds->lowerBound;

@@ -61,7 +61,7 @@ trait CollectionAlgorithms
 
     public function indexOf(mixed $element): mixed
     {
-        return $this->firstIndex(fn(mixed $e): bool => equivalent($e, $element));
+        return $this->firstIndex(fn (mixed $e): bool => equivalent($e, $element));
     }
 
     public function distance(int $start, int $end): int
@@ -69,7 +69,11 @@ trait CollectionAlgorithms
         return $end - $start;
     }
 
-    /** @noinspection PhpPureAttributeCanBeAddedInspection */
+    /**
+     *
+     *
+     * @noinspection PhpPureAttributeCanBeAddedInspection
+     */
     public function isEmpty(): bool
     {
         return $this->startIndex() == $this->endIndex();
@@ -87,7 +91,11 @@ trait CollectionAlgorithms
                     $instance[] = $e;
                 }
             }
-            /** @psalm-suppress TypeDoesNotContainType */
+            /**
+             *
+             *
+             * @psalm-suppress TypeDoesNotContainType
+             */
             if ($stop) {
                 break;
             }
@@ -97,22 +105,28 @@ trait CollectionAlgorithms
 
     public function filtered(Predicate $predicate): self
     {
-        return $this->filter(fn(mixed $e): bool => $predicate->evaluate($e));
+        return $this->filter(fn (mixed $e): bool => $predicate->evaluate($e));
     }
 
     public function sorted(iterable $descriptors): self
     {
         $instance = clone $this;
-        $instance->sort(function (mixed $e1, mixed $e2) use ($descriptors): int {
-            $result = ComparisonResult::orderedSame;
-            /** @var SortDescriptor $descriptor */
-            foreach ($descriptors as $descriptor) {
-                if (($result = $descriptor->compareObject($e1, $e2)) !== ComparisonResult::orderedSame) {
-                    break;
+        $instance->sort(
+            function (mixed $e1, mixed $e2) use ($descriptors): int {
+                $result = ComparisonResult::orderedSame;
+                /**
+                 *
+                 *
+                 * @var SortDescriptor $descriptor
+                 */
+                foreach ($descriptors as $descriptor) {
+                    if (($result = $descriptor->compareObject($e1, $e2)) !== ComparisonResult::orderedSame) {
+                        break;
+                    }
                 }
+                return $result->value;
             }
-            return $result->value;
-        });
+        );
         return $instance;
     }
 
@@ -123,7 +137,7 @@ trait CollectionAlgorithms
 
     public function join(string $separator): string
     {
-        return join($separator, $this->map(fn(mixed $e): string => human_readable_value($e))->toArray());
+        return join($separator, $this->map(fn (mixed $e): string => human_readable_value($e))->toArray());
     }
 
     #[Pure]

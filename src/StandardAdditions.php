@@ -4,7 +4,6 @@ namespace Sabatier\Foundation;
 
 use Collator;
 use Exception;
-use JetBrains\PhpStorm\Deprecated;
 use JetBrains\PhpStorm\ExpectedValues;
 use JetBrains\PhpStorm\Pure;
 use RuntimeException;
@@ -229,12 +228,13 @@ function string_search(string $string, string $needle, SearchMethod $method = Se
     if (!($options & CompareOptions::quoted)) {
         $needle = preg_quote($needle);
     }
-    $pattern = '/' . match ($method) {
-            SearchMethod::matches => "^$needle$",
-            SearchMethod::beginsWith => "^$needle",
-            SearchMethod::endsWith => "$needle$",
-            SearchMethod::contains => ($options & CompareOptions::words) ? "(?:^|\W)$needle(?:$|\W)" : $needle
-        };
+    $pattern = '/';
+    $pattern .= match ($method) {
+        SearchMethod::matches => "^$needle$",
+        SearchMethod::beginsWith => "^$needle",
+        SearchMethod::endsWith => "$needle$",
+        SearchMethod::contains => ($options & CompareOptions::words) ? "(?:^|\W)$needle(?:$|\W)" : $needle
+    };
     $pattern .= '/';
     if ($options & CompareOptions::caseInsensitive) {
         $pattern .= 'i';
@@ -349,6 +349,7 @@ function home_directory(): string
  */
 function full_user_name(): string
 {
+    /** @noinspection SpellCheckingInspection */
     if (function_exists('posix_getpwuid')) {
         return posix_getpwuid(posix_geteuid())['name'] ?? get_current_user();
     }
@@ -373,7 +374,7 @@ function is_hidden(string $filename): bool
     if (USE_UNSAFE_FUNCTIONS) : // @phpstan-ignore-line
         if (target_os_win()) {
             /** @psalm-suppress ForbiddenCode */
-            $attributes = trim(unsafe_value(fn (): string|bool|null => shell_exec("FOR %A IN (" . "\"" . $filename . "\"" . ") DO @ECHO %~aA")));
+            $attributes = trim(unsafe_value(fn(): string|bool|null => shell_exec("FOR %A IN (" . "\"" . $filename . "\"" . ") DO @ECHO %~aA")));
             return $attributes[3] === 'h' || $attributes[4] === 's';
         }
     endif;
@@ -440,29 +441,7 @@ function is_serialized(mixed $value, bool $strict = true): bool
     return false;
 }
 
-/**
- * @internal
- */
-function string_with_options(string $string, #[ExpectedValues(flagsFromClass: CompareOptions::class)] int $options): string
+function equivalent(mixed $a, mixed $b): bool
 {
-    if ($options & CompareOptions::caseInsensitive) {
-        if ($options & CompareOptions::diacriticInsensitive) {
-            if (function_exists('transliterator_transliterate')):
-                $string = transliterator_transliterate(TransliteratorDefault, $string);
-                if ($string === false) {
-                    throw new RuntimeException(sprintf('%s() %s', __FUNCTION__, intl_get_error_message()));
-                }
-            endif;
-            if (!($options & CompareOptions::normalized)) {
-                if (function_exists('normalizer_normalize')):
-                    $string = normalizer_normalize($string);
-                    /** @psalm-suppress TypeDoesNotContainType */
-                    if ($string === false) {
-                        throw new RuntimeException(sprintf('%s() %s', __FUNCTION__, intl_get_error_message()));
-                    }
-                endif;
-            }
-        }
-    }
-    return $string;
+    return $a instanceof Equatable ? $a->isEqual($b) : $a === $b;
 }

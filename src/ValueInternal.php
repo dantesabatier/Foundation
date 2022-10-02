@@ -2,6 +2,9 @@
 
 namespace Sabatier\Foundation;
 
+use JetBrains\PhpStorm\ExpectedValues;
+use RuntimeException;
+
 /** @internal */
 function pv(mixed $v): mixed
 {
@@ -18,7 +21,27 @@ function pn(string|int|float|Number $n): int|float
     return (is_int($v) || is_float($v)) ? $v : (int)$v;
 }
 
-function equivalent(mixed $a, mixed $b): bool
+/** @internal */
+function string_with_options(string $string, #[ExpectedValues(flagsFromClass: CompareOptions::class)] int $options): string
 {
-    return $a instanceof Equatable ? $a->isEqual($b) : $a === $b;
+    if ($options & CompareOptions::caseInsensitive) {
+        if ($options & CompareOptions::diacriticInsensitive) {
+            if (function_exists('transliterator_transliterate')) :
+                $string = transliterator_transliterate(TransliteratorDefault, $string);
+                if ($string === false) {
+                    throw new RuntimeException(sprintf('%s() %s', __FUNCTION__, intl_get_error_message()));
+                }
+            endif;
+            if (!($options & CompareOptions::normalized)) {
+                if (function_exists('normalizer_normalize')) :
+                    $string = normalizer_normalize($string);
+                    /** @psalm-suppress TypeDoesNotContainType */
+                    if ($string === false) {
+                        throw new RuntimeException(sprintf('%s() %s', __FUNCTION__, intl_get_error_message()));
+                    }
+                endif;
+            }
+        }
+    }
+    return $string;
 }

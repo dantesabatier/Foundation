@@ -1,6 +1,7 @@
 <?php
 
 namespace Sabatier\Foundation;
+
 /**
  * The entities that can make a network request.
  * Use one of these values when setting the attribution parameter of a {@see URLRequest}. If you don't set a value, the system assumes URLRequestAttribution::developer.

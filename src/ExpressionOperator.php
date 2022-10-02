@@ -47,7 +47,7 @@ class ExpressionOperator extends Expression
         return ExpressionOperatorType::symbol($this->operatorType());
     }
 
-    public function function (): string
+    public function function(): string
     {
         return $this->name;
     }

@@ -8,7 +8,7 @@ class ApplicationPreferences
     public readonly URL $url;
     /** @var Dictionary<mixed> */
     public readonly Dictionary $dictionaryRepresentation;
-    
+
     /** @noinspection PhpUnhandledExceptionInspection */
     public function __construct(public readonly string $domainName)
     {

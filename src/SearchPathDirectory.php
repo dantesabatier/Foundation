@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Created by PhpStorm.
  * User: dante
@@ -11,7 +12,7 @@ namespace Sabatier\Foundation;
 /**
  * Class SearchPathDirectory
  * The location of significant directories.
- * These caseants are used by the {@see FileManager::urls()} and {@see FileManager::url()} methods of FileManager.
+ * These constants are used by the {@see FileManager::urls()} and {@see FileManager::url()} methods of FileManager.
  * @package Sabatier\Foundation
  */
 enum SearchPathDirectory: int

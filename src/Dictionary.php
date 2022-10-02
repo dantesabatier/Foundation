@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Created by PhpStorm.
  * User: dante
@@ -51,7 +52,7 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
         if ($iterable instanceof Dictionary) {
             $this->reserved = $iterable->toArray();
         } elseif (is_array($iterable) && (!count($iterable) || !is_sequential($iterable))) {
-            $this->reserved = array_filter($iterable, fn(mixed $e): bool => $e !== null);
+            $this->reserved = array_filter($iterable, fn (mixed $e): bool => $e !== null);
         } else {
             throw new InvalidArgumentException();
         }
@@ -474,7 +475,7 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
             $this->reserved = [];
             return;
         }
-        $this->reserved = $this->filter(fn(mixed $e, string $i): bool => !$where($e, $i))->reserved;
+        $this->reserved = $this->filter(fn (mixed $e, string $i): bool => !$where($e, $i))->reserved;
     }
 
     public function setDictionary(Dictionary $dictionary): void
@@ -555,12 +556,12 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
         if ($this->offsetExists($key)) {
             return $this->offsetGet($key);
         }
-        return $this->first(fn(mixed $e, string $k): bool => string_is_equal($k, $key, CompareOptions::caseInsensitive));
+        return $this->first(fn (mixed $e, string $k): bool => string_is_equal($k, $key, CompareOptions::caseInsensitive));
     }
 
     public function description(): string
     {
-        return $this->isEmpty() ? "[:]" : "[" . $this->mapValues(fn(mixed $value, string $key): string => sprintf("%s: %s", $key, human_readable_value($value)))->values->join(", ") . "]";
+        return $this->isEmpty() ? "[:]" : "[" . $this->mapValues(fn (mixed $value, string $key): string => sprintf("%s: %s", $key, human_readable_value($value)))->values->join(", ") . "]";
     }
 
     #[Pure]

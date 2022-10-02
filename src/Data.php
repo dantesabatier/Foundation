@@ -731,7 +731,6 @@ class Data extends ObjectClass implements RangeReplaceableCollection, Iterator
         $this->position = 0;
     }
 
-    #[Pure]
     public function count(): int
     {
         return $this->length;

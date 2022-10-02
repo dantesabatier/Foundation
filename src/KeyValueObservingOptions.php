@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Created by PhpStorm.
  * User: dante
@@ -7,6 +8,7 @@
  */
 
 namespace Sabatier\Foundation;
+
 /**
  * Class KeyValueObservingOptions
  * The values that can be returned in a change dictionary.

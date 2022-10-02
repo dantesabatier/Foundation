@@ -207,11 +207,15 @@ class PredicateScanner extends Scanner
         } elseif ($this->scanString('[l]')) {
             $options = ComparisonPredicateOptions::localeSensitive;
         } elseif ($this->scanString('[d]')) {
-            throw new InvalidArgumentException("invalid argument: invalid option \"[d]\" at index $this->scanLocation",
-                E_USER_WARNING);
+            throw new InvalidArgumentException(
+                "invalid argument: invalid option \"[d]\" at index $this->scanLocation",
+                E_USER_WARNING
+            );
         } elseif ($this->scanString('[n]')) {
-            throw new InvalidArgumentException("invalid argument: invalid option \"[n]\" at index $this->scanLocation",
-                E_USER_WARNING);
+            throw new InvalidArgumentException(
+                "invalid argument: invalid option \"[n]\" at index $this->scanLocation",
+                E_USER_WARNING
+            );
         }
         $right = $this->parseExpression();
         /** @psalm-suppress PossiblyNullArgument */

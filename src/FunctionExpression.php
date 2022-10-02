@@ -73,7 +73,7 @@ class FunctionExpression extends Expression
         }
     }
 
-    public function function (): string
+    public function function(): string
     {
         return $this->selector;
     }
