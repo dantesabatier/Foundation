@@ -1,5 +1,7 @@
 <?php
 
+namespace Sabatier\Foundation;
+
 /** @var string Cocoa errors */
 const CocoaErrorDomain = 'CocoaErrorDomain';
 /** @var string POSIX/BSD errors */

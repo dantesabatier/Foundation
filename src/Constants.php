@@ -1,5 +1,7 @@
 <?php
 
+namespace Sabatier\Foundation;
+
 /** @var string */
 const MimeTypeJPEG = 'image/jpeg';
 /** @var string */
