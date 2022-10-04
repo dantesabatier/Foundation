@@ -9,6 +9,7 @@
 
 namespace Sabatier\Foundation;
 
+use Exception;
 use GdImage;
 use InvalidArgumentException;
 use Locale;
@@ -25,8 +26,8 @@ final class Bundle extends ObjectClass
     /** @var Dictionary<Bundle>|null $loadedBundles */
     private static ?Dictionary $loadedBundles = null;
     public const didLoadNotification = BundleDidLoadNotification;
-    /** @var URL The file URL of the bundle's subdirectory containing resource files. */
-    public readonly URL $resourceURL;
+    /** @var URL|null The file URL of the bundle's subdirectory containing resource files. */
+    public readonly ?URL $resourceURL;
     /** @var URL|null The file URL of the receiver's executable file. */
     public readonly ?URL $executableURL;
     /** @var URL|null The file URL of the bundle's subdirectory containing private frameworks. */
@@ -54,7 +55,6 @@ final class Bundle extends ObjectClass
     public readonly ?string $principalClass;
     /** @var URL The full URL of the receiver's bundle directory. */
     public readonly URL $bundleURL;
-    private readonly URL $contentsURL;
 
     /**
      * Returns a Bundle object initialized to correspond to the specified file URL.
@@ -75,7 +75,6 @@ final class Bundle extends ObjectClass
         unset($this->developmentLocalization);
         unset($this->localizedInfoDictionary);
         unset($this->principalClass);
-        unset($this->contentsURL);
         if (!FileManager::default()->fileExists($url->path, $isDirectory) || !$isDirectory) {
             throw new InvalidArgumentException("Invalid bundle url \"$url\"");
         }
@@ -89,26 +88,23 @@ final class Bundle extends ObjectClass
 
     public function __get(string $name)
     {
-        if ($name == 'contentsURL') {
-            $this->$name = $this->directoryURL($this->bundleURL, 'Contents') ?? $this->bundleURL;
-            return $this->$name;
-        } elseif ($name == 'resourceURL') {
-            $this->$name = $this->directoryURL($this->bundleURL, 'Resources') ?? $this->bundleURL;
+        if ($name == 'resourceURL') {
+            $this->$name = $this->directoryURL($this->bundleURL, 'Resources');
             return $this->$name;
         } elseif ($name == 'executableURL') {
-            $this->$name = $this->directoryURL($this->contentsURL->appendingPathComponent('OS'), $this->object(kCFBundleExecutableKey) ?? $this->object(kCFBundleNameKey));
+            $this->$name = $this->directoryURL($this->bundleURL->appendingPathComponent('OS'), $this->object(kCFBundleExecutableKey) ?? $this->object(kCFBundleNameKey));
             return $this->$name;
         } elseif ($name == 'privateFrameworksURL') {
-            $this->$name = $this->directoryURL($this->contentsURL, 'PrivateFrameworks');
+            $this->$name = $this->directoryURL($this->bundleURL, 'PrivateFrameworks');
             return $this->$name;
         } elseif ($name == 'sharedFrameworksURL') {
-            $this->$name = $this->directoryURL($this->contentsURL, 'Frameworks');
+            $this->$name = $this->directoryURL($this->bundleURL, 'Frameworks');
             return $this->$name;
         } elseif ($name == 'builtInPlugInsURL') {
-            $this->$name = $this->directoryURL($this->contentsURL, 'Plugins');
+            $this->$name = $this->directoryURL($this->bundleURL, 'Plugins');
             return $this->$name;
         } elseif ($name == 'sharedSupportURL') {
-            $this->$name = $this->directoryURL($this->contentsURL, 'SharedSupport');
+            $this->$name = $this->directoryURL($this->bundleURL, 'SharedSupport');
             return $this->$name;
         } elseif ($name == 'bundleIdentifier') {
             $this->$name = $this->object(kCFBundleIdentifierKey);
@@ -222,9 +218,8 @@ final class Bundle extends ObjectClass
                 $url->deleteLastPathComponent();
             }
             return self::bundleWithURL($url);
-        } catch (Throwable $throwable) {
-            $throwableClass = $throwable::class;
-            throw new $throwableClass($throwable->getMessage(), $throwable->getCode());
+        } catch (Exception $exception) {
+            throw new InvalidArgumentException($exception->getMessage(), $exception->getCode());
         }
     }
 
@@ -264,14 +259,14 @@ final class Bundle extends ObjectClass
     }
 
     /**
-     * @param URL $baseUrl
+     * @param URL $baseURL
      * @param string|null $name
      * @param ArrayClass<string>|null $extensions
      * @param ArrayClass<string>|null $languages
      * @param int $limit
      * @return ArrayClass<URL>|null
      */
-    private static function findBundleResources(URL $baseUrl, ?string $name = null, ?ArrayClass $extensions = null, ?ArrayClass $languages = null, int $limit = NotFound): ?ArrayClass
+    private static function findBundleResources(URL $baseURL, ?string $name = null, ?ArrayClass $extensions = null, ?ArrayClass $languages = null, int $limit = NotFound): ?ArrayClass
     {
         try {
             $extensions ??= new ArrayClass();
@@ -280,7 +275,7 @@ final class Bundle extends ObjectClass
                 $extensions->append($extension);
             }
             $languages ??= new ArrayClass(['']);
-            $resources = $languages->flatMap(fn(string $language): iterable => FileManager::default()->contentsOfDirectory($language ? $baseUrl->appendingPathComponent($language) : $baseUrl, null, DirectoryEnumerationOptions::skipsHiddenFiles))->filter(function (URL $url, int $idx, bool &$stop) use ($name, $extensions, $limit): bool {
+            $resources = $languages->flatMap(fn(string $language): iterable => FileManager::default()->contentsOfDirectory($language ? $baseURL->appendingPathComponent($language) : $baseURL, null, DirectoryEnumerationOptions::skipsHiddenFiles))->filter(function (URL $url, int $idx, bool &$stop) use ($name, $extensions, $limit): bool {
                 $pathExtension = $url->pathExtension;
                 /** @psalm-suppress InvalidScalarArgument */
                 $ok = $name ? (string_is_equal($url->deletingPathExtension()->lastPathComponent, pathinfo($name, PATHINFO_FILENAME)) && (empty($pathExtension) || $extensions->containsElement($pathExtension))) : (empty($pathExtension) || $extensions->containsElement($pathExtension));
@@ -311,8 +306,9 @@ final class Bundle extends ObjectClass
      */
     public function url(?string $name, ?string $extension = null, ?string $subpath = null, ?string $localization = null): ?URL
     {
+        $baseURL = $this->resourceURL ?? $this->bundleURL;
         /** @psalm-suppress InvalidArgument */
-        return self::findBundleResources($subpath ? $this->resourceURL->appendingPathComponent($subpath) : $this->resourceURL, $name, $extension ? new ArrayClass([$extension]) : null, $localization ? new ArrayClass([$localization]) : null, 1)?->first();
+        return self::findBundleResources($subpath ? $baseURL->appendingPathComponent($subpath) : $baseURL, $name, $extension ? new ArrayClass([$extension]) : null, $localization ? new ArrayClass([$localization]) : null, 1)?->first();
     }
 
     /**
@@ -327,8 +323,9 @@ final class Bundle extends ObjectClass
      */
     public function urls(?string $extension = null, ?string $subpath = null, ?string $localization = null): ?ArrayClass
     {
+        $baseURL = $this->resourceURL ?? $this->bundleURL;
         /** @psalm-suppress InvalidArgument */
-        return self::findBundleResources($subpath ? $this->resourceURL->appendingPathComponent($subpath) : $this->resourceURL, null, $extension ? new ArrayClass([$extension]) : null, $localization ? new ArrayClass([$localization]) : null);
+        return self::findBundleResources($subpath ? $baseURL->appendingPathComponent($subpath) : $baseURL, null, $extension ? new ArrayClass([$extension]) : null, $localization ? new ArrayClass([$localization]) : null);
     }
 
     /**
@@ -365,7 +362,7 @@ final class Bundle extends ObjectClass
      */
     public function urlForImageResource(string $name): ?URL
     {
-        return self::findBundleResources($this->resourceURL, $name, (new ArrayClass([MimeTypeJPEG, MimeTypePNG]))->flatMap(fn(string $mimeType): iterable => URLFileTypeMappings::shared()->extensions($mimeType) ?? []), null, 1)?->first();
+        return self::findBundleResources($this->resourceURL ?? $this->bundleURL, $name, (new ArrayClass([MimeTypeJPEG, MimeTypePNG]))->flatMap(fn(string $mimeType): iterable => URLFileTypeMappings::shared()->extensions($mimeType) ?? []), null, 1)?->first();
     }
 
     /**
@@ -402,7 +399,7 @@ final class Bundle extends ObjectClass
      */
     public function pathForSoundResource(string $name): ?string
     {
-        return self::findBundleResources($this->resourceURL, $name, new ArrayClass(['mp3']), null, 1)?->first()?->path;
+        return self::findBundleResources($this->resourceURL ?? $this->bundleURL, $name, new ArrayClass(['mp3']), null, 1)?->first()?->path;
     }
 
     /**
@@ -414,7 +411,7 @@ final class Bundle extends ObjectClass
      */
     public function localizedString(string $key, string $value = null, string $table = null): string
     {
-        $string = localized_string($key, $table ?? 'Localizable', $this->resourceURL->path);
+        $string = localized_string($key, $table ?? 'Localizable', $this->resourceURL?->path ?? '');
         if (string_is_equal($key, $string) && $value) {
             return $value;
         }

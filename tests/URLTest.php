@@ -2,14 +2,16 @@
 
 namespace Sabatier\Foundation\Test;
 
+use Exception;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
+use Sabatier\Foundation\Set;
 use Sabatier\Foundation\URL;
-use Sabatier\Foundation\URLScheme;
+use Sabatier\Foundation\URLResourceKey;
 
 class URLTest extends TestCase
 {
-    public const URLString = 'http://localhost/user?id=1';
+    public const URLString = 'http://localhost';
 
     public function testCanBeCreatedFromValidUrl(): URL
     {
@@ -27,12 +29,26 @@ class URLTest extends TestCase
         new URL('invalid');
     }
 
-    public function testCanBeCreatedFromValidFileUrl(): void
+    /**
+     * @depends testCanBeCreatedFromValidUrl
+     * @param URL $url
+     */
+    public function testCanBeUsedAsString(URL $url): void
     {
+        self::assertEquals(
+            self::URLString,
+            $url
+        );
+    }
+
+    public function testCanBeCreatedFromValidFileUrl(): URL
+    {
+        $url = URL::fileURL(__FILE__);
         self::assertInstanceOf(
             URL::class,
-            URL::fileURL('/')
+            $url
         );
+        return $url;
     }
 
     public function testCannotBeCreatedFromInvalidFileUrl(): void
@@ -42,37 +58,19 @@ class URLTest extends TestCase
     }
 
     /**
-     * @depends testCanBeCreatedFromValidUrl
+     * @depends testCanBeCreatedFromValidFileUrl
      * @param URL $url
      * @return URL
+     * @throws Exception
      */
-    public function testCanReturnExpectedProperties(URL $url): URL
+    public function testCanSetTemporaryResourceValues(URL $url): URL
     {
-        self::assertNull($url->fragment);
-        self::assertEquals(
-            URLScheme::http,
-            $url->scheme
-        );
-        self::assertEquals(
-            'localhost',
-            $url->host
-        );
-        self::assertNull($url->port);
-        self::assertNotNull($url->query);
-        self::assertNull($url->user);
-        self::assertNull($url->password);
+        $keys = new Set([URLResourceKey::nameKey]);
+        $values = $url->resourceValues($keys);
+        foreach ($values->allValues as $key => $value) {
+            $url->setTemporaryResourceValue($value, $key);
+        }
+        self::assertIsString($values->name);
         return $url;
-    }
-
-    /**
-     * @depends testCanReturnExpectedProperties
-     * @param URL $url
-     */
-    public function testCanBeUsedAsString(URL $url): void
-    {
-        self::assertEquals(
-            self::URLString,
-            $url
-        );
     }
 }

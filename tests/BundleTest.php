@@ -6,15 +6,14 @@ use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Sabatier\Foundation\ArrayClass;
 use Sabatier\Foundation\Bundle;
-use Sabatier\Foundation\FileManager;
 use Sabatier\Foundation\URL;
 use const Sabatier\Foundation\kCFBundleNameKey;
 
 class BundleTest extends TestCase
 {
-    public function testCanBeCreatedFromUrl(): Bundle
+    public function testCanBeCreatedFromValidUrl(): Bundle
     {
-        $bundle = Bundle::bundleWithURL(FileManager::default()->documentRootDirectory);
+        $bundle = Bundle::main();
         self::assertInstanceOf(
             Bundle::class,
             $bundle
@@ -28,7 +27,7 @@ class BundleTest extends TestCase
         Bundle::bundleWithURL(URL::fileURL(__FILE__));
     }
 
-    public function testCanBeCreatedFromClass(): void
+    public function testCanBeCreatedFromValidClass(): void
     {
         self::assertInstanceOf(
             Bundle::class,
@@ -36,8 +35,14 @@ class BundleTest extends TestCase
         );
     }
 
+    public function testCannotBeCreatedFromInvalidClass(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        Bundle::bundleForClass('Invalid');
+    }
+
     /**
-     * @depends testCanBeCreatedFromUrl
+     * @depends testCanBeCreatedFromValidUrl
      * @param Bundle $bundle
      */
     public function testCanLoadInfoDictionary(Bundle $bundle): void
@@ -49,7 +54,7 @@ class BundleTest extends TestCase
     }
 
     /**
-     * @depends testCanBeCreatedFromUrl
+     * @depends testCanBeCreatedFromValidUrl
      * @param Bundle $bundle
      */
     public function testCanLoadPreferredLocalizations(Bundle $bundle): void
@@ -64,7 +69,7 @@ class BundleTest extends TestCase
     }
 
     /**
-     * @depends testCanBeCreatedFromUrl
+     * @depends testCanBeCreatedFromValidUrl
      * @param Bundle $bundle
      */
     public function testCanLoadLocalizedString(Bundle $bundle): void
@@ -73,7 +78,7 @@ class BundleTest extends TestCase
     }
 
     /**
-     * @depends testCanBeCreatedFromUrl
+     * @depends testCanBeCreatedFromValidUrl
      * @param Bundle $bundle
      */
     public function testCanFindResource(Bundle $bundle): void
@@ -85,7 +90,7 @@ class BundleTest extends TestCase
     }
 
     /**
-     * @depends testCanBeCreatedFromUrl
+     * @depends testCanBeCreatedFromValidUrl
      * @param Bundle $bundle
      */
     public function testCanFindClass(Bundle $bundle): void

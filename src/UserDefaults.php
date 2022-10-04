@@ -26,11 +26,10 @@ class UserDefaults
      * Creates a user defaults object initialized with the defaults for the specified database name.
      * If you pass nil to this parameter, the system uses the default search list that the {@see standard()} class method uses. Because a suite manages the defaults of a specified app group, a suite name must be distinct from your app's main bundle identifier. The {@see globalDomain} is also an invalid suite name, because it isn't writeable by apps.
      * @param string|null $suiteName The domain identifier of the search list.
-     * @noinspection PhpUnhandledExceptionInspection, PhpDocMissingThrowsInspection
      */
     public function __construct(?string $suiteName = null)
     {
-        $suiteName ??= Bundle::bundleWithURL(FileManager::default()->documentRootDirectory)->bundleIdentifier ?? throw new InvalidArgumentException();
+        $suiteName ??= Bundle::main()->bundleIdentifier ?? throw new InvalidArgumentException();
         $this->suiteName = $suiteName;
         $this->addSuite($this->suiteName);
     }
@@ -40,7 +39,7 @@ class UserDefaults
      */
     private function standardUserPreferences(): Dictionary
     {
-        if (self::$standardUserPreferences == null) {
+        if (self::$standardUserPreferences === null) {
             self::$standardUserPreferences = new Dictionary();
         }
         return self::$standardUserPreferences;

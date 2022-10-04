@@ -13,7 +13,6 @@ use Closure;
 use Exception;
 use InvalidArgumentException;
 use JetBrains\PhpStorm\ExpectedValues;
-use SplFileInfo;
 
 /**
  * Class FileManager

@@ -6,7 +6,9 @@ use Exception;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Sabatier\Foundation\ArrayClass;
+use Sabatier\Foundation\Date;
 use Sabatier\Foundation\DirectoryEnumerationOptions;
+use Sabatier\Foundation\FileAttributeKey;
 use Sabatier\Foundation\FileManager;
 use Sabatier\Foundation\SearchPathDirectory;
 use Sabatier\Foundation\SearchPathDomainMask;
@@ -88,6 +90,23 @@ class FileManagerTest extends TestCase
         }
         self::assertFileExists($path);
         return $url;
+    }
+
+    /**
+     * @depends testCanCreateDirectory
+     * @param URL $url
+     * @throws Exception
+     */
+    public function testCanReadFileAttributes(URL $url): void
+    {
+        $attributes = FileManager::default()->attributesOfItem($url->path);
+        self::assertInstanceOf(
+            Date::class,
+            $attributes[FileAttributeKey::creationDate]
+        );
+        self::assertIsBool($attributes[FileAttributeKey::immutable]);
+        self::assertIsInt($attributes[FileAttributeKey::posixPermissions]);
+        self::assertIsString($attributes[FileAttributeKey::type]);
     }
 
     /**
