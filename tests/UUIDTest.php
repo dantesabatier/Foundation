@@ -4,15 +4,16 @@ namespace Sabatier\Foundation\Test;
 
 use PHPUnit\Framework\TestCase;
 use Sabatier\Foundation\UUID;
+
 use function Sabatier\Foundation\uuid_generate_time;
 
-class UUIDTest extends TestCase
+final class UUIDTest extends TestCase
 {
-    public const UIUIDString = 'e621e1f8-c36c-495a-93fc-0c247a3e6e5f';
+    public const UUIDString = 'e621e1f8-c36c-495a-93fc-0c247a3e6e5f';
 
     public function testCanBeCreatedFromUuid4(): UUID
     {
-        $url = new UUID(self::UIUIDString);
+        $url = new UUID(self::UUIDString);
         self::assertInstanceOf(
             UUID::class,
             $url
@@ -20,14 +21,12 @@ class UUIDTest extends TestCase
         return $url;
     }
 
-    public function testCanBeCreatedFromUuid1(): UUID
+    public function testCanBeCreatedFromUuid1(): void
     {
-        $url = new UUID(uuid_generate_time());
         self::assertInstanceOf(
             UUID::class,
-            $url
+            new UUID(uuid_generate_time())
         );
-        return $url;
     }
     /**
      * @depends testCanBeCreatedFromUuid4
@@ -36,7 +35,7 @@ class UUIDTest extends TestCase
     public function testCanBeUsedAsString(UUID $uuid): void
     {
         self::assertEquals(
-            self::UIUIDString,
+            self::UUIDString,
             $uuid
         );
     }

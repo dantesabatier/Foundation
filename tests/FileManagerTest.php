@@ -16,7 +16,7 @@ use Sabatier\Foundation\Set;
 use Sabatier\Foundation\URL;
 use Sabatier\Foundation\URLResourceKey;
 
-class FileManagerTest extends TestCase
+final class FileManagerTest extends TestCase
 {
     /**
      * @throws Exception

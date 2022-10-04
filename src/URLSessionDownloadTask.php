@@ -29,11 +29,14 @@ class URLSessionDownloadTask extends URLSessionTask
         return static::taskWithRequest($request, function (?string $data, ?URLResponse $response, ?Error $error) use ($completion): void {
             if ($response instanceof HTTPURLResponse) {
                 $fileManager = FileManager::default();
-                $filename = $response->url->lastPathComponent;
-                $url = $fileManager->temporaryDirectory->appendingPathComponent($filename);
-                if (empty($url->pathExtension) && ($mimeType = $response->mimeType) && ($extension = URLFileTypeMappings::shared()->preferredExtension($mimeType))) {
-                    $url->appendPathExtension($extension);
+                $directoryURL = $fileManager->temporaryDirectory;
+                if (!($filename = $response->url->lastPathComponent)) {
+                    $filename = uniqid((string)(new SystemRandomNumberGenerator())->next(), true);
                 }
+                if (!($pathExtension = $response->url->pathExtension) && ($mimeType = $response->mimeType) && ($extension = URLFileTypeMappings::shared()->preferredExtension($mimeType))) {
+                    $pathExtension = $extension;
+                }
+                $url = $directoryURL->appendingPathComponent($filename)->appendPathExtension($pathExtension);
                 $path = $url->path;
                 $fileManager->createFile($path, $data);
                 $completion($url, $response, $error);

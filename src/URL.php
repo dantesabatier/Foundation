@@ -56,15 +56,15 @@ final class URL extends ObjectClass
      */
     public function __construct(string $string, ?URL $baseURL = null)
     {
-        if (!empty(parse_url($string, PHP_URL_SCHEME))) {
+        if ($string) {
             $components = new URLComponents($string);
             $proposed = $components->string;
             if ($proposed) {
                 $string = $proposed;
             }
         }
-        if (empty(parse_url($string, PHP_URL_SCHEME))) {
-            throw new InvalidArgumentException();
+        if (!url_validate($string)) {
+            throw new InvalidArgumentException(sprintf("invalid argument: expecting uri string, \"%s\" given", $string));
         }
         $this->string = $string;
         $this->baseURL = $baseURL;

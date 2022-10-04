@@ -264,16 +264,6 @@ function string_contains(string $string, string $substring, #[ExpectedValues(fla
     return string_search($string, $substring, SearchMethod::contains, $options) > 0;
 }
 
-function string_to_binary(string $string): string
-{
-    return implode(' ', array_map(fn(string $c): string => base_convert(unpack("H*", $c)[1], 16, 2), str_split($string)));
-}
-
-function string_from_binary(string $string): string
-{
-    return implode('', array_map(fn(string $c): string => pack('H*', dechex((int)bindec($c))), explode(' ', $string)));
-}
-
 /**
  * Returns a localized version of the string designated by the specified key and residing in the specified table.
  * @param string $string The key for a string in the specified table.
@@ -300,18 +290,6 @@ function localized_string(string $string, string $domain = 'Localizable', string
     bind_textdomain_codeset($domain, 'UTF-8');
     textdomain($domain);
     return gettext($string);
-}
-
-function url_encode(string $url, string $endpoint, array $parameters = []): string
-{
-    if (!string_has_suffix($url, '/')) {
-        $url .= '/';
-    }
-    $url .= $endpoint;
-    if (!empty($parameters)) {
-        $url .= "?" . http_build_query($parameters);
-    }
-    return $url;
 }
 
 function document_root_directory(): string

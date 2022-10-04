@@ -7,9 +7,10 @@ use PHPUnit\Framework\TestCase;
 use Sabatier\Foundation\ArrayClass;
 use Sabatier\Foundation\Bundle;
 use Sabatier\Foundation\URL;
+
 use const Sabatier\Foundation\kCFBundleNameKey;
 
-class BundleTest extends TestCase
+final class BundleTest extends TestCase
 {
     public function testCanBeCreatedFromValidUrl(): Bundle
     {
@@ -38,6 +39,7 @@ class BundleTest extends TestCase
     public function testCannotBeCreatedFromInvalidClass(): void
     {
         $this->expectException(InvalidArgumentException::class);
+        /** @psalm-suppress UndefinedClass, ArgumentTypeCoercion */
         Bundle::bundleForClass('Invalid');
     }
 

@@ -57,6 +57,7 @@
       "src/ErrorUserInfoKey.php",
       "src/KeyValueCodingInternal.php",
       "src/StandardAdditions.php",
+      "src/URLAdditions.php",
       "src/UUIDAdditions.php",
       "src/ValueInternal.php"
     ]

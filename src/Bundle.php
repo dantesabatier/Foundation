@@ -193,7 +193,7 @@ final class Bundle extends ObjectClass
      */
     public static function bundleWithIdentifier(string $identifier): ?Bundle
     {
-        return self::allBundles()->first(fn(Bundle $bundle): bool => string_is_equal($bundle->bundleIdentifier ?? '', $identifier, CompareOptions::caseInsensitive));
+        return self::allBundles()->first(fn(Bundle $bundle): bool => (($bundleIdentifier = $bundle->bundleIdentifier) && string_is_equal($bundleIdentifier, $identifier, CompareOptions::caseInsensitive)));
     }
 
     /**
@@ -219,7 +219,7 @@ final class Bundle extends ObjectClass
             }
             return self::bundleWithURL($url);
         } catch (Exception $exception) {
-            throw new InvalidArgumentException($exception->getMessage(), $exception->getCode());
+            throw new InvalidArgumentException($exception->getMessage());
         }
     }
 
@@ -231,10 +231,11 @@ final class Bundle extends ObjectClass
     public static function main(): Bundle
     {
         /** @psalm-suppress RedundantCondition */
-        if (LOAD_MAIN_BUNDLE_USING_DOCUMENT_ROOT_DIRECTORY_URL) {
+        if (/** @phpstan-ignore-line */ LOAD_MAIN_BUNDLE_USING_DOCUMENT_ROOT_DIRECTORY_URL) {
             return Bundle::bundleWithURL(FileManager::default()->documentRootDirectory);
         }
-        return Bundle::bundleForClass(get_calling_class() ?? throw new InternalInconsistencyException());
+        /** @phpstan-ignore-next-line */
+        return Bundle::bundleForClass(get_calling_class() ?? fatal_error());
     }
 
     /**

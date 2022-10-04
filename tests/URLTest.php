@@ -9,7 +9,7 @@ use Sabatier\Foundation\Set;
 use Sabatier\Foundation\URL;
 use Sabatier\Foundation\URLResourceKey;
 
-class URLTest extends TestCase
+final class URLTest extends TestCase
 {
     public const URLString = 'http://localhost';
 

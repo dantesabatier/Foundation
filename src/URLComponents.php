@@ -31,11 +31,10 @@ class URLComponents extends ObjectClass
 
     public function __construct(?string $string = null)
     {
-        if ($string) {
-            $components = parse_url($string);
+        if ($string && ($components = parse_url($string))) {
             foreach ($components as $key => $value) {
                 if (!empty($value)) {
-                    $this->$key = $value;
+                    $this->$key = $value; // @phpstan-ignore-line
                 }
             }
         }
@@ -47,24 +46,24 @@ class URLComponents extends ObjectClass
             return $this->urlRelativeTo(null);
         } elseif ($name == 'string') {
             $scheme = $this->scheme;
-            if (!empty($scheme)) {
+            if ($scheme) {
                 $scheme .= '://';
             }
             $user = $this->user;
             $password = $this->password;
-            if (!empty($password) && !empty($user)) {
+            if ($password && $user) {
                 $user .= ':';
                 $password = rawurlencode($password) . '@';
-            } elseif (!empty($user)) {
+            } elseif ($user) {
                 $user .= '@';
             }
             $host = $this->host;
             $port = $this->port;
-            if (!empty($port) && !empty($host)) {
+            if ($port && $host) {
                 $host = "$host:";
             }
             $path = $this->path;
-            if (!empty($path)) {
+            if ($path) {
                 $tu = '';
                 $tok = strtok($path, "\\/");
                 while (strlen($tok)) {
@@ -74,14 +73,14 @@ class URLComponents extends ObjectClass
                 $path = '/' . trim($tu, '/');
             }
             $query = $this->query;
-            if (!empty($query)) {
+            if ($query) {
                 $query = '?' . $query;
             }
             $fragment = $this->fragment;
-            if (!empty($fragment)) {
+            if ($fragment) {
                 $fragment = '#' . $fragment;
             }
-            $string = (new ArrayClass([$scheme, $user, $password, $host, $port, $path, $query, $fragment]))->compactMap(fn(mixed $element): mixed => $element)->join('');
+            $string = (new ArrayClass([$scheme, $user, $password, $host, $port, $path, $query, $fragment]))->compactMap(fn(string|int|null $element): string|int|null => $element)->join('');
             return empty($string) ? null : $string;
         } elseif ($name == 'queryItems') {
             return ($this->query === null) ? null : (new ArrayClass(explode('&', $this->query)))->map(function (string $pair): URLQueryItem {

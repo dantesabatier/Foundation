@@ -7,7 +7,7 @@ use Sabatier\Foundation\ArrayClass;
 use Sabatier\Foundation\URL;
 use Sabatier\Foundation\URLComponents;
 
-class URLComponentsTest extends TestCase
+final class URLComponentsTest extends TestCase
 {
     public const URLString = 'https://admin:admin@host.com:1234/path/data?key=value2#fragment';
 
