@@ -13,6 +13,7 @@ use Closure;
 use Exception;
 use InvalidArgumentException;
 use JetBrains\PhpStorm\ExpectedValues;
+use SplFileInfo;
 
 /**
  * Class FileManager
@@ -412,7 +413,7 @@ final class FileManager extends ObjectClass
      */
     public function createSymbolicLink(URL $sourceUrl, URL $destinationUrl): bool
     {
-        return unsafe_value(fn(): bool => symlink($sourceUrl->path, $destinationUrl->path));
+        return unsafe_value(fn(): bool => symlink($sourceUrl->fileSystemRepresentation, $destinationUrl->path));
     }
 
     /**

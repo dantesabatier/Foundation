@@ -17,7 +17,7 @@ final class URLFileTypeMappingsInternal
         /** @var Dictionary<string> $extensionToMIMEType */
         $extensionToMIMEType = new Dictionary();
         /** @noinspection PhpUnhandledExceptionInspection */
-        if (($url = Bundle::bundleForClass(self::class)?->url('mime.types')) && ($contents = FileManager::default()->contents($url->path))) {
+        if (($url = Bundle::bundleForClass(self::class)->url('mime.types')) && ($contents = FileManager::default()->contents($url->path))) {
             $scanner = new Scanner($contents);
             $scanner->charactersToBeSkipped = PHP_EOL;
             while ($scanner->scanUpCharacters(PHP_EOL, $line)) {

@@ -52,7 +52,7 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
         if ($iterable instanceof Dictionary) {
             $this->reserved = $iterable->toArray();
         } elseif (is_array($iterable) && (!count($iterable) || !is_sequential($iterable))) {
-            $this->reserved = array_filter($iterable, fn (mixed $e): bool => $e !== null);
+            $this->reserved = array_filter($iterable, fn(mixed $e): bool => $e !== null);
         } else {
             throw new InvalidArgumentException();
         }
@@ -475,7 +475,7 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
             $this->reserved = [];
             return;
         }
-        $this->reserved = $this->filter(fn (mixed $e, string $i): bool => !$where($e, $i))->reserved;
+        $this->reserved = $this->filter(fn(mixed $e, string $i): bool => !$where($e, $i))->reserved;
     }
 
     public function setDictionary(Dictionary $dictionary): void
@@ -523,29 +523,6 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
         }
     }
 
-    public function valueForKeyPath(string $keyPath)
-    {
-        if ((strlen($keyPath) == 0) || $keyPath[0] !== '@') {
-            return parent::valueForKeyPath($keyPath);
-        }
-        $components = components_from_key_path($keyPath);
-        $key = $components->key;
-        $operator = kvc_operator_from_key($key);
-        if (!$operator) {
-            return null;
-        }
-        $value = $this;
-        $remainderPath = $components->remainderPath;
-        if ($remainderPath) {
-            $value = parent::valueForKeyPath($remainderPath);
-            assert($value instanceof Dictionary, sprintf("invalid argument: expecting \"%s\", given \"%s\"", Dictionary::class, typeof($value)));
-        }
-        return match ($operator) {
-            KeyValueOperator::averageKeyValueOperator, KeyValueOperator::countKeyValueOperator, KeyValueOperator::maximumKeyValueOperator, KeyValueOperator::minimumKeyValueOperator, KeyValueOperator::sumKeyValueOperator => PredicateUtilities::$operator($value),
-            default => throw new InvalidArgumentException(sprintf('%s %s() this class does not implement the "%s" operation', $this->debugDescription(), __FUNCTION__, $operator)),
-        };
-    }
-
     /**
      * As on {@see valueForKey()} but for case-insensitive key.
      * @param string $key
@@ -556,15 +533,14 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
         if ($this->offsetExists($key)) {
             return $this->offsetGet($key);
         }
-        return $this->first(fn (mixed $e, string $k): bool => string_is_equal($k, $key, CompareOptions::caseInsensitive));
+        return $this->first(fn(mixed $e, string $k): bool => string_is_equal($k, $key, CompareOptions::caseInsensitive));
     }
 
     public function description(): string
     {
-        return $this->isEmpty() ? "[:]" : "[" . $this->mapValues(fn (mixed $value, string $key): string => sprintf("%s: %s", $key, human_readable_value($value)))->values->join(", ") . "]";
+        return sprintf("[%s]", $this->isEmpty() ? ":" : $this->mapValues(fn(mixed $value, string $key): string => sprintf("%s: %s", $key, human_readable_value($value)))->values->join(", "));
     }
 
-    #[Pure]
     public function count(): int
     {
         return count($this->reserved);

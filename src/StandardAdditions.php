@@ -290,8 +290,8 @@ function localized_string(string $string, string $domain = 'Localizable', string
     if (!$fileManager->fileExists($directoryUrl->path, $isDirectory) || !$isDirectory) {
         $directoryUrl = $fileManager->documentRootDirectory->appendingPathComponent('Resources');
     }
-    if ((!$fileManager->fileExists($directoryUrl->path, $isDirectory) || !$isDirectory) && ($bundle = Bundle::bundleForClass(FileManager::class))) {
-        $directoryUrl = $bundle->bundleURL;
+    if ((!$fileManager->fileExists($directoryUrl->path, $isDirectory) || !$isDirectory)) {
+        $directoryUrl = Bundle::bundleForClass(FileManager::class)->bundleURL;
     }
     if (!string_is_equal($directoryUrl->lastPathComponent, 'Resources')) {
         $directoryUrl = $directoryUrl->appendingPathComponent('Resources');

@@ -87,7 +87,7 @@ class FlattenSequence extends ObjectClass implements Sequence, IteratorAggregate
         return (function (): Generator {
             $recursive = function (iterable $iterable) use (&$recursive): Traversable {
                 foreach ($iterable as $item) {
-                    if ($item instanceof Traversable && !$item instanceof Dictionary) {
+                    if (is_array($item) || ($item instanceof Traversable && !$item instanceof Dictionary)) {
                         foreach ($recursive($item) as $v) {
                             yield $v;
                         }

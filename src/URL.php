@@ -15,6 +15,7 @@ use InvalidArgumentException;
 use JetBrains\PhpStorm\ArrayShape;
 use JetBrains\PhpStorm\ExpectedValues;
 use JetBrains\PhpStorm\Pure;
+use SplFileInfo;
 
 /**
  * Class URL
@@ -23,21 +24,21 @@ use JetBrains\PhpStorm\Pure;
  * @property-read string $absoluteString The absolute string for the URL.
  * @property-read URL $absoluteURL The absolute URL.
  * @property-read URL|null $baseURL The base URL.
- * @property-read string $fragment The fragment component of the URL if the URL conforms to RFC 1808 (the most common form of URL), otherwise nil.
- * @property-read string $host The host component of a URL if the URL conforms to RFC 1808 (the most common form of URL), otherwise nil.
+ * @property-read string|null $fragment The fragment component of the URL if the URL conforms to RFC 1808 (the most common form of URL), otherwise nil.
+ * @property-read string|null $host The host component of a URL if the URL conforms to RFC 1808 (the most common form of URL), otherwise nil.
  * @property-read string $lastPathComponent The last path component of the URL, or an empty string if the path is an empty string.
  * @property-read string $path The path component of the URL if the URL conforms to RFC 1808 (the most common form of URL), otherwise an empty string.
  * @property-read ArrayClass<string> $pathComponents The path components of the URL, or an empty array if the path is an empty string.
  * @property-read string $pathExtension The path extension of the URL, or an empty string if the path is an empty string.
- * @property-read int $port The port component of the URL if the URL conforms to RFC 1808 (the most common form of URL), otherwise nil.
- * @property-read string $query The query of the URL if the URL conforms to RFC 1808 (the most common form of URL), otherwise nil.
+ * @property-read int|null $port The port component of the URL if the URL conforms to RFC 1808 (the most common form of URL), otherwise nil.
+ * @property-read string|null $query The query of the URL if the URL conforms to RFC 1808 (the most common form of URL), otherwise nil.
  * @property-read string $relativePath The relative path of the URL if the URL conforms to RFC 1808 (the most common form of URL), otherwise nil.
  * @property-read string $relativeString The relative portion of a URL.
  * @property-read string $scheme The scheme of the URL.
  * @property-read URL $standardized A version of the URL with any instances of “..” or “.” removed from its path.
  * @property-read URL $standardizedFileURL A standardized version of the path of a file URL.
- * @property-read string $user The user component of the URL if the URL conforms to RFC 1808 (the most common form of URL), otherwise nil.
- * @property-read string $password The password component of the URL if the URL conforms to RFC 1808 (the most common form of URL), otherwise nil.
+ * @property-read string|null $user The user component of the URL if the URL conforms to RFC 1808 (the most common form of URL), otherwise nil.
+ * @property-read string|null $password The password component of the URL if the URL conforms to RFC 1808 (the most common form of URL), otherwise nil.
  * @property-read bool $isFileURL A Boolean that is true if the scheme is {@see URLScheme::file}.
  * @property-read bool $hasDirectoryPath A Boolean that is true if the URL path represents a directory.
  * @property-read string $fileSystemRepresentation A string containing the URL's file system path.
@@ -61,6 +62,9 @@ final class URL extends ObjectClass
             if ($proposed) {
                 $string = $proposed;
             }
+        }
+        if (empty(parse_url($string, PHP_URL_SCHEME))) {
+            throw new InvalidArgumentException();
         }
         $this->string = $string;
         $this->baseURL = $baseURL;
@@ -128,9 +132,9 @@ final class URL extends ObjectClass
             }
             return $this->absoluteURL->absoluteString;
         } elseif ($name == 'fileSystemRepresentation') {
-            return realpath($this->path);
+            return (new SplFileInfo($this->path))->getRealPath();
         } elseif ($name == 'fragment') {
-            return (string)parse_url($this->absoluteString, PHP_URL_FRAGMENT);
+            return $this->parse(PHP_URL_FRAGMENT);
         } elseif ($name == 'standardized') {
             $url = clone $this;
             $url->standardize();
@@ -138,13 +142,13 @@ final class URL extends ObjectClass
         } elseif ($name == 'standardizedFileURL') {
             return $this->standardized;
         } elseif ($name == 'scheme') {
-            return (string)parse_url($this->absoluteString, PHP_URL_SCHEME);
+            return $this->parse(PHP_URL_SCHEME) ?? '';
         } elseif ($name == 'host') {
-            return (string)parse_url($this->absoluteString, PHP_URL_HOST);
+            return $this->parse(PHP_URL_HOST);
         } elseif ($name == 'lastPathComponent') {
             return basename($this->path);
         } elseif ($name == 'path') {
-            $path = (string)parse_url($this->absoluteString, PHP_URL_PATH);
+            $path = $this->parse(PHP_URL_PATH) ?? '';
             if ($this->isFileURL) {
                 $path = rawurldecode($path);
             }
@@ -164,13 +168,13 @@ final class URL extends ObjectClass
         } elseif ($name == 'pathExtension') {
             return pathinfo($this->path, PATHINFO_EXTENSION);
         } elseif ($name == 'port') {
-            return (int)parse_url($this->absoluteString, PHP_URL_PORT);
+            return $this->parse(PHP_URL_PORT);
         } elseif ($name == 'query') {
-            return (string)parse_url($this->absoluteString, PHP_URL_QUERY);
+            return $this->parse(PHP_URL_QUERY);
         } elseif ($name == 'user') {
-            return (string)parse_url($this->absoluteString, PHP_URL_USER);
+            return $this->parse(PHP_URL_USER);
         } elseif ($name == 'password') {
-            return (string)parse_url($this->absoluteString, PHP_URL_PASS);
+            return $this->parse(PHP_URL_PASS);
         } elseif ($name == 'isFileURL') {
             return $this->scheme == URLScheme::file;
         } elseif ($name == 'hasDirectoryPath') {
@@ -180,6 +184,16 @@ final class URL extends ObjectClass
         } else {
             return $this->valueForUndefinedKey($name);
         }
+    }
+
+    /** @noinspection PhpMixedReturnTypeCanBeReducedInspection */
+    private function parse(int $component): mixed
+    {
+        $v = parse_url($this->absoluteString, $component);
+        if (empty($v)) {
+            return null;
+        }
+        return $v;
     }
 
     private function storage(): URLResourceValuesStorage
@@ -199,7 +213,7 @@ final class URL extends ObjectClass
     {
         $string = "";
         if (target_os_win()) {
-            $path = str_replace("\\", "/", parse_url($path, PHP_URL_PATH));
+            $path = str_replace("\\", "/", (string)parse_url($path, PHP_URL_PATH));
         }
         $scheme = parse_url($path, PHP_URL_SCHEME);
         if (empty($scheme)) {

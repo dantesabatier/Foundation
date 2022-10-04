@@ -49,11 +49,11 @@ class PredicateOperator extends ObjectClass
                 default => throw new InvalidArgumentException(sprintf("invalid argument: %s", $this->modifier->name)),
             };
         }
-        if ($left instanceof Set) {
+        if ($left instanceof ExpressibleByArrayLiteral) {
             $left = $left->toArray();
         }
         if (!is_array($left)) {
-            throw new InvalidArgumentException(sprintf('%s %s the left hand side for an ALL or ANY modifier must be an Array or a Set', $this->debugDescription(), __FUNCTION__));
+            throw new InvalidArgumentException(sprintf("Invalid argument: the left hand side for an ALL or ANY modifier must be an Array or a Set, \"%s\" given", typeof($left)));
         }
         if (empty($left)) {
             return false;

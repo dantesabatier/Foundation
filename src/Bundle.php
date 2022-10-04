@@ -11,6 +11,7 @@ namespace Sabatier\Foundation;
 
 use GdImage;
 use InvalidArgumentException;
+use Locale;
 use ReflectionClass;
 use Throwable;
 
@@ -26,24 +27,24 @@ final class Bundle extends ObjectClass
     public const didLoadNotification = BundleDidLoadNotification;
     /** @var URL The file URL of the bundle's subdirectory containing resource files. */
     public readonly URL $resourceURL;
-    /** @var URL The file URL of the receiver's executable file. */
-    public readonly URL $executableURL;
-    /** @var URL The file URL of the bundle's subdirectory containing private frameworks. */
-    public readonly URL $privateFrameworksURL;
-    /** @var URL The file URL of the receiver's subdirectory containing shared frameworks. */
-    public readonly URL $sharedFrameworksURL;
-    /** @var URL The file URL of the receiver's subdirectory containing plug-ins. */
-    public readonly URL $builtInPlugInsURL;
-    /** @var URL The file URL of the bundle's subdirectory containing shared support files. */
-    public readonly URL $sharedSupportURL;
+    /** @var URL|null The file URL of the receiver's executable file. */
+    public readonly ?URL $executableURL;
+    /** @var URL|null The file URL of the bundle's subdirectory containing private frameworks. */
+    public readonly ?URL $privateFrameworksURL;
+    /** @var URL|null The file URL of the receiver's subdirectory containing shared frameworks. */
+    public readonly ?URL $sharedFrameworksURL;
+    /** @var URL|null The file URL of the receiver's subdirectory containing plug-ins. */
+    public readonly ?URL $builtInPlugInsURL;
+    /** @var URL|null The file URL of the bundle's subdirectory containing shared support files. */
+    public readonly ?URL $sharedSupportURL;
     /** @var string|null The receiver's bundle identifier. */
     public readonly ?string $bundleIdentifier;
     /** @var Dictionary<mixed>|null A dictionary, constructed from the bundle's Info.plist file, that contains information about the receiver. */
     public readonly ?Dictionary $infoDictionary;
-    /** @var ArrayClass<string>|null $localizations A list of all the localizations contained in the bundle. An array of string objects containing language IDs for all the localizations contained in the bundle. */
-    public readonly ?ArrayClass $localizations;
-    /** @var ArrayClass<string>|null $preferredLocalizations An ordered list of preferred localizations contained in the bundle. An array of string objects containing language IDs for localizations in the bundle. The strings are ordered according to the user's language preferences and available localizations */
-    public readonly ?ArrayClass $preferredLocalizations;
+    /** @var ArrayClass<string> $localizations A list of all the localizations contained in the bundle. An array of string objects containing language IDs for all the localizations contained in the bundle. */
+    public readonly ArrayClass $localizations;
+    /** @var ArrayClass<string> $preferredLocalizations An ordered list of preferred localizations contained in the bundle. An array of string objects containing language IDs for localizations in the bundle. The strings are ordered according to the user's language preferences and available localizations */
+    public readonly ArrayClass $preferredLocalizations;
     /** @var string|null The localization for the development language.
      * This property corresponds to the value in the CFBundleDevelopmentRegion key of the bundle's property list (Info.plist). */
     public readonly ?string $developmentLocalization;
@@ -53,6 +54,7 @@ final class Bundle extends ObjectClass
     public readonly ?string $principalClass;
     /** @var URL The full URL of the receiver's bundle directory. */
     public readonly URL $bundleURL;
+    private readonly URL $contentsURL;
 
     /**
      * Returns a Bundle object initialized to correspond to the specified file URL.
@@ -73,7 +75,8 @@ final class Bundle extends ObjectClass
         unset($this->developmentLocalization);
         unset($this->localizedInfoDictionary);
         unset($this->principalClass);
-        if (!$url->isFileURL || !$url->hasDirectoryPath) {
+        unset($this->contentsURL);
+        if (!FileManager::default()->fileExists($url->path, $isDirectory) || !$isDirectory) {
             throw new InvalidArgumentException("Invalid bundle url \"$url\"");
         }
         $this->bundleURL = $url;
@@ -86,28 +89,26 @@ final class Bundle extends ObjectClass
 
     public function __get(string $name)
     {
-        if ($name == 'resourceURL') {
-            $bundleURL = $this->bundleURL;
-            $resourcesURL = $bundleURL->appendingPathComponent('Resources');
-            if (!FileManager::default()->fileExists($resourcesURL->path, $isDirectory) || !$isDirectory) {
-                $resourcesURL = $bundleURL;
-            }
-            $this->$name = $resourcesURL;
+        if ($name == 'contentsURL') {
+            $this->$name = $this->directoryURL($this->bundleURL, 'Contents') ?? $this->bundleURL;
+            return $this->$name;
+        } elseif ($name == 'resourceURL') {
+            $this->$name = $this->directoryURL($this->bundleURL, 'Resources') ?? $this->bundleURL;
             return $this->$name;
         } elseif ($name == 'executableURL') {
-            $this->$name = $this->bundleURL->appendingPathComponent($this->object(kCFBundleExecutableKey) ?? $this->object(kCFBundleNameKey) ?? '');
+            $this->$name = $this->directoryURL($this->contentsURL->appendingPathComponent('OS'), $this->object(kCFBundleExecutableKey) ?? $this->object(kCFBundleNameKey));
             return $this->$name;
         } elseif ($name == 'privateFrameworksURL') {
-            $this->$name = $this->bundleURL->appendingPathComponent('PrivateFrameworks');
+            $this->$name = $this->directoryURL($this->contentsURL, 'PrivateFrameworks');
             return $this->$name;
         } elseif ($name == 'sharedFrameworksURL') {
-            $this->$name = $this->bundleURL->appendingPathComponent('Frameworks');
+            $this->$name = $this->directoryURL($this->contentsURL, 'Frameworks');
             return $this->$name;
         } elseif ($name == 'builtInPlugInsURL') {
-            $this->$name = $this->bundleURL->appendingPathComponent('Plugins');
+            $this->$name = $this->directoryURL($this->contentsURL, 'Plugins');
             return $this->$name;
         } elseif ($name == 'sharedSupportURL') {
-            $this->$name = $this->bundleURL->appendingPathComponent('SharedSupport');
+            $this->$name = $this->directoryURL($this->contentsURL, 'SharedSupport');
             return $this->$name;
         } elseif ($name == 'bundleIdentifier') {
             $this->$name = $this->object(kCFBundleIdentifierKey);
@@ -117,10 +118,12 @@ final class Bundle extends ObjectClass
             $this->$name = FileManager::default()->fileExists($infoUrl->path) ? PropertyListSerialization::propertyListWithURL($infoUrl) : null;
             return $this->$name;
         } elseif ($name == 'localizations') {
-            $this->$name = $this->object(kCFBundleLocalizationsKey);
+            $this->$name = $this->object(kCFBundleLocalizationsKey) ?? new ArrayClass();
             return $this->$name;
         } elseif ($name == 'preferredLocalizations') {
-            $this->$name = null;
+            $preferredLocalizations = clone $this->localizations;
+            $preferredLocalizations->partition(fn(string $localization): bool => $localization !== Locale::getPrimaryLanguage(Locale::getDefault()));
+            $this->$name = $preferredLocalizations;
             return $this->$name;
         } elseif ($name == 'developmentLocalization') {
             $this->$name = $this->object(kCFBundleDevelopmentRegionKey);
@@ -137,6 +140,15 @@ final class Bundle extends ObjectClass
         }
     }
 
+    private function directoryURL(URL $baseURL, string $name): ?URL
+    {
+        $url = $baseURL->appendingPathComponent($name);
+        if (FileManager::default()->fileExists($url->path, $isDirectory) && $isDirectory) {
+            return $url;
+        }
+        return null;
+    }
+
     /**
      * @return Dictionary<Bundle>
      */
@@ -151,21 +163,17 @@ final class Bundle extends ObjectClass
     /**
      * Returns a Bundle object initialized to correspond to the specified file URL.
      * @param URL $url The file URL to a directory. This must be a full URL for a directory; if it contains any symbolic links, they must be resolvable.
-     * @return Bundle|null A Bundle object initialized to correspond to url.
+     * @return Bundle A Bundle object initialized to correspond to url.
      * This method initializes and returns a new instance only if there is no existing bundle associated with url, otherwise it deallocates self and returns the existing object.
      * If url doesn't exist or the user doesn't have access to it, returns nil.
      */
-    public static function bundleWithURL(URL $url): ?Bundle
+    public static function bundleWithURL(URL $url): Bundle
     {
         $key = (string)$url;
         $loadedBundles = self::loadedBundles();
         if (!($bundle = $loadedBundles[$key])) {
-            $path = $url->path;
-            $fileManager = FileManager::default();
-            if ($fileManager->fileExists($path, $isDirectory) && $isDirectory && $fileManager->isReadableFile($path)) {
-                $bundle = new Bundle($url);
-                $loadedBundles[$key] = $bundle;
-            }
+            $bundle = new Bundle($url);
+            $loadedBundles[$key] = $bundle;
         }
         return $bundle;
     }
@@ -174,9 +182,9 @@ final class Bundle extends ObjectClass
      * Returns a Bundle object that corresponds to the specified directory.
      * @param string $path The path to a directory. This must be a full pathname for a directory; if it contains any symbolic links, they must be resolvable.
      * This method allocates and initializes the returned object if there is no existing Bundle associated with fullPath, in which case it returns the existing object.
-     * @return Bundle|null The Bundle object that corresponds to path, or nil if path does not identify an accessible bundle directory.
+     * @return Bundle The Bundle object that corresponds to path, or nil if path does not identify an accessible bundle directory.
      */
-    public static function bundleWithPath(string $path): ?Bundle
+    public static function bundleWithPath(string $path): Bundle
     {
         return self::bundleWithURL(URL::fileURL($path));
     }
@@ -199,21 +207,21 @@ final class Bundle extends ObjectClass
      * However, if the initial lookup of an already loaded and cached bundle with the specified identifier fails, this method uses potentially time-consuming heuristics to attempt to locate the bundle.
      * As an optimization, you can use the bundleWithPath() or bundleWithURL() method instead to avoid file system traversal.
      * @param class-string $class A class.
-     * @return Bundle|null The Bundle object that dynamically loaded $class (a loadable bundle), the Bundle object for the framework in which $class is defined, or the main bundle object if $class was not dynamically loaded or is not defined in a framework.
+     * @return Bundle The Bundle object that dynamically loaded $class (a loadable bundle), the Bundle object for the framework in which $class is defined, or the main bundle object if $class was not dynamically loaded or is not defined in a framework.
      * This method creates and returns a new Bundle object if there is no existing bundle associated with $class. Otherwise, the existing instance is returned.
      */
-    public static function bundleForClass(string $class): ?Bundle
+    public static function bundleForClass(string $class): Bundle
     {
         try {
-            if (($path = (new ReflectionClass($class))->getFileName())) {
-                $url = URL::fileURL($path)->deleteLastPathComponent();
-                $name = $url->lastPathComponent;
-                if (string_is_equal($name, 'src', CompareOptions::caseInsensitive)) {
-                    $url->deleteLastPathComponent();
-                }
-                return self::bundleWithURL($url);
+            if (!($path = (new ReflectionClass($class))->getFileName())) {
+                throw new InvalidArgumentException();
             }
-            return null;
+            $url = URL::fileURL($path)->deleteLastPathComponent();
+            $name = $url->lastPathComponent;
+            if (string_is_equal($name, 'src', CompareOptions::caseInsensitive)) {
+                $url->deleteLastPathComponent();
+            }
+            return self::bundleWithURL($url);
         } catch (Throwable $throwable) {
             $throwableClass = $throwable::class;
             throw new $throwableClass($throwable->getMessage(), $throwable->getCode());
@@ -223,14 +231,15 @@ final class Bundle extends ObjectClass
     /**
      * Returns the bundle object that contains the current executable.
      * The main bundle lets you access the resources in the same directory as the currently running executable. For a running app, the main bundle offers access to the app's bundle directory. For code running in a framework, the main bundle offers access to the framework's bundle directory.
-     * @return Bundle|null The Bundle object corresponding to the bundle directory that contains the current executable. This method may return a valid bundle object even for unbundled apps. It may also return nil if the bundle object could not be created, so always check the return value.
+     * @return Bundle The Bundle object corresponding to the bundle directory that contains the current executable. This method may return a valid bundle object even for unbundled apps. It may also return nil if the bundle object could not be created, so always check the return value.
      */
-    public static function main(): ?Bundle
+    public static function main(): Bundle
     {
-        if ($class = get_calling_class()) {
-            return Bundle::bundleForClass($class);
+        /** @psalm-suppress RedundantCondition */
+        if (LOAD_MAIN_BUNDLE_USING_DOCUMENT_ROOT_DIRECTORY_URL) {
+            return Bundle::bundleWithURL(FileManager::default()->documentRootDirectory);
         }
-        return null;
+        return Bundle::bundleForClass(get_calling_class() ?? throw new InternalInconsistencyException());
     }
 
     /**
@@ -251,7 +260,7 @@ final class Bundle extends ObjectClass
      */
     public static function allBundles(): ArrayClass
     {
-        return self::loadedBundles()->filter(fn(Bundle $bundle): bool => $bundle->object(kCFBundlePackageTypeKey) != 'FMWK')->values;
+        return self::loadedBundles()->filter(fn(Bundle $bundle): bool => $bundle->object(kCFBundlePackageTypeKey) !== 'FMWK')->values;
     }
 
     /**

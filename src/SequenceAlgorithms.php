@@ -128,6 +128,7 @@ trait SequenceAlgorithms
         return iterator_to_array($this);
     }
 
+    /** @noinspection PhpMixedReturnTypeCanBeReducedInspection */
     public function jsonSerialize(): mixed
     {
         return $this->toArray();

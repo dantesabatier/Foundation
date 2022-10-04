@@ -10,7 +10,6 @@
 namespace Sabatier\Foundation;
 
 use Closure;
-use InvalidArgumentException;
 use Iterator;
 use JetBrains\PhpStorm\Pure;
 
@@ -35,6 +34,9 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
         map as protected sequenceMap;
         compactMap as protected sequenceCompactMap;
         flatMap as protected sequenceFlatMap;
+        valueForKey as protected collectionValueForKey;
+        setValueForKey as protected collectionSetValueForKey;
+        valueForKeyPath as protected collectionValueForKeyPath;
         randomElement as protected collectionRandomElement;
         firstIndex as protected collectionFirstIndex;
         lastIndex as protected collectionLastIndex;
@@ -682,7 +684,7 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
      */
     public function valueForKey(string $key): Set
     {
-        return $this->compactMap(fn(KeyValueCoding $member): mixed => $member->valueForKey($key));
+        return $this->collectionValueForKey($key);
     }
 
     /**
@@ -692,33 +694,7 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
      */
     public function setValueForKey(mixed $value, string $key): void
     {
-        foreach ($this as $member) {
-            assert($member instanceof KeyValueCoding);
-            $member->setValueForKey($value, $key);
-        }
-    }
-
-    public function valueForKeyPath(string $keyPath): mixed
-    {
-        if ((strlen($keyPath) == 0) || $keyPath[0] !== '@') {
-            return parent::valueForKeyPath($keyPath);
-        }
-        $components = components_from_key_path($keyPath);
-        $key = $components->key;
-        $operator = kvc_operator_from_key($key);
-        if (!$operator) {
-            return null;
-        }
-        $value = $this;
-        $remainderPath = $components->remainderPath;
-        if ($remainderPath) {
-            $value = parent::valueForKeyPath($remainderPath);
-            assert($value instanceof Set, sprintf("invalid argument: expecting \"%s\", given \"%s\"", Set::class, typeof($value)));
-        }
-        return match ($operator) {
-            KeyValueOperator::averageKeyValueOperator, KeyValueOperator::countKeyValueOperator, KeyValueOperator::maximumKeyValueOperator, KeyValueOperator::minimumKeyValueOperator, KeyValueOperator::sumKeyValueOperator => PredicateUtilities::$operator($value),
-            default => throw new InvalidArgumentException(sprintf('%s %s() this class does not implement the "%s" operation', $this->debugDescription(), __FUNCTION__, $operator)),
-        };
+        $this->collectionSetValueForKey($value, $key);
     }
 
     public function description(): string
@@ -756,7 +732,6 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
         $this->position = 0;
     }
 
-    #[Pure]
     public function count(): int
     {
         return count($this->reserved);

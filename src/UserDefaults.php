@@ -3,6 +3,7 @@
 namespace Sabatier\Foundation;
 
 use Exception;
+use InvalidArgumentException;
 
 /**
  * Class UserDefaults
@@ -29,16 +30,8 @@ class UserDefaults
      */
     public function __construct(?string $suiteName = null)
     {
-        if (!$suiteName) {
-            $processInfo = ProcessInfo::processInfo();
-            $suiteName = $processInfo->processName;
-            $fileManager = FileManager::default();
-            $bundleUrl = $fileManager->url(SearchPathDirectory::applicationsDirectory)->appendingPathComponent($suiteName);
-            if ($fileManager->fileExists($bundleUrl->path)) {
-                $suiteName = Bundle::bundleWithURL($bundleUrl)?->bundleIdentifier;
-            }
-        }
-        $this->suiteName = $suiteName ?? throw new InternalInconsistencyException();
+        $suiteName ??= Bundle::bundleWithURL(FileManager::default()->documentRootDirectory)->bundleIdentifier ?? throw new InvalidArgumentException();
+        $this->suiteName = $suiteName;
         $this->addSuite($this->suiteName);
     }
 

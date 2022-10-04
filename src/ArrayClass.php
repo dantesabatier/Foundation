@@ -10,7 +10,6 @@
 namespace Sabatier\Foundation;
 
 use Closure;
-use InvalidArgumentException;
 use Iterator;
 use JetBrains\PhpStorm\Pure;
 
@@ -35,6 +34,9 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
         map as protected sequenceMap;
         compactMap as protected sequenceCompactMap;
         flatMap as protected sequenceFlatMap;
+        valueForKey as protected collectionValueForKey;
+        setValueForKey as protected collectionSetValueForKey;
+        valueForKeyPath as protected collectionValueForKeyPath;
         randomElement as protected collectionRandomElement;
         firstIndex as protected collectionFirstIndex;
         lastIndex as protected collectionLastIndex;
@@ -645,7 +647,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
      */
     public function starts(Sequence $possiblePrefix, ?Closure $areEquivalent = null): bool
     {
-        $areEquivalent ??= fn(mixed $e1, mixed $e2): bool => equivalent($e1, $e2);
+        $areEquivalent ??= fn(mixed $e0, mixed $e1): bool => equivalent($e0, $e1);
         foreach ($this as $e0) {
             if ($possiblePrefix->valid()) {
                 if (!$areEquivalent($e0, $possiblePrefix->current())) {
@@ -668,16 +670,16 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
      */
     public function lexicographicallyPrecedes(Sequence $other, ?Closure $areInIncreasingOrder = null): bool
     {
-        $areInIncreasingOrder ??= fn(mixed $e1, mixed $e2): bool => $e1 < $e2;
+        $areInIncreasingOrder ??= fn(mixed $e0, mixed $e1): bool => $e0 < $e1;
         while (true) {
             if ($this->valid()) {
-                $e1 = $this->current();
+                $e0 = $this->current();
                 if ($other->valid()) {
-                    $e2 = $other->current();
-                    if ($areInIncreasingOrder($e1, $e2)) {
+                    $e1 = $other->current();
+                    if ($areInIncreasingOrder($e0, $e1)) {
                         return true;
                     }
-                    if ($areInIncreasingOrder($e2, $e1)) {
+                    if ($areInIncreasingOrder($e1, $e0)) {
                         return false;
                     }
                     $this->next();
@@ -710,7 +712,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
      */
     public function valueForKey(string $key): ArrayClass
     {
-        return $this->map(fn(KeyValueCoding $e): mixed => $e->valueForKey($key));
+        return $this->collectionValueForKey($key);
     }
 
     /**
@@ -720,33 +722,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
      */
     public function setValueForKey(mixed $value, string $key): void
     {
-        foreach ($this as $element) {
-            assert($element instanceof KeyValueCoding);
-            $element->setValueForKey($value, $key);
-        }
-    }
-
-    public function valueForKeyPath(string $keyPath): mixed
-    {
-        if ((strlen($keyPath) == 0) || $keyPath[0] !== '@') {
-            return parent::valueForKeyPath($keyPath);
-        }
-        $components = components_from_key_path($keyPath);
-        $key = $components->key;
-        $operator = kvc_operator_from_key($key);
-        if (!$operator) {
-            return null;
-        }
-        $value = $this;
-        $remainderPath = $components->remainderPath;
-        if ($remainderPath) {
-            $value = parent::valueForKeyPath($remainderPath);
-            assert($value instanceof ArrayClass, sprintf("invalid argument: expecting \"%s\", given \"%s\"", ArrayClass::class, typeof($value)));
-        }
-        return match ($operator) {
-            KeyValueOperator::averageKeyValueOperator, KeyValueOperator::countKeyValueOperator, KeyValueOperator::maximumKeyValueOperator, KeyValueOperator::minimumKeyValueOperator, KeyValueOperator::sumKeyValueOperator => PredicateUtilities::$operator($value),
-            default => throw new InvalidArgumentException(sprintf('%s %s() this class does not implement the "%s" operation', $this->debugDescription(), __FUNCTION__, $operator)),
-        };
+        $this->collectionSetValueForKey($value, $key);
     }
 
     public function description(): string
@@ -784,7 +760,6 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
         $this->position = 0;
     }
 
-    #[Pure]
     public function count(): int
     {
         return count($this->reserved);

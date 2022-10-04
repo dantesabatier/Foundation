@@ -58,9 +58,10 @@ trait CollectionAlgorithms
         return null;
     }
 
+    /** @noinspection PhpMixedReturnTypeCanBeReducedInspection */
     public function indexOf(mixed $element): mixed
     {
-        return $this->firstIndex(fn (mixed $e): bool => equivalent($e, $element));
+        return $this->firstIndex(fn(mixed $e): bool => equivalent($e, $element));
     }
 
     public function distance(int $start, int $end): int
@@ -95,7 +96,7 @@ trait CollectionAlgorithms
 
     public function filtered(Predicate $predicate): self
     {
-        return $this->filter(fn (mixed $e): bool => $predicate->evaluate($e));
+        return $this->filter(fn(mixed $e): bool => $predicate->evaluate($e));
     }
 
     public function sorted(iterable $descriptors): self
@@ -123,7 +124,7 @@ trait CollectionAlgorithms
 
     public function join(string $separator): string
     {
-        return join($separator, $this->map(fn (mixed $e): string => human_readable_value($e))->toArray());
+        return join($separator, $this->map(fn(mixed $e): string => human_readable_value($e))->toArray());
     }
 
     #[Pure]
@@ -136,5 +137,47 @@ trait CollectionAlgorithms
     {
         assert($other instanceof Countable);
         return ComparisonResult::from($this->count() <=> $other->count());
+    }
+
+    public function valueForKey(string $key): self
+    {
+        return $this->map(function (mixed $e) use ($key): mixed {
+            assert($e instanceof KeyValueCoding); // @phpstan-ignore-line
+            return $e->valueForKey($key);
+        });
+    }
+
+    public function setValueForKey(mixed $value, string $key): void
+    {
+        foreach ($this as $e) {
+            assert($e instanceof KeyValueCoding); // @phpstan-ignore-line
+            $e->setValueForKey($value, $key);
+        }
+    }
+
+    public function valueForKeyPath(string $keyPath): mixed
+    {
+        if ((strlen($keyPath) == 0) || $keyPath[0] !== '@') {
+            return parent::valueForKeyPath($keyPath);
+        }
+        $components = components_from_key_path($keyPath);
+        $key = $components->key;
+        $operator = kvc_operator_from_key($key);
+        if (!$operator) {
+            return null;
+        }
+        $value = $this;
+        $remainderPath = $components->remainderPath;
+        if ($remainderPath) {
+            $value = parent::valueForKeyPath($remainderPath);
+            assert($value instanceof self);
+        }
+        return match ($operator) {
+            KeyValueOperator::averageKeyValueOperator, KeyValueOperator::countKeyValueOperator, KeyValueOperator::maximumKeyValueOperator, KeyValueOperator::minimumKeyValueOperator, KeyValueOperator::sumKeyValueOperator => PredicateUtilities::$operator($value),
+            KeyValueOperator::distinctUnionOfArraysKeyValueOperator, KeyValueOperator::distinctUnionOfObjectsKeyValueOperator => new ArrayClass(new Set($value->joined())),
+            KeyValueOperator::unionOfObjectsKeyValueOperator, KeyValueOperator::unionOfArraysKeyValueOperator => new ArrayClass($value->joined()),
+            KeyValueOperator::distinctUnionOfSetsKeyValueOperator, KeyValueOperator::unionOfSetsKeyValueOperator => new Set($value->joined()),
+            default => $this->valueForUndefinedKey($operator),
+        };
     }
 }
