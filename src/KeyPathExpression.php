@@ -59,7 +59,6 @@ class KeyPathExpression extends FunctionExpression
             $format .= $operand->description();
             $format .= '.';
         }
-        $format .= $this->keyPath;
-        return $format;
+        return $format . $this->keyPath;
     }
 }

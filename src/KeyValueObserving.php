@@ -20,10 +20,7 @@ use JetBrains\PhpStorm\ExpectedValues;
 interface KeyValueObserving
 {
     /**
-     * @param string $keyPath
-     * @param int $options
      * @param Closure(mixed, KeyValueObservedChange): void|null $handler
-     * @return KeyValueObservation
      */
     public function observe(string $keyPath, #[ExpectedValues(flagsFromClass: KeyValueObservingOptions::class)] int $options = KeyValueObservingOptions::new, Closure $handler = null): KeyValueObservation;
 

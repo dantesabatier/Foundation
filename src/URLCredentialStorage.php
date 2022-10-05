@@ -15,7 +15,6 @@ class URLCredentialStorage
 
     /**
      * The shared URL credential storage instance.
-     * @return URLCredentialStorage
      */
     public static function shared(): URLCredentialStorage
     {

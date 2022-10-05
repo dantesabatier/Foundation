@@ -34,11 +34,10 @@ class Range extends ObjectClass implements ExpressibleByArrayLiteral, IteratorAg
     /**
      * A Boolean value indicating whether the range contains no elements.
      * An empty Range instance has equal lower and upper bounds.
-     * @return bool
      */
     public function isEmpty(): bool
     {
-        return $this->lowerBound == $this->upperBound;
+        return $this->lowerBound === $this->upperBound;
     }
 
     /**

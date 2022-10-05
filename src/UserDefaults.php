@@ -15,11 +15,11 @@ class UserDefaults
     private static ?UserDefaults $standard = null;
     /** @var Dictionary<ApplicationPreferences>|null */
     private static ?Dictionary $standardUserPreferences = null;
-    public const argumentDomain = ArgumentDomain;
-    public const globalDomain = GlobalDomain;
-    public const registrationDomain = RegistrationDomain;
-    public const didChangeNotification = UserDefaultsDidChangeNotification;
-    public const sizeLimitExceededNotification = UserDefaultsSizeLimitExceededNotification;
+    final public const argumentDomain = ArgumentDomain;
+    final public const globalDomain = GlobalDomain;
+    final public const registrationDomain = RegistrationDomain;
+    final public const didChangeNotification = UserDefaultsDidChangeNotification;
+    final public const sizeLimitExceededNotification = UserDefaultsSizeLimitExceededNotification;
     private readonly string $suiteName;
 
     /**
@@ -146,10 +146,8 @@ class UserDefaults
      */
     public function bool(string $key): bool
     {
-        if ($object = $this->object($key)) {
-            if (is_bool($object) || is_numeric($object)) {
-                return (new Number($object))->boolValue;
-            }
+        if (($object = $this->object($key)) && (is_bool($object) || is_numeric($object))) {
+            return (new Number($object))->boolValue;
         }
         return false;
     }
@@ -162,10 +160,8 @@ class UserDefaults
      */
     public function integer(string $key): int
     {
-        if ($object = $this->object($key)) {
-            if (is_bool($object) || is_numeric($object)) {
-                return (new Number($object))->intValue;
-            }
+        if (($object = $this->object($key)) && (is_bool($object) || is_numeric($object))) {
+            return (new Number($object))->intValue;
         }
         return 0;
     }
@@ -178,10 +174,8 @@ class UserDefaults
      */
     public function float(string $key): float
     {
-        if ($object = $this->object($key)) {
-            if (is_bool($object) || is_numeric($object)) {
-                return (new Number($object))->floatValue;
-            }
+        if (($object = $this->object($key)) && (is_bool($object) || is_numeric($object))) {
+            return (new Number($object))->floatValue;
         }
         return 0.0;
     }

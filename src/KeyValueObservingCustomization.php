@@ -20,8 +20,6 @@ interface KeyValueObservingCustomization
 
     /**
      * Returns a Boolean value that indicates whether the observed object supports automatic key-value observation for the given key.
-     * @param string $key
-     * @return bool
      */
     public static function automaticallyNotifiesObserversForKey(string $key): bool;
 }

@@ -21,35 +21,25 @@ final class URLSession
     /** @internal */
     public static int $debugLevel = 0;
     private static ?URLSession $shared = null;
-    private CurlMultiHandle $mh;
+    private readonly CurlMultiHandle $mh;
     /** @var ArrayClass<URLSessionTask> */
     public readonly ArrayClass $allTasks;
-    /** @var URLSessionConfiguration A copy of the configuration object for this session. */
-    public readonly URLSessionConfiguration $configuration;
-    /** @var URLSessionDelegate|null The delegate assigned when this object was created. */
-    public readonly ?URLSessionDelegate $delegate;
-    /** @var OperationQueue The operation queue provided when this object was created. */
-    public readonly OperationQueue $delegateQueue;
 
     /**
      * Creates a session with the specified session configuration.
      * @param URLSessionConfiguration $configuration A configuration object that specifies certain behaviors, such as caching policies, timeouts, proxies, pipelining, TLS versions to support, cookie policies, credential storage, and so on.
      * @param URLSessionDelegate|null $delegate A session delegate object that handles requests for authentication and other session-related events.
      * This delegate object is responsible for handling authentication challenges, for making caching decisions, and for handling other session-related events. If nil, the class should be used only with methods that take completion handlers.
-     * @param OperationQueue|null $delegateQueue An operation queue for scheduling the delegate calls and completion handlers. The queue should be a serial queue, in order to ensure the correct ordering of callbacks. If nil, the session creates a serial operation queue for performing all delegate method calls and completion handler calls.
+     * @param OperationQueue $delegateQueue An operation queue for scheduling the delegate calls and completion handlers. The queue should be a serial queue, in order to ensure the correct ordering of callbacks. If nil, the session creates a serial operation queue for performing all delegate method calls and completion handler calls.
      */
-    public function __construct(URLSessionConfiguration $configuration, ?URLSessionDelegate $delegate = null, ?OperationQueue $delegateQueue = null)
+    public function __construct(public readonly URLSessionConfiguration $configuration, public readonly ?URLSessionDelegate $delegate = null, public readonly OperationQueue $delegateQueue = new OperationQueue())
     {
         $this->mh = curl_multi_init();
         $this->allTasks = new ArrayClass();
-        $this->configuration = $configuration;
-        $this->delegate = $delegate;
-        $this->delegateQueue = $delegateQueue ?? new OperationQueue();
     }
 
     /**
      * The shared singleton session object.
-     * @return URLSession
      */
     public static function shared(): URLSession
     {
@@ -93,7 +83,6 @@ final class URLSession
      * Creates a download task that retrieves the contents of a URL based on the specified URL request object and saves the results to a file.
      * @param URLRequest $request A URL request object that provides the URL, cache policy, request type, body data or body stream, and so on.
      * @param Closure(URL|null, URLResponse|null, Error|null): void $completion The completion handler to call when the load request is complete.
-     * @return URLSessionDownloadTask
      */
     public function downloadTaskWithRequest(URLRequest $request, Closure $completion): URLSessionDownloadTask
     {
@@ -118,7 +107,6 @@ final class URLSession
      * Creates a download task that retrieves the contents of the specified URL, saves the results to a file, and calls a handler upon completion.
      * @param URL $url The URL to download.
      * @param Closure(URL|null, URLResponse|null, Error|null): void $completion The completion handler to call when the load request is complete.
-     * @return URLSessionDownloadTask
      */
     public function downloadTaskWithURL(URL $url, Closure $completion): URLSessionDownloadTask
     {
@@ -130,7 +118,6 @@ final class URLSession
      * @param URLRequest $request A URL request object that provides the URL, cache policy, request type, and so on. The body stream and body data in this request object are ignored.
      * @param URL $fileUrl The URL of the file to upload.
      * @param Closure(string|null, URLResponse|null, Error|null): void $completion The completion handler to call when the load request is complete.
-     * @return URLSessionUploadTask
      */
     public function uploadTaskWithRequest(URLRequest $request, URL $fileUrl, Closure $completion): URLSessionUploadTask
     {
@@ -174,7 +161,7 @@ final class URLSession
         $data = curl_multi_getcontent($ch);
         $errno = curl_errno($ch);
         $error = ($errno != CURLE_OK) ? new Error(URLErrorDomain, $errno, new Dictionary([LocalizedFailureReasonErrorKey => curl_error($ch)])) : null;
-        $completion($data, (int)curl_getinfo($ch, CURLINFO_HTTP_CODE), $error);
+        $completion($data, curl_getinfo($ch, CURLINFO_HTTP_CODE), $error);
     }
 
     /**

@@ -70,7 +70,6 @@ class Predicate extends ObjectClass
     /**
      * Initializes a predicate with a metadata query string.
      * @param string $queryString A metadata query string.
-     * @return Predicate|null
      */
     public function fromMetadataQueryString(/** @noinspection PhpUnusedParameterInspection */ string $queryString): ?Predicate
     {
@@ -97,7 +96,6 @@ class Predicate extends ObjectClass
 
     /**
      * The predicate's format string.
-     * @return string
      */
     public function predicateFormat(): string
     {

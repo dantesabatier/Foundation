@@ -11,10 +11,10 @@ namespace Sabatier\Foundation;
 
 class URLScheme
 {
-    const http = "http";
-    const https = "https";
-    const file = "file";
-    const data = "data";
-    const ftp = "ftp";
-    const localhost = "localhost";
+    final const http = "http";
+    final const https = "https";
+    final const file = "file";
+    final const data = "data";
+    final const ftp = "ftp";
+    final const localhost = "localhost";
 }

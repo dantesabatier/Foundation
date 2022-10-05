@@ -54,7 +54,6 @@ final class FileManager extends ObjectClass
 
     /**
      * The shared file manager object for the process.
-     * @return FileManager
      */
     public static function default(): FileManager
     {

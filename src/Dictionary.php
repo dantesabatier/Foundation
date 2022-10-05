@@ -51,7 +51,7 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
     {
         if ($iterable instanceof Dictionary) {
             $this->reserved = $iterable->toArray();
-        } elseif (is_array($iterable) && (!count($iterable) || !is_sequential($iterable))) {
+        } elseif (is_array($iterable) && ($iterable === [] || !is_sequential($iterable))) {
             $this->reserved = array_filter($iterable, fn(mixed $e): bool => $e !== null);
         } else {
             throw new InvalidArgumentException();
@@ -525,7 +525,6 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
 
     /**
      * As on {@see valueForKey()} but for case-insensitive key.
-     * @param string $key
      * @return Element|null
      */
     public function valueForCaseInsensitiveKey(string $key)
@@ -553,7 +552,6 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
 
     /**
      * @param string $offset
-     * @return bool
      */
     #[Pure]
     public function offsetExists(mixed $offset): bool
@@ -562,7 +560,6 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
     }
 
     /**
-     * @param mixed $offset
      * @return Element|null
      */
     public function offsetGet(mixed $offset): mixed

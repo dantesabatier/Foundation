@@ -114,8 +114,6 @@ class URLComponents extends ObjectClass
      * If the URLComponents has an authority component (user, password, host or port) and a path component,
      * then the path must either begin with “/” or be an empty string.
      * If the URLComponents does not have an authority component (user, password, host or port) and has a path component, the path component must not start with “//”. If those requirements are not met, nil is returned.
-     * @param URL|null $baseURL
-     * @return URL|null
      */
     public function urlRelativeTo(?URL $baseURL): ?URL
     {

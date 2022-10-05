@@ -45,7 +45,7 @@ const UnarchiveFromDataTransformerName = "UnarchiveFromData";
 /** @var string The name of the value transformer that creates then returns an object by attempting to unarchive the data to a class that supports secure coding. */
 const SecureUnarchiveFromDataTransformerName = 'SecureUnarchiveFromData';
 /** @var float The time interval between 1 January 1970 and the reference date 1 January 2001 00:00:00 GMT. */
-const kCFAbsoluteTimeIntervalSince1970 = 978307200.0;
+const kCFAbsoluteTimeIntervalSince1970 = 978_307_200.0;
 /** @var string The version of the information property list format. */
 const kCFBundleInfoDictionaryVersionKey = 'CFBundleInfoDictionaryVersion';
 /** @var string The name of the executable in this bundle (if any). */

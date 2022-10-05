@@ -24,22 +24,18 @@ function pn(string|int|float|Number $n): int|float
 /** @internal */
 function string_with_options(string $string, #[ExpectedValues(flagsFromClass: CompareOptions::class)] int $options): string
 {
-    if ($options & CompareOptions::caseInsensitive) {
-        if ($options & CompareOptions::diacriticInsensitive) {
-            if (function_exists('transliterator_transliterate')) :
-                $string = transliterator_transliterate(TransliteratorDefault, $string);
-                if ($string === false) {
-                    throw new RuntimeException(sprintf('%s() %s', __FUNCTION__, intl_get_error_message()));
-                }
-            endif;
-            if (!($options & CompareOptions::normalized)) {
-                if (function_exists('normalizer_normalize')) :
-                    $string = normalizer_normalize($string);
-                    /** @psalm-suppress TypeDoesNotContainType */
-                    if ($string === false) {
-                        throw new RuntimeException(sprintf('%s() %s', __FUNCTION__, intl_get_error_message()));
-                    }
-                endif;
+    if (($options & CompareOptions::caseInsensitive) && ($options & CompareOptions::diacriticInsensitive)) {
+        if (function_exists('transliterator_transliterate')) :
+            $string = transliterator_transliterate(TransliteratorDefault, $string);
+            if ($string === false) {
+                throw new RuntimeException(sprintf('%s() %s', __FUNCTION__, intl_get_error_message()));
+            }
+        endif;
+        if (!($options & CompareOptions::normalized) && function_exists('normalizer_normalize')) {
+            $string = normalizer_normalize($string);
+            /** @psalm-suppress TypeDoesNotContainType */
+            if ($string === false) {
+                throw new RuntimeException(sprintf('%s() %s', __FUNCTION__, intl_get_error_message()));
             }
         }
     }

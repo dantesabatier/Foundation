@@ -11,7 +11,6 @@ interface CustomDebugStringConvertible extends CustomStringConvertible
 {
     /**
      * A textual representation of this instance, suitable for debugging.
-     * @return string
      */
     public function debugDescription(): string;
 }

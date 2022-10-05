@@ -52,7 +52,7 @@ class PredicateScanner extends Scanner
             if (!$this->isAtEnd) {
                 $message .= sprintf(" - Format string contains extra characters \"%s***%s***\"", substring_to_index($this->string, $this->scanLocation), substring_from_index($this->string, $this->scanLocation));
             }
-            throw new InvalidArgumentException($message, (int)$throwable->getCode());
+            throw new InvalidArgumentException($message, (int)$throwable->getCode(), $throwable);
         }
     }
 
@@ -266,7 +266,7 @@ class PredicateScanner extends Scanner
                 /** @psalm-suppress PossiblyNullArgument */
                 $subexpressions[] = $this->parseExpression(); // @phpstan-ignore-line
             }
-            if (!$this->scanString('}')) { // @phpstan-ignore-line
+            if (/** @phpstan-ignore-line */ !$this->scanString('}')) {
                 throw new InvalidArgumentException("invalid argument: missing closing \"}\" at index $this->scanLocation");
             }
             return Expression::expressionForAggregate($subexpressions); // @phpstan-ignore-line
@@ -295,7 +295,7 @@ class PredicateScanner extends Scanner
                         $scanLocation = $this->scanLocation;
                         break;
                     case 'K':
-                        $this->scanLocation = $this->scanLocation + 1;
+                        $this->scanLocation += 1;
                         return Expression::expressionForKeyPath($this->arguments->popFirst());
                     case '@':
                     case 's':
@@ -315,26 +315,23 @@ class PredicateScanner extends Scanner
                     case 'f':
                     case 'g':
                     case 'G':
-                        $this->scanLocation = $this->scanLocation + 1;
+                        $this->scanLocation += 1;
                         return Expression::expressionForConstantValue($this->arguments->popFirst());
                     case 'h':
                         $this->scanString('h');
-                        /** @psalm-suppress RedundantCondition */
-                        if (!$this->isAtEnd) { // @phpstan-ignore-line
-                            $c = $this->string[$this->scanLocation];
-                            if ($c == 'i' || $c == 'u') {
-                                $this->scanLocation = $this->scanLocation + 1;
-                                return Expression::expressionForConstantValue($this->arguments->popFirst());
-                            }
+                        $c = $this->string[$this->scanLocation];
+                        if ($c == 'i' || $c == 'u') {
+                            $this->scanLocation += 1;
+                            return Expression::expressionForConstantValue($this->arguments->popFirst());
                         }
                         break;
                     case 'q':
                         $this->scanString('q');
                         /** @psalm-suppress RedundantCondition */
-                        if (!$this->isAtEnd) { // @phpstan-ignore-line
+                        if (/** @phpstan-ignore-line */ !$this->isAtEnd) {
                             $c = $this->string[$this->scanLocation];
                             if ($c == 'i' || $c == 'u' || $c == 'x' || $c == 'X') {
-                                $this->scanLocation = $this->scanLocation + 1;
+                                $this->scanLocation += 1;
                                 return Expression::expressionForConstantValue($this->arguments->popFirst());
                             }
                         }
@@ -503,7 +500,7 @@ class PredicateScanner extends Scanner
                         /** @psalm-suppress PossiblyNullArgument */
                         $subexpressions[] = $this->parseExpression(); // @phpstan-ignore-line
                     }
-                    if (!$this->scanString(')')) { // @phpstan-ignore-line
+                    if (/** @phpstan-ignore-line */ !$this->scanString(')')) {
                         throw new InvalidArgumentException("invalid argument: missing closing \")\" at index $this->scanLocation");
                     }
                 }

@@ -23,16 +23,12 @@ class FlattenSequence extends ObjectClass implements Sequence, IteratorAggregate
         reduce as protected sequenceReduce;
     }
 
-    /** @var Base $base The underlying collection of the FlattenSequence. */
-    public readonly mixed $base;
-
     /**
      * Creates a view into the given collection that allows access to elements within the specified range.
      * @param Base $base The collection to create a view into.
      */
-    public function __construct(mixed $base)
+    public function __construct(public readonly mixed $base)
     {
-        $this->base = $base;
     }
 
     /**

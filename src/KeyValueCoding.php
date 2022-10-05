@@ -99,7 +99,6 @@ interface KeyValueCoding
     /**
      * Sets the property of the receiver specified by a given key to a given value.
      * @param T|null $value
-     * @param string $key
      */
     public function setValueForKey(mixed $value, string $key): void;
 
@@ -108,7 +107,6 @@ interface KeyValueCoding
      * Subclasses can override this method to handle the request in some other way.
      * The default implementation raises an {@see UndefinedKeyException}.
      * @param T|null $value The value for the key identified by key.
-     * @param string $key
      */
     public function setValueForUndefinedKey(mixed $value, string $key): void;
 

@@ -88,7 +88,6 @@ class SetExpression extends Expression
             default:
                 break;
         }
-        $format .= $rightExpression->description();
-        return $format;
+        return $format . $rightExpression->description();
     }
 }

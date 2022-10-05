@@ -13,7 +13,7 @@ use JetBrains\PhpStorm\Pure;
 class Date extends ObjectClass
 {
     /** @var float The number of seconds from 1 January 1970 to the reference date, 1 January 2001. */
-    public const timeIntervalBetween1970AndReferenceDate = kCFAbsoluteTimeIntervalSince1970;
+    final public const timeIntervalBetween1970AndReferenceDate = kCFAbsoluteTimeIntervalSince1970;
     /** @var float The time interval between the date value and the current date and time. If the date is earlier than the current date and time, this property's value is negative. */
     public readonly float $timeIntervalSinceNow;
     /** @var float The interval between the date value and 00:00:00 UTC on 1 January 1970. This property's value is negative if the date object is earlier than 00:00:00 UTC on 1 January 1970. */
@@ -88,21 +88,19 @@ class Date extends ObjectClass
     /**
      * A date value representing a date in the distant future.
      * The distant future is in terms of centuries.
-     * @return Date
      */
     public static function distantFuture(): Date
     {
-        return Date::dateWithTimeIntervalSinceReferenceDate(63113904000.0);
+        return Date::dateWithTimeIntervalSinceReferenceDate(63_113_904_000.0);
     }
 
     /**
      * A date value representing a date in the distant past.
      * The distant past is in terms of centuries.
-     * @return Date
      */
     public static function distantPast(): Date
     {
-        return Date::dateWithTimeIntervalSinceReferenceDate(-63114076800.0);
+        return Date::dateWithTimeIntervalSinceReferenceDate(-63_114_076_800.0);
     }
 
     public function compare(mixed $other): ComparisonResult
@@ -174,7 +172,6 @@ class Date extends ObjectClass
 
     /**
      * Generates a locale-aware string representation of a date using the default date format style.
-     * @return string
      */
     public function formatted(): string
     {

@@ -108,7 +108,6 @@ class FunctionExpression extends Expression
             }
         }
         $format .= $this->arguments?->join(', ') ?? '';
-        $format .= ')';
-        return $format;
+        return $format . ')';
     }
 }

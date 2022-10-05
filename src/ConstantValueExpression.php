@@ -11,7 +11,7 @@ namespace Sabatier\Foundation;
 /** @internal */
 class ConstantValueExpression extends Expression
 {
-    private mixed $constantValue;
+    private readonly mixed $constantValue;
 
     public function __construct(mixed $value)
     {

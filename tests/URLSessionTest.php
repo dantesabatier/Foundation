@@ -19,31 +19,29 @@ final class URLSessionTest extends TestCase
         $this->url = new URL('https://api.ipify.org/?format=json');
     }
 
-    public function testCanFetch(): void
+    public function testCanExecuteDataTask(): void
     {
-        $task = URLSession::shared()->dataTaskWithURL($this->url, function (?string $data, ?URLResponse $response, ?Error $error): void {
+        URLSession::shared()->dataTaskWithURL($this->url, function (?string $data, ?URLResponse $response, ?Error $error): void {
+            self::assertNotEmpty($data);
             self::assertNull($error);
             self::assertInstanceOf(
                 HTTPURLResponse::class,
                 $response
             );
             self::assertNotEmpty($data);
-        });
-        $task->resume();
+        })->resume();
     }
 
-    public function testCanDownload(): void
+    public function testCanExecuteDownloadTask(): void
     {
-        $task = URLSession::shared()->downloadTaskWithURL($this->url, function (?URL $url, ?URLResponse $response, ?Error $error): void {
+        URLSession::shared()->downloadTaskWithURL($this->url, function (?URL $url, ?URLResponse $response, ?Error $error): void {
             self::assertNull($error);
             self::assertInstanceOf(
                 HTTPURLResponse::class,
                 $response
             );
             self::assertNotNull($url);
-            self::assertTrue($url->isFileURL);
             self::assertFileExists($url->path);
-        });
-        $task->resume();
+        })->resume();
     }
 }

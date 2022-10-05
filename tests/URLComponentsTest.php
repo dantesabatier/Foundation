@@ -19,7 +19,7 @@ final class URLComponentsTest extends TestCase
         $this->components = new URLComponents(self::URLString);
     }
 
-    public function testCanGetUrl(): void
+    public function testCanParseUrl(): void
     {
         self::assertInstanceOf(
             URL::class,
@@ -27,7 +27,19 @@ final class URLComponentsTest extends TestCase
         );
     }
 
-    public function testCanGetQueryItems(): void
+    public function testCanParseComponents(): void
+    {
+        self::assertNotNull($this->components->fragment);
+        self::assertNotNull($this->components->host);
+        self::assertNotNull($this->components->password);
+        self::assertNotNull($this->components->path);
+        self::assertIsInt($this->components->port);
+        self::assertNotNull($this->components->query);
+        self::assertNotNull($this->components->scheme);
+        self::assertNotNull($this->components->user);
+    }
+
+    public function testCanParseQueryItems(): void
     {
         $queryItems = $this->components->queryItems;
         self::assertInstanceOf(

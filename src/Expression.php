@@ -238,7 +238,6 @@ class Expression extends ObjectClass
 
     /**
      * The constant value of the expression.
-     * @return mixed
      */
     public function constantValue(): mixed
     {

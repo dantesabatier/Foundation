@@ -15,11 +15,8 @@ use JetBrains\PhpStorm\ExpectedValues;
 /** @internal */
 class BlockPredicate extends Predicate
 {
-    private Closure $block;
-
-    public function __construct(Closure $block)
+    public function __construct(private readonly Closure $block)
     {
-        $this->block = $block;
     }
 
     public function withSubstitutionVariables(Dictionary $variables): Predicate

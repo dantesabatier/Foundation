@@ -118,7 +118,7 @@ class Scanner extends ObjectClass
         if ((!string_is_equal($substring, $string, $this->caseSensitive ? CompareOptions::none : CompareOptions::caseInsensitive))) {
             return false;
         }
-        $this->scanLocation = $this->scanLocation + strlen($substring);
+        $this->scanLocation += strlen($substring);
         $into = $substring;
         return true;
     }
@@ -142,16 +142,13 @@ class Scanner extends ObjectClass
             return false;
         }
         $substring = substr($this->string, $this->scanLocation, $location);
-        $this->scanLocation = $this->scanLocation + strlen($substring);
+        $this->scanLocation += strlen($substring);
         $into = $substring;
         return true;
     }
 
     /**
      * @param-out mixed $number
-     * @param mixed $number
-     * @param bool $isInt
-     * @return bool
      */
     private function scanNumber(mixed &$number, bool $isInt = true): bool
     {
@@ -169,7 +166,7 @@ class Scanner extends ObjectClass
         }
         $value = $matches[0];
         $number = filter_var($value, $isInt ? FILTER_VALIDATE_INT : FILTER_VALIDATE_FLOAT);
-        $this->scanLocation = (int)strpos($this->string, $value, $this->scanLocation) + strlen($value);
+        $this->scanLocation = (int)strpos($this->string, (string) $value, $this->scanLocation) + strlen($value);
         return true;
     }
 

@@ -57,7 +57,6 @@ class UUID extends ObjectClass
 
     /**
      * A textual description of the UUID.
-     * @return string
      */
     public function description(): string
     {

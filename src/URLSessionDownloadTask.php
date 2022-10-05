@@ -22,7 +22,6 @@ class URLSessionDownloadTask extends URLSessionTask
      * Creates a download task that retrieves the contents of a URL based on the specified URL request object and saves the results to a file.
      * @param URLRequest $request A URL request object that provides the URL, cache policy, request type, body data or body stream, and so on.
      * @param Closure(URL|null, URLResponse|null, Error|null): void $completion The completion handler to call when the load request is complete.
-     * @return URLSessionDownloadTask
      */
     public static function downloadTaskWithRequest(URLRequest $request, Closure $completion): URLSessionDownloadTask
     {

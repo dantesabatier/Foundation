@@ -31,7 +31,7 @@ function debuglog(string $string): void
     print $string . PHP_EOL;
 }
 
-#[Deprecated("since Foundation 0.1, use debuglog() instead", "\Sabatier\Foundation\debuglog(%parametersList%)")]
+#[Deprecated("since Foundation 0.1, use debuglog() instead", "debuglog(%parametersList%)")]
 function cli_log(string $string): void
 {
     trigger_error(sprintf("%s() is deprecated, use debuglog() instead", __FUNCTION__), E_USER_DEPRECATED);
@@ -53,7 +53,7 @@ function has_escape_sequences(): bool
 
 function typeof(mixed $value): string
 {
-    return is_object($value) ? get_class($value) : gettype($value);
+    return get_debug_type($value);
 }
 
 function human_readable_value(mixed $value): string
@@ -67,10 +67,10 @@ function human_readable_value(mixed $value): string
     } elseif (is_array($value)) {
         return "[" . implode(', ', array_map(fn(mixed $index, mixed $element): string => sprintf("%s: %s", $index, human_readable_value($element)), array_keys($value), array_values($value))) . "]";
     } elseif (is_scalar($value)) {
-        return strval($value);
+        return (string) $value;
     } elseif (is_object($value)) {
         if ($value instanceof Stringable) {
-            return strval($value);
+            return (string) $value;
         } elseif ($value instanceof BackedEnum) {
             return sprintf("%s::%s", $value::class, $value->name);
         }
@@ -84,13 +84,13 @@ function human_readable_time(float $interval): string
     $s = (int)$interval % 60;
     $m = (int)floor(((int)$interval % 3600) / 60);
     $h = (int)floor(((int)$interval % 86400) / 3600);
-    $d = (int)floor(((int)$interval % 2592000) / 86400);
-    $M = (int)floor((int)$interval / 2592000);
+    $d = (int)floor(((int)$interval % 2_592_000) / 86400);
+    $M = (int)floor((int)$interval / 2_592_000);
     $string = '';
     if ($M) {
         $string .= sprintf('%d month%s', $M, ($M > 1) ? 's' : '');
         $string .= ' ';
-        $interval -= $M * 2592000;
+        $interval -= $M * 2_592_000;
     }
     if ($d) {
         $string .= sprintf('%d day%s', $d, ($d > 1) ? 's' : '');
@@ -112,15 +112,13 @@ function human_readable_time(float $interval): string
         $string .= ' ';
         $interval -= $s;
     }
-    $string .= sprintf('%.f seconds', $interval);
-    return $string;
+    return $string . sprintf('%.f seconds', $interval);
 }
 
 /**
  * @param string $message The string to print. The default is an empty string.
  * @param string $file The file name to print with message. The default is the file where fatal_error() is called.
  * @param int $line The line number to print along with message. The default is the file where fatal_error() is called.
- * @return never
  * @throws ErrorException
  */
 function fatal_error(string $message = '', string $file = '', int $line = 0): never
@@ -158,7 +156,6 @@ function unsafe_value(Closure $block): mixed
 /**
  * Return the name of the given class
  * @param class-string $class
- * @return string
  */
 function class_name(string $class): string
 {
@@ -177,10 +174,11 @@ function get_calling_class(): ?string
 {
     $backtrace = debug_backtrace();
     $object = $backtrace[1]['object'] ?? null;
-    for ($i = 1; $i < count($backtrace); $i++) {
+    $backtraceCount = count($backtrace);
+    for ($i = 1; $i < $backtraceCount; $i++) {
         if (isset($backtrace[$i])) {
             $current = $backtrace[$i]['object'] ?? null;
-            if ($object != $current) {
+            if ($object !== $current) {
                 if (is_object($current)) {
                     $current = $current::class;
                 }

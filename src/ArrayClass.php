@@ -402,7 +402,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
      */
     public function replaceSubrange(Range $subrange, Collection $newElements): void
     {
-        assert($subrange->count() <= $this->count() && $subrange->count() == $newElements->count(), "invalid argument: the range's upper bound must be less or equal to the count of the receiver and, range and collection must have the same number of elements");
+        assert($subrange->count() <= $this->count() && $subrange->count() === $newElements->count(), "invalid argument: the range's upper bound must be less or equal to the count of the receiver and, range and collection must have the same number of elements");
         foreach ($subrange as $idx => $bound) {
             $this->removeAt($bound);
             $this->insert($newElements[$idx], $bound);
@@ -540,7 +540,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
         $result = new ArrayClass();
         $subSequenceStart = $this->startIndex();
         $appendSubsequence = (function (int $end) use ($result, &$subSequenceStart, $omittingEmptySubsequences): bool {
-            if ($subSequenceStart == $end && $omittingEmptySubsequences) {
+            if ($subSequenceStart === $end && $omittingEmptySubsequences) {
                 return false;
             }
             /** @psalm-suppress InvalidArgument */
@@ -631,7 +631,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
      */
     public function swapAt(int $i, int $j): void
     {
-        if ($i == $j) {
+        if ($i === $j) {
             return;
         }
         $temp = $this[$i];
@@ -767,7 +767,6 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
 
     /**
      * @param int $offset
-     * @return bool
      */
     #[Pure]
     public function offsetExists(mixed $offset): bool
@@ -776,7 +775,6 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
     }
 
     /**
-     * @param mixed $offset
      * @return Element
      */
     public function offsetGet(mixed $offset): mixed

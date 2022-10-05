@@ -30,7 +30,7 @@ final class URLFileTypeMappingsInternal
                     }
                     $MIMETypeToExtensionList[$mimeType] = $extensions;
                 }
-                $scanner->scanLocation = $scanner->scanLocation + 1;
+                $scanner->scanLocation += 1;
             }
         }
         $this->MIMETypeToExtensionList = $MIMETypeToExtensionList;

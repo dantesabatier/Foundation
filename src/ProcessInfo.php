@@ -61,7 +61,7 @@ class ProcessInfo extends ObjectClass
                         if (count($components) == 2) {
                             [$key, $value] = $components;
                             $environment[trim($key)] = trim($value, "\"' ");
-                            $scanner->scanLocation = $scanner->scanLocation + 1;
+                            $scanner->scanLocation += 1;
                         }
                     }
                 }
@@ -100,7 +100,6 @@ class ProcessInfo extends ObjectClass
 
     /**
      * Returns the process information agent for the process.
-     * @return ProcessInfo
      */
     public static function processInfo(): ProcessInfo
     {

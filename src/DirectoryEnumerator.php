@@ -16,19 +16,16 @@ abstract class DirectoryEnumerator implements IteratorAggregate
 {
     /**
      * A dictionary with the attributes of the directory at which enumeration started.
-     * @return Dictionary|null
      */
     abstract public function directoryAttributes(): ?Dictionary;
 
     /**
      * A dictionary with the attributes of the most recently returned file or subdirectory (as referenced by the pathname).
-     * @return Dictionary|null
      */
     abstract public function fileAttributes(): ?Dictionary;
 
     /**
      * The number of levels deep the current object is in the directory hierarchy being enumerated.
-     * @return int
      */
     abstract public function level(): int;
 

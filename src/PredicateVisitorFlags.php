@@ -12,9 +12,9 @@ namespace Sabatier\Foundation;
 /** @internal */
 class PredicateVisitorFlags
 {
-    const expressions = 1;
-    const operators = 2;
-    const internalNodes = 4;
-    const operatorsBefore = 8;
-    const common = PredicateVisitorFlags::expressions | PredicateVisitorFlags::operators | PredicateVisitorFlags::internalNodes;
+    final const expressions = 1;
+    final const operators = 2;
+    final const internalNodes = 4;
+    final const operatorsBefore = 8;
+    final const common = PredicateVisitorFlags::expressions | PredicateVisitorFlags::operators | PredicateVisitorFlags::internalNodes;
 }

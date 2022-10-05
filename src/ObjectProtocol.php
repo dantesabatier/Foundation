@@ -45,7 +45,6 @@ interface ObjectProtocol extends CustomDebugStringConvertible, Equatable
 
     /**
      * Returns an integer that can be used as a table address in a hash table structure.
-     * @return int
      */
     public function hash(): int;
 
@@ -76,5 +75,5 @@ interface ObjectProtocol extends CustomDebugStringConvertible, Equatable
      * @param array $arguments Arguments of the message.
      * @return mixed An object that is the result of the message.
      */
-    public function performSelector(string $selector, array $arguments = []): mixed;
+    public function perform(string $selector, array $arguments = []): mixed;
 }

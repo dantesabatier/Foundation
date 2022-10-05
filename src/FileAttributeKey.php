@@ -17,32 +17,32 @@ namespace Sabatier\Foundation;
 class FileAttributeKey
 {
     /** @var string The key in a file attribute dictionary whose value indicates whether the file is read-only. */
-    const appendOnly = 'appendOnly';
+    final const appendOnly = 'appendOnly';
     /** @var string The key in a file attribute dictionary whose value indicates whether the file is busy. */
-    const busy = 'busy';
+    final const busy = 'busy';
     /** @var string The key in a file attribute dictionary whose value indicates the file's creation date. */
-    const creationDate = 'creationDate';
+    final const creationDate = 'creationDate';
     /** @var string The key in a file attribute dictionary whose value indicates whether the file's extension is hidden. */
-    const extensionHidden = 'extensionHidden';
+    final const extensionHidden = 'extensionHidden';
     /** @var string The key in a file attribute dictionary whose value indicates the file's last modified date. */
-    const modificationDate = 'modificationDate';
+    final const modificationDate = 'modificationDate';
     /** @var string The key in a file attribute dictionary whose value indicates whether the file is mutable. */
-    const immutable = 'immutable';
+    final const immutable = 'immutable';
     /** @var string The key in a file attribute dictionary whose value indicates the file's group ID. */
-    const groupOwnerAccountID = 'groupOwnerAccountID';
+    final const groupOwnerAccountID = 'groupOwnerAccountID';
     /** @var string The key in a file attribute dictionary whose value indicates the group name of the file's owner. */
-    const groupOwnerAccountName = 'groupOwnerAccountName';
+    final const groupOwnerAccountName = 'groupOwnerAccountName';
     /** @var string The key in a file attribute dictionary whose value indicates the file's owner's account ID. */
-    const ownerAccountID = 'ownerAccountID';
+    final const ownerAccountID = 'ownerAccountID';
     /** @var string The key in a file attribute dictionary whose value indicates the name of the file's owner. */
-    const ownerAccountName = 'ownerAccountName';
+    final const ownerAccountName = 'ownerAccountName';
     /** @var string The key in a file attribute dictionary whose value indicates the file's Posix permissions. */
-    const posixPermissions = 'posixPermissions';
+    final const posixPermissions = 'posixPermissions';
     /** @var string The key in a file attribute dictionary whose value identifies the protection level for this file. */
-    const protectionKey = 'protectionKey';
+    final const protectionKey = 'protectionKey';
     /** @var string The key in a file attribute dictionary whose value indicates the file's size in bytes. */
-    const size = 'size';
+    final const size = 'size';
     /** @var string The key in a file attribute dictionary whose value indicates the file's type. The corresponding value is a string. See {@see FileAttributeType} for possible values.
      */
-    const type = 'type';
+    final const type = 'type';
 }

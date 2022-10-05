@@ -18,7 +18,7 @@ use JetBrains\PhpStorm\ExpectedValues;
 /** @internal */
 class PropertyListSerializer
 {
-    private DOMDocument $document;
+    private readonly DOMDocument $document;
 
     /** @noinspection PhpUnhandledExceptionInspection */
     public function __construct()

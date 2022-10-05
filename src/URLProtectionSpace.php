@@ -24,7 +24,6 @@ class URLProtectionSpace
     /**
      * A Boolean value that indicates whether the credentials for the protection space can be sent securely.
      * This value is true if the credentials for the protection space represented by the receiver can be sent securely, false otherwise.
-     * @return bool
      */
     public function receivesCredentialSecurely(): bool
     {

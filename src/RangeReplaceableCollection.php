@@ -22,7 +22,6 @@ interface RangeReplaceableCollection extends MutableCollection
      * Creates a new collection containing the specified number of a single, repeated value.
      * @param mixed $value The element to repeat.
      * @param int $count The number of times to repeat the value passed in the repeating parameter. count must be zero or greater.
-     * @return RangeReplaceableCollection
      */
     public static function repeating(mixed $value, int $count): self;
 

@@ -16,13 +16,10 @@ use Stringable;
 /** @internal */
 class EqualityPredicateOperator extends PredicateOperator
 {
-    public readonly bool $isNegation;
-
     #[Pure]
-    public function __construct(PredicateOperatorType $operatorType, ComparisonPredicateModifier $modifier = ComparisonPredicateModifier::direct, #[ExpectedValues(flagsFromClass: ComparisonPredicateOptions::class)] int $options = ComparisonPredicateOptions::none, bool $isNegation = false)
+    public function __construct(PredicateOperatorType $operatorType, ComparisonPredicateModifier $modifier = ComparisonPredicateModifier::direct, #[ExpectedValues(flagsFromClass: ComparisonPredicateOptions::class)] int $options = ComparisonPredicateOptions::none, public readonly bool $isNegation = false)
     {
         parent::__construct($operatorType, $modifier, $options);
-        $this->isNegation = $isNegation;
     }
 
     public function performPrimitiveOperation(mixed $left, mixed $right): bool

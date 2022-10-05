@@ -18,9 +18,6 @@ use JetBrains\PhpStorm\ExpectedValues;
 class HTTPURLResponse extends URLResponse
 {
     public readonly string $httpVersion;
-    /** @var int The response's HTTP status code. */
-    #[ExpectedValues(valuesFromClass: HTTPStatusCode::class)]
-    public readonly int $statusCode;
     /** @var Dictionary<mixed> All HTTP header fields of the response. */
     public readonly Dictionary $allHeaderFields;
 
@@ -31,9 +28,8 @@ class HTTPURLResponse extends URLResponse
      * @param string|null $httpVersion The version of the HTTP response as returned by the server. This is typically represented as "HTTP/1.1".
      * @param Dictionary<mixed>|null $headerFields A dictionary representing the keys and values from the server's response header.
      */
-    public function __construct(URL $url, #[ExpectedValues(valuesFromClass: HTTPStatusCode::class)] int $statusCode = HTTPStatusCode::ok, ?string $httpVersion = null, ?Dictionary $headerFields = null)
+    public function __construct(URL $url, #[ExpectedValues(valuesFromClass: HTTPStatusCode::class)] public readonly int $statusCode = HTTPStatusCode::ok, ?string $httpVersion = null, ?Dictionary $headerFields = null)
     {
-        $this->statusCode = $statusCode;
         $this->httpVersion = $httpVersion ?? $_SERVER['SERVER_PROTOCOL'] ?? "HTTP/1.1";
         $this->allHeaderFields = (function () use ($headerFields): Dictionary {
             if (!$headerFields) {
@@ -77,12 +73,10 @@ class HTTPURLResponse extends URLResponse
 
     private function suggestedFilename(?Dictionary $headerFields): string
     {
-        if ($value = $headerFields?->valueForCaseInsensitiveKey("Content-Disposition")) {
-            if (string_contains($value, ";")) {
-                [, $part] = explode(";", $value);
-                [, $filename] = explode("=", $part);
-                return $filename;
-            }
+        if (($value = $headerFields?->valueForCaseInsensitiveKey("Content-Disposition")) && string_contains($value, ";")) {
+            [, $part] = explode(";", $value);
+            [, $filename] = explode("=", $part);
+            return $filename;
         }
         return "Unknown";
     }

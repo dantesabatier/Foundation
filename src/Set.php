@@ -293,7 +293,6 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
 
     /**
      * Returns the elements of the sequence, shuffled.
-     * @param RandomNumberGenerator $generator
      * @return ArrayClass<Element> A shuffled array of this sequence's elements.
      */
     public function shuffled(RandomNumberGenerator $generator): ArrayClass
@@ -428,7 +427,6 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
 
     /**
      * Removes the element at the given index of the set.
-     * @param int $index
      * @return Element The element that was removed from the set.
      */
     public function removeAt(int $index)
@@ -739,7 +737,6 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
 
     /**
      * @param int $offset
-     * @return bool
      */
     #[Pure]
     public function offsetExists(mixed $offset): bool
@@ -748,7 +745,6 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
     }
 
     /**
-     * @param mixed $offset
      * @return Element
      */
     public function offsetGet(mixed $offset): mixed

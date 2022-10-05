@@ -18,7 +18,6 @@ final class Nil extends Value
 
     /**
      * Returns the singleton instance of Nil.
-     * @return Nil
      */
     public static function nil(): Nil
     {

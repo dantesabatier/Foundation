@@ -15,13 +15,10 @@ use JetBrains\PhpStorm\Pure;
 /** @internal */
 class ComparisonPredicateOperator extends PredicateOperator
 {
-    public readonly PredicateOperatorType $variant;
-
     #[Pure]
-    public function __construct(PredicateOperatorType $operatorType, ComparisonPredicateModifier $modifier, #[ExpectedValues(flagsFromClass: ComparisonPredicateOptions::class)] int $options, PredicateOperatorType $variant)
+    public function __construct(PredicateOperatorType $operatorType, ComparisonPredicateModifier $modifier, #[ExpectedValues(flagsFromClass: ComparisonPredicateOptions::class)] int $options, public readonly PredicateOperatorType $variant)
     {
         parent::__construct($operatorType, $modifier, $options);
-        $this->variant = $variant;
     }
 
     public function performPrimitiveOperation(mixed $left, mixed $right): bool

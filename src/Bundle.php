@@ -58,7 +58,6 @@ final class Bundle extends ObjectClass
 
     /**
      * Returns a Bundle object initialized to correspond to the specified file URL.
-     * @param URL $url
      */
     private function __construct(URL $url)
     {
@@ -219,7 +218,7 @@ final class Bundle extends ObjectClass
             }
             return self::bundleWithURL($url);
         } catch (Exception $exception) {
-            throw new InvalidArgumentException($exception->getMessage());
+            throw new InvalidArgumentException($exception->getMessage(), (int)$exception->getCode(), $exception);
         }
     }
 
@@ -230,12 +229,7 @@ final class Bundle extends ObjectClass
      */
     public static function main(): Bundle
     {
-        /** @psalm-suppress RedundantCondition */
-        if (/** @phpstan-ignore-line */ LOAD_MAIN_BUNDLE_USING_DOCUMENT_ROOT_DIRECTORY_URL) {
-            return Bundle::bundleWithURL(FileManager::default()->documentRootDirectory);
-        }
-        /** @phpstan-ignore-next-line */
-        return Bundle::bundleForClass(get_calling_class() ?? fatal_error());
+        return Bundle::bundleWithURL(FileManager::default()->documentRootDirectory);
     }
 
     /**

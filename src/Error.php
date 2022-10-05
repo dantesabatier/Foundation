@@ -40,8 +40,7 @@ class Error extends ObjectClass
     public function __get(string $name)
     {
         if ($name == 'localizedDescription') {
-            $localizedDescription = $this->userInfo?->valueForKey(LocalizedDescriptionKey) ?? "The operation couldn't be completed." . " " . ($this->localizedFailureReason ?? "($this->domain error $this->code.)");
-            $this->$name = $localizedDescription;
+            $this->$name = $this->userInfo?->valueForKey(LocalizedDescriptionKey) ?? "The operation couldn't be completed." . " " . ($this->localizedFailureReason ?? "($this->domain error $this->code.)");
             return $this->$name;
         } elseif ($name == 'localizedRecoveryOptions') {
             $this->$name = $this->userInfo?->valueForKey(LocalizedRecoveryOptionsErrorKey);
@@ -118,7 +117,6 @@ class Error extends ObjectClass
      * Specifies a block to call when the corresponding property is not present in the user info dictionary.
      * @param string $errorDomain The error domain of the provider.
      * @param Closure(Error, string): mixed $provider A block to be executed synchronously at the time a corresponding property is accessed.
-     * @return void
      */
     public static function setUserInfoValueProvider(string $errorDomain, Closure $provider): void
     {

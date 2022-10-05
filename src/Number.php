@@ -23,7 +23,7 @@ class Number extends Value
 
     /**
      * Returns a Number object initialized to contain a given value.
-     * @param bool|float|int|string $value The value for the new number.
+     * @param scalar $value The value for the new number.
      */
     public function __construct(bool|float|int|string $value)
     {
@@ -39,10 +39,9 @@ class Number extends Value
     public function __get(string $name)
     {
         return $this->$name = match ($name) {
-            'boolValue' => boolval($this->value),
-            'floatValue' => floatval($this->value),
-            'doubleValue' => doubleval($this->value),
-            'intValue' => intval($this->value),
+            'boolValue' => (bool) $this->value,
+            'floatValue', 'doubleValue' => (float) $this->value,
+            'intValue' => (int) $this->value,
             'stringValue' => human_readable_value($this->value),
             default => $this->valueForUndefinedKey($name)
         };

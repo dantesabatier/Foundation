@@ -46,7 +46,6 @@ use SplFileInfo;
 final class URL extends ObjectClass
 {
     private string $string;
-    private ?URL $baseURL;
     private ?URLResourceValuesStorage $storage = null;
 
     /**
@@ -54,24 +53,25 @@ final class URL extends ObjectClass
      * @param string $string The URL string with which to initialize the URL object.
      * @param URL|null $baseURL The base URL for the URL object.
      */
-    public function __construct(string $string, ?URL $baseURL = null)
+    public function __construct(string $string, private ?URL $baseURL = null)
     {
-        if ($string) {
-            $components = new URLComponents($string);
-            $proposed = $components->string;
-            if ($proposed) {
-                $string = $proposed;
+        if ($this->baseURL === null) {
+            if ($string) {
+                $components = new URLComponents($string);
+                $proposed = $components->string;
+                if ($proposed) {
+                    $string = $proposed;
+                }
+            }
+            if (!url_validate($string)) {
+                throw new InvalidArgumentException(sprintf("invalid argument: expecting url string, \"%s\" given", $string));
             }
         }
-        if (!url_validate($string)) {
-            throw new InvalidArgumentException(sprintf("invalid argument: expecting uri string, \"%s\" given", $string));
-        }
         $this->string = $string;
-        $this->baseURL = $baseURL;
     }
 
     #[Pure]
-    #[ArrayShape(['string' => "string", 'baseURL' => "\Sabatier\Foundation\URL"])]
+    #[ArrayShape(['string' => "string", 'baseURL' => '\\' . URL::class])]
     public function __serialize(): array
     {
         $serialization = ['string' => $this->string];
@@ -91,7 +91,7 @@ final class URL extends ObjectClass
     {
         if ($name == 'absoluteURL') {
             $baseURL = $this->baseURL;
-            if ($baseURL === null) {
+            if (!$baseURL instanceof URL) {
                 return $this;
             }
             if (!$baseURL->hasDirectoryPath) {
@@ -216,7 +216,7 @@ final class URL extends ObjectClass
             $path = str_replace("\\", "/", (string)parse_url($path, PHP_URL_PATH));
         }
         $scheme = parse_url($path, PHP_URL_SCHEME);
-        if (empty($scheme)) {
+        if (empty($scheme) && !empty($path)) {
             $scheme = URLScheme::file;
             $string .= "$scheme:";
         }
@@ -230,7 +230,6 @@ final class URL extends ObjectClass
     /**
      * Appends a path component to the URL.
      * @param string $component The path component to add to the URL, in its original form (not URL encoded).
-     * @return URL
      */
     public function appendPathComponent(string $component): URL
     {
@@ -247,7 +246,6 @@ final class URL extends ObjectClass
     /**
      * Returns a URL constructed by appending the given path component to self.
      * @param string $component The path component to add to the URL, in its original form (not URL encoded).
-     * @return URL
      */
     public function appendingPathComponent(string $component): URL
     {
@@ -259,7 +257,6 @@ final class URL extends ObjectClass
     /**
      * Appends the given path extension to self.
      * @param string $extension The path extension to add to the URL.
-     * @return URL
      */
     public function appendPathExtension(string $extension): URL
     {
@@ -275,7 +272,6 @@ final class URL extends ObjectClass
     /**
      * Returns a URL constructed by appending the given path extension to self.
      * @param string $extension The path extension to add to the URL.
-     * @return URL
      */
     public function appendingPathExtension(string $extension): URL
     {
@@ -286,7 +282,6 @@ final class URL extends ObjectClass
 
     /**
      * Returns a URL constructed by removing the last path component of self.
-     * @return URL
      */
     public function deleteLastPathComponent(): URL
     {
@@ -299,7 +294,6 @@ final class URL extends ObjectClass
 
     /**
      * Returns a URL constructed by removing the last path component of self.
-     * @return URL
      */
     public function deletingLastPathComponent(): URL
     {
@@ -310,7 +304,6 @@ final class URL extends ObjectClass
 
     /**
      * Returns a URL constructed by removing any path extension.
-     * @return URL
      */
     public function deletePathExtension(): URL
     {
@@ -320,7 +313,6 @@ final class URL extends ObjectClass
 
     /**
      * Returns a URL constructed by removing any path extension.
-     * @return URL
      */
     public function deletingPathExtension(): URL
     {
@@ -329,9 +321,6 @@ final class URL extends ObjectClass
         return $url;
     }
 
-    /**
-     * @return string
-     */
     public function removingPercentEncoding(): string
     {
         return urldecode($this->absoluteString);
@@ -368,7 +357,6 @@ final class URL extends ObjectClass
      * Sets the resource value identified by a given resource key.
      * This method writes the new resource values out to the backing store. Attempts to set a read-only resource property or to set a resource property not supported by the resource are ignored and are not considered errors. This method is currently applicable only to URLs for file system resources.
      * URLResourceValues keeps track of which of its properties have been set. Those values are the ones used by this function to determine which properties to write.
-     * @param URLResourceValues $values
      * @throws Exception
      */
     public function setResourceValues(URLResourceValues $values): void
@@ -379,7 +367,6 @@ final class URL extends ObjectClass
     /**
      * Removes the cached resource value identified by a given resource value key from the URL object.
      * Removing a cached resource value may remove other cached resource values because some resource values are cached as a set of values, and because some resource values depend on other resource values (temporary resource values have no dependencies). This method is currently applicable only to URLs for file system resources.
-     * @param string $key
      */
     public function removeCachedResourceValue(#[ExpectedValues(valuesFromClass: URLResourceKey::class)] string $key): void
     {
@@ -399,8 +386,6 @@ final class URL extends ObjectClass
      * Sets a temporary resource value on the URL object.
      * Temporary resource values are for client use. Temporary resource values exist only in memory and are never written to the resource's backing store. Once set, a temporary resource value can be copied from the URL object with func {@see resourceValues()}. The values are stored in the loosely-typed allValues dictionary property.
      * To remove a temporary resource value from the URL object, use func {@see removeCachedResourceValue()}. Care should be taken to ensure the key that identifies a temporary resource value is unique and does not conflict with system defined keys (using reverse domain name notation in your temporary resource value keys is recommended). This method is currently applicable only to URLs for file system resources.
-     * @param mixed $value
-     * @param string $key
      */
     public function setTemporaryResourceValue(mixed $value, #[ExpectedValues(valuesFromClass: URLResourceKey::class)] string $key): void
     {
@@ -422,7 +407,6 @@ final class URL extends ObjectClass
     /**
      * Resolves any symlinks in the path of a file URL.
      * If the isFileURL is false, this method does nothing.
-     * @return URL
      */
     public function resolveSymlinksInPath(): URL
     {
@@ -435,7 +419,6 @@ final class URL extends ObjectClass
 
     /**
      * Resolves any symlinks in the path of a file URL.
-     * @return URL
      */
     public function resolvingSymlinksInPath(): URL
     {
@@ -449,7 +432,6 @@ final class URL extends ObjectClass
 
     /**
      * Standardizes the path of a file URL.
-     * @return URL
      */
     public function standardize(): URL
     {

@@ -20,7 +20,6 @@ final class URLSessionConfiguration
 
     /**
      * A default session configuration object.
-     * @return URLSessionConfiguration
      */
     #[Pure]
     public static function default(): URLSessionConfiguration

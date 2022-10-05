@@ -160,7 +160,6 @@ class Data extends ObjectClass implements RangeReplaceableCollection, Iterator
 
     /**
      * Appends the specified data to the end of this data.
-     * @param Data $data
      */
     public function appendData(Data $data): void
     {
@@ -530,7 +529,6 @@ class Data extends ObjectClass implements RangeReplaceableCollection, Iterator
 
     /**
      * Reverses the elements of the collection in place.
-     * @return Data
      */
     public function reverse(): Data
     {
@@ -551,7 +549,7 @@ class Data extends ObjectClass implements RangeReplaceableCollection, Iterator
 
     public function join(string $separator): string
     {
-        return join($separator, $this->toArray());
+        return implode($separator, $this->toArray());
     }
 
     /**
@@ -568,7 +566,6 @@ class Data extends ObjectClass implements RangeReplaceableCollection, Iterator
      * Returns a subsequence by skipping elements while predicate returns true and returning the remaining elements.
      * @param Closure(int): bool $while A closure that takes an element of the sequence as its argument and returns true if the element should be skipped or false if it should be included.
      * Once the predicate returns false it will not be called again.
-     * @return Data
      */
     public function drop(Closure $while): Data
     {
@@ -639,7 +636,6 @@ class Data extends ObjectClass implements RangeReplaceableCollection, Iterator
     /**
      * Returns a subsequence containing the initial elements until predicate returns false and skipping the remaining elements.
      * @param Closure(int, int=): bool $predicate A closure that takes an element of the sequence as its argument and returns true if the element should be included or false if it should be excluded. Once the predicate returns false it will not be called again.
-     * @return Data
      */
     public function prefixWhile(Closure $predicate): Data
     {
@@ -675,7 +671,6 @@ class Data extends ObjectClass implements RangeReplaceableCollection, Iterator
     /**
      * Returns a new copy of the data in a specified range.
      * @param Range $range The range to copy.
-     * @return Data
      */
     public function subdata(Range $range): Data
     {
@@ -692,7 +687,6 @@ class Data extends ObjectClass implements RangeReplaceableCollection, Iterator
 
     /**
      * A textual description of the data.
-     * @return string
      */
     public function description(): string
     {
@@ -737,19 +731,15 @@ class Data extends ObjectClass implements RangeReplaceableCollection, Iterator
 
     /**
      * @param int $offset
-     * @return bool
      */
     public function offsetExists(mixed $offset): bool
     {
         return in_range($offset, $this->startIndex(), $this->endIndex());
     }
 
-    /**
-     * @param mixed $offset
-     * @return int
-     */
     public function offsetGet(mixed $offset): int
     {
+        /** @psalm-suppress RedundantConditionGivenDocblockType */
         assert(is_int($offset), sprintf("invalid argument: expecting \"int\", \"%s\" given", typeof($offset)));
         assert($this->offsetExists($offset), sprintf("%s %s(%s) index \"%s\" out of bounds [%s...<%s]", $this->debugDescription(), __FUNCTION__, $offset, $offset, $this->startIndex(), $this->endIndex()));
         return ord($this->reserved[$offset]);

@@ -20,7 +20,7 @@ use UnexpectedValueException;
  */
 class URLDirectoryEnumerator extends DirectoryEnumerator
 {
-    private RecursiveIteratorIterator $iterator;
+    private readonly RecursiveIteratorIterator $iterator;
     private ?URL $current = null;
     private bool $shouldContinue = false;
     private bool $isPostOrderDirectory = false;

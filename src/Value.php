@@ -57,7 +57,7 @@ class Value extends ObjectClass
     public function compare(mixed $other): ComparisonResult
     {
         if (is_scalar($other) || is_null($other)) {
-            return ComparisonResult::from(($this->type != typeof($other)) ? -1 : $this->value <=> $other);
+            return ComparisonResult::from(($this->type !== typeof($other)) ? -1 : $this->value <=> $other);
         } elseif ($other instanceof Value) {
             return ComparisonResult::from($this->value <=> $other->value);
         }

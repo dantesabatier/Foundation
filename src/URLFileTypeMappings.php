@@ -6,7 +6,7 @@ namespace Sabatier\Foundation;
 final class URLFileTypeMappings
 {
     private static ?URLFileTypeMappings $shared = null;
-    private URLFileTypeMappingsInternal $internal;
+    private readonly URLFileTypeMappingsInternal $internal;
 
     public function __construct()
     {
@@ -21,10 +21,6 @@ final class URLFileTypeMappings
         return self::$shared;
     }
 
-    /**
-     * @param string $mimeType
-     * @return ArrayClass<string>|null
-     */
     public function extensions(string $mimeType): ?ArrayClass
     {
         return $this->internal->MIMETypeToExtensionList[$mimeType];

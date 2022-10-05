@@ -78,7 +78,6 @@ class BlockExpression extends Expression
             }
             $format .= $arguments->join(', ');
         }
-        $format .= ')';
-        return $format;
+        return $format . ')';
     }
 }

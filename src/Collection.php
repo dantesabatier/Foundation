@@ -25,19 +25,16 @@ interface Collection extends Sequence, Countable, ArrayAccess
 {
     /**
      * The position of the first element in a nonempty collection.
-     * @return int
      */
     public function startIndex(): int;
 
     /**
      * The collection's “past the end” position—that is, the position one greater than the last valid subscript argument.
-     * @return int
      */
     public function endIndex(): int;
 
     /**
      * The indices that are valid for subscripting the collection, in ascending order.
-     * @return Range
      */
     public function indices(): Range;
 
@@ -85,7 +82,6 @@ interface Collection extends Sequence, Countable, ArrayAccess
 
     /**
      * A Boolean value indicating whether the sequence is empty.
-     * @return bool
      */
     public function isEmpty(): bool;
 

@@ -59,12 +59,7 @@ class PredicateUtilities
 
     public static function count(Countable|Stringable $value): Number
     {
-        if ($value instanceof Countable) {
-            $value = $value->count();
-        } else {
-            $value = strlen((string)$value);
-        }
-        return new Number($value);
+        return new Number($value instanceof Countable ? $value->count() : strlen((string)$value));
     }
 
     public static function min(ArrayClass|Set $values): ?Number
@@ -109,7 +104,7 @@ class PredicateUtilities
         if (!$values->isEmpty()) {
             /** @var Dictionary<int> $occurrences */
             $occurrences = $values->reduce(new Dictionary(), function (Dictionary $result, Number|int|float $element): Dictionary {
-                $result[strval($element)] += 1;
+                $result[(string) $element] += 1;
                 return $result;
             });
             $max = $occurrences->max();
@@ -127,7 +122,7 @@ class PredicateUtilities
         }
         $count = $values->count();
         $avg = abs($values->sum()) / $count;
-        $sum = $values->map(fn(Number|int|float $element): int|float => pow(pn($element) - $avg, 2))->sum();
+        $sum = $values->map(fn(Number|int|float $element): int|float => (pn($element) - $avg) ** 2)->sum();
         return new Number(sqrt($sum / $count - 1));
     }
 
@@ -173,7 +168,7 @@ class PredicateUtilities
 
     public static function raiseToPower(Number|int|float $base, Number|int|float $exp): Number
     {
-        return new Number(pow(pn($base), pn($exp)));
+        return new Number(pn($base) ** pn($exp));
     }
 
     public static function exp(Number|float $arg): Number
@@ -193,7 +188,7 @@ class PredicateUtilities
 
     public static function trunc(Number|int|float $number): Number
     {
-        return new Number(intval(pn($number) * 1e2) / 1e2);
+        return new Number((int) (pn($number) * 1e2) / 1e2);
     }
 
     public static function random(Number|int $max = NotFound): Number

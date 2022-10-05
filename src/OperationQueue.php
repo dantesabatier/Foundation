@@ -163,14 +163,6 @@ final class OperationQueue extends ObjectClass
     }
 
     /**
-     * Invokes a block when the queue finishes all enqueued operations, and prevents subsequent operations from starting until the block has completed.
-     * @param Closure(): void $barrier The block to invoke after all currently enqueued operations have finished. Operations you add after the barrier block don't start until the block has completed.
-     */
-    public function addBarrierBlock(Closure $barrier): void
-    {
-    }
-
-    /**
      * Cancels all queued and executing operations.
      * This method calls the cancel() method on all operations currently in the queue.
      */

@@ -11,6 +11,7 @@ namespace Sabatier\Foundation;
 
 use Closure;
 use InvalidArgumentException;
+use JetBrains\PhpStorm\Deprecated;
 use JetBrains\PhpStorm\ExpectedValues;
 use JetBrains\PhpStorm\Pure;
 use JsonSerializable;
@@ -83,7 +84,7 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
         return method_exists(static::class, $selector) || property_exists(static::class, $selector);
     }
 
-    public function performSelector(string $selector, array $arguments = []): mixed
+    public function perform(string $selector, array $arguments = []): mixed
     {
         if (method_exists($this, $selector)) {
             return $this->$selector(...$arguments);
@@ -92,6 +93,13 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
         } else {
             $this->doesNotRecognizeSelector($selector);
         }
+    }
+
+    #[Deprecated('since Foundation 0.1, use perform() instead', '%class%->perform(%parameters%)')]
+    public function performSelector(string $selector, array $arguments = []): mixed
+    {
+        trigger_error(sprintf("%s() is deprecated, use perform() instead", __METHOD__), E_USER_DEPRECATED);
+        return $this->perform($selector, $arguments);
     }
 
     /**
@@ -112,7 +120,7 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
     public function isEqual(mixed $other): bool
     {
         if ($other instanceof ObjectClass) {
-            return $this->hash() == $other->hash();
+            return $this->hash() === $other->hash();
         }
         return false;
     }
@@ -221,7 +229,7 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
     {
         $selector = sprintf("%s%s", "validate", ucfirst($key));
         if ($this->responds($selector)) {
-            return $this->performSelector($selector, [&$value]);
+            return $this->perform($selector, [&$value]);
         }
         return true;
     }
@@ -259,7 +267,7 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
         $selectors = [$key, sprintf('is%s', ucfirst($key)), sprintf('get%s', ucfirst($key))];
         foreach ($selectors as $selector) {
             if ($this->responds($selector)) {
-                return $this->performSelector($selector);
+                return $this->perform($selector);
             }
         }
         if (property_exists($this, $key)) {
@@ -276,7 +284,7 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
         $selector = sprintf('set%s', ucfirst($key));
         if (method_exists($this, $selector)) {
             $this->willChangeValueForKey($key);
-            $this->performSelector($selector, [$value]);
+            $this->perform($selector, [$value]);
             $this->didChangeValueForKey($key);
         } elseif (property_exists($this, $key)) {
             $this->willChangeValueForKey($key);
@@ -291,7 +299,7 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
     {
         $components = components_from_key_path($keyPath);
         $key = $components->key;
-        if ((strlen($key) === 0) || ($key === $keyPath)) {
+        if (($key === '') || ($key === $keyPath)) {
             return $this->valueForKey($keyPath);
         }
         $obj = $this->valueForKeyPath($key);

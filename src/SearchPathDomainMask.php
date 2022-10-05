@@ -18,11 +18,11 @@ namespace Sabatier\Foundation;
 class SearchPathDomainMask
 {
     /** @var int The user's home directory—the place to install user's personal items (~). */
-    const user = 1;
+    final const user = 1;
     /** @var int The place to install items available to everyone on this machine. */
-    const local = 2;
+    final const local = 2;
     /** @var int A directory for system files. */
-    const system = 4;
+    final const system = 4;
     /** @var int All domains. */
-    const all = SearchPathDomainMask::user | SearchPathDomainMask::local | SearchPathDomainMask::system;
+    final const all = SearchPathDomainMask::user | SearchPathDomainMask::local | SearchPathDomainMask::system;
 }

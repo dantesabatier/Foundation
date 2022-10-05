@@ -5,25 +5,25 @@ namespace Sabatier\Foundation;
 class KeyValueOperator
 {
     /** @var string The @avg array operator. */
-    const averageKeyValueOperator = 'avg';
+    final const averageKeyValueOperator = 'avg';
     /** @var string The @count array operator. */
-    const countKeyValueOperator = 'count';
+    final const countKeyValueOperator = 'count';
     /** @var string The @distinctUnionOfArrays array operator. */
-    const distinctUnionOfArraysKeyValueOperator = 'distinctUnionOfArrays';
+    final const distinctUnionOfArraysKeyValueOperator = 'distinctUnionOfArrays';
     /** @var string The @distinctUnionOfObjects array operator. */
-    const distinctUnionOfObjectsKeyValueOperator = 'distinctUnionOfObjects';
+    final const distinctUnionOfObjectsKeyValueOperator = 'distinctUnionOfObjects';
     /** @var string The @distinctUnionOfSets array operator. */
-    const distinctUnionOfSetsKeyValueOperator = 'distinctUnionOfSets';
+    final const distinctUnionOfSetsKeyValueOperator = 'distinctUnionOfSets';
     /** @var string The @max array operator. */
-    const maximumKeyValueOperator = 'max';
+    final const maximumKeyValueOperator = 'max';
     /** @var string The @min array operator. */
-    const minimumKeyValueOperator = 'min';
+    final const minimumKeyValueOperator = 'min';
     /** @var string The @sum array operator. */
-    const sumKeyValueOperator = 'sum';
+    final const sumKeyValueOperator = 'sum';
     /** @var string The @unionOfArrays array operator. */
-    const unionOfArraysKeyValueOperator = 'unionOfArrays';
+    final const unionOfArraysKeyValueOperator = 'unionOfArrays';
     /** @var string The @unionOfObjects array operator. */
-    const unionOfObjectsKeyValueOperator = 'unionOfObjects';
+    final const unionOfObjectsKeyValueOperator = 'unionOfObjects';
     /** @var string The @unionOfSets array operator. */
-    const unionOfSetsKeyValueOperator = 'unionOfSets';
+    final const unionOfSetsKeyValueOperator = 'unionOfSets';
 }

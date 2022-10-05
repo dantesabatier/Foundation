@@ -69,7 +69,6 @@ function array_passing_test(callable $predicate, array $array, FilteringMethod $
  * @template Element
  * @param array<Index, Element> $array
  * @param callable(mixed, mixed=, bool=): bool|null $predicate
- * @param FilteringMethod $method
  * @return Element|null
  */
 function array_first(array $array, callable $predicate = null, FilteringMethod $method = FilteringMethod::default)
@@ -92,7 +91,7 @@ function array_first(array $array, callable $predicate = null, FilteringMethod $
         }
         return $ok;
     }, $array);
-    if (count($array) === 0) {
+    if ($array === []) {
         return null;
     }
     return reset($array);
@@ -103,7 +102,6 @@ function array_first(array $array, callable $predicate = null, FilteringMethod $
  * @template Element
  * @param array<Index, Element> $array
  * @param callable|null $where
- * @param FilteringMethod $method
  * @return Element|null
  */
 function array_last(array $array, callable $where = null, FilteringMethod $method = FilteringMethod::useValue)
@@ -137,8 +135,6 @@ function substring_to_index(string $string, int $index): string
 
 /**
  * Returns a case and diacritic-insensitive string value.
- * @param string $string
- * @return string
  */
 function canonical(string $string): string
 {
@@ -323,7 +319,6 @@ function home_directory(): string
 
 /**
  * A string containing the full name of the current user.
- * @return string
  */
 function full_user_name(): string
 {
@@ -345,17 +340,15 @@ function temporary_directory(): string
 
 /**
  * @throws Exception
+ * @psalm-suppress TypeDoesNotContainType, ForbiddenCode
  */
 function is_hidden(string $filename): bool
 {
-    /** @psalm-suppress TypeDoesNotContainType */
-    if (USE_UNSAFE_FUNCTIONS) : // @phpstan-ignore-line
-        if (target_os_win()) {
-            /** @psalm-suppress ForbiddenCode */
-            $attributes = trim(unsafe_value(fn(): string|bool|null => shell_exec("FOR %A IN (" . "\"" . $filename . "\"" . ") DO @ECHO %~aA")));
-            return $attributes[3] === 'h' || $attributes[4] === 's';
-        }
-    endif;
+    /** @phpstan-ignore-next-line */
+    if (USE_UNSAFE_FUNCTIONS && target_os_win()) {
+        $attributes = trim(unsafe_value(fn(): string|bool|null => shell_exec("FOR %A IN (" . "\"" . $filename . "\"" . ") DO @ECHO %~aA")));
+        return $attributes[3] === 'h' || $attributes[4] === 's';
+    }
     return string_has_prefix($filename, '.');
 }
 
