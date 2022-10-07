@@ -745,11 +745,11 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
     }
 
     /**
+     * @param int $offset
      * @return Element
      */
     public function offsetGet(mixed $offset): mixed
     {
-        assert(is_int($offset), sprintf("invalid argument: expecting \"int\", \"%s\" given", typeof($offset)));
         assert(in_range($offset, $this->startIndex(), $this->endIndex()), sprintf("%s %s(%s) index \"%s\" out of bounds [%s...<%s]", $this->debugDescription(), __FUNCTION__, $offset, $offset, $this->startIndex(), $this->endIndex()));
         return $this->reserved[$offset];
     }

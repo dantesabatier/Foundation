@@ -560,11 +560,11 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
     }
 
     /**
+     * @param string $offset
      * @return Element|null
      */
     public function offsetGet(mixed $offset): mixed
     {
-        assert(is_string($offset), sprintf("invalid argument: expecting \"string\", \"%s\" given", typeof($offset)));
         return $this->reserved[$offset] ?? null;
     }
 

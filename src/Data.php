@@ -737,11 +737,13 @@ class Data extends ObjectClass implements RangeReplaceableCollection, Iterator
         return in_range($offset, $this->startIndex(), $this->endIndex());
     }
 
+    /**
+     * @param int $offset
+     * @return int
+     */
     public function offsetGet(mixed $offset): int
     {
-        /** @psalm-suppress RedundantConditionGivenDocblockType */
-        assert(is_int($offset), sprintf("invalid argument: expecting \"int\", \"%s\" given", typeof($offset)));
-        assert($this->offsetExists($offset), sprintf("%s %s(%s) index \"%s\" out of bounds [%s...<%s]", $this->debugDescription(), __FUNCTION__, $offset, $offset, $this->startIndex(), $this->endIndex()));
+        assert(in_range($offset, $this->startIndex(), $this->endIndex()), sprintf("%s %s(%s) index \"%s\" out of bounds [%s...<%s]", $this->debugDescription(), __FUNCTION__, $offset, $offset, $this->startIndex(), $this->endIndex()));
         return ord($this->reserved[$offset]);
     }
 

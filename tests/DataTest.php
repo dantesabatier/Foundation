@@ -9,11 +9,9 @@ class DataTest extends TestCase
 {
     public function testCanBeCreatedFromString(): void
     {
-        $data = new Data('Hello world!');
         self::assertInstanceOf(
             Data::class,
-            $data
+            new Data('Hello world!')
         );
-        error_log($data->description());
     }
 }
