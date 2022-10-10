@@ -40,7 +40,7 @@ class FunctionExpression extends Expression
         $arguments = $this->arguments ?? new ArrayClass();
         if ($operand instanceof ExpressionOperator) {
             $value = $operand->expressionValue($object, $context);
-            if (Predicate::$debugLevel) {
+            if (Predicate::$debugDefault) {
                 error_log(sprintf("Foundation: expression %s: %s(%s) => %s", $this->expressionType->name, $selector, $arguments->join(", "), human_readable_value($value)));
             }
             return $value;
@@ -48,7 +48,7 @@ class FunctionExpression extends Expression
         $obj = $operand->expressionValue($object, $context);
         $arguments = $arguments->map(fn(Expression $expression): mixed => $expression->expressionValue($object, $context));
         $value = $obj->$selector(...$arguments);
-        if (Predicate::$debugLevel) {
+        if (Predicate::$debugDefault) {
             error_log(sprintf("Foundation: expression %s: %s::%s(%s) => %s", $this->expressionType->name, typeof($obj), $selector, $arguments->join(", "), human_readable_value($value)));
         }
         return $value;

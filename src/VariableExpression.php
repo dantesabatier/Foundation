@@ -31,7 +31,7 @@ class VariableExpression extends Expression
     public function expressionValue(mixed $object = null, ?Dictionary $context = null): mixed
     {
         $value = $this->withSubstitutionVariables($context ?? new Dictionary())->expressionValue($object, $context);
-        if (Predicate::$debugLevel) {
+        if (Predicate::$debugDefault) {
             error_log(sprintf("Foundation: expression %s: %s", $this->expressionType->name, human_readable_value($value)));
         }
         return $value;

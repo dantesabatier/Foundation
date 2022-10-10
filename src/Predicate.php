@@ -20,7 +20,7 @@ use JetBrains\PhpStorm\Pure;
 class Predicate extends ObjectClass
 {
     /** @internal */
-    public static int $debugLevel = 0;
+    public static bool $debugDefault = false;
 
     /**
      * Initializes a predicate by substituting the values in a given array into a format string and parsing the result.
@@ -77,7 +77,7 @@ class Predicate extends ObjectClass
     }
 
     /**
-     * Returns a Boolean value indicating whether the specified object matches the conditions specified by the predicate after substituting in the values in a given variables dictionary.
+     * Returns a Boolean value indicating whether the specified object matches the conditions specified by the predicate after substituting in the values in a given Variables dictionary.
      * @param mixed $object The object against which to evaluate the predicate.
      * @param Dictionary<mixed>|null $substitutionVariables The substitution variables dictionary.
      * The dictionary must contain key-value pairs for all variables in the predicate.

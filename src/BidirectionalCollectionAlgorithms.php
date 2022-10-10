@@ -23,6 +23,7 @@ trait BidirectionalCollectionAlgorithms
         $i -= 1;
     }
 
+    /** @noinspection PhpMixedReturnTypeCanBeReducedInspection */
     public function lastIndex(Closure $where): mixed
     {
         $start = $this->startIndex();
@@ -41,7 +42,7 @@ trait BidirectionalCollectionAlgorithms
         if ($this->isEmpty()) {
             return null;
         }
-        if (!$where) {
+         if ($where === null) {
             return $this[$this->indexBefore($this->endIndex())];
         }
         if ($i = $this->lastIndex($where)) {
@@ -64,6 +65,13 @@ trait BidirectionalCollectionAlgorithms
 
     public function reversed(): self
     {
-        request_concrete_implementation($this, __FUNCTION__);
+        $instance = new self();
+        $start = $this->startIndex();
+        $i = $this->endIndex();
+        while ($i != $start) {
+            $instance[] = $this[$i];
+            $this->formIndexBefore($i);
+        }
+        return $instance;
     }
 }

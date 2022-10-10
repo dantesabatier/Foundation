@@ -28,7 +28,7 @@ class AggregateExpression extends Expression
     public function expressionValue(mixed $object = null, ?Dictionary $context = null): mixed
     {
         $value = $this->collection->compactMap(fn(Expression $expression): mixed => $expression->expressionValue($object, $context));
-        if (Predicate::$debugLevel) {
+        if (Predicate::$debugDefault) {
             error_log(sprintf("Foundation: expression %s: %s", $this->expressionType->name, human_readable_value($value)));
         }
         return $value;

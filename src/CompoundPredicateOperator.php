@@ -25,7 +25,7 @@ class CompoundPredicateOperator extends PredicateOperator
 
     public static function notPredicateOperator(): CompoundPredicateOperator
     {
-        if (!static::$notPredicateOperator) {
+        if (static::$notPredicateOperator === null) {
             static::$notPredicateOperator = new CompoundPredicateOperator(CompoundPredicateLogicalType::not);
         }
         return static::$notPredicateOperator;
@@ -33,7 +33,7 @@ class CompoundPredicateOperator extends PredicateOperator
 
     public static function andPredicateOperator(): CompoundPredicateOperator
     {
-        if (!static::$andPredicateOperator) {
+        if (static::$andPredicateOperator === null) {
             static::$andPredicateOperator = new CompoundPredicateOperator(CompoundPredicateLogicalType::and);
         }
         return static::$andPredicateOperator;
@@ -41,7 +41,7 @@ class CompoundPredicateOperator extends PredicateOperator
 
     public static function orPredicateOperator(): CompoundPredicateOperator
     {
-        if (!static::$orPredicateOperator) {
+        if (static::$orPredicateOperator === null) {
             static::$orPredicateOperator = new CompoundPredicateOperator(CompoundPredicateLogicalType::or);
         }
         return static::$orPredicateOperator;

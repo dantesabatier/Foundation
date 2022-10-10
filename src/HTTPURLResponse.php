@@ -32,7 +32,7 @@ class HTTPURLResponse extends URLResponse
     {
         $this->httpVersion = $httpVersion ?? $_SERVER['SERVER_PROTOCOL'] ?? "HTTP/1.1";
         $this->allHeaderFields = (function () use ($headerFields): Dictionary {
-            if (!$headerFields) {
+            if ($headerFields === null) {
                 return new Dictionary();
             }
             /** @var Dictionary<mixed> $canonicalizedFields */

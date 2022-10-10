@@ -34,7 +34,7 @@ class KeyPathExpression extends FunctionExpression
         if (is_object($obj)) {
             $arguments = new ArrayClass([$keyPath]);
             $value = $obj->$selector(...$arguments);
-            if (Predicate::$debugLevel) {
+            if (Predicate::$debugDefault) {
                 error_log(sprintf("Foundation: expression %s: %s::%s(%s) => %s", $this->expressionType->name, typeof($obj), $selector, $arguments->join(", "), human_readable_value($value)));
             }
             return $value;

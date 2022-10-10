@@ -25,7 +25,7 @@ class ConstantValueExpression extends Expression
         if ($value instanceof Expression) {
             $value = $value->expressionValue($object, $context);
         }
-        if (Predicate::$debugLevel) {
+        if (Predicate::$debugDefault) {
             error_log(sprintf("Foundation: expression %s: %s", $this->expressionType->name, human_readable_value($value)));
         }
         return $value;

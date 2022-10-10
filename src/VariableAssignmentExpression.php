@@ -62,7 +62,7 @@ class VariableAssignmentExpression extends Expression
         assert($context !== null, "Cannot evaluate variable assignment with nil bindings");
         $value = $this->subexpression()->expressionValue($object, $context);
         $context[$this->variable()] = $value;
-        if (Predicate::$debugLevel) {
+        if (Predicate::$debugDefault) {
             error_log(sprintf("Foundation: expression %s: %s", $this->expressionType->name, human_readable_value($value)));
         }
         return $value;

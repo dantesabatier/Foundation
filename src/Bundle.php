@@ -436,7 +436,7 @@ final class Bundle extends ObjectClass
     {
         $name = array_last(explode("\\", $className)) ?? $className;
         $enumerator = FileManager::default()->enumerator($this->bundleURL->appendingPathComponent('src'), null, DirectoryEnumerationOptions::skipsHiddenFiles);
-        if ($enumerator) {
+        if ($enumerator !== null) {
             foreach ($enumerator as $url) {
                 $path = $url->path;
                 if (string_is_equal($url->pathExtension, 'php', CompareOptions::caseInsensitive) && string_is_equal(pathinfo($path, PATHINFO_FILENAME), $name, CompareOptions::caseInsensitive)) {

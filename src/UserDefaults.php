@@ -127,13 +127,14 @@ class UserDefaults
      */
     public function string(string $key): ?string
     {
-        if ($object = $this->object($key)) {
-            if (is_bool($object) || is_int($object) || is_float($object)) {
-                $object = (new Number($object))->stringValue;
-            }
-            if (is_string($object)) {
-                return $object;
-            }
+        $object = $this->object($key);
+        if ($object === null) {
+           return null; 
+        }
+        if (is_bool($object) || is_int($object) || is_float($object)) {
+            $object = (new Number($object))->stringValue;
+        } elseif (is_string($object)) {
+            return $object;
         }
         return null;
     }
@@ -146,7 +147,8 @@ class UserDefaults
      */
     public function bool(string $key): bool
     {
-        if (($object = $this->object($key)) && (is_bool($object) || is_numeric($object))) {
+        $object = $this->object($key);
+        if (($object !== null) && (is_bool($object) || is_numeric($object))) {
             return (new Number($object))->boolValue;
         }
         return false;
@@ -160,7 +162,8 @@ class UserDefaults
      */
     public function integer(string $key): int
     {
-        if (($object = $this->object($key)) && (is_bool($object) || is_numeric($object))) {
+        $object = $this->object($key);
+        if (($object !== null) && (is_bool($object) || is_numeric($object))) {
             return (new Number($object))->intValue;
         }
         return 0;
@@ -174,7 +177,8 @@ class UserDefaults
      */
     public function float(string $key): float
     {
-        if (($object = $this->object($key)) && (is_bool($object) || is_numeric($object))) {
+        $object = $this->object($key);
+        if (($object !== null) && (is_bool($object) || is_numeric($object))) {
             return (new Number($object))->floatValue;
         }
         return 0.0;

@@ -30,7 +30,7 @@ class SubqueryExpression extends Expression
         $context[$this->variable()] ??= Expression::expressionForEvaluatedObject();
         $predicate = $this->predicate->withSubstitutionVariables($context);
         $value = $collection->filter(fn(mixed $obj): bool => $predicate->evaluate($obj, $context));
-        if (Predicate::$debugLevel) {
+        if (Predicate::$debugDefault) {
             error_log(sprintf("Foundation: expression %s: %s %s => %s", $this->expressionType->name, $collection->join(", "), $predicate->predicateFormat(), human_readable_value($value)));
         }
         return $value;

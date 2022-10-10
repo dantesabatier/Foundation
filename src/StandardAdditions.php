@@ -290,6 +290,7 @@ function localized_string(string $string, string $domain = 'Localizable', string
 
 function document_root_directory(): string
 {
+    /** @psalm-suppress PossiblyUndefinedArrayOffset */
     $path = $_SERVER['DOCUMENT_ROOT'];
     if (is_running_from_cli()) {
         if (isset($_SERVER['PWD'])) {

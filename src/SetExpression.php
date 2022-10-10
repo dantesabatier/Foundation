@@ -39,7 +39,7 @@ class SetExpression extends Expression
         } elseif ($expressionType == ExpressionType::unionSet) {
             $value->formUnion($right);
         }
-        if (Predicate::$debugLevel) {
+        if (Predicate::$debugDefault) {
             error_log(sprintf("Foundation: expression %s %s %s => %s", human_readable_value($left), $expressionType->name, human_readable_value($right), human_readable_value($value)));
         }
         return $value;

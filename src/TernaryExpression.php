@@ -29,7 +29,7 @@ class TernaryExpression extends Expression
     {
         $expression = $this->predicate()->evaluate($object, $context) ? $this->true() : $this->false();
         $value = $expression->expressionValue($object, $context);
-        if (Predicate::$debugLevel) {
+        if (Predicate::$debugDefault) {
             error_log(sprintf("Foundation: expression %s: %s", $this->expressionType->name, human_readable_value($value)));
         }
         return $value;

@@ -24,9 +24,11 @@ return static function (RectorConfig $rectorConfig): void {
         SetList::CODE_QUALITY,
     ]);
     $rectorConfig->skip([
+        CountOnNullRector::class => [
+            __DIR__ . 'URLFileTypeMappingsInternal.php'
+        ],
         ExplicitBoolCompareRector::class,
         ReturnNeverTypeRector::class,
-        CountOnNullRector::class,
         NullToStrictStringFuncCallArgRector::class,
         UnionTypesRector::class,
         MixedTypeRector::class,
@@ -34,4 +36,6 @@ return static function (RectorConfig $rectorConfig): void {
         RemoveUselessReturnTagRector::class
     ]);
     $rectorConfig->rule(InlineConstructorDefaultToPropertyRector::class);
+    $rectorConfig->parallel(360, 2, 5);
+    //$rectorConfig->disableParallel();
 };

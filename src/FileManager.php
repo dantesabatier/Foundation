@@ -161,7 +161,7 @@ final class FileManager extends ObjectClass
                 $components = new URLComponents($fileUrl->absoluteString);
                 $components->host = $url->host;
                 $componentsUrl = $components->url;
-                if ($componentsUrl) {
+                if ($componentsUrl !== null) {
                     $fileUrl = $componentsUrl;
                 }
             }
