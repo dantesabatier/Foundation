@@ -104,7 +104,7 @@ class PredicateUtilities
         if (!$values->isEmpty()) {
             /** @var Dictionary<int> $occurrences */
             $occurrences = $values->reduce(new Dictionary(), function (Dictionary $result, Number|int|float $element): Dictionary {
-                $result[(string) $element] += 1;
+                $result[(string)$element] += 1;
                 return $result;
             });
             $max = $occurrences->max();
@@ -188,7 +188,7 @@ class PredicateUtilities
 
     public static function trunc(Number|int|float $number): Number
     {
-        return new Number((int) (pn($number) * 1e2) / 1e2);
+        return new Number((int)(pn($number) * 1e2) / 1e2);
     }
 
     public static function random(Number|int $max = NotFound): Number
@@ -291,6 +291,21 @@ class PredicateUtilities
     public static function uuid(): UUID
     {
         return new UUID();
+    }
+
+    public static function isNull(mixed $value): bool
+    {
+        return Nil::nil()->isEqual($value);
+    }
+
+    public static function ifNull(mixed $value, mixed $default): mixed
+    {
+        return self::isNull($value) ? $default : $value;
+    }
+
+    public static function nullIf(mixed $a, mixed $b): mixed
+    {
+        return equivalent($a, $b) ? null : $a;
     }
 
     public static function bitwiseAndWith(int $n1, int $n2): Number

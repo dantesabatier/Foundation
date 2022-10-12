@@ -59,6 +59,9 @@ enum ExpressionOperatorType: int
     case second = 43;
     case uuid = 111;
     case concat = 112;
+    case isNull = 996;
+    case ifNull = 997;
+    case nullIf = 998;
     case cast = 1000;
     case chs = 1001;
 
@@ -178,6 +181,12 @@ enum ExpressionOperatorType: int
             return ExpressionOperatorType::uuid;
         } elseif (string_is_equal($functionName, 'concat:', CompareOptions::caseInsensitive)) {
             return ExpressionOperatorType::concat;
+        } elseif (string_is_equal($functionName, 'isNull:', CompareOptions::caseInsensitive)) {
+            return ExpressionOperatorType::isNull;
+        } elseif (string_is_equal($functionName, 'ifNull:', CompareOptions::caseInsensitive)) {
+            return ExpressionOperatorType::ifNull;
+        } elseif (string_is_equal($functionName, 'nullIf:', CompareOptions::caseInsensitive)) {
+            return ExpressionOperatorType::nullIf;
         } else {
             throw new InvalidArgumentException(sprintf("%s unable to parse selector name \"%s\" into supported method", ExpressionOperatorType::class, $functionName));
         }
