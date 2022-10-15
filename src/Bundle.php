@@ -211,10 +211,12 @@ final class Bundle extends ObjectClass
             if (!($path = (new ReflectionClass($class))->getFileName())) {
                 throw new InvalidArgumentException();
             }
-            $url = URL::fileURL($path)->deleteLastPathComponent();
-            $name = $url->lastPathComponent;
-            if (string_is_equal($name, 'src', CompareOptions::caseInsensitive)) {
+            $url = URL::fileURL($path);
+            while ($url->path !== '/') {
                 $url->deleteLastPathComponent();
+                if (string_is_equal($url->lastPathComponent, 'src', CompareOptions::caseInsensitive)) {
+                    break;
+                }
             }
             return self::bundleWithURL($url);
         } catch (Exception $exception) {

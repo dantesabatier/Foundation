@@ -618,7 +618,6 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
     {
         $second = $this->filter($belongsInSecondPartition);
         $this->removeAll($belongsInSecondPartition);
-        /** @psalm-suppress InvalidArgument */
         $this->appendContentsOf($second);
         return $this->count() - $second->count();
     }

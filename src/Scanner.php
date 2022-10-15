@@ -148,15 +148,14 @@ class Scanner extends ObjectClass
     }
 
     /**
-     * @param-out mixed $number
+     * @param-out float|int $number
      */
-    private function scanNumber(mixed &$number, bool $isInt = true): bool
+    private function scanNumber(float|int &$number, bool $isInt = true): bool
     {
         $this->skipCharacters();
         if ($this->isAtEnd) {
             return false;
         }
-        $matches = [];
         $substring = substring_from_index($this->string, $this->scanLocation);
         if (!string_search($substring, $isInt ? "[1-9]+[0-9]*" : "[0-9]*\.?[0-9]+([eE][0-9]+)?", SearchMethod::beginsWith, CompareOptions::quoted, $matches)) {
             return false;
@@ -166,7 +165,7 @@ class Scanner extends ObjectClass
         }
         $value = $matches[0];
         $number = filter_var($value, $isInt ? FILTER_VALIDATE_INT : FILTER_VALIDATE_FLOAT);
-        $this->scanLocation = (int)strpos($this->string, (string) $value, $this->scanLocation) + strlen($value);
+        $this->scanLocation = (int)strpos($this->string, (string)$value, $this->scanLocation) + strlen($value);
         return true;
     }
 
@@ -177,6 +176,7 @@ class Scanner extends ObjectClass
      */
     public function scanInt(int &$int): bool
     {
+        /** @psalm-suppress ReferenceConstraintViolation */
         return $this->scanNumber($int);
     }
 

@@ -157,7 +157,7 @@ final class FileManager extends ObjectClass
     {
         $fileUrl = $this->urls($directory, $domain)->first() ?? throw new InvalidArgumentException();
         if ($directory == SearchPathDirectory::itemReplacementDirectory) {
-            if ($url && $domain & SearchPathDomainMask::user) {
+            if ($url && ($domain & SearchPathDomainMask::user)) {
                 $components = new URLComponents($fileUrl->absoluteString);
                 $components->host = $url->host;
                 $componentsUrl = $components->url;
