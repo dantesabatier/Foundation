@@ -96,7 +96,7 @@ class URLRequest extends ObjectClass
         if ($this->allHTTPHeaderFields === null) {
             $this->allHTTPHeaderFields = new Dictionary();
         }
-        $this->allHTTPHeaderFields->setValueForCaseInsensitiveKey($value, $field);
+        $this->allHTTPHeaderFields[$field] = $value;
     }
 
     /**

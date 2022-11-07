@@ -534,30 +534,6 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
         return $this->first(fn(mixed $e, string $k): bool => string_is_equal($k, $key, CompareOptions::caseInsensitive));
     }
 
-    public function setValueForCaseInsensitiveKey(mixed $value, string $key): void
-    {
-        if ($this->offsetExists($key)) {
-            $this->setValueForKey($value, $key);
-            return;
-        }
-        $index = $this->firstIndex(fn(string $k): bool => string_is_equal($k, $key, CompareOptions::caseInsensitive));
-        if ($index !== null) {
-            $this->setValueForKey($value, $index);
-        }
-    }
-
-    public function removeValueForCaseInsensitiveKey(string $key): void
-    {
-        if ($this->offsetExists($key)) {
-            $this->removeValueForKey($key);
-            return;
-        }
-        $index = $this->firstIndex(fn(string $k): bool => string_is_equal($k, $key, CompareOptions::caseInsensitive));
-        if ($index !== null) {
-            $this->removeValueForKey($index);
-        }
-    }
-
     public function description(): string
     {
         return sprintf("[%s]", $this->isEmpty() ? ":" : $this->mapValues(fn(mixed $value, string $key): string => sprintf("%s: %s", $key, human_readable_value($value)))->values->join(", "));
