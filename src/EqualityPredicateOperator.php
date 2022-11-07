@@ -24,11 +24,20 @@ class EqualityPredicateOperator extends PredicateOperator
 
     public function performPrimitiveOperation(mixed $left, mixed $right): bool
     {
+        if (Predicate::$debugDefault) {
+            error_log(sprintf("Foundation: predicate operator %s: (%s)%s %s (%s)%s", $this->operatorType->name, typeof($left), human_readable_value($left), $this->symbol(), typeof($right), human_readable_value($right)));
+        }
         if ($left instanceof Value) {
             $left = $left->value;
         }
         if ($right instanceof Value) {
             $right = $right->value;
+        }
+        if ($left === '') {
+            $left = null;
+        }
+        if ($right === '') {
+            $right = null;
         }
         $isNegation = $this->isNegation;
         if ($left === null && $right === null) {

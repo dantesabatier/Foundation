@@ -160,7 +160,7 @@ final class URLSession
         } while ($running);
         $data = curl_multi_getcontent($ch);
         $errno = curl_errno($ch);
-        $error = ($errno != CURLE_OK) ? new Error(URLErrorDomain, $errno, new Dictionary([LocalizedFailureReasonErrorKey => curl_error($ch)])) : null;
+        $error = ($errno !== CURLE_OK) ? new Error(URLErrorDomain, $errno, new Dictionary([LocalizedFailureReasonErrorKey => curl_error($ch)])) : null;
         $completion($data, curl_getinfo($ch, CURLINFO_HTTP_CODE), $error);
     }
 

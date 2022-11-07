@@ -4,7 +4,6 @@ namespace Sabatier\Foundation;
 
 use Closure;
 use Countable;
-use JetBrains\PhpStorm\Pure;
 
 /**
  * @psalm-require-implements Collection
@@ -18,7 +17,6 @@ trait CollectionAlgorithms
         return iterator_count($this);
     }
 
-    #[Pure]
     public function startIndex(): int
     {
         return 0;
@@ -34,7 +32,6 @@ trait CollectionAlgorithms
         return new Range($this->startIndex(), $this->endIndex());
     }
 
-    #[Pure]
     public function indexAfter(int $i): int
     {
         return $i + 1;
@@ -49,7 +46,7 @@ trait CollectionAlgorithms
     {
         $i = $this->startIndex();
         $end = $this->endIndex();
-        while ($i != $end) {
+        while ($i !== $end) {
             if ($where($this[$i])) {
                 return $i;
             }
@@ -71,7 +68,7 @@ trait CollectionAlgorithms
 
     public function isEmpty(): bool
     {
-        return $this->startIndex() == $this->endIndex();
+        return $this->startIndex() === $this->endIndex();
     }
 
     public function filter(Closure $isIncluded): self
@@ -127,7 +124,6 @@ trait CollectionAlgorithms
         return implode($separator, $this->map(fn(mixed $e): string => human_readable_value($e))->toArray());
     }
 
-    #[Pure]
     public function joined(): FlattenSequence
     {
         return new FlattenSequence($this);
@@ -157,7 +153,7 @@ trait CollectionAlgorithms
 
     public function valueForKeyPath(string $keyPath): mixed
     {
-        if ((strlen($keyPath) == 0) || $keyPath[0] !== '@') {
+        if (strlen($keyPath) === 0 || $keyPath[0] !== '@') {
             return parent::valueForKeyPath($keyPath);
         }
         $components = components_from_key_path($keyPath);

@@ -25,7 +25,7 @@ class AggregateExpression extends Expression
         return new self($this->collection->map(fn(Expression $expression): Expression => $expression->withSubstitutionVariables($variables)));
     }
 
-    public function expressionValue(mixed $object = null, ?Dictionary $context = null): mixed
+    public function expressionValue(mixed $object = null, ?Dictionary $context = null): ArrayClass
     {
         $value = $this->collection->compactMap(fn(Expression $expression): mixed => $expression->expressionValue($object, $context));
         if (Predicate::$debugDefault) {

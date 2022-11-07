@@ -58,7 +58,7 @@ class Scanner extends ObjectClass
         $substring = null;
         $scanLocation = $this->scanLocation;
         $length = strlen($this->string);
-        while ($scanLocation != $length) {
+        while ($scanLocation !== $length) {
             $character = $this->string[$scanLocation];
             if (in_string($characters, $character) === $stop) {
                 break;

@@ -211,7 +211,6 @@ class Expression extends ObjectClass
         return new VariableAssignmentExpression(new VariableExpression($name), $expression);
     }
 
-    #[Pure]
     public static function expressionForSymbolicString(string $string): Expression
     {
         return new SymbolicExpression($string);

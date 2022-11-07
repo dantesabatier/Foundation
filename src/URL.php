@@ -91,7 +91,7 @@ final class URL extends ObjectClass
     {
         if ($name == 'absoluteURL') {
             $baseURL = $this->baseURL;
-            if (!$baseURL instanceof URL) {
+            if ($baseURL === null) {
                 return $this;
             }
             if (!$baseURL->hasDirectoryPath) {
@@ -114,6 +114,9 @@ final class URL extends ObjectClass
                     $relative = substring_from_index($relative, 3);
                     $steps--;
                 }
+            }
+            if (empty($relative)) {
+                return $baseURL;
             }
             return $baseURL->appendingPathComponent($relative);
         } elseif ($name == 'absoluteString') {
@@ -178,7 +181,7 @@ final class URL extends ObjectClass
         } elseif ($name == 'isFileURL') {
             return $this->scheme == URLScheme::file;
         } elseif ($name == 'hasDirectoryPath') {
-            return is_dir($this->path);
+            return $this->isFileURL && is_dir($this->path) || $this->pathExtension === '';
         } elseif ($name == 'baseURL') {
             return $this->$name;
         } else {
@@ -194,6 +197,20 @@ final class URL extends ObjectClass
             return null;
         }
         return $v;
+    }
+
+    private function rebuild(string $path): void
+    {
+        $components = new URLComponents();
+        $components->scheme = $this->scheme;
+        $components->user = $this->user;
+        $components->password = $this->password;
+        $components->host = $this->host;
+        $components->port = $this->port;
+        $components->path = $path;
+        $components->query = $this->query;
+        $components->fragment = $this->fragment;
+        $this->string = $components->string ?? throw new InvalidArgumentException();
     }
 
     private function storage(): URLResourceValuesStorage
@@ -233,13 +250,15 @@ final class URL extends ObjectClass
      */
     public function appendPathComponent(string $component): URL
     {
-        if (!string_has_suffix($this->string, '/')) {
-            if ($this->isFileURL && FileManager::default()->fileExists($this->path, $isDirectory) && !$isDirectory) {
-                trigger_error("{$this->debugDescription()} is not a directory");
+        $path = $this->path;
+        if (!string_has_suffix($path, '/')) {
+            if ($this->isFileURL && FileManager::default()->fileExists($path, $isDirectory) && !$isDirectory) {
+                throw new InternalInconsistencyException("Cannot append components to a file");
             }
-            $this->string .= '/';
+            $path .= '/';
         }
-        $this->string .= $component;
+        $path .= $component;
+        $this->rebuild($path);
         return $this;
     }
 
@@ -261,10 +280,12 @@ final class URL extends ObjectClass
     public function appendPathExtension(string $extension): URL
     {
         if (strlen($extension)) {
-            if (!string_has_suffix($this->string, '.')) {
-                $this->string .= '.';
+            $path = $this->path;
+            if (!string_has_suffix($path, '.') && !string_has_prefix($extension, '.')) {
+                $path .= '.';
             }
-            $this->string .= $extension;
+            $path .= $extension;
+            $this->rebuild($path);
         }
         return $this;
     }

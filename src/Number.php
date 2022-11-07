@@ -79,6 +79,6 @@ class Number extends Value
      */
     public function isEqual(mixed $other): bool
     {
-        return $this->compare($other) == ComparisonResult::orderedSame;
+        return $this->compare($other) === ComparisonResult::orderedSame;
     }
 }

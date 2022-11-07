@@ -50,11 +50,10 @@ class PropertyListSerializer
             $element->appendChild($document->createElement('date', (string)$obj));
         } elseif ($obj instanceof Data) {
             $element->appendChild($document->createElement('data', $obj->base64EncodedString()));
-        } elseif ($obj instanceof ArrayClass || $obj instanceof Dictionary) {
-            $parent = $document->createElement($obj instanceof ArrayClass ? 'array' : 'dict');
+        } elseif ($obj instanceof ArrayClass || $obj instanceof Dictionary || is_array($obj)) {
+            $parent = $document->createElement(($obj instanceof ArrayClass || (is_array($obj) && is_sequential($obj))) ? 'array' : 'dict');
             $element->appendChild($parent);
             foreach ($obj as $key => $value) {
-                /** @psalm-suppress DocblockTypeContradiction */
                 if (is_string($key)) {
                     $parent->appendChild($document->createElement('key', $key));
                 }
@@ -65,7 +64,7 @@ class PropertyListSerializer
 
     private function element(DOMNode $node): ?DOMElement
     {
-        while ($node->nodeType == XML_TEXT_NODE) {
+        while ($node->nodeType === XML_TEXT_NODE) {
             if (!($node = $node->nextSibling)) {
                 break;
             }

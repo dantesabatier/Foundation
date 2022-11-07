@@ -15,7 +15,7 @@ use JetBrains\PhpStorm\ExpectedValues;
  * A URL load request that is independent of protocol or URL scheme.
  * @package Sabatier\Foundation
  */
-class URLRequest
+class URLRequest extends ObjectClass
 {
     /** @var string The HTTP request method. */
     #[ExpectedValues(valuesFromClass: HTTPRequestMethod::class)]
@@ -41,6 +41,35 @@ class URLRequest
      */
     public function __construct(public URL $url)
     {
+        unset($this->httpBody);
+    }
+
+    public function __get(string $name)
+    {
+        if ($name == 'httpBody') {
+            $httpBody = null;
+            if ($this->httpMethod !== HTTPRequestMethod::get && $this->httpMethod !== HTTPRequestMethod::head && $this->httpMethod !== HTTPRequestMethod::options) {
+                $contentType = $this->valueForHttpHeaderField("Content-Type") ?? "text/plain";
+                $mediaType = $contentType;
+                if (string_contains($contentType, ";")) {
+                    [$mediaType,] = explode(";", $contentType);
+                }
+                if (string_is_equal($mediaType, "application/x-www-form-urlencoded", CompareOptions::caseInsensitive)) {
+                    parse_str(urldecode(file_get_contents("php://input")), $body);
+                    if (!empty($body)) {
+                        $httpBody = json_encode($body);
+                    }
+                } elseif (string_has_prefix($mediaType, "multipart/form-data", CompareOptions::caseInsensitive)) {
+                    $httpBody = json_encode(empty($_FILES) ? $_POST : $_FILES);
+                } else {
+                    $httpBody = file_get_contents('php://input');
+                }
+            }
+            $this->$name = $httpBody;
+            return $this->$name;
+        } else {
+            return $this->valueForUndefinedKey($name);
+        }
     }
 
     /**
@@ -67,7 +96,7 @@ class URLRequest
         if ($this->allHTTPHeaderFields === null) {
             $this->allHTTPHeaderFields = new Dictionary();
         }
-        $this->allHTTPHeaderFields[$field] = $value;
+        $this->allHTTPHeaderFields->setValueForCaseInsensitiveKey($value, $field);
     }
 
     /**

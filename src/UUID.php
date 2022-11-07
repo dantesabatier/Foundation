@@ -4,7 +4,6 @@ namespace Sabatier\Foundation;
 
 use InvalidArgumentException;
 use JetBrains\PhpStorm\ArrayShape;
-use JetBrains\PhpStorm\Pure;
 
 /**
  * Class UUID
@@ -28,7 +27,6 @@ class UUID extends ObjectClass
         $this->uuidString = $uuidString ?? uuid_generate();
     }
 
-    #[Pure]
     #[ArrayShape(['uuidString' => "string"])]
     public function __serialize(): array
     {
@@ -52,7 +50,7 @@ class UUID extends ObjectClass
 
     public function isEqual(mixed $other): bool
     {
-        return $this->compare($other) == ComparisonResult::orderedSame;
+        return $this->compare($other) === ComparisonResult::orderedSame;
     }
 
     /**

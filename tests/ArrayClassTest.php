@@ -188,13 +188,13 @@ final class ArrayClassTest extends TestCase
     {
         self::assertEquals(
             1,
-            $this->array->filter(fn(mixed $e): bool => $e->amount->value == 1)->count()
+            $this->array->filter(fn(mixed $e): bool => $e->amount->value === 1)->count()
         );
     }
 
     public function testCanFilterUsingPredicate(): void
     {
-        $predicate = Predicate::format("amount.value == 1");
+        $predicate = Predicate::format("amount.value === 1");
         self::assertNotNull($predicate);
         self::assertEquals(
             1,

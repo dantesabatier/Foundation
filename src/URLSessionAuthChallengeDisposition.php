@@ -4,6 +4,7 @@ namespace Sabatier\Foundation;
 
 /**
  * Class URLSessionAuthChallengeDisposition
+ * 
  * Constants passed by session or task delegates to the provided continuation block in response to an authentication challenge.
  * @package Sabatier\Foundation
  */

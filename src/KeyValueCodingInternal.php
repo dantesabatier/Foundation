@@ -2,29 +2,24 @@
 
 namespace Sabatier\Foundation;
 
-use JetBrains\PhpStorm\Pure;
-
-/** @internal */
-#[Pure]
-function components_from_key_path(string $key): KeyPathComponents
+function components_from_key_path(string $keyPath): KeyPathComponents
 {
     $remainderPath = null;
-    $idx = strpos($key, '.');
+    $idx = strpos($keyPath, '.');
     if ($idx !== false) {
         $remainderPath = '';
-        $subkey = substr($key, 0, $idx);
-        if ($idx < strlen($key) - 1) {
-            $remainderPath = substring_from_index($key, $idx + 1);
+        $subKey = substring_to_index($keyPath, $idx);
+        if ($idx < strlen($keyPath) - 1) {
+            $remainderPath = substring_from_index($keyPath, $idx + 1);
         }
-        $key = $subkey;
+        $keyPath = $subKey;
     }
-    return new KeyPathComponents($key, $remainderPath);
+    return new KeyPathComponents($keyPath, $remainderPath);
 }
 
-/** @internal */
 function kvc_operator_from_key(string $key): ?string
 {
-    if (!string_has_prefix($key, '@')) {
+    if (strlen($key) === 0 || $key[0] !== '@') {
         return null;
     }
     $name = substring_from_index($key, 1);
@@ -32,4 +27,27 @@ function kvc_operator_from_key(string $key): ?string
         KeyValueOperator::averageKeyValueOperator, KeyValueOperator::countKeyValueOperator, KeyValueOperator::distinctUnionOfArraysKeyValueOperator, KeyValueOperator::distinctUnionOfObjectsKeyValueOperator, KeyValueOperator::distinctUnionOfSetsKeyValueOperator, KeyValueOperator::maximumKeyValueOperator, KeyValueOperator::minimumKeyValueOperator, KeyValueOperator::sumKeyValueOperator, KeyValueOperator::unionOfArraysKeyValueOperator, KeyValueOperator::unionOfObjectsKeyValueOperator, KeyValueOperator::unionOfSetsKeyValueOperator => $name,
         default => null,
     };
+}
+
+/**
+ * @param string $keyPath
+ * @return string[]
+ */
+function kvc_components(string $keyPath): array
+{
+    $idx = strpos($keyPath, '@');
+    if ($idx === false) {
+        return [];
+    }
+    $collection = '';
+    $property = '';
+    $components = preg_split(sprintf("/%s/", preg_quote(".", "/")), substring_to_index($keyPath, $idx), -1, PREG_SPLIT_NO_EMPTY);
+    $numberOfComponents = count($components);
+    if ($numberOfComponents) {
+        $collection = array_shift($components);
+        if ($numberOfComponents > 1) {
+            $property = array_pop($components);
+        }
+    }
+    return [$collection, substring_from_index($keyPath, $idx + 1), $property];
 }

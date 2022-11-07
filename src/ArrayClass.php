@@ -11,7 +11,6 @@ namespace Sabatier\Foundation;
 
 use Closure;
 use Iterator;
-use JetBrains\PhpStorm\Pure;
 
 /**
  * Class ArrayClass
@@ -421,7 +420,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
 
     public function removeLast(int $k): void
     {
-        if ($k == 0) {
+        if ($k === 0) {
             return;
         }
         assert($k > 0, "Number of elements to remove should be non-negative");
@@ -547,7 +546,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
             $result->append(new Slice($this, new Range($subSequenceStart, $end)));
             return true;
         });
-        if ($maxSplits == 0 || $this->isEmpty()) {
+        if ($maxSplits === 0 || $this->isEmpty()) {
             $appendSubsequence($this->endIndex());
             return $result;
         }
@@ -558,7 +557,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
                 $didAppend = $appendSubsequence($subSequenceEnd);
                 $this->formIndexAfter($subSequenceEnd);
                 $subSequenceStart = $subSequenceEnd;
-                if ($didAppend && $result->count() == $maxSplits) {
+                if ($didAppend && $result->count() === $maxSplits) {
                     break;
                 }
                 continue;
@@ -742,13 +741,11 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
         $this->formIndexAfter($this->position);
     }
 
-    #[Pure]
     public function key(): int
     {
         return $this->position;
     }
 
-    #[Pure]
     public function valid(): bool
     {
         return $this->offsetExists($this->key());
@@ -767,7 +764,6 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
     /**
      * @param int $offset
      */
-    #[Pure]
     public function offsetExists(mixed $offset): bool
     {
         return array_key_exists($offset, $this->reserved);

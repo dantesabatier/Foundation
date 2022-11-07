@@ -11,7 +11,6 @@ namespace Sabatier\Foundation;
 
 use Closure;
 use InvalidArgumentException;
-use JetBrains\PhpStorm\Deprecated;
 use JetBrains\PhpStorm\ExpectedValues;
 use JetBrains\PhpStorm\Pure;
 use JsonSerializable;
@@ -36,44 +35,43 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
      */
     public static function initialize(): void
     {
-        //FIXME: to make this work we need to get rid of composer and create our own autoloader
     }
 
     #[Pure]
-    public function superclass(): string
+    final public function superclass(): string
     {
         return get_parent_class($this); // @phpstan-ignore-line
     }
 
     #[Pure]
-    public function isKind(string $class): bool
+    final public function isKind(string $class): bool
     {
         return is_a($this, $class, true);
     }
 
     #[Pure]
-    public function isMember(string $class): bool
+    final public function isMember(string $class): bool
     {
         return $this->isKind($class);
     }
 
     #[Pure]
-    public function isSubclass(string $class): bool
+    final public function isSubclass(string $class): bool
     {
         return is_subclass_of($this, $class);
     }
 
-    public function hash(): int
+    final public function hash(): int
     {
         return spl_object_id($this);
     }
 
     public function responds(string $selector): bool
     {
-        return method_exists($this, $selector) || property_exists($this, $selector);
+        return method_exists($this, $selector);
     }
 
-    public function conforms(string $protocol): bool
+    final public function conforms(string $protocol): bool
     {
         return isset(class_implements($this)[$protocol]);
     }
@@ -81,25 +79,15 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
     #[Pure]
     public static function instancesRespond(string $selector): bool
     {
-        return method_exists(static::class, $selector) || property_exists(static::class, $selector);
+        return method_exists(static::class, $selector);
     }
 
     public function perform(string $selector, array $arguments = []): mixed
     {
         if (method_exists($this, $selector)) {
             return $this->$selector(...$arguments);
-        } elseif (property_exists($this, $selector)) {
-            return $this->$selector;
-        } else {
-            $this->doesNotRecognizeSelector($selector);
         }
-    }
-
-    #[Deprecated('since Foundation 0.1, use perform() instead', '%class%->perform(%parameters%)')]
-    public function performSelector(string $selector, array $arguments = []): mixed
-    {
-        trigger_error(sprintf("%s() is deprecated, use perform() instead", __METHOD__), E_USER_DEPRECATED);
-        return $this->perform($selector, $arguments);
+        $this->doesNotRecognizeSelector($selector);
     }
 
     /**
@@ -158,9 +146,9 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
                 $change = new KeyValueObservedChange();
                 $change->kind = $changeKind;
                 if ($observance->options & KeyValueObservingOptions::new) {
-                    $change->newValue = $changedValue ?? $this->valueForKey($key);
+                    $change->newValue = $changedValue;
                 }
-                if ($observance->options & KeyValueObservingOptions::old) {
+                if ($observance->options & KeyValueObservingOptions::old && $changeKind !== KeyValueChange::setting) {
                     $change->oldValue = $this->valueForKey($key);
                 }
                 if ($observance->options & KeyValueObservingOptions::prior) {
@@ -187,10 +175,10 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
                 $change = new KeyValueObservedChange();
                 $change->kind = $changeKind;
                 if ($options & KeyValueObservingOptions::new) {
-                    $change->newValue = $changedValue ?? $this->valueForKey($key);
+                    $change->newValue = $this->valueForKey($key);
                 }
                 if ($options & KeyValueObservingOptions::old) {
-                    $change->oldValue = $this->valueForKey($key);
+                    $change->oldValue = $changedValue;
                 }
                 if ($options & KeyValueObservingOptions::prior) {
                     $change->isPrior = false;
@@ -242,7 +230,7 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
         }
         $key = substring_to_index($keyPath, $idx);
         $obj = $this->valueForKeyPath($key);
-        if ($obj == null) {
+        if ($obj === null) {
             return false;
         }
         $keyPath = substring_from_index($keyPath, $idx + 1);
@@ -264,12 +252,6 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
 
     public function valueForKey(string $key)
     {
-        $selectors = [$key, sprintf('is%s', ucfirst($key)), sprintf('get%s', ucfirst($key))];
-        foreach ($selectors as $selector) {
-            if ($this->responds($selector)) {
-                return $this->perform($selector);
-            }
-        }
         if (property_exists($this, $key)) {
             return $this->$key;
         }
@@ -281,29 +263,24 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
         if (!$this->validateValueForKey($value, $key)) {
             return;
         }
-        $selector = sprintf('set%s', ucfirst($key));
-        if (method_exists($this, $selector)) {
-            $this->willChangeValueForKey($key);
-            $this->perform($selector, [$value]);
-            $this->didChangeValueForKey($key);
-        } elseif (property_exists($this, $key)) {
-            $this->willChangeValueForKey($key);
-            $this->$key = $value;
-            $this->didChangeValueForKey($key);
-        } else {
+        if (!property_exists($this, $key)) {
             $this->setValueForUndefinedKey($value, $key);
+            return;
         }
+        $this->willChangeValueForKey($key);
+        $this->$key = $value;
+        $this->didChangeValueForKey($key);
     }
 
     public function valueForKeyPath(string $keyPath)
     {
         $components = components_from_key_path($keyPath);
         $key = $components->key;
-        if (($key === '') || ($key === $keyPath)) {
+        if ($key === '' || $key === $keyPath) {
             return $this->valueForKey($keyPath);
         }
         $obj = $this->valueForKeyPath($key);
-        if ($obj == null) {
+        if ($obj === null) {
             return null;
         }
         $remainderPath = $components->remainderPath;
@@ -328,7 +305,7 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
         }
         $key = substring_to_index($keyPath, $idx);
         $obj = $this->valueForKeyPath($key);
-        if ($obj == null) {
+        if ($obj === null) {
             return;
         }
         $keyPath = substring_from_index($keyPath, $idx + 1);

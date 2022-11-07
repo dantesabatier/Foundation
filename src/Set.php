@@ -11,7 +11,6 @@ namespace Sabatier\Foundation;
 
 use Closure;
 use Iterator;
-use JetBrains\PhpStorm\Pure;
 
 /**
  * Class Set
@@ -600,7 +599,7 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
      */
     public function isSubset(SetAlgebra $other): bool
     {
-        if ($this->compare($other) != ComparisonResult::orderedAscending) {
+        if ($this->compare($other) !== ComparisonResult::orderedAscending) {
             return false;
         }
         foreach ($this as $element) {
@@ -619,7 +618,7 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
      */
     public function isSuperset(SetAlgebra $other): bool
     {
-        if ($this->compare($other) != ComparisonResult::orderedDescending) {
+        if ($this->compare($other) !== ComparisonResult::orderedDescending) {
             return false;
         }
         foreach ($this as $element) {
@@ -713,13 +712,11 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
         $this->formIndexAfter($this->position);
     }
 
-    #[Pure]
     public function key(): int
     {
         return $this->position;
     }
 
-    #[Pure]
     public function valid(): bool
     {
         return $this->offsetExists($this->key());
@@ -738,7 +735,6 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
     /**
      * @param int $offset
      */
-    #[Pure]
     public function offsetExists(mixed $offset): bool
     {
         return array_key_exists($offset, $this->reserved);

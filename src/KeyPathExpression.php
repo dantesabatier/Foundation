@@ -17,7 +17,7 @@ class KeyPathExpression extends FunctionExpression
         if ($this->keyPath instanceof KeyPathSpecifierExpression && !string_contains($this->keyPath->keyPath(), '.')) {
             $selector = 'valueForKey';
         }
-        parent::__construct(ExpressionType::keyPath, $operand, $selector, new ArrayClass([$keyPath]));
+        parent::__construct(ExpressionType::keyPath, $operand, $selector, new ArrayClass([$this->keyPath]));
     }
 
     public function withSubstitutionVariables(Dictionary $variables): Expression
@@ -32,10 +32,10 @@ class KeyPathExpression extends FunctionExpression
         $selector = $this->selector;
         $keyPath = $this->keyPath;
         if (is_object($obj)) {
-            $arguments = new ArrayClass([$keyPath]);
+            $arguments = [(string)$keyPath];
             $value = $obj->$selector(...$arguments);
             if (Predicate::$debugDefault) {
-                error_log(sprintf("Foundation: expression %s: %s::%s(%s) => %s", $this->expressionType->name, typeof($obj), $selector, $arguments->join(", "), human_readable_value($value)));
+                error_log(sprintf("Foundation: expression %s: %s::%s(%s) => %s", $this->expressionType->name, typeof($obj), $selector, implode(", ", $arguments), human_readable_value($value)));
             }
             return $value;
         }

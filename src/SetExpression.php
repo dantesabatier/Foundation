@@ -32,11 +32,11 @@ class SetExpression extends Expression
         }
         $value = $left;
         $expressionType = $this->expressionType;
-        if ($expressionType == ExpressionType::minusSet) {
+        if ($expressionType === ExpressionType::minusSet) {
             $value->subtract($right);
-        } elseif ($expressionType == ExpressionType::intersectSet) {
+        } elseif ($expressionType === ExpressionType::intersectSet) {
             $value->formIntersection($right);
-        } elseif ($expressionType == ExpressionType::unionSet) {
+        } elseif ($expressionType === ExpressionType::unionSet) {
             $value->formUnion($right);
         }
         if (Predicate::$debugDefault) {

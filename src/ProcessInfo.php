@@ -2,6 +2,8 @@
 
 namespace Sabatier\Foundation;
 
+use Exception;
+
 /**
  * Class ProcessInfo
  * A collection of information about the current process.
@@ -39,6 +41,9 @@ class ProcessInfo extends ObjectClass
         unset($this->hostName);
     }
 
+    /**
+     * @throws Exception
+     */
     public function __get(string $name)
     {
         if ($name == 'arguments') {
@@ -50,19 +55,15 @@ class ProcessInfo extends ObjectClass
             $fileManager = FileManager::default();
             $url = $fileManager->documentRootDirectory->appendingPathComponent('.env');
             $path = $url->path;
-            if ($fileManager->fileExists($path)) {
-                /** @noinspection PhpUnhandledExceptionInspection */
-                $string = $fileManager->contents($url->path);
-                if ($string) {
-                    $scanner = new Scanner($string);
-                    $scanner->charactersToBeSkipped = PHP_EOL;
-                    while ($scanner->scanUpCharacters(PHP_EOL, $line) && $line) {
-                        $components = explode('=', $line, 2);
-                        if (count($components) == 2) {
-                            [$key, $value] = $components;
-                            $environment[trim($key)] = trim($value, "\"' ");
-                            $scanner->scanLocation += 1;
-                        }
+            if ($fileManager->fileExists($path) && ($string = $fileManager->contents($path))) {
+                $scanner = new Scanner($string);
+                $scanner->charactersToBeSkipped = PHP_EOL;
+                while ($scanner->scanUpCharacters(PHP_EOL, $line) && $line) {
+                    $components = explode('=', $line, 2);
+                    if (count($components) == 2) {
+                        [$key, $value] = $components;
+                        $environment[trim($key)] = trim($value, "\"' ");
+                        $scanner->scanLocation += 1;
                     }
                 }
             }

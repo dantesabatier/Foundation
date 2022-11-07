@@ -15,7 +15,7 @@ trait MutableCollectionAlgorithms
     {
         $start = $this->startIndex();
         $end = $this->endIndex();
-        while (($start != $end) && $while($this[$start])) {
+        while (($start !== $end) && $while($this[$start])) {
             $this->formIndexAfter($start);
         }
         return new Slice($this, new Range($start, $end));

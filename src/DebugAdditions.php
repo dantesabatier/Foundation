@@ -67,10 +67,10 @@ function human_readable_value(mixed $value): string
     } elseif (is_array($value)) {
         return "[" . implode(', ', array_map(fn(mixed $index, mixed $element): string => sprintf("%s: %s", $index, human_readable_value($element)), array_keys($value), array_values($value))) . "]";
     } elseif (is_scalar($value)) {
-        return (string) $value;
+        return (string)$value;
     } elseif (is_object($value)) {
         if ($value instanceof Stringable) {
-            return (string) $value;
+            return (string)$value;
         } elseif ($value instanceof BackedEnum) {
             return sprintf("%s::%s", $value::class, $value->name);
         }

@@ -2,12 +2,9 @@
 
 namespace Sabatier\Foundation;
 
-use JetBrains\PhpStorm\Pure;
-
 /** @internal */
 class SymbolicExpression extends Expression
 {
-    #[Pure]
     protected function __construct(private readonly string $token)
     {
         parent::__construct(ExpressionType::symbolic);
@@ -21,7 +18,7 @@ class SymbolicExpression extends Expression
         return false;
     }
 
-    public function constantValue(): mixed
+    public function constantValue(): string
     {
         return $this->token;
     }
@@ -31,7 +28,7 @@ class SymbolicExpression extends Expression
         return $this->token;
     }
 
-    public function expressionValue(mixed $object = null, ?Dictionary $context = null): mixed
+    public function expressionValue(mixed $object = null, ?Dictionary $context = null): static
     {
         return $this;
     }

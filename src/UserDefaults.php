@@ -132,7 +132,7 @@ class UserDefaults
            return null; 
         }
         if (is_bool($object) || is_int($object) || is_float($object)) {
-            $object = (new Number($object))->stringValue;
+            return (new Number($object))->stringValue;
         } elseif (is_string($object)) {
             return $object;
         }
@@ -148,7 +148,7 @@ class UserDefaults
     public function bool(string $key): bool
     {
         $object = $this->object($key);
-        if (($object !== null) && (is_bool($object) || is_numeric($object))) {
+        if (is_bool($object) || is_numeric($object)) {
             return (new Number($object))->boolValue;
         }
         return false;
@@ -163,7 +163,7 @@ class UserDefaults
     public function integer(string $key): int
     {
         $object = $this->object($key);
-        if (($object !== null) && (is_bool($object) || is_numeric($object))) {
+        if (is_bool($object) || is_numeric($object)) {
             return (new Number($object))->intValue;
         }
         return 0;
@@ -178,7 +178,7 @@ class UserDefaults
     public function float(string $key): float
     {
         $object = $this->object($key);
-        if (($object !== null) && (is_bool($object) || is_numeric($object))) {
+        if (is_bool($object) || is_numeric($object)) {
             return (new Number($object))->floatValue;
         }
         return 0.0;
@@ -190,9 +190,7 @@ class UserDefaults
      */
     public function dictionaryRepresentation(): Dictionary
     {
-        /** @var ApplicationPreferences $preferences */
-        $preferences = self::standardUserPreferences()[$this->suiteName];
-        return $preferences->dictionaryRepresentation;
+        return self::standardUserPreferences()->valueForKey($this->suiteName)?->dictionaryRepresentation ?? throw new InternalInconsistencyException();
     }
 
     /**

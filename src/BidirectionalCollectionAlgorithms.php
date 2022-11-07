@@ -3,7 +3,6 @@
 namespace Sabatier\Foundation;
 
 use Closure;
-use JetBrains\PhpStorm\Pure;
 
 /**
  * @psalm-require-implements BidirectionalCollection
@@ -12,7 +11,6 @@ trait BidirectionalCollectionAlgorithms
 {
     use CollectionAlgorithms;
 
-    #[Pure]
     public function indexBefore(int $i): int
     {
         return $i - 1;
@@ -28,7 +26,7 @@ trait BidirectionalCollectionAlgorithms
     {
         $start = $this->startIndex();
         $i = $this->endIndex();
-        while ($i != $start) {
+        while ($i !== $start) {
             $this->formIndexBefore($i);
             if ($where($this[$i])) {
                 return $i;
@@ -68,7 +66,7 @@ trait BidirectionalCollectionAlgorithms
         $instance = new self();
         $start = $this->startIndex();
         $i = $this->endIndex();
-        while ($i != $start) {
+        while ($i !== $start) {
             $instance[] = $this[$i];
             $this->formIndexBefore($i);
         }

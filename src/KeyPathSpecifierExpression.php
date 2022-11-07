@@ -13,12 +13,12 @@ class KeyPathSpecifierExpression extends Expression
         parent::__construct(ExpressionType::keyPathSpecifierExpressionType);
     }
 
-    public function expressionValue(mixed $object = null, ?Dictionary $context = null): mixed
+    public function expressionValue(mixed $object = null, ?Dictionary $context = null): string
     {
         return $this->value;
     }
 
-    public function constantValue(): mixed
+    public function constantValue(): string
     {
         return $this->value;
     }

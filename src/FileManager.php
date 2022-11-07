@@ -156,7 +156,7 @@ final class FileManager extends ObjectClass
     public function url(SearchPathDirectory $directory, #[ExpectedValues(flagsFromClass: SearchPathDomainMask::class)] int $domain = SearchPathDomainMask::local, ?URL $url = null, bool $shouldCreate = false): URL
     {
         $fileUrl = $this->urls($directory, $domain)->first() ?? throw new InvalidArgumentException();
-        if ($directory == SearchPathDirectory::itemReplacementDirectory) {
+        if ($directory === SearchPathDirectory::itemReplacementDirectory) {
             if ($url && ($domain & SearchPathDomainMask::user)) {
                 $components = new URLComponents($fileUrl->absoluteString);
                 $components->host = $url->host;
@@ -512,7 +512,7 @@ final class FileManager extends ObjectClass
     /**
      * Returns the attributes of the item at a given path.
      * @param string $path The path of a file or directory.
-     * @return Dictionary A dictionary object that describes the attributes (file, directory, symlink, and so on) of the file specified by path.
+     * @return Dictionary<mixed> A dictionary object that describes the attributes (file, directory, symlink, and so on) of the file specified by path.
      * @throws Exception
      */
     public function attributesOfItem(string $path): Dictionary

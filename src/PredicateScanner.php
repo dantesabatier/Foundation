@@ -72,15 +72,15 @@ class PredicateScanner extends Scanner
         $left = $this->parseOr();
         while ($this->scanKeyword('AND') || $this->scanKeyword('&&')) {
             $right = $this->parseOr();
-            if ($right instanceof CompoundPredicate && ($right->compoundPredicateType == CompoundPredicateLogicalType::and)) {
-                if ($left instanceof CompoundPredicate && ($left->compoundPredicateType == CompoundPredicateLogicalType::and)) {
+            if ($right instanceof CompoundPredicate && ($right->compoundPredicateType === CompoundPredicateLogicalType::and)) {
+                if ($left instanceof CompoundPredicate && ($left->compoundPredicateType === CompoundPredicateLogicalType::and)) {
                     $left->subpredicates->appendContentsOf($right->subpredicates);
                 } else {
                     /** @psalm-suppress PossiblyNullArgument */
                     $right->subpredicates->append($left);
                     $left = $right;
                 }
-            } elseif ($left instanceof CompoundPredicate && ($left->compoundPredicateType == CompoundPredicateLogicalType::and)) {
+            } elseif ($left instanceof CompoundPredicate && ($left->compoundPredicateType === CompoundPredicateLogicalType::and)) {
                 /** @psalm-suppress PossiblyNullArgument */
                 $left->subpredicates->append($right);
             } else {
@@ -124,15 +124,15 @@ class PredicateScanner extends Scanner
         $left = $this->parseNot();
         while ($this->scanKeyword('OR') || $this->scanKeyword('||')) {
             $right = $this->parseNot();
-            if ($right instanceof CompoundPredicate && ($right->compoundPredicateType == CompoundPredicateLogicalType::or)) {
-                if ($left instanceof CompoundPredicate && ($left->compoundPredicateType == CompoundPredicateLogicalType::or)) {
+            if ($right instanceof CompoundPredicate && ($right->compoundPredicateType === CompoundPredicateLogicalType::or)) {
+                if ($left instanceof CompoundPredicate && ($left->compoundPredicateType === CompoundPredicateLogicalType::or)) {
                     $left->subpredicates->appendContentsOf($right->subpredicates);
                 } else {
                     /** @psalm-suppress PossiblyNullArgument */
                     $right->subpredicates->append($left);
                     $left = $right;
                 }
-            } elseif ($left instanceof CompoundPredicate && ($left->compoundPredicateType == CompoundPredicateLogicalType::or)) {
+            } elseif ($left instanceof CompoundPredicate && ($left->compoundPredicateType === CompoundPredicateLogicalType::or)) {
                 /** @psalm-suppress PossiblyNullArgument */
                 $left->subpredicates->append($right);
             } else {
@@ -320,7 +320,7 @@ class PredicateScanner extends Scanner
                     case 'h':
                         $this->scanString('h');
                         $c = $this->string[$this->scanLocation];
-                        if ($c == 'i' || $c == 'u') {
+                        if ($c === 'i' || $c === 'u') {
                             $this->scanLocation += 1;
                             return Expression::expressionForConstantValue($this->arguments->popFirst());
                         }
@@ -330,7 +330,7 @@ class PredicateScanner extends Scanner
                         /** @psalm-suppress RedundantCondition */
                         if (/** @phpstan-ignore-line */ !$this->isAtEnd) {
                             $c = $this->string[$this->scanLocation];
-                            if ($c == 'i' || $c == 'u' || $c == 'x' || $c == 'X') {
+                            if ($c === 'i' || $c === 'u' || $c === 'x' || $c === 'X') {
                                 $this->scanLocation += 1;
                                 return Expression::expressionForConstantValue($this->arguments->popFirst());
                             }
@@ -452,10 +452,10 @@ class PredicateScanner extends Scanner
                 /** @var Expression $right */
                 $right = $this->parseSimpleExpression();
                 $expressionType = $right->expressionType;
-                if ($expressionType == ExpressionType::keyPath) {
+                if ($expressionType === ExpressionType::keyPath) {
                     /** @psalm-suppress PossiblyNullArgument */
                     $left = new KeyPathExpression($right, $left);
-                } elseif ($expressionType == ExpressionType::variable || $expressionType == ExpressionType::constantValue) {
+                } elseif ($expressionType === ExpressionType::variable || $expressionType === ExpressionType::constantValue) {
                     /** @psalm-suppress PossiblyNullArgument */
                     $left = Expression::expressionForSelector($left, 'valueForKey', new ArrayClass([$right]));
                 } else {

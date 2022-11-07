@@ -108,8 +108,8 @@ abstract class URLSessionTask extends ObjectClass
                 curl_setopt($ch, CURLOPT_VERBOSE, true);
             }
             if ($body = $this->request->httpBody) {
-                if ($this instanceof URLSessionUploadTask) {
-                    $body = ['file' => new CURLFile($body, mime_content_type($body), basename($body))];
+                if (FileManager::default()->fileExists($body)) {
+                    $body = ['file' => new CURLFile($body, URLFileTypeMappings::shared()->mimeType(pathinfo($body, PATHINFO_EXTENSION)) ?? mime_content_type($body), basename($body))];
                 }
                 curl_setopt($ch, CURLOPT_POSTFIELDS, $body);
             }

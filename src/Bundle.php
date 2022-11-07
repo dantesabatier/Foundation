@@ -58,6 +58,7 @@ final class Bundle extends ObjectClass
 
     /**
      * Returns a Bundle object initialized to correspond to the specified file URL.
+     * @param URL $url The file URL to a directory. This must be a full URL for a directory; if it contains any symbolic links, they must be resolvable.
      */
     private function __construct(URL $url)
     {
@@ -215,6 +216,7 @@ final class Bundle extends ObjectClass
             while ($url->path !== '/') {
                 $url->deleteLastPathComponent();
                 if (string_is_equal($url->lastPathComponent, 'src', CompareOptions::caseInsensitive)) {
+                    $url->deleteLastPathComponent();
                     break;
                 }
             }

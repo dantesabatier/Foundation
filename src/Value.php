@@ -66,7 +66,7 @@ class Value extends ObjectClass
 
     public function isEqual(mixed $other): bool
     {
-        return $this->compare($other) == ComparisonResult::orderedSame;
+        return $this->compare($other) === ComparisonResult::orderedSame;
     }
 
     #[Pure]

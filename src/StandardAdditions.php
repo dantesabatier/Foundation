@@ -167,7 +167,7 @@ function in_string(string $string, string $substring, #[ExpectedValues(flagsFrom
  */
 function string_compare(string $string, string $other, #[ExpectedValues(flagsFromClass: CompareOptions::class)] int $options = CompareOptions::none): int
 {
-    if (($options != CompareOptions::none) && ($collator = Collator::create('root'))) {
+    if (($options !== CompareOptions::none) && ($collator = Collator::create('root'))) {
         $collator->setAttribute(Collator::STRENGTH, Collator::PRIMARY);
         if (!($options & CompareOptions::diacriticInsensitive)) {
             $collator->setAttribute(Collator::STRENGTH, Collator::SECONDARY);
@@ -323,7 +323,6 @@ function home_directory(): string
  */
 function full_user_name(): string
 {
-    /** @noinspection SpellCheckingInspection */
     if (function_exists('posix_getpwuid')) {
         return posix_getpwuid(posix_geteuid())['name'] ?? get_current_user();
     }

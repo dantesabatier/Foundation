@@ -13,11 +13,11 @@ use ArrayIterator;
 use Closure;
 use InvalidArgumentException;
 use IteratorAggregate;
-use JetBrains\PhpStorm\Pure;
 use Traversable;
 
 /**
  * Class Dictionary
+ *
  * A collection whose elements are key-value pairs.
  * @template Element
  * @implements Collection<string, Element>
@@ -281,7 +281,7 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
         $v = $this->values;
         $i = $this->startIndex();
         $end = $this->endIndex();
-        while ($i != $end) {
+        while ($i !== $end) {
             if ($where($v[$i])) {
                 return $k[$i];
             }
@@ -396,7 +396,6 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
      * Returns the elements of this sequence of sequences, concatenated.
      * @return FlattenSequence<Dictionary<Element>> A flattened view of the elements of this sequence of sequences.
      */
-    #[Pure]
     public function joined(): FlattenSequence
     {
         return new FlattenSequence($this);
@@ -535,6 +534,30 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
         return $this->first(fn(mixed $e, string $k): bool => string_is_equal($k, $key, CompareOptions::caseInsensitive));
     }
 
+    public function setValueForCaseInsensitiveKey(mixed $value, string $key): void
+    {
+        if ($this->offsetExists($key)) {
+            $this->setValueForKey($value, $key);
+            return;
+        }
+        $index = $this->firstIndex(fn(string $k): bool => string_is_equal($k, $key, CompareOptions::caseInsensitive));
+        if ($index !== null) {
+            $this->setValueForKey($value, $index);
+        }
+    }
+
+    public function removeValueForCaseInsensitiveKey(string $key): void
+    {
+        if ($this->offsetExists($key)) {
+            $this->removeValueForKey($key);
+            return;
+        }
+        $index = $this->firstIndex(fn(string $k): bool => string_is_equal($k, $key, CompareOptions::caseInsensitive));
+        if ($index !== null) {
+            $this->removeValueForKey($index);
+        }
+    }
+
     public function description(): string
     {
         return sprintf("[%s]", $this->isEmpty() ? ":" : $this->mapValues(fn(mixed $value, string $key): string => sprintf("%s: %s", $key, human_readable_value($value)))->values->join(", "));
@@ -553,7 +576,6 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
     /**
      * @param string $offset
      */
-    #[Pure]
     public function offsetExists(mixed $offset): bool
     {
         return array_key_exists($offset, $this->reserved);

@@ -87,6 +87,9 @@ class URLComponents extends ObjectClass
                 $components = explode('=', $pair);
                 $name = $components[0];
                 $value = (count($components) === 2) ? urldecode($components[1]) : null;
+                if ($value) {
+                    $value = htmlspecialchars($value, ENT_QUOTES);
+                }
                 return new URLQueryItem($name, $value);
             });
         } else {
@@ -111,8 +114,7 @@ class URLComponents extends ObjectClass
 
     /**
      * Returns a URL based on the component settings and relative to a given base URL.
-     * If the URLComponents has an authority component (user, password, host or port) and a path component,
-     * then the path must either begin with “/” or be an empty string.
+     * If the URLComponents has an authority component (user, password, host or port) and a path component, then the path must either begin with “/” or be an empty string.
      * If the URLComponents does not have an authority component (user, password, host or port) and has a path component, the path component must not start with “//”. If those requirements are not met, nil is returned.
      */
     public function urlRelativeTo(?URL $baseURL): ?URL

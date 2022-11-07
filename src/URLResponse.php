@@ -13,7 +13,7 @@ namespace Sabatier\Foundation;
  * The metadata associated with the response to a URL load request, independent of protocol and URL scheme.
  * @package Sabatier\Foundation
  */
-class URLResponse
+class URLResponse extends ObjectClass
 {
     /**
      * Creates an initialized URLResponse object with the URL, MIME type, length, and text encoding set to given values.
