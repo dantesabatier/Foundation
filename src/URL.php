@@ -91,7 +91,7 @@ final class URL extends ObjectClass
     {
         if ($name == 'absoluteURL') {
             $baseURL = $this->baseURL;
-            if ($baseURL === null) {
+            if (!$baseURL instanceof URL) {
                 return $this;
             }
             if (!$baseURL->hasDirectoryPath) {
@@ -139,7 +139,7 @@ final class URL extends ObjectClass
         } elseif ($name == 'fragment') {
             return $this->parse(PHP_URL_FRAGMENT);
         } elseif ($name == 'standardized') {
-            $url = clone $this;
+            $url = clone $this->absoluteURL;
             $url->standardize();
             return $url;
         } elseif ($name == 'standardizedFileURL') {
@@ -268,7 +268,7 @@ final class URL extends ObjectClass
      */
     public function appendingPathComponent(string $component): URL
     {
-        $url = clone $this;
+        $url = clone $this->absoluteURL;
         $url->appendPathComponent($component);
         return $url;
     }
@@ -296,7 +296,7 @@ final class URL extends ObjectClass
      */
     public function appendingPathExtension(string $extension): URL
     {
-        $url = clone $this;
+        $url = clone $this->absoluteURL;
         $url->appendPathExtension($extension);
         return $url;
     }
@@ -318,7 +318,7 @@ final class URL extends ObjectClass
      */
     public function deletingLastPathComponent(): URL
     {
-        $url = clone $this;
+        $url = clone $this->absoluteURL;
         $url->deleteLastPathComponent();
         return $url;
     }
@@ -337,7 +337,7 @@ final class URL extends ObjectClass
      */
     public function deletingPathExtension(): URL
     {
-        $url = clone $this;
+        $url = clone $this->absoluteURL;
         $url->deletePathExtension();
         return $url;
     }
@@ -446,7 +446,7 @@ final class URL extends ObjectClass
         if (!$this->isFileURL) {
             return $this;
         }
-        $url = clone $this;
+        $url = clone $this->absoluteURL;
         $url->resolveSymlinksInPath();
         return $url;
     }

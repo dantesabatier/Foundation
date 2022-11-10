@@ -19,7 +19,7 @@ function components_from_key_path(string $keyPath): KeyPathComponents
 
 function kvc_operator_from_key(string $key): ?string
 {
-    if (strlen($key) === 0 || $key[0] !== '@') {
+    if ($key === '' || $key[0] !== '@') {
         return null;
     }
     $name = substring_from_index($key, 1);

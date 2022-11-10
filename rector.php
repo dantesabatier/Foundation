@@ -8,6 +8,7 @@ use Rector\Config\RectorConfig;
 use Rector\DeadCode\Rector\ClassMethod\RemoveUselessParamTagRector;
 use Rector\DeadCode\Rector\ClassMethod\RemoveUselessReturnTagRector;
 use Rector\Php71\Rector\FuncCall\CountOnNullRector;
+use Rector\Php73\Rector\FuncCall\JsonThrowOnErrorRector;
 use Rector\Php80\Rector\FunctionLike\MixedTypeRector;
 use Rector\Php80\Rector\FunctionLike\UnionTypesRector;
 use Rector\Php81\Rector\FuncCall\NullToStrictStringFuncCallArgRector;
@@ -25,7 +26,10 @@ return static function (RectorConfig $rectorConfig): void {
     ]);
     $rectorConfig->skip([
         CountOnNullRector::class => [
-            __DIR__ . 'URLFileTypeMappingsInternal.php'
+            __DIR__ . '/src/URLFileTypeMappingsInternal.php'
+        ],
+        JsonThrowOnErrorRector::class => [
+            __DIR__ . '/src/URLRequest.php'
         ],
         ExplicitBoolCompareRector::class,
         ReturnNeverTypeRector::class,

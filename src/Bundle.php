@@ -438,6 +438,9 @@ final class Bundle extends ObjectClass
      */
     public function classNamed(string $className): ?string
     {
+        if (class_exists($className)) {
+            return $className;
+        }
         $name = array_last(explode("\\", $className)) ?? $className;
         $enumerator = FileManager::default()->enumerator($this->bundleURL->appendingPathComponent('src'), null, DirectoryEnumerationOptions::skipsHiddenFiles);
         if ($enumerator !== null) {

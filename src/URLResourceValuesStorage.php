@@ -94,7 +94,7 @@ class URLResourceValuesStorage
             if ($key == URLResourceKey::isDirectoryKey) {
                 $result[$key] = $info->isDir();
             } elseif ($key == URLResourceKey::parentDirectoryURLKey) {
-                if ($directory = $info->getPathInfo()->getRealPath()) {
+                if ($directory = $info->getPathInfo()?->getRealPath()) {
                     $result[$key] = URL::fileURL($directory);
                 }
             } elseif ($key == URLResourceKey::fileResourceTypeKey) {

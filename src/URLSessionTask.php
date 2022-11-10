@@ -118,6 +118,11 @@ abstract class URLSessionTask extends ObjectClass
                     $this->request->setValueForHttpHeaderField($value, $key);
                 }
             }
+            if ($this->session->configuration->httpShouldSetCookies && ($cookies = $this->session->configuration->httpCookieStorage?->cookies($this->request->url))) {
+                foreach (HTTPCookie::requestHeaderFields($cookies) as $key => $value) {
+                    $this->request->setValueForHttpHeaderField($value, $key);
+                }
+            }
             if ($allHTTPHeaderFields = $this->request->allHTTPHeaderFields) {
                 curl_setopt($ch, CURLOPT_HTTPHEADER, $allHTTPHeaderFields->mapValues(fn(string $value, string $key): string => "$key: $value")->values->toArray());
             }

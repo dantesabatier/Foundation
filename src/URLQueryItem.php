@@ -2,22 +2,15 @@
 
 namespace Sabatier\Foundation;
 
-use Stringable;
-
 /**
  * Class URLQueryItem
  * A single name-value pair from the query portion of a URL.
  * @package Sabatier\Foundation
  */
-class URLQueryItem implements Stringable
+class URLQueryItem extends ObjectClass
 {
     public function __construct(public string $name, public ?string $value = null)
     {
-    }
-
-    public function __toString(): string
-    {
-        return $this->description();
     }
 
     public function description(): string
