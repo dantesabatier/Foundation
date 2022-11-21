@@ -11,11 +11,10 @@ namespace Sabatier\Foundation;
 
 use Closure;
 use Iterator;
+use Sabatier\Foundation\Predicates\Predicate;
 
 /**
- * Class Set
  * An unordered collection of unique elements.
- * @package Sabatier\Foundation
  * @template Element
  * @implements Iterator<int, Element>
  * @implements SetAlgebra<Element>
@@ -23,36 +22,58 @@ use Iterator;
 class Set extends ObjectClass implements SetAlgebra, Iterator
 {
     use MutableCollectionAlgorithms {
-        contains as protected sequenceContains;
-        containsElement as protected sequenceContainsElement;
-        first as protected sequenceFirst;
-        last as protected sequenceLast;
-        min as protected sequenceMin;
-        max as protected sequenceMax;
-        reduce as protected sequenceReduce;
-        map as protected sequenceMap;
-        compactMap as protected sequenceCompactMap;
-        flatMap as protected sequenceFlatMap;
-        valueForKey as protected collectionValueForKey;
-        setValueForKey as protected collectionSetValueForKey;
-        valueForKeyPath as protected collectionValueForKeyPath;
-        randomElement as protected collectionRandomElement;
-        firstIndex as protected collectionFirstIndex;
-        lastIndex as protected collectionLastIndex;
-        indexOf as protected collectionIndexOf;
-        filter as protected collectionFilter;
-        filtered as protected collectionFiltered;
-        sorted as protected collectionSorted;
-        allSatisfy as protected collectionAllSatisfy;
-        joined as protected collectionJoined;
-        drop as protected mutableCollectionDrop;
-        dropFirst as protected mutableCollectionDropFirst;
-        dropLast as protected mutableCollectionDropLast;
+        toArray as private sequenceToArray;
+        contains as private sequenceContains;
+        containsElement as private sequenceContainsElement;
+        first as private sequenceFirst;
+        last as private sequenceLast;
+        min as private sequenceMin;
+        max as private sequenceMax;
+        reduce as private sequenceReduce;
+        map as private sequenceMap;
+        compactMap as private sequenceCompactMap;
+        flatMap as private sequenceFlatMap;
+        offsetExists as private collectionOffsetExists;
+        offsetGet as private collectionOffsetGet;
+        offsetSet as private collectionOffsetSet;
+        offsetUnset as private collectionOffsetUnset;
+        valueForKey as private collectionValueForKey;
+        setValueForKey as private collectionSetValueForKey;
+        valueForKeyPath as private collectionValueForKeyPath;
+        randomElement as private collectionRandomElement;
+        firstIndex as private collectionFirstIndex;
+        lastIndex as private collectionLastIndex;
+        indexOf as private collectionIndexOf;
+        elementAt as private collectionElementAt;
+        filter as private collectionFilter;
+        filtered as private collectionFiltered;
+        sort as private collectionSort;
+        sorted as private collectionSorted;
+        allSatisfy as private collectionAllSatisfy;
+        joined as private collectionJoined;
+        reverse as private bidirectionalCollectionReverse;
+        reversed as private bidirectionalCollectionReversed;
+        append as private mutableCollectionAppend;
+        appendContentsOf as private mutableCollectionAppendContentsOf;
+        insert as private mutableCollectionInsert;
+        insertAt as private mutableCollectionInsertAt;
+        insertContentsOf as private mutableCollectionInsertContentsOf;
+        update as private mutableCollectionUpdate;
+        remove as private mutableCollectionRemove;
+        removeAt as private mutableCollectionRemoveAt;
+        removeFirst as private mutableCollectionRemoveFirst;
+        removeLast as private mutableCollectionRemoveLast;
+        removeAll as private mutableCollectionRemoveAll;
+        drop as private mutableCollectionDrop;
+        dropFirst as private mutableCollectionDropFirst;
+        dropLast as private mutableCollectionDropLast;
+        popFirst as private mutableCollectionPopFirst;
+        popLast as private mutableCollectionPopLast;
     }
-
-    /** @var Element[] */
-    private array $reserved = [];
-    private int $position = 0;
+    
+    use IteratorAlgorithms {
+        current as private iteratorCurrent;
+    }
 
     /**
      * @param iterable<Element> $iterable
@@ -64,31 +85,6 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
         } else {
             $this->appendContentsOf($iterable);
         }
-    }
-
-    public function __clone()
-    {
-        $this->reserved = $this->toArray();
-    }
-
-    public function __serialize(): array
-    {
-        return $this->reserved;
-    }
-
-    public function __unserialize(array $data): void
-    {
-        $this->reserved = $data;
-    }
-
-    public function __isset(string $name): bool
-    {
-        return isset($this->reserved[$name]);
-    }
-
-    public function __unset(string $name): void
-    {
-        unset($this->reserved[$name]);
     }
 
     /**
@@ -235,7 +231,7 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
      */
     public function elementAt(mixed $index)
     {
-        return $this->reserved[$index] ?? null;
+        return $this->collectionElementAt($index);
     }
 
     /**
@@ -276,8 +272,7 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
      */
     public function sort(Closure $by): Set
     {
-        usort($this->reserved, $by);
-        return $this;
+        return $this->collectionSort($by);
     }
 
     /**
@@ -320,39 +315,43 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
     }
 
     /**
-     * Returns a subsequence by skipping elements while predicate returns true and returning the remaining elements.
-     * @param Closure(Element): bool $while A closure that takes an element of the sequence as its argument and returns true if the element should be skipped or false if it should be included.
-     * Once the predicate returns false it will not be called again.
-     * @return Slice<Set<Element>>
-     * @psalm-suppress LessSpecificReturnStatement, MoreSpecificReturnType
+     * Return a set containing the results of invoking {@see KeyValueCoding::valueForKey()} on each of the receiving set's members.
+     *
+     * The returned set might not have the same number of members as the receiving set. The returned set will not contain any elements corresponding to instances of valueForKey() returning nil.
+     * @param string $key The name of one of the properties of the receiving set's members.
+     * @return Set A set containing the results of invoking {@see KeyValueCoding::valueForKey()} (with the argument key) on each of the receiving set's members.
      */
-    public function drop(Closure $while): Slice
+    public function valueForKey(string $key): Set
     {
-        return $this->mutableCollectionDrop($while);
+        return $this->collectionValueForKey($key);
     }
 
     /**
-     * Returns a subsequence containing all but the given number of initial elements.
-     * If the number of elements to drop exceeds the number of elements in the collection, the result is an empty subsequence.
-     * @param int $k The number of elements to drop from the beginning of the collection. k must be greater than or equal to zero.
-     * @return Slice<Set<Element>> A subsequence starting after the specified number of elements.
-     * @psalm-suppress LessSpecificReturnStatement, MoreSpecificReturnType
+     * Invokes {@see KeyValueCoding::setValueForKey()} on each of the set's members.
+     * @param mixed $value The value for the property identified by key.
+     * @param string $key The name of one of the properties of the set's members.
      */
-    public function dropFirst(int $k): Slice
+    public function setValueForKey(mixed $value, string $key): void
     {
-        return $this->mutableCollectionDropFirst($k);
+        $this->collectionSetValueForKey($value, $key);
     }
 
     /**
-     * Returns a subsequence containing all but the specified number of final elements.
-     * If the number of elements to drop exceeds the number of elements in the collection, the result is an empty subsequence.
-     * @param int $k The number of elements to drop off the end of the collection. k must be greater than or equal to zero.
-     * @return Slice<Set<Element>> A subsequence that leaves off the specified number of elements at the end.
-     * @psalm-suppress LessSpecificReturnStatement, MoreSpecificReturnType
+     * Reverses the elements of the collection in place.
+     * @return Set<Element>
      */
-    public function dropLast(int $k): Slice
+    public function reverse(): Set
     {
-        return $this->mutableCollectionDropLast($k);
+        return $this->bidirectionalCollectionReverse();
+    }
+
+    /**
+     * Returns a collection containing the elements of this sequence in reverse order.
+     * @return Set<Element> A collection containing the elements of this sequence in reverse order.
+     */
+    public function reversed(): Set
+    {
+        return $this->bidirectionalCollectionReversed();
     }
 
     /**
@@ -362,7 +361,7 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
     public function append(mixed $element): void
     {
         if (!$this->containsElement($element)) {
-            $this->reserved[] = $element;
+            $this->mutableCollectionAppend($element);
         }
     }
 
@@ -372,44 +371,57 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
      */
     public function appendContentsOf(iterable $newElements): void
     {
-        foreach ($newElements as $element) {
-            $this->append($element);
-        }
+        $this->mutableCollectionAppendContentsOf($newElements);
     }
 
     /**
-     * Inserts the given element in the set if it is not already present.
-     * If an element equal to newMember is already contained in the set, this method has no effect.
-     * @param Element $newMember An element to insert into the set.
-     * @return array{inserted: boolean, memberAfterInsert: Element} (true, newMember) if newMember was not contained in the set. If an element equal to newMember was already contained in the set, the method returns (false, oldMember), where oldMember is the element that was equal to newMember. In some cases, oldMember may be distinguishable from newMember by identity comparison or some other means.
-     * If an element equal to newMember is already contained in the set, this method has no effect.
+     * Inserts the given element in the collection if it is not already present.
+     *
+     * If an element equal to newElement is already contained in the collection, this method has no effect.
+     * @param Element $newElement An element to insert into the collection.
+     * @return array{inserted: boolean, elementAfterInsert: Element} (true, newElement) if newElement was not contained in the collection. If an element equal to newElement was already contained in the collection, the method returns (false, oldElement), where oldElement is the element that was equal to newElement. In some cases, oldElement may be distinguishable from newElement by identity comparison or some other means.
      */
-    public function insert(mixed $newMember): array
+    public function insert(mixed $newElement): array
     {
-        $oldMember = $this->member($newMember);
-        if ($oldMember === null) {
-            $this->append($newMember);
-            return ['inserted' => true, 'memberAfterInsert' => $newMember];
-        }
-        return ['inserted' => false, 'memberAfterInsert' => $oldMember];
+        return $this->mutableCollectionInsert($newElement);
     }
 
     /**
-     * Inserts the given element into the set unconditionally.
-     * If an element equal to newMember is already contained in the set, newMember replaces the existing element.
-     * @param Element $element An element to insert into the set.
-     * @return Element|null An element equal to newMember if the set already contained such a member; otherwise, nil.
+     * Inserts the value into the collection at the specified position.
+     *
+     * The new element is inserted before the element currently at the specified index.
+     * If you pass the collection's endIndex property as the index parameter, the new element is appended to the collection.
+     * @param Element $element The new element to insert into the collection.
+     * @param int $at The position at which to insert the new element. index must be a valid index into the collection.
+     */
+    public function insertAt(mixed $element, int $at): void
+    {
+        if (!$this->containsElement($element)) {
+            $this->mutableCollectionInsertAt($element, $at);
+        }
+    }
+
+    /**
+     * Inserts the elements of a sequence into the collection at the specified position.
+     * The new elements are inserted before the element currently at the specified index.
+     * If you pass the collection's endIndex property as the index parameter, the new elements are appended to the collection.
+     * @param iterable<int, Element> $newElements The new elements to insert into the collection.
+     * @param int $at The position at which to insert the new elements. index must be a valid index of the collection.
+     */
+    public function insertContentsOf(iterable $newElements, int $at = NotFound): void
+    {
+        $this->mutableCollectionInsertContentsOf($newElements, $at);
+    }
+
+    /**
+     * Inserts the given element into the collection unconditionally.
+     * If an element equal to newElement is already contained in the collection, newElement replaces the existing element.
+     * @param Element $element An element to insert into the collection.
+     * @return Element|null An element equal to newElement if the collection already contained such a member; otherwise, nil.
      */
     public function update(mixed $element)
     {
-        $index = $this->indexOf($element);
-        if ($index !== null) {
-            $member = $this->offsetGet($index);
-            $this->reserved[$index] = $element;
-            return $member;
-        }
-        $this->append($element);
-        return null;
+        return $this->mutableCollectionUpdate($element);
     }
 
     /**
@@ -418,22 +430,16 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
      */
     public function remove(mixed $element): void
     {
-        $index = $this->indexOf($element);
-        if ($index !== null) {
-            $this->removeAt($index);
-        }
+        $this->mutableCollectionRemove($element);
     }
 
     /**
-     * Removes the element at the given index of the set.
-     * @return Element The element that was removed from the set.
+     * @param int $index The index of the member to remove, position must be a valid index of the collection, and must not be equal to the collection's end index.
+     * @return Element The value that was removed.
      */
     public function removeAt(int $index)
     {
-        $member = $this->offsetGet($index);
-        $this->offsetUnset($index);
-        $this->reserved = array_values($this->reserved);
-        return $member;
+        return $this->mutableCollectionRemoveAt($index);
     }
 
     /**
@@ -442,32 +448,17 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
      */
     public function removeAll(Closure $where = null): void
     {
-        if ($where === null) {
-            $this->reserved = [];
-            return;
-        }
-        $this->reserved = $this->filter(fn(mixed $e, int $i): bool => !$where($e, $i))->reserved;
+        $this->mutableCollectionRemoveAll($where);
     }
 
     public function removeFirst(int $k): void
     {
-        $this->removeAll(fn(mixed $e, int $i): bool => $i < $k);
+        $this->mutableCollectionRemoveFirst($k);
     }
 
     public function removeLast(int $k): void
     {
-        if ($k === 0) {
-            return;
-        }
-        assert($k > 0, "Number of elements to remove should be non-negative");
-        $e = $this->endIndex();
-        $i = $e - $k;
-        assert($i >= 0 && $i < $e, "Can't remove more items from a collection than it contains");
-        while ($i < $e) {
-            $this->offsetUnset($i);
-            $this->formIndexAfter($i);
-        }
-        $this->reserved = array_values($this->reserved);
+        $this->mutableCollectionRemoveLast($k);
     }
 
     /**
@@ -476,10 +467,53 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
      */
     public function popFirst()
     {
-        if ($this->isEmpty()) {
-            return null;
-        }
-        return $this->removeAt(0);
+        return $this->mutableCollectionPopFirst();
+    }
+
+    /**
+     * Removes and returns the last element of the collection.
+     *
+     * Calling this method may invalidate all saved indices of this collection. Do not rely on a previously stored index value after altering a collection with any operation that can change its length.
+     * @return Element|null The last element of the collection if the collection is not empty; otherwise, nil.
+     */
+    public function popLast()
+    {
+        return $this->mutableCollectionPopLast();
+    }
+
+    /**
+     * Returns a subsequence by skipping elements while predicate returns true and returning the remaining elements.
+     * @param Closure(Element): bool $while A closure that takes an element of the sequence as its argument and returns true if the element should be skipped or false if it should be included.
+     * Once the predicate returns false it will not be called again.
+     * @return Slice<Element>
+     */
+    public function drop(Closure $while): Slice
+    {
+        return $this->mutableCollectionDrop($while);
+    }
+
+    /**
+     * Returns a subsequence containing all but the given number of initial elements.
+     *
+     * If the number of elements to drop exceeds the number of elements in the collection, the result is an empty subsequence.
+     * @param int $k The number of elements to drop from the beginning of the collection. k must be greater than or equal to zero.
+     * @return Slice<Element> A subsequence starting after the specified number of elements.
+     */
+    public function dropFirst(int $k): Slice
+    {
+        return $this->mutableCollectionDropFirst($k);
+    }
+
+    /**
+     * Returns a subsequence containing all but the specified number of final elements.
+     *
+     * If the number of elements to drop exceeds the number of elements in the collection, the result is an empty subsequence.
+     * @param int $k The number of elements to drop off the end of the collection. k must be greater than or equal to zero.
+     * @return Slice<Element> A subsequence that leaves off the specified number of elements at the end.
+     */
+    public function dropLast(int $k): Slice
+    {
+        return $this->mutableCollectionDropLast($k);
     }
 
     /**
@@ -639,30 +673,9 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
         return !$this->contains(fn(mixed $member): bool => $other->containsElement($member));
     }
 
-    /**
-     * Reverses the elements of the collection in place.
-     * @return Set<Element>
-     */
-    public function reverse(): Set
-    {
-        $this->reserved = array_reverse($this->reserved);
-        return $this;
-    }
-
-    /**
-     * Returns a collection containing the elements of this sequence in reverse order.
-     * @return Set<Element> A collection containing the elements of this sequence in reverse order.
-     */
-    public function reversed(): Set
-    {
-        $instance = clone $this;
-        $instance->reverse();
-        return $instance;
-    }
-
     public function setSet(Set $set): void
     {
-        $this->reserved = $set->reserved;
+        $this->reserved = $set->toArray();
     }
 
     /**
@@ -670,28 +683,7 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
      */
     public function toArray(): array
     {
-        return $this->reserved;
-    }
-
-    /**
-     * Return a set containing the results of invoking {@see KeyValueCoding::valueForKey()} on each of the receiving set's members.
-     * The returned set might not have the same number of members as the receiving set. The returned set will not contain any elements corresponding to instances of valueForKey() returning nil.
-     * @param string $key The name of one of the properties of the receiving set's members.
-     * @return Set A set containing the results of invoking {@see KeyValueCoding::valueForKey()} (with the argument key) on each of the receiving set's members.
-     */
-    public function valueForKey(string $key): Set
-    {
-        return $this->collectionValueForKey($key);
-    }
-
-    /**
-     * Invokes {@see KeyValueCoding::setValueForKey()} on each of the set's members.
-     * @param mixed $value The value for the property identified by key.
-     * @param string $key The name of one of the properties of the set's members.
-     */
-    public function setValueForKey(mixed $value, string $key): void
-    {
-        $this->collectionSetValueForKey($value, $key);
+        return $this->sequenceToArray();
     }
 
     public function description(): string
@@ -704,74 +696,41 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
      */
     public function current(): mixed
     {
-        return $this->offsetGet($this->key());
-    }
-
-    public function next(): void
-    {
-        $this->formIndexAfter($this->position);
-    }
-
-    public function key(): int
-    {
-        return $this->position;
-    }
-
-    public function valid(): bool
-    {
-        return $this->offsetExists($this->key());
-    }
-
-    public function rewind(): void
-    {
-        $this->position = 0;
-    }
-
-    public function count(): int
-    {
-        return count($this->reserved);
+        return $this->iteratorCurrent();
     }
 
     /**
      * @param int $offset
+     * @return bool
      */
     public function offsetExists(mixed $offset): bool
     {
-        return array_key_exists($offset, $this->reserved);
+        return $this->collectionOffsetExists($offset);
     }
-
+    
     /**
      * @param int $offset
      * @return Element
      */
     public function offsetGet(mixed $offset): mixed
     {
-        assert(in_range($offset, $this->startIndex(), $this->endIndex()), sprintf("%s %s(%s) index \"%s\" out of bounds [%s...<%s]", $this->debugDescription(), __FUNCTION__, $offset, $offset, $this->startIndex(), $this->endIndex()));
-        return $this->reserved[$offset];
+        return $this->collectionOffsetGet($offset);
     }
-
+    
     /**
      * @param int|null $offset
      * @param Element $value
      */
     public function offsetSet(mixed $offset, mixed $value): void
     {
-        if (!$this->containsElement($value)) {
-            if ($offset === null) {
-                $this->reserved[] = $value;
-            } else {
-                $this->reserved[$offset] = $value;
-            }
-        }
+        $this->collectionOffsetSet($offset, $value);
     }
-
+    
     /**
      * @param int $offset
      */
     public function offsetUnset(mixed $offset): void
     {
-        if ($this->offsetExists($offset)) {
-            unset($this->reserved[$offset]);
-        }
+        $this->collectionOffsetUnset($offset);
     }
 }

@@ -3,10 +3,9 @@
 namespace Sabatier\Foundation;
 
 /**
- * Class URLResourceKey
  * Keys that apply to file system URLs.
+ *
  * To request information using one of these keys, pass it to the $keys parameter of the {@see URL::resourceValues()} instance method.
- * @package Sabatier\Foundation
  */
 class URLResourceKey
 {

@@ -1,11 +1,5 @@
 <?php
 
-/**
- * @author Dante Sabatier <dantesabatier@me.com>
- * @version 1.0
- * @package Sabatier\Foundation
- */
-
 namespace Sabatier\Foundation;
 
 trait Debuggable
@@ -17,11 +11,11 @@ trait Debuggable
 
     public function description(): string
     {
-        return sprintf('<%s %s>', static::class, spl_object_id($this));
+        return sprintf('<%s %s>', static::className(), spl_object_id($this));
     }
 
     public function debugDescription(): string
     {
-        return sprintf('<%s %s>', static::class, spl_object_id($this));
+        return sprintf('<%s %s>', static::className(), spl_object_id($this));
     }
 }

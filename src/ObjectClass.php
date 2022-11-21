@@ -17,7 +17,6 @@ use JsonSerializable;
 
 /**
  * The root class of most class hierarchies, from which subclasses inherit a basic interface to the runtime system and the ability to behave as Objective-C objects.
- * @package Sabatier\Foundation
  */
 class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, Comparable, JsonSerializable
 {
@@ -92,6 +91,7 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
 
     /**
      * Handles messages the receiver doesn't recognize.
+     *
      * The runtime system invokes this method whenever an object receives an aSelector message it can't respond to or forward. This method, in turn, raises an InvalidArgumentException, and generates an error message.
      * @param string $selector A Selector that identifies a method not implemented or recognized by the receiver.
      */
@@ -263,13 +263,13 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
         if (!$this->validateValueForKey($value, $key)) {
             return;
         }
-        if (!property_exists($this, $key)) {
-            $this->setValueForUndefinedKey($value, $key);
+        if (property_exists($this, $key)) {
+            $this->willChangeValueForKey($key, KeyValueChange::replacement, $value);
+            $this->$key = $value;
+            $this->didChangeValueForKey($key, KeyValueChange::replacement, $value);
             return;
         }
-        $this->willChangeValueForKey($key);
-        $this->$key = $value;
-        $this->didChangeValueForKey($key);
+        $this->setValueForUndefinedKey($value, $key);
     }
 
     public function valueForKeyPath(string $keyPath)

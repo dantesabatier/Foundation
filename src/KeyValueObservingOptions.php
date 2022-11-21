@@ -10,10 +10,9 @@
 namespace Sabatier\Foundation;
 
 /**
- * Class KeyValueObservingOptions
  * The values that can be returned in a change dictionary.
+ *
  * These constants are passed to {@see KeyValueObserving::addObserver()} and determine the values that are returned as part of the change dictionary passed to an {@see KeyValueObserving::observeValue()}. You can pass 0 if you require no change dictionary values.
- * @package Sabatier\Foundation
  */
 class KeyValueObservingOptions
 {

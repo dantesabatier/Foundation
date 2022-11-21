@@ -13,9 +13,7 @@ use Closure;
 use JetBrains\PhpStorm\ExpectedValues;
 
 /**
- * Interface KeyValueObserving
  * An informal protocol that objects adopt to be notified of changes to the specified properties of other objects.
- * @package Sabatier\Foundation
  */
 interface KeyValueObserving
 {

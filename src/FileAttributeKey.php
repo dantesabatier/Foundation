@@ -10,9 +10,7 @@
 namespace Sabatier\Foundation;
 
 /**
- * Class FileAttributeKey
  * Keys in dictionaries used to get and set file attributes.
- * @package Sabatier\Foundation
  */
 class FileAttributeKey
 {

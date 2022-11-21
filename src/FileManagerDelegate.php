@@ -3,9 +3,7 @@
 namespace Sabatier\Foundation;
 
 /**
- * Interface FileManagerDelegate
  * The interface a file manager's delegate uses to intervene during operations or if an error occurs.
- * @package Sabatier\Foundation
  */
 interface FileManagerDelegate
 {

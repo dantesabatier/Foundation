@@ -1,17 +1,9 @@
 <?php
 
-/**
- * @author Dante Sabatier <dantesabatier@me.com>
- * @version 1.0
- * @package Sabatier\Foundation
- */
-
 namespace Sabatier\Foundation;
 
 /**
- * Class Scanner
  * A string parser that scans for substrings or characters in a character set, and for numeric values from decimal, hexadecimal, and floating-point representations.
- * @package Sabatier\Foundation
  * @property int $scanLocation The character position at which the receiver will begin its next scanning operation. This property is useful for backing up to rescan after an error. Rather than setting the scan location directly to skip known sequences of characters, use {@see scanString()} or {@see scanCharacters()}, which allow you to verify that the expected substring (or set of characters) is in fact present.
  * @property-read bool $isAtEnd Flag that indicates whether the receiver has exhausted all significant characters.
  */

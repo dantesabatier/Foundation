@@ -5,9 +5,7 @@ namespace Sabatier\Foundation;
 use Exception;
 
 /**
- * Class ProcessInfo
  * A collection of information about the current process.
- * @package Sabatier\Foundation
  */
 class ProcessInfo extends ObjectClass
 {

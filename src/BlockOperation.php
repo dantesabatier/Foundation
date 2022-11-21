@@ -14,7 +14,6 @@ use Closure;
 /**
  * Class BlockOperation
  * An operation that manages the concurrent execution of one or more blocks.
- * @package Sabatier\Foundation
  */
 class BlockOperation extends Operation
 {

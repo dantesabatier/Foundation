@@ -3,9 +3,7 @@
 namespace Sabatier\Foundation;
 
 /**
- * Class PropertyListSerializationFormat
  * These constants are used to specify a property list serialization format.
- * @package Sabatier\Foundation
  */
 enum PropertyListSerializationFormat: int
 {

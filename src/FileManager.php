@@ -15,9 +15,7 @@ use InvalidArgumentException;
 use JetBrains\PhpStorm\ExpectedValues;
 
 /**
- * Class FileManager
  * A convenient interface to the contents of the file system, and the primary means of interacting with it.
- * @package Sabatier\Foundation
  */
 final class FileManager extends ObjectClass
 {
@@ -94,7 +92,6 @@ final class FileManager extends ObjectClass
         switch ($directory) {
             case SearchPathDirectory::applicationsDirectory:
             case SearchPathDirectory::libraryDirectory:
-            case SearchPathDirectory::cachesDirectory:
                 if ($domainMask & SearchPathDomainMask::local) {
                     $urls->append($this->documentRootDirectory->appendingPathComponent($dirname));
                 }
@@ -121,14 +118,12 @@ final class FileManager extends ObjectClass
                 }
                 break;
             case SearchPathDirectory::itemReplacementDirectory:
+            case SearchPathDirectory::cachesDirectory:
                 if ($domainMask & SearchPathDomainMask::local) {
-                    $urls->append($this->documentRootDirectory->appendingPathComponent($dirname));
+                    $urls->appendContentsOf($this->urls(SearchPathDirectory::libraryDirectory, $domainMask)->map(fn(URL $url): URL => $url->appendingPathComponent($dirname)));
                 }
-                if ($domainMask & SearchPathDomainMask::user) {
-                    $urls->append($this->homeDirectoryForCurrentUser->appendingPathComponent($dirname));
-                }
-                if ($domainMask & SearchPathDomainMask::system) {
-                    $urls->append(URL::fileURL(sys_get_temp_dir()));
+                if ($domainMask & SearchPathDomainMask::user || $domainMask & SearchPathDomainMask::system) {
+                    $urls->append($this->temporaryDirectory);
                 }
                 break;
             case SearchPathDirectory::applicationSupportDirectory:
@@ -229,20 +224,7 @@ final class FileManager extends ObjectClass
             /** @var int $posixPermissions */
             $posixPermissions = $attributes?->valueForKey(FileAttributeKey::posixPermissions) ?? 0755;
             if (mkdir($path, $posixPermissions, $createIntermediates)) {
-                /** @var string|null $accountName */
-                $accountName = $attributes?->valueForKey(FileAttributeKey::ownerAccountName);
-                /** @var int|null $accountID */
-                $accountID = $attributes?->valueForKey(FileAttributeKey::ownerAccountID);
-                if ($accountName !== null || $accountID !== null) {
-                    chown($path, $accountName ?? $accountID);
-                }
-                /** @var string|null $groupAccountName */
-                $groupAccountName = $attributes?->valueForKey(FileAttributeKey::groupOwnerAccountName);
-                /** @var int|null $groupAccountID */
-                $groupAccountID = $attributes?->valueForKey(FileAttributeKey::groupOwnerAccountID);
-                if ($groupAccountName !== null || $groupAccountID !== null) {
-                    chgrp($path, $groupAccountName ?? $groupAccountID);
-                }
+                $this->setNewAttributes($attributes, $path);
                 return true;
             }
             return false;
@@ -274,20 +256,7 @@ final class FileManager extends ObjectClass
             if ($posixPermissions !== null) {
                 chmod($path, $posixPermissions);
             }
-            /** @var string|null $accountName */
-            $accountName = $attributes?->valueForKey(FileAttributeKey::ownerAccountName);
-            /** @var int|null $accountID */
-            $accountID = $attributes?->valueForKey(FileAttributeKey::ownerAccountID);
-            if ($accountName !== null || $accountID !== null) {
-                chown($path, $accountName ?? $accountID);
-            }
-            /** @var string|null $groupAccountName */
-            $groupAccountName = $attributes?->valueForKey(FileAttributeKey::groupOwnerAccountName);
-            /** @var int|null $groupAccountID */
-            $groupAccountID = $attributes?->valueForKey(FileAttributeKey::groupOwnerAccountID);
-            if ($groupAccountName !== null || $groupAccountID !== null) {
-                chgrp($path, $groupAccountName ?? $groupAccountID);
-            }
+            $this->setNewAttributes($attributes, $path);
             return true;
         });
     }
@@ -578,5 +547,23 @@ final class FileManager extends ObjectClass
             }
             return file_get_contents($path);
         });
+    }
+
+    private function setNewAttributes(?Dictionary $attributes, string $path): void
+    {
+        /** @var string|null $accountName */
+        $accountName = $attributes?->valueForKey(FileAttributeKey::ownerAccountName);
+        /** @var int|null $accountID */
+        $accountID = $attributes?->valueForKey(FileAttributeKey::ownerAccountID);
+        if ($accountName !== null || $accountID !== null) {
+            chown($path, $accountName ?? $accountID);
+        }
+        /** @var string|null $groupAccountName */
+        $groupAccountName = $attributes?->valueForKey(FileAttributeKey::groupOwnerAccountName);
+        /** @var int|null $groupAccountID */
+        $groupAccountID = $attributes?->valueForKey(FileAttributeKey::groupOwnerAccountID);
+        if ($groupAccountName !== null || $groupAccountID !== null) {
+            chgrp($path, $groupAccountName ?? $groupAccountID);
+        }
     }
 }

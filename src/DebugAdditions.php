@@ -1,16 +1,11 @@
 <?php
 
-/**
- * @author Dante Sabatier <dantesabatier@me.com>
- * @version 1.0
- * @package Sabatier\Foundation
- */
-
 namespace Sabatier\Foundation;
 
 use BackedEnum;
 use Closure;
 use ErrorException;
+use Exception;
 use InvalidArgumentException;
 use JetBrains\PhpStorm\Deprecated;
 use JetBrains\PhpStorm\Pure;
@@ -119,7 +114,7 @@ function human_readable_time(float $interval): string
  * @param string $message The string to print. The default is an empty string.
  * @param string $file The file name to print with message. The default is the file where fatal_error() is called.
  * @param int $line The line number to print along with message. The default is the file where fatal_error() is called.
- * @throws ErrorException
+ * @throws Exception
  */
 function fatal_error(string $message = '', string $file = '', int $line = 0): never
 {

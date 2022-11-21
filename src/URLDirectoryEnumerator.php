@@ -35,15 +35,21 @@ class URLDirectoryEnumerator extends DirectoryEnumerator
 
     public function directoryAttributes(): ?Dictionary
     {
-        /** @noinspection PhpUnhandledExceptionInspection */
-        return FileManager::default()->attributesOfItem($this->url->path);
+        try {
+            return FileManager::default()->attributesOfItem($this->url->path);
+        } catch (Exception) {
+            return null;
+        }
     }
 
     public function fileAttributes(): ?Dictionary
     {
         if ($current = $this->current) {
-            /** @noinspection PhpUnhandledExceptionInspection */
-            return FileManager::default()->attributesOfItem($current->path);
+            try {
+                return FileManager::default()->attributesOfItem($current->path);
+            } catch (Exception) {
+                return null;
+            }
         }
         return null;
     }

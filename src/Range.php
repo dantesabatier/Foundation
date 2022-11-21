@@ -6,13 +6,10 @@ use Countable;
 use Generator;
 use IteratorAggregate;
 use JetBrains\PhpStorm\Deprecated;
-use JetBrains\PhpStorm\Pure;
 use Traversable;
 
 /**
- * Class Range
  * A half-open interval from a lower bound up to, but not including, an upper bound.
- * @package Sabatier\Foundation
  * @implements IteratorAggregate<int, int>
  */
 class Range extends ObjectClass implements ExpressibleByArrayLiteral, IteratorAggregate, Countable
@@ -33,6 +30,7 @@ class Range extends ObjectClass implements ExpressibleByArrayLiteral, IteratorAg
 
     /**
      * A Boolean value indicating whether the range contains no elements.
+     *
      * An empty Range instance has equal lower and upper bounds.
      */
     public function isEmpty(): bool
@@ -42,6 +40,7 @@ class Range extends ObjectClass implements ExpressibleByArrayLiteral, IteratorAg
 
     /**
      * Returns a Boolean value indicating whether the given element is contained within the range.
+     *
      * Because Range represents a half-open range, a Range instance does not contain its upper bound. element is contained in the range if it is greater than or equal to the lower bound and less than the upper bound.
      * @param int $element The element to check for containment.
      * @return bool true if element is contained in the range; otherwise, false.
@@ -66,8 +65,7 @@ class Range extends ObjectClass implements ExpressibleByArrayLiteral, IteratorAg
             }
         })();
     }
-
-    #[Pure]
+    
     public function description(): string
     {
         return sprintf("[%s...<%s]", $this->lowerBound, $this->upperBound);
@@ -76,13 +74,11 @@ class Range extends ObjectClass implements ExpressibleByArrayLiteral, IteratorAg
     /**
      * @return int[]
      */
-    #[Pure]
     public function toArray(): array
     {
         return range($this->lowerBound, $this->upperBound - 1);
     }
-
-    #[Pure]
+    
     public function jsonSerialize(): array
     {
         return $this->toArray();

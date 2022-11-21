@@ -10,11 +10,10 @@
 namespace Sabatier\Foundation;
 
 /**
- * Interface KeyValueCoding
  * A mechanism by which you can access the properties of an object indirectly by name or key.
+ *
  * The basic methods for accessing an object's values are {@see setValueForKey()}, which sets the value for the property identified by the specified key, and {@see valueForKey()}, which returns the value for the property identified by the specified key. Thus, all of an object's properties can be accessed in a consistent manner.
  * The default implementation relies on the accessor methods normally implemented by objects (or to access instance variables directly if need be).
- * @package Sabatier\Foundation
  * @template T
  */
 interface KeyValueCoding

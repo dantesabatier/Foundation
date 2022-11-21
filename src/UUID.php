@@ -6,9 +6,7 @@ use InvalidArgumentException;
 use JetBrains\PhpStorm\ArrayShape;
 
 /**
- * Class UUID
  * A universally unique value that can be used to identify types, interfaces, and other items.
- * @package Sabatier\Foundation
  */
 class UUID extends ObjectClass
 {

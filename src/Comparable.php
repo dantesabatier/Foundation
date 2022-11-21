@@ -11,7 +11,6 @@ namespace Sabatier\Foundation;
 
 /**
  * Interface Comparable
- * @package Sabatier\Foundation
  */
 interface Comparable extends Equatable
 {

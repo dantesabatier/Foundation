@@ -3,9 +3,7 @@
 namespace Sabatier\Foundation;
 
 /**
- * Class Nil
  * A singleton object used to represent null values in collection objects that don't allow null values.
- * @package Sabatier\Foundation
  */
 final class Nil extends Value
 {

@@ -3,18 +3,40 @@
 namespace Sabatier\Foundation;
 
 use Closure;
-use Countable;
+use Sabatier\Foundation\Predicates\Predicate;
+use Sabatier\Foundation\Predicates\PredicateUtilities;
 
-/**
- * @psalm-require-implements Collection
- */
 trait CollectionAlgorithms
 {
     use SequenceAlgorithms;
 
-    public function count(): int
+    public function offsetExists(mixed $offset): bool
     {
-        return iterator_count($this);
+        return array_key_exists($offset, $this->reserved);
+    }
+
+    public function offsetGet(mixed $offset): mixed
+    {
+        assert(is_int($offset), sprintf("invalid argument: expecting int, \"%s\" given", typeof($offset)));
+        assert(in_range($offset, $this->startIndex(), $this->endIndex()), sprintf("%s %s(%s) index \"%s\" out of bounds [%s...<%s]", $this->debugDescription(), __FUNCTION__, $offset, $offset, $this->startIndex(), $this->endIndex()));
+        return $this->reserved[$offset];
+    }
+
+    public function offsetSet(mixed $offset, mixed $value): void
+    {
+        if ($offset === null) {
+            $this->reserved[] = $value;
+            return;
+        }
+        $this->reserved[$offset] = $value;
+    }
+
+    public function offsetUnset(mixed $offset): void
+    {
+        if (!$this->offsetExists($offset)) {
+            return;
+        }
+        unset($this->reserved[$offset]);
     }
 
     public function startIndex(): int
@@ -61,6 +83,11 @@ trait CollectionAlgorithms
         return $this->firstIndex(fn(mixed $e): bool => equivalent($e, $element));
     }
 
+    public function elementAt(mixed $index)
+    {
+        return $this->reserved[$index] ?? null;
+    }
+
     public function distance(int $start, int $end): int
     {
         return $end - $start;
@@ -77,14 +104,10 @@ trait CollectionAlgorithms
         foreach ($this as $i => $e) {
             $stop = false;
             if ($isIncluded($e, $i, $stop)) {
-                if ($instance instanceof Dictionary) {
-                    $instance[$i] = $e;
-                } else {
-                    $instance[] = $e;
-                }
+                $instance[] = $e;
             }
             /** @psalm-suppress TypeDoesNotContainType */
-            if ($stop) {
+            if (/** @phpstan-ingore-line */ $stop) {
                 break;
             }
         }
@@ -96,21 +119,25 @@ trait CollectionAlgorithms
         return $this->filter(fn(mixed $e): bool => $predicate->evaluate($e));
     }
 
+    public function sort(Closure $by): self
+    {
+        usort($this->reserved, $by);
+        return $this;
+    }
+
     public function sorted(iterable $descriptors): self
     {
         $instance = clone $this;
-        $instance->sort(
-            function (mixed $e1, mixed $e2) use ($descriptors): int {
-                $result = ComparisonResult::orderedSame;
-                /** @var SortDescriptor $descriptor */
-                foreach ($descriptors as $descriptor) {
-                    if (($result = $descriptor->compareObject($e1, $e2)) !== ComparisonResult::orderedSame) {
-                        break;
-                    }
+        $instance->sort(function (mixed $e1, mixed $e2) use ($descriptors): int {
+            $result = ComparisonResult::orderedSame;
+            /** @var SortDescriptor $descriptor */
+            foreach ($descriptors as $descriptor) {
+                if (($result = $descriptor->compareObject($e1, $e2)) !== ComparisonResult::orderedSame) {
+                    break;
                 }
-                return $result->value;
             }
-        );
+            return $result->value;
+        });
         return $instance;
     }
 
@@ -129,16 +156,10 @@ trait CollectionAlgorithms
         return new FlattenSequence($this);
     }
 
-    public function compare(mixed $other): ComparisonResult
-    {
-        assert($other instanceof Countable);
-        return ComparisonResult::from($this->count() <=> $other->count());
-    }
-
     public function valueForKey(string $key): self
     {
-        return $this->map(function (mixed $e) use ($key): mixed {
-            assert($e instanceof KeyValueCoding); // @phpstan-ignore-line
+        return $this->map(function (KeyValueCoding $e) use ($key): mixed {
+            assert($e instanceof KeyValueCoding, sprintf("invalid argument: expecting %s, \"%s\" given", KeyValueCoding::class, typeof($e)));
             return $e->valueForKey($key);
         });
     }
@@ -146,7 +167,7 @@ trait CollectionAlgorithms
     public function setValueForKey(mixed $value, string $key): void
     {
         foreach ($this as $e) {
-            assert($e instanceof KeyValueCoding); // @phpstan-ignore-line
+            assert($e instanceof KeyValueCoding, sprintf("invalid argument: expecting %s, \"%s\" given", KeyValueCoding::class, typeof($e)));
             $e->setValueForKey($value, $key);
         }
     }

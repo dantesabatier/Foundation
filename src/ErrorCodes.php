@@ -16,3 +16,19 @@ const FormattingError = 2048;
 const UserCancelledError = 3072;
 /** @var string A key-value coding validation error. */
 const KeyValueValidationError = 1024;
+/** @var int A properly formed URL couldn't be handled by the framework. */
+const URLErrorUnsupportedURL = -1002;
+/** @var int The host name for a URL couldn't be resolved. */
+const URLErrorCannotFindHost = -1003;
+/** @var int A malformed URL prevented a URL request from being initiated. */
+const URLErrorBadURL = -1000;
+/** @var int A client or server connection was severed in the middle of an in-progress load. */
+const URLErrorNetworkConnectionLost = -1005;
+/** @var int The URL Loading System received bad data from the server. */
+const URLErrorBadServerResponse = -1011;
+/** @var int The URL Loading System encountered an error that it can’t interpret. */
+const URLErrorUnknown = -1;
+/** @var int An asynchronous operation timed out. */
+const URLErrorTimedOut = -1001;
+/** @var int A redirect loop was detected or the threshold for number of allowable redirects was exceeded (currently 16). */
+const URLErrorHTTPTooManyRedirects = -1007;

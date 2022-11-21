@@ -6,7 +6,7 @@ use Closure;
 
 /**
  * A collection that supports backward as well as forward traversal.
- * @package Sabatier\Foundation
+ *
  * @template Index of array-key
  * @template Element
  * @template-extends Collection<Index, Element>
@@ -22,6 +22,7 @@ interface BidirectionalCollection extends Collection
 
     /**
      * Replaces the given index with its predecessor.
+     *
      * @param int $i A valid index of the collection. $i must be greater than startIndex.
      */
     public function formIndexBefore(int &$i): void;

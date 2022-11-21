@@ -3,10 +3,9 @@
 namespace Sabatier\Foundation;
 
 /**
- * Class Number
  * An object wrapper for primitive scalar numeric values.
+ *
  * Number is a subclass of Value that offers a value as any scalar (numeric) type. It defines a set of methods specifically for setting and accessing the value as an int, float, double or as a BOOL. (Note that number objects do not necessarily preserve the type they are created with.) It also defines a {@see Comparable::compare()} method to determine the ordering of two Number objects.
- * @package Sabatier\Foundation
  */
 class Number extends Value
 {
@@ -49,6 +48,7 @@ class Number extends Value
 
     /**
      * Returns an {@see ComparisonResult} value that indicates whether the number object's value is greater than, equal to, or less than a given number.
+     *
      * The compare() method follows the standard C rules for type conversion. For example, if you compare a Number object that has an integer value with a Number object that has a floating point value, the integer value is converted to a floating-point value for comparison.
      * @param mixed $other The number to compare to the number object's value.
      * This value must not be nil.
@@ -72,6 +72,7 @@ class Number extends Value
 
     /**
      * Returns a Boolean value that indicates whether the number object's value and a given number are equal.
+     *
      * Two Number objects are considered equal if they have the same id values or if they have equivalent values (as determined by the {@see compare()} method).
      * This method is more efficient than {@see compare()} if you know the two objects are numbers.
      * @param mixed $other The number to compare to the number object's value.

@@ -3,9 +3,7 @@
 namespace Sabatier\Foundation;
 
 /**
- * Class PropertyListSerializationMutabilityOptions
  * These constants specify mutability options in property lists.
- * @package Sabatier\Foundation
  */
 class PropertyListSerializationMutabilityOptions
 {

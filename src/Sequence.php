@@ -10,17 +10,16 @@
 namespace Sabatier\Foundation;
 
 use Closure;
+use Countable;
 use Traversable;
 
 /**
- * Interface Sequence
  * A type that provides sequential, iterated access to its elements.
- * @package Sabatier\Foundation
  * @template Index of array-key
  * @template Element
  * @template-extends Traversable<Index, Element>
  */
-interface Sequence extends Traversable, ExpressibleByArrayLiteral
+interface Sequence extends Traversable, Countable, Comparable, ExpressibleByArrayLiteral
 {
     /**
      * Returns a Boolean value indicating whether the sequence contains an element that satisfies the given predicate.
@@ -31,6 +30,7 @@ interface Sequence extends Traversable, ExpressibleByArrayLiteral
 
     /**
      * Returns a bool value indicating whether the sequence contains an element that satisfies the given predicate.
+     * 
      * Available when Element conforms to {@see Equatable}.
      * @param Element $element The element to find in the sequence.
      * @return bool {@see true} if the element was found in the sequence; otherwise, {@see false}.
@@ -66,6 +66,7 @@ interface Sequence extends Traversable, ExpressibleByArrayLiteral
 
     /**
      * Returns the result of combining the elements of the sequence using the given closure.
+     * 
      * Use the {@see Sequence::reduce()} method to produce a single value from the elements of an entire sequence.
      * For example, you can use this method on an array of integers to filter adjacent equal entries or count frequencies.
      * @template Result

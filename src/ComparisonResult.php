@@ -10,9 +10,7 @@
 namespace Sabatier\Foundation;
 
 /**
- * Class ComparisonResult
  * Constants that indicate sort order.
- * @package Sabatier\Foundation
  */
 enum ComparisonResult: int
 {

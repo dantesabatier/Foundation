@@ -10,9 +10,7 @@
 namespace Sabatier\Foundation;
 
 /**
- * Class Notification
  * A container for information broadcast through a notification center to all registered observers.
- * @package Sabatier\Foundation
  */
 class Notification implements CustomStringConvertible
 {

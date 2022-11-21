@@ -1,19 +1,11 @@
 <?php
 
-/**
- * @author Dante Sabatier <dantesabatier@me.com>
- * @version 1.0
- * @package Sabatier\Foundation
- */
-
 namespace Sabatier\Foundation;
 
 use Closure;
 
 /**
- * Class SortDescriptor
  * An immutable description of how to order a collection of objects based on a property common to all the objects.
- * @package Sabatier\Foundation
  */
 class SortDescriptor extends ObjectClass
 {

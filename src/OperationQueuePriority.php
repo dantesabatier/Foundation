@@ -10,10 +10,9 @@
 namespace Sabatier\Foundation;
 
 /**
- * Class OperationQueuePriority
  * These constants let you prioritize the order in which operations execute.
+ *
  * You can use these constants to specify the relative ordering of operations that are waiting to be started in an operation queue. You should always use these constants (and not the defined value) for determining priority.
- * @package Sabatier\Foundation
  */
 enum OperationQueuePriority: int
 {

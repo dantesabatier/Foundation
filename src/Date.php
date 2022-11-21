@@ -6,9 +6,7 @@ use JetBrains\PhpStorm\ArrayShape;
 use JetBrains\PhpStorm\Pure;
 
 /**
- * Class Date
  * A specific point in time, independent of any calendar or time zone.
- * @package Sabatier\Foundation
  */
 class Date extends ObjectClass
 {
@@ -21,7 +19,6 @@ class Date extends ObjectClass
     /** @var float The interval between the date value and 00:00:00 UTC on 1 January 2001. This property's value is negative if the date object is earlier than the system's absolute reference date (00:00:00 UTC on 1 January 2001). */
     public float $timeIntervalSinceReferenceDate;
 
-    /** @noinspection PhpPureAttributeCanBeAddedInspection */
     public function __construct(?float $time = null)
     {
         $this->timeIntervalSinceReferenceDate = $time ?? absolute_time_get_current();
@@ -45,6 +42,7 @@ class Date extends ObjectClass
 
     /**
      * Creates a date value initialized relative to the current date and time by a given number of seconds.
+     *
      * @param float $timeInterval The number of seconds from the current date and time for the new date. Use a negative value to specify a date before the current date.
      * @return Date A Date object set to seconds from the current date and time.
      */
@@ -55,6 +53,7 @@ class Date extends ObjectClass
 
     /**
      * Creates a date value initialized relative to another given date by a given number of seconds.
+     *
      * @param float $timeInterval The number of seconds to add to date. A negative value means the receiver will be earlier than date.
      * @param Date $date The reference date.
      * @return Date A Date object set to seconds from date.
@@ -66,6 +65,7 @@ class Date extends ObjectClass
 
     /**
      * Creates and returns a date object set to the given number of seconds from 00:00:00 UTC on 1 January 1970.
+     *
      * This method is useful for creating Date objects from time_t values returned by BSD system functions.
      * @param float $timeInterval The number of seconds from the reference date (00:00:00 UTC on 1 January 1970) for the new date. Use a negative argument to specify a date and time before the reference date.
      * @return Date A Date object set to seconds from the reference date.
@@ -77,6 +77,7 @@ class Date extends ObjectClass
 
     /**
      * Creates and returns a date object set to a given number of seconds from 00:00:00 UTC on 1 January 2001.
+     *
      * @param float $timeInterval The number of seconds from the absolute reference date (00:00:00 UTC on 1 January 2001) for the new date. Use a negative argument to specify a date and time before the reference date.
      * @return Date A Date object set to seconds from the absolute reference date.
      */
@@ -119,6 +120,7 @@ class Date extends ObjectClass
 
     /**
      * Returns the distance from this date to another date, specified as a time interval.
+     *
      * @param Date $other Another date.
      * @return float The distance from this date to the other date.
      */
@@ -130,6 +132,7 @@ class Date extends ObjectClass
 
     /**
      * Returns the interval between this date and another given date.
+     *
      * @param Date $date The date with which to compare to this one.
      * @return float The interval between the receiver and the another parameter. If the receiver is earlier than date, the return value is negative. If date is nil, the results are undefined.
      */
@@ -141,6 +144,7 @@ class Date extends ObjectClass
 
     /**
      * Adds a time interval to this date.
+     *
      * @param float $timeInterval The value to add, in seconds.
      */
     public function addTimeInterval(float $timeInterval): void
@@ -150,6 +154,7 @@ class Date extends ObjectClass
 
     /**
      * Creates a new date value by adding a time interval to this date.
+     *
      * @param float $timeInterval The value to add, in seconds.
      * @return Date A new date value calculated by adding a time interval to this date.
      */
@@ -162,6 +167,7 @@ class Date extends ObjectClass
 
     /**
      * Returns a date offset the specified time interval from this date.
+     *
      * @param float $n The time interval offset.
      * @return Date A date offset the specified time interval from this date.
      */

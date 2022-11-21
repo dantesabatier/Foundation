@@ -271,11 +271,11 @@ function string_contains(string $string, string $substring, #[ExpectedValues(fla
  */
 function localized_string(string $string, string $domain = 'Localizable', string $directory = '', string $comment = ''): string
 {
-    $directoryUrl = URL::fileURL($directory);
     $fileManager = FileManager::default();
-    if (!$fileManager->fileExists($directoryUrl->path, $isDirectory) || !$isDirectory) {
-        $directoryUrl = $fileManager->documentRootDirectory->appendingPathComponent('Resources');
+    if (!$fileManager->fileExists($directory, $isDirectory) || !$isDirectory) {
+        $directory = $fileManager->documentRootDirectory->appendingPathComponent('Resources')->path;
     }
+    $directoryUrl = URL::fileURL($directory);
     if ((!$fileManager->fileExists($directoryUrl->path, $isDirectory) || !$isDirectory)) {
         $directoryUrl = Bundle::bundleForClass(FileManager::class)->bundleURL;
     }

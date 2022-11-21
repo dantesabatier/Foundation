@@ -15,9 +15,8 @@ use InvalidArgumentException;
 use Throwable;
 
 /**
- * Class OperationQueue
- * @package Sabatier\Foundation
  * A queue that regulates the execution of operations.
+ *
  * An operation queue executes its queued Operation objects based on their priority and readiness.
  * After being added to an operation queue, an operation remains in its queue until it reports that it is finished with its task.
  * You can't directly remove an operation from a queue after it has been added.
@@ -79,6 +78,7 @@ final class OperationQueue extends ObjectClass
 
     /**
      * Returns the operation queue that launched the current operation.
+     *
      * You can use this method from within a running operation object to get a reference to the operation queue that started it.
      * Calling this method from outside the context of a running operation typically results in nil being returned.
      * @return OperationQueue|null The operation queue that started the operation or nil if the queue could not be determined.
@@ -90,6 +90,7 @@ final class OperationQueue extends ObjectClass
 
     /**
      * Adds the specified operation to the receiver.
+     *
      * Once added, the specified operation remains in the queue until it finishes executing.
      * @param Operation $operation The operation to be added to the queue.
      * @throws InvalidArgumentException An operation object can be in at most one operation queue at a time and this method throws an {@see InvalidArgumentException} exception if the operation is already in another queue.
@@ -135,6 +136,7 @@ final class OperationQueue extends ObjectClass
 
     /**
      * Adds the specified operations to the queue.
+     *
      * An operation object can be in at most one operation queue at a time and cannot be added if it is currently executing or finished.
      * This method throws an InvalidArgumentException exception if any of those error conditions are true for any of the operations in the $operations parameter.
      * Once added, the specified operation remains in the queue until its isFinished method returns true.
@@ -164,6 +166,7 @@ final class OperationQueue extends ObjectClass
 
     /**
      * Cancels all queued and executing operations.
+     *
      * This method calls the cancel() method on all operations currently in the queue.
      */
     public function cancelAllOperations(): void

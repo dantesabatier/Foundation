@@ -40,7 +40,7 @@ trait BidirectionalCollectionAlgorithms
         if ($this->isEmpty()) {
             return null;
         }
-         if ($where === null) {
+        if ($where === null) {
             return $this[$this->indexBefore($this->endIndex())];
         }
         if ($i = $this->lastIndex($where)) {
@@ -61,15 +61,16 @@ trait BidirectionalCollectionAlgorithms
         return $this[$i];
     }
 
+    public function reverse(): self
+    {
+        $this->reserved = array_reverse($this->reserved);
+        return $this;
+    }
+
     public function reversed(): self
     {
-        $instance = new self();
-        $start = $this->startIndex();
-        $i = $this->endIndex();
-        while ($i !== $start) {
-            $instance[] = $this[$i];
-            $this->formIndexBefore($i);
-        }
+        $instance = clone $this;
+        $instance->reverse();
         return $instance;
     }
 }

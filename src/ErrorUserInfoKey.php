@@ -14,6 +14,7 @@ const LocalizedFailureReasonErrorKey = 'LocalizedFailureReasonErrorKey';
 const RecoveryAttempterErrorKey = 'RecoveryAttempterErrorKey';
 /** @var string The corresponding value is a URL object. */
 const URLErrorKey = 'URLErrorKey';
+const URLErrorFailingURLErrorKey = "URLErrorFailingURLErrorKey";
 /** @var string Contains the file path of the error. */
 const FilePathErrorKey = 'FilePathErrorKey';
 /** The corresponding value is an error that was encountered in an underlying implementation and caused the error that the receiver represents to occur. */

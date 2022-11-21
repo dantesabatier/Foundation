@@ -1,11 +1,5 @@
 <?php
 
-/**
- * @author Dante Sabatier <dantesabatier@me.com>
- * @version 1.0
- * @package Sabatier\Foundation
- */
-
 namespace Sabatier\Foundation;
 
 use DateTime;
@@ -48,8 +42,6 @@ class PropertyListSerializer
             $element->appendChild($document->createElement('real', (string)$obj));
         } elseif ($obj instanceof Date) {
             $element->appendChild($document->createElement('date', (string)$obj));
-        } elseif ($obj instanceof Data) {
-            $element->appendChild($document->createElement('data', $obj->base64EncodedString()));
         } elseif ($obj instanceof ArrayClass || $obj instanceof Dictionary || is_array($obj)) {
             $parent = $document->createElement(($obj instanceof ArrayClass || (is_array($obj) && is_sequential($obj))) ? 'array' : 'dict');
             $element->appendChild($parent);
@@ -86,7 +78,6 @@ class PropertyListSerializer
             'real' => (float)$element->nodeValue,
             'true', 'false' => filter_var($element->nodeName, FILTER_VALIDATE_BOOLEAN),
             'date' => new Date((new DateTime($element->nodeValue ?? 'now'))->getTimestamp()),
-            'data' => new Data(base64String: (string)$element->nodeValue),
             default => $element->nodeValue,
         };
     }

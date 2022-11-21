@@ -11,48 +11,70 @@ namespace Sabatier\Foundation;
 
 use Closure;
 use Iterator;
+use Sabatier\Foundation\Predicates\Predicate;
 
 /**
- * Class ArrayClass
  * An ordered, random-access collection.
  * @template Element
  * @implements RangeReplaceableCollection<Element>
  * @implements Iterator<int, Element>
- * @package Sabatier\Foundation
  */
 class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iterator
 {
     use RangeReplaceableCollectionAlgorithms {
-        contains as protected sequenceContains;
-        containsElement as protected sequenceContainsElement;
-        first as protected sequenceFirst;
-        last as protected sequenceLast;
-        min as protected sequenceMin;
-        max as protected sequenceMax;
-        reduce as protected sequenceReduce;
-        map as protected sequenceMap;
-        compactMap as protected sequenceCompactMap;
-        flatMap as protected sequenceFlatMap;
-        valueForKey as protected collectionValueForKey;
-        setValueForKey as protected collectionSetValueForKey;
-        valueForKeyPath as protected collectionValueForKeyPath;
-        randomElement as protected collectionRandomElement;
-        firstIndex as protected collectionFirstIndex;
-        lastIndex as protected collectionLastIndex;
-        indexOf as protected collectionIndexOf;
-        filter as protected collectionFilter;
-        filtered as protected collectionFiltered;
-        sorted as protected collectionSorted;
-        allSatisfy as protected collectionAllSatisfy;
-        joined as protected collectionJoined;
-        drop as protected mutableCollectionDrop;
-        dropFirst as protected mutableCollectionDropFirst;
-        dropLast as protected mutableCollectionDropLast;
+        toArray as private sequenceToArray;
+        contains as private sequenceContains;
+        containsElement as private sequenceContainsElement;
+        first as private sequenceFirst;
+        last as private sequenceLast;
+        min as private sequenceMin;
+        max as private sequenceMax;
+        reduce as private sequenceReduce;
+        map as private sequenceMap;
+        compactMap as private sequenceCompactMap;
+        flatMap as private sequenceFlatMap;
+        offsetExists as private collectionOffsetExists;
+        offsetGet as private collectionOffsetGet;
+        offsetSet as private collectionOffsetSet;
+        offsetUnset as private collectionOffsetUnset;
+        valueForKey as private collectionValueForKey;
+        setValueForKey as private collectionSetValueForKey;
+        valueForKeyPath as private collectionValueForKeyPath;
+        randomElement as private collectionRandomElement;
+        firstIndex as private collectionFirstIndex;
+        lastIndex as private collectionLastIndex;
+        indexOf as private collectionIndexOf;
+        elementAt as private collectionElementAt;
+        filter as private collectionFilter;
+        filtered as private collectionFiltered;
+        sort as private collectionSort;
+        sorted as private collectionSorted;
+        allSatisfy as private collectionAllSatisfy;
+        joined as private collectionJoined;
+        reverse as private bidirectionalCollectionReverse;
+        reversed as private bidirectionalCollectionReversed;
+        append as private mutableCollectionAppend;
+        appendContentsOf as private mutableCollectionAppendContentsOf;
+        insert as private mutableCollectionInsert;
+        insertAt as private mutableCollectionInsertAt;
+        insertContentsOf as private mutableCollectionInsertContentsOf;
+        update as private mutableCollectionUpdate;
+        remove as private mutableCollectionRemove;
+        removeAt as private mutableCollectionRemoveAt;
+        removeFirst as private mutableCollectionRemoveFirst;
+        removeLast as private mutableCollectionRemoveLast;
+        removeAll as private mutableCollectionRemoveAll;
+        drop as private mutableCollectionDrop;
+        dropFirst as private mutableCollectionDropFirst;
+        dropLast as private mutableCollectionDropLast;
+        popFirst as private mutableCollectionPopFirst;
+        popLast as private mutableCollectionPopLast;
+        replaceSubrange as private rangeReplaceableCollectionReplaceSubrange;
     }
 
-    /** @var Element[] $reserved */
-    private array $reserved = [];
-    private int $position = 0;
+    use IteratorAlgorithms {
+        current as private iteratorCurrent;
+    }
 
     /**
      * @param iterable<Element> $iterable
@@ -66,31 +88,6 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
         } else {
             $this->appendContentsOf($iterable);
         }
-    }
-
-    public function __clone()
-    {
-        $this->reserved = $this->toArray();
-    }
-
-    public function __serialize(): array
-    {
-        return $this->reserved;
-    }
-
-    public function __unserialize(array $data): void
-    {
-        $this->reserved = $data;
-    }
-
-    public function __isset(string $name): bool
-    {
-        return isset($this->reserved[$name]);
-    }
-
-    public function __unset(string $name): void
-    {
-        unset($this->reserved[$name]);
     }
 
     public static function arrayWithArray(array $array): ArrayClass
@@ -110,6 +107,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
 
     /**
      * Returns a bool value indicating whether the sequence contains an element that satisfies the given predicate.
+     *
      * Available when Element conforms to {@see Equatable}.
      * @param Element $element The element to find in the sequence.
      * @return bool {@see true} if the element was found in the sequence; otherwise, {@see false}.
@@ -139,6 +137,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
 
     /**
      * Returns the result of combining the elements of the sequence using the given closure.
+     *
      * Use the {@see reduce()} method to produce a single value from the elements of an entire sequence.
      * For example, you can use this method on an array of integers to filter adjacent equal entries or count frequencies.
      * @template Result
@@ -242,7 +241,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
      */
     public function elementAt(mixed $index)
     {
-        return $this->reserved[$index] ?? null;
+        return $this->collectionElementAt($index);
     }
 
     /**
@@ -293,8 +292,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
      */
     public function sort(Closure $by): ArrayClass
     {
-        usort($this->reserved, $by);
-        return $this;
+        return $this->collectionSort($by);
     }
 
     /**
@@ -308,12 +306,60 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
     }
 
     /**
+     * Returns the elements of this sequence of sequences, concatenated.
+     * @return FlattenSequence<ArrayClass<Element>> A flattened view of the elements of this sequence of sequences.
+     * @psalm-suppress LessSpecificReturnStatement, MoreSpecificReturnType
+     */
+    public function joined(): FlattenSequence
+    {
+        return $this->collectionJoined();
+    }
+
+    /**
+     * Returns an array containing the results of invoking {@see KeyValueCoding::valueForKey()} using key on each of the array's objects.
+     * @param string $key The key to retrieve.
+     * @return ArrayClass The value of the retrieved key.
+     */
+    public function valueForKey(string $key): ArrayClass
+    {
+        return $this->collectionValueForKey($key);
+    }
+
+    /**
+     * Invokes {@see KeyValueCoding::setValueForKey()} on each of the array's items using the specified value and key.
+     * @param mixed $value The object value.
+     * @param string $key The key to store the value.
+     */
+    public function setValueForKey(mixed $value, string $key): void
+    {
+        $this->collectionSetValueForKey($value, $key);
+    }
+
+    /**
+     * Reverses the elements of the collection in place.
+     * @return ArrayClass<Element>
+     */
+    public function reverse(): ArrayClass
+    {
+        return $this->bidirectionalCollectionReverse();
+    }
+
+    /**
+     * Returns a collection containing the elements of this sequence in reverse order.
+     * @return ArrayClass<Element> A collection containing the elements of this sequence in reverse order.
+     */
+    public function reversed(): ArrayClass
+    {
+        return $this->bidirectionalCollectionReversed();
+    }
+
+    /**
      * Adds an element to the end of the collection.
      * @param Element $element
      */
     public function append(mixed $element): void
     {
-        $this->reserved[] = $element;
+        $this->mutableCollectionAppend($element);
     }
 
     /**
@@ -322,8 +368,8 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
      */
     public function appendContentsOf(iterable $newElements): void
     {
-        $this->insertContentsOf($newElements);
-    }
+       $this->mutableCollectionAppendContentsOf($newElements);
+    }    
 
     /**
      * Removes the given element and any elements subsumed by the given element.
@@ -331,23 +377,32 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
      */
     public function remove(mixed $element): void
     {
-        $index = $this->indexOf($element);
-        if ($index !== null) {
-            $this->removeAt($index);
-        }
+        $this->mutableCollectionRemove($element);
+    }
+
+    /**
+     * Inserts the given element in the collection if it is not already present.
+     *
+     * If an element equal to newElement is already contained in the collection, this method has no effect.
+     * @param Element $newElement An element to insert into the collection.
+     * @return array{inserted: boolean, elementAfterInsert: Element} (true, newElement) if newElement was not contained in the collection. If an element equal to newElement was already contained in the collection, the method returns (false, oldElement), where oldElement is the element that was equal to newElement. In some cases, oldElement may be distinguishable from newElement by identity comparison or some other means.
+     */
+    public function insert(mixed $newElement): array
+    {
+        return $this->mutableCollectionInsert($newElement);
     }
 
     /**
      * Inserts the value into the collection at the specified position.
+     *
      * The new element is inserted before the element currently at the specified index.
      * If you pass the collection's endIndex property as the index parameter, the new element is appended to the collection.
      * @param Element $element The new element to insert into the collection.
      * @param int $at The position at which to insert the new element. index must be a valid index into the collection.
      */
-    public function insert(mixed $element, int $at): void
+    public function insertAt(mixed $element, int $at): void
     {
-        array_splice($this->reserved, $at, 0, [$element]);
-        ksort($this->reserved);
+        $this->mutableCollectionInsertAt($element, $at);
     }
 
     /**
@@ -359,13 +414,18 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
      */
     public function insertContentsOf(iterable $newElements, int $at = NotFound): void
     {
-        foreach ($newElements as $idx => $element) {
-            if ($at != NotFound) {
-                $this->insert($element, $at + $idx);
-            } else {
-                $this->append($element);
-            }
-        }
+        $this->mutableCollectionInsertContentsOf($newElements, $at);
+    }
+
+    /**
+     * Inserts the given element into the collection unconditionally.
+     * If an element equal to newElement is already contained in the collection, newElement replaces the existing element.
+     * @param Element $element An element to insert into the collection.
+     * @return Element|null An element equal to newElement if the collection already contained such a member; otherwise, nil.
+     */
+    public function update(mixed $element)
+    {
+        return $this->mutableCollectionUpdate($element);
     }
 
     /**
@@ -374,10 +434,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
      */
     public function removeAt(int $index)
     {
-        $element = $this->offsetGet($index);
-        $this->offsetUnset($index);
-        $this->reserved = array_values($this->reserved);
-        return $element;
+        return $this->mutableCollectionRemoveAt($index);
     }
 
     /**
@@ -386,52 +443,17 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
      */
     public function removeAll(Closure $where = null): void
     {
-        if ($where === null) {
-            $this->reserved = [];
-            return;
-        }
-        $this->reserved = $this->filter(fn(mixed $e, int $i): bool => !$where($e, $i))->reserved;
-    }
-
-    /**
-     * This method has the effect of removing the specified range of elements from the collection and inserting the new elements at the same location.
-     * The number of new elements need not match the number of elements being removed.
-     * @param Range $subrange The subrange of the collection to replace. The start and end of a subrange must be valid indices of the collection.
-     * @param Collection<int, Element> $newElements The new elements to add to the collection.
-     */
-    public function replaceSubrange(Range $subrange, Collection $newElements): void
-    {
-        assert($subrange->count() <= $this->count() && $subrange->count() === $newElements->count(), "invalid argument: the range's upper bound must be less or equal to the count of the receiver and, range and collection must have the same number of elements");
-        foreach ($subrange as $idx => $bound) {
-            $this->removeAt($bound);
-            $this->insert($newElements[$idx], $bound);
-        }
-    }
-
-    public function removeSubrange(Range $subrange): void
-    {
-        $this->removeAll(fn(mixed $e, int $i): bool => $subrange->contains($i));
+        $this->mutableCollectionRemoveAll($where);
     }
 
     public function removeFirst(int $k): void
     {
-        $this->removeAll(fn(mixed $e, int $i): bool => $i < $k);
+        $this->mutableCollectionRemoveFirst($k);
     }
 
     public function removeLast(int $k): void
     {
-        if ($k === 0) {
-            return;
-        }
-        assert($k > 0, "Number of elements to remove should be non-negative");
-        $e = $this->endIndex();
-        $i = $e - $k;
-        assert($i >= 0 && $i < $e, "Can't remove more items from a collection than it contains");
-        while ($i < $e) {
-            $this->offsetUnset($i);
-            $this->formIndexAfter($i);
-        }
-        $this->reserved = array_values($this->reserved);
+        $this->mutableCollectionRemoveLast($k);
     }
 
     /**
@@ -440,62 +462,25 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
      */
     public function popFirst()
     {
-        if ($this->isEmpty()) {
-            return null;
-        }
-        return $this->removeAt(0);
+        return $this->mutableCollectionPopFirst();
     }
 
     /**
      * Removes and returns the last element of the collection.
+     *
      * Calling this method may invalidate all saved indices of this collection. Do not rely on a previously stored index value after altering a collection with any operation that can change its length.
      * @return Element|null The last element of the collection if the collection is not empty; otherwise, nil.
      */
     public function popLast()
     {
-        if ($this->isEmpty()) {
-            return null;
-        }
-        return $this->removeAt($this->indexBefore($this->endIndex()));
-    }
-
-    /**
-     * Reverses the elements of the collection in place.
-     * @return ArrayClass<Element>
-     */
-    public function reverse(): ArrayClass
-    {
-        $this->reserved = array_reverse($this->reserved);
-        return $this;
-    }
-
-    /**
-     * Returns a collection containing the elements of this sequence in reverse order.
-     * @return ArrayClass<Element> A collection containing the elements of this sequence in reverse order.
-     */
-    public function reversed(): ArrayClass
-    {
-        $instance = clone $this;
-        $instance->reverse();
-        return $instance;
-    }
-
-    /**
-     * Returns the elements of this sequence of sequences, concatenated.
-     * @return FlattenSequence<ArrayClass<Element>> A flattened view of the elements of this sequence of sequences.
-     * @psalm-suppress LessSpecificReturnStatement, MoreSpecificReturnType
-     */
-    public function joined(): FlattenSequence
-    {
-        return $this->collectionJoined();
+        return $this->mutableCollectionPopLast();
     }
 
     /**
      * Returns a subsequence by skipping elements while predicate returns true and returning the remaining elements.
      * @param Closure(Element): bool $while A closure that takes an element of the sequence as its argument and returns true if the element should be skipped or false if it should be included.
      * Once the predicate returns false it will not be called again.
-     * @return Slice<ArrayClass<Element>>
-     * @psalm-suppress LessSpecificReturnStatement, MoreSpecificReturnType
+     * @return Slice<Element>
      */
     public function drop(Closure $while): Slice
     {
@@ -504,10 +489,10 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
 
     /**
      * Returns a subsequence containing all but the given number of initial elements.
+     *
      * If the number of elements to drop exceeds the number of elements in the collection, the result is an empty subsequence.
      * @param int $k The number of elements to drop from the beginning of the collection. k must be greater than or equal to zero.
-     * @return Slice<ArrayClass<Element>> A subsequence starting after the specified number of elements.
-     * @psalm-suppress LessSpecificReturnStatement, MoreSpecificReturnType
+     * @return Slice<Element> A subsequence starting after the specified number of elements.
      */
     public function dropFirst(int $k): Slice
     {
@@ -516,10 +501,10 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
 
     /**
      * Returns a subsequence containing all but the specified number of final elements.
+     *
      * If the number of elements to drop exceeds the number of elements in the collection, the result is an empty subsequence.
      * @param int $k The number of elements to drop off the end of the collection. k must be greater than or equal to zero.
-     * @return Slice<ArrayClass<Element>> A subsequence that leaves off the specified number of elements at the end.
-     * @psalm-suppress LessSpecificReturnStatement, MoreSpecificReturnType
+     * @return Slice<Element> A subsequence that leaves off the specified number of elements at the end.
      */
     public function dropLast(int $k): Slice
     {
@@ -527,15 +512,27 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
     }
 
     /**
+     * This method has the effect of removing the specified range of elements from the collection and inserting the new elements at the same location.
+     *
+     * The number of new elements need not match the number of elements being removed.
+     * @param Range $subrange The subrange of the collection to replace. The start and end of a subrange must be valid indices of the collection.
+     * @param Collection<int, Element> $newElements The new elements to add to the collection.
+     */
+    public function replaceSubrange(Range $subrange, Collection $newElements): void
+    {
+        $this->rangeReplaceableCollectionReplaceSubrange($subrange, $newElements);
+    }
+
+    /**
      * Returns the longest possible subsequences of the collection, in order, that don't contain elements satisfying the given predicate.
      * @param Closure(Element): bool $isSeparator A closure that takes an element as an argument and returns a Boolean value indicating whether the collection should be split at that element.
      * @param int $maxSplits The maximum number of times to split the collection, or one less than the number of subsequences to return. If maxSplits + 1 subsequences are returned, the last one is a suffix of the original collection containing the remaining elements. maxSplits must be greater than or equal to zero. The default value is Int.max.
      * @param bool $omittingEmptySubsequences If false, an empty subsequence is returned in the result for each pair of consecutive elements satisfying the isSeparator predicate and for each element at the start or end of the collection satisfying the isSeparator predicate. The default value is true.
-     * @return ArrayClass<Slice<ArrayClass<Element>>> An array of subsequences, split from this collection's elements.
+     * @return ArrayClass<Slice<Element>> An array of subsequences, split from this collection's elements.
      */
     public function split(Closure $isSeparator, int $maxSplits = PHP_INT_MAX, bool $omittingEmptySubsequences = true): ArrayClass
     {
-        /** @var ArrayClass<Slice<ArrayClass<Element>>> $result */
+        /** @var ArrayClass<Slice<Element>> $result */
         $result = new ArrayClass();
         $subSequenceStart = $this->startIndex();
         $appendSubsequence = (function (int $end) use ($result, &$subSequenceStart, $omittingEmptySubsequences): bool {
@@ -573,11 +570,12 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
 
     /**
      * Returns the longest possible subsequences of the collection, in order, around elements equal to the given element.
+     *
      * Available when Element conforms to {@see Equatable}.
      * @param Element $separator The element that should be split upon.
      * @param int $maxSplits The maximum number of times to split the collection, or one less than the number of subsequences to return. If maxSplits + 1 subsequences are returned, the last one is a suffix of the original collection containing the remaining elements. maxSplits must be greater than or equal to zero. The default value is PHP_INT_MAX.
      * @param bool $omittingEmptySubsequences If false, an empty subsequence is returned in the result for each consecutive pair of separator elements in the collection and for each instance of separator at the start or end of the collection. If true, only nonempty subsequences are returned. The default value is true.
-     * @return ArrayClass<Slice<ArrayClass<Element>>> An array of subsequences, split from this collection's elements.
+     * @return ArrayClass<Slice<Element>> An array of subsequences, split from this collection's elements.
      */
     public function separate(mixed $separator, int $maxSplits = PHP_INT_MAX, bool $omittingEmptySubsequences = true): ArrayClass
     {
@@ -623,6 +621,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
 
     /**
      * Exchanges the values at the specified indices of the collection.
+     *
      * Both parameters must be valid indices of the collection that are not equal to endIndex. Calling swapAt() with the same index as both i and j has no effect.
      * @param int $i The index of the first value to swap.
      * @param int $j The index of the second value to swap.
@@ -661,6 +660,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
 
     /**
      * Returns a Boolean value indicating whether the sequence precedes another sequence in a lexicographical (dictionary) ordering, using the given predicate to compare elements.
+     *
      * This method implements the mathematical notion of lexicographical ordering, which has no connection to Unicode. If you are sorting strings to present to the end user, use String APIs that perform localized comparison.
      * @param Sequence&Iterator $other A sequence to compare to this sequence.
      * @param Closure(Element, Element): bool|null $areInIncreasingOrder A predicate that returns true if its first argument should be ordered before its second argument; otherwise, false.
@@ -692,7 +692,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
 
     public function setArray(ArrayClass $array): void
     {
-        $this->reserved = $array->reserved;
+        $this->reserved = $array->toArray();
     }
 
     /**
@@ -700,27 +700,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
      */
     public function toArray(): array
     {
-        return $this->reserved;
-    }
-
-    /**
-     * Returns an array containing the results of invoking {@see KeyValueCoding::valueForKey()} using key on each of the array's objects.
-     * @param string $key The key to retrieve.
-     * @return ArrayClass The value of the retrieved key.
-     */
-    public function valueForKey(string $key): ArrayClass
-    {
-        return $this->collectionValueForKey($key);
-    }
-
-    /**
-     * Invokes {@see KeyValueCoding::setValueForKey()} on each of the array's items using the specified value and key.
-     * @param mixed $value The object value.
-     * @param string $key The key to store the value.
-     */
-    public function setValueForKey(mixed $value, string $key): void
-    {
-        $this->collectionSetValueForKey($value, $key);
+        return $this->sequenceToArray();
     }
 
     public function description(): string
@@ -733,72 +713,41 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
      */
     public function current(): mixed
     {
-        return $this->offsetGet($this->key());
-    }
-
-    public function next(): void
-    {
-        $this->formIndexAfter($this->position);
-    }
-
-    public function key(): int
-    {
-        return $this->position;
-    }
-
-    public function valid(): bool
-    {
-        return $this->offsetExists($this->key());
-    }
-
-    public function rewind(): void
-    {
-        $this->position = 0;
-    }
-
-    public function count(): int
-    {
-        return count($this->reserved);
+        return $this->iteratorCurrent();
     }
 
     /**
      * @param int $offset
+     * @return bool
      */
     public function offsetExists(mixed $offset): bool
     {
-        return array_key_exists($offset, $this->reserved);
+        return $this->collectionOffsetExists($offset);
     }
-
+    
     /**
      * @param int $offset
      * @return Element
      */
     public function offsetGet(mixed $offset): mixed
     {
-        assert(in_range($offset, $this->startIndex(), $this->endIndex()), sprintf("%s %s(%s) index \"%s\" out of bounds [%s...<%s]", $this->debugDescription(), __FUNCTION__, $offset, $offset, $this->startIndex(), $this->endIndex()));
-        return $this->reserved[$offset];
+        return $this->collectionOffsetGet($offset);
     }
-
+    
     /**
      * @param int|null $offset
      * @param Element $value
      */
     public function offsetSet(mixed $offset, mixed $value): void
     {
-        if ($offset === null) {
-            $this->reserved[] = $value;
-        } else {
-            $this->reserved[$offset] = $value;
-        }
+        $this->collectionOffsetSet($offset, $value);
     }
-
+    
     /**
      * @param int $offset
      */
     public function offsetUnset(mixed $offset): void
     {
-        if ($this->offsetExists($offset)) {
-            unset($this->reserved[$offset]);
-        }
+        $this->collectionOffsetUnset($offset);
     }
 }

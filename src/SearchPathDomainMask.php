@@ -10,10 +10,9 @@
 namespace Sabatier\Foundation;
 
 /**
- * Class SearchPathDomainMask
  * Domain constants specifying base locations to use when you search for significant directories.
+ *
  * These constants are used by the {@see FileManager::urls()} and {@see FileManager::url()} methods of FileManager.
- * @package Sabatier\Foundation
  */
 class SearchPathDomainMask
 {

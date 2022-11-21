@@ -12,9 +12,7 @@ namespace Sabatier\Foundation;
 use Closure;
 
 /**
- * Class NotificationCenter
  * A notification dispatch mechanism that enables the broadcast of information to registered observers.
- * @package Sabatier\Foundation
  */
 final class NotificationCenter
 {

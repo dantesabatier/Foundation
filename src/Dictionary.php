@@ -13,11 +13,10 @@ use ArrayIterator;
 use Closure;
 use InvalidArgumentException;
 use IteratorAggregate;
+use Sabatier\Foundation\Predicates\Predicate;
 use Traversable;
 
 /**
- * Class Dictionary
- *
  * A collection whose elements are key-value pairs.
  * @template Element
  * @implements Collection<string, Element>
@@ -28,21 +27,18 @@ use Traversable;
 class Dictionary extends ObjectClass implements Collection, IteratorAggregate
 {
     use CollectionAlgorithms {
-        contains as protected sequenceContains;
-        containsElement as protected sequenceContainsElement;
-        first as protected sequenceFirst;
-        min as protected sequenceMin;
-        max as protected sequenceMax;
-        reduce as protected sequenceReduce;
-        indexOf as protected collectionIndexOf;
-        filter as protected collectionFilter;
-        filtered as protected collectionFiltered;
-        sorted as protected collectionSorted;
-        allSatisfy as protected collectionAllSatisfy;
+        contains as private sequenceContains;
+        containsElement as private sequenceContainsElement;
+        first as private sequenceFirst;
+        min as private sequenceMin;
+        max as private sequenceMax;
+        reduce as private sequenceReduce;
+        indexOf as private collectionIndexOf;
+        filter as private collectionFilter;
+        filtered as private collectionFiltered;
+        sorted as private collectionSorted;
+        allSatisfy as private collectionAllSatisfy;
     }
-
-    /** @var array<string, Element> $reserved */
-    private array $reserved = [];
 
     /**
      * @param iterable<Element> $iterable
@@ -58,21 +54,6 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
         }
     }
 
-    public function __clone()
-    {
-        $this->reserved = $this->toArray();
-    }
-
-    public function __serialize(): array
-    {
-        return $this->reserved;
-    }
-
-    public function __unserialize(array $data): void
-    {
-        $this->reserved = $data;
-    }
-
     public function __get(string $name)
     {
         return match ($name) {
@@ -82,16 +63,6 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
         };
     }
 
-    public function __isset(string $name): bool
-    {
-        return isset($this->reserved[$name]);
-    }
-
-    public function __unset(string $name): void
-    {
-        unset($this->reserved[$name]);
-    }
-
     public static function dictionaryWithArray(array $array): Dictionary
     {
         return ArrayConverter::dictionaryWithArray($array);
@@ -99,6 +70,7 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
 
     /**
      * Creates a new dictionary whose keys are the groupings returned by the given closure and whose values are arrays of the elements that returned each key.
+     *
      * The arrays in the “values” position of the new dictionary each contain at least one element, with the elements in the same order as the source sequence.
      * The following example declares an array of names, and then creates a dictionary from that array by grouping the names by first letter:
      * <code>
@@ -138,6 +110,7 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
 
     /**
      * Returns a bool value indicating whether the sequence contains an element that satisfies the given predicate.
+     *
      * Available when Element conforms to {@see Equatable}.
      * @param Element $element The element to find in the sequence.
      * @return bool {@see true} if the element was found in the sequence; otherwise, {@see false}.
@@ -167,6 +140,7 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
 
     /**
      * Returns the result of combining the elements of the sequence using the given closure.
+     *
      * Use the {@see reduce()} method to produce a single value from the elements of an entire sequence.
      * For example, you can use this method on an array of integers to filter adjacent equal entries or count frequencies.
      * @template Result
@@ -324,9 +298,21 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
      * @param Closure(Element, string=, bool=): bool $isIncluded
      * @return Dictionary<Element>
      */
-    public function filter(Closure $isIncluded): Dictionary
+    
+    public function filter(Closure $isIncluded): self
     {
-        return $this->collectionFilter($isIncluded);
+        $instance = new Dictionary();
+        foreach ($this as $i => $e) {
+            $stop = false;
+            if ($isIncluded($e, $i, $stop)) {
+                $instance[$i] = $e;
+            }
+            /** @psalm-suppress TypeDoesNotContainType */
+            if (/** @phpstan-ignore-line */ $stop) {
+                break;
+            }
+        }
+        return $instance;
     }
 
     /**
@@ -361,27 +347,6 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
     }
 
     /**
-     * Reverses the elements of the collection in place.
-     * @return Dictionary<Element>
-     */
-    public function reverse(): Dictionary
-    {
-        $this->reserved = array_reverse($this->reserved);
-        return $this;
-    }
-
-    /**
-     * Returns a collection containing the elements of this sequence in reverse order.
-     * @return Dictionary<Element> A collection containing the elements of this sequence in reverse order.
-     */
-    public function reversed(): Dictionary
-    {
-        $instance = clone $this;
-        $instance->reverse();
-        return $instance;
-    }
-
-    /**
      * Returns a Boolean value indicating whether every element of a sequence satisfies a given predicate.
      * @param Closure(Element, string=): bool $predicate A closure that takes an element of the sequence as its argument and returns a Boolean value that indicates whether the passed element satisfies a condition.
      * @return bool {@see true} if the sequence contains an element that satisfies predicate; otherwise, {@see false}.
@@ -395,6 +360,7 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
     /**
      * Returns the elements of this sequence of sequences, concatenated.
      * @return FlattenSequence<Dictionary<Element>> A flattened view of the elements of this sequence of sequences.
+     * @psalm-suppress LessSpecificReturnStatement, MoreSpecificReturnType
      */
     public function joined(): FlattenSequence
     {
@@ -402,21 +368,8 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
     }
 
     /**
-     * Updates the value stored in the dictionary for the given key, or adds a new key-value pair if the key does not exist.
-     * Use this method instead of key-based subscripting when you need to know whether the new value supplants the value of an existing key. If the value of an existing key is updated, updateValue() returns the original value.
-     * @param Element $value The new value to add to the dictionary.
-     * @param string $key The key to associate with value. If key already exists in the dictionary, value replaces the existing associated value. If key isn't already a key of the dictionary, the (key, value) pair is added.
-     * @return Element The value that was replaced, or nil if a new key-value pair was added.
-     */
-    public function updateValue(mixed $value, string $key)
-    {
-        $current = $this->valueForKey($key);
-        $this->setValueForKey($value, $key);
-        return $current;
-    }
-
-    /**
      * Merges the given dictionary into this dictionary, using a combining closure to determine the value for any duplicate keys.
+     *
      * Use the combine closure to select a value to use in the updated dictionary, or to combine existing and new values.
      * As the key-values pairs in other are merged with this dictionary, the combine closure is called with the current and new values for any duplicate keys that are encountered.
      * @param Dictionary<Element> $other A dictionary to merge.
@@ -452,6 +405,57 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
     }
 
     /**
+     * Returns the value associated with a given key.
+     * @param string $key The key for which to return the corresponding value.
+     * @return Element|null The value associated with key.
+     */
+    public function valueForKey(string $key)
+    {
+        return $this->offsetGet($key);
+    }
+
+    /**
+     * As on {@see valueForKey()} but for case-insensitive key.
+     * @return Element|null
+     */
+    public function valueForCaseInsensitiveKey(string $key)
+    {
+        if ($this->offsetExists($key)) {
+            return $this->offsetGet($key);
+        }
+        return $this->first(fn(mixed $e, string $k): bool => string_is_equal($k, $key, CompareOptions::caseInsensitive));
+    }
+
+    /**
+     * Adds a given key-value pair to the dictionary.
+     * @param Element|null $value The value for key.
+     * @param string $key The key for value.
+     */
+    public function setValueForKey(mixed $value, string $key): void
+    {
+        if ($value === null) {
+            $this->offsetUnset($key);
+        } else {
+            $this->offsetSet($key, $value);
+        }
+    }
+
+    /**
+     * Updates the value stored in the dictionary for the given key, or adds a new key-value pair if the key does not exist.
+     *
+     * Use this method instead of key-based subscripting when you need to know whether the new value supplants the value of an existing key. If the value of an existing key is updated, updateValue() returns the original value.
+     * @param Element $value The new value to add to the dictionary.
+     * @param string $key The key to associate with value. If key already exists in the dictionary, value replaces the existing associated value. If key isn't already a key of the dictionary, the (key, value) pair is added.
+     * @return Element The value that was replaced, or nil if a new key-value pair was added.
+     */
+    public function updateValue(mixed $value, string $key)
+    {
+        $current = $this->valueForKey($key);
+        $this->setValueForKey($value, $key);
+        return $current;
+    }
+
+    /**
      * Removes the given key and its associated value from the dictionary.
      * If the key is found in the dictionary, this method returns the key's associated value. On removal, this method invalidates all indices with respect to the dictionary.
      * @param string $key The key to remove along with its associated value.
@@ -479,7 +483,7 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
 
     public function setDictionary(Dictionary $dictionary): void
     {
-        $this->reserved = $dictionary->reserved;
+        $this->reserved = $dictionary->toArray();
     }
 
     public function isEqual(mixed $other): bool
@@ -498,50 +502,9 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
         return $this->reserved;
     }
 
-    /**
-     * Returns the value associated with a given key.
-     * @param string $key The key for which to return the corresponding value.
-     * @return Element|null The value associated with key.
-     */
-    public function valueForKey(string $key)
-    {
-        return $this->offsetGet($key);
-    }
-
-    /**
-     * Adds a given key-value pair to the dictionary.
-     * @param Element|null $value The value for key.
-     * @param string $key The key for value.
-     */
-    public function setValueForKey(mixed $value, string $key): void
-    {
-        if ($value === null) {
-            $this->offsetUnset($key);
-        } else {
-            $this->offsetSet($key, $value);
-        }
-    }
-
-    /**
-     * As on {@see valueForKey()} but for case-insensitive key.
-     * @return Element|null
-     */
-    public function valueForCaseInsensitiveKey(string $key)
-    {
-        if ($this->offsetExists($key)) {
-            return $this->offsetGet($key);
-        }
-        return $this->first(fn(mixed $e, string $k): bool => string_is_equal($k, $key, CompareOptions::caseInsensitive));
-    }
-
     public function description(): string
     {
         return sprintf("[%s]", $this->isEmpty() ? ":" : $this->mapValues(fn(mixed $value, string $key): string => sprintf("%s: %s", $key, human_readable_value($value)))->values->join(", "));
-    }
-
-    public function count(): int
-    {
-        return count($this->reserved);
     }
 
     public function getIterator(): Traversable
@@ -574,9 +537,9 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
     {
         if ($value === null) {
             unset($this->reserved[$offset]);
-        } else {
-            $this->reserved[$offset] = $value;
+            return;
         }
+        $this->reserved[$offset] = $value;
     }
 
     /**
@@ -584,8 +547,9 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
      */
     public function offsetUnset(mixed $offset): void
     {
-        if ($this->offsetExists($offset)) {
-            unset($this->reserved[$offset]);
+        if (!$this->offsetExists($offset)) {
+            return;
         }
+        unset($this->reserved[$offset]);
     }
 }

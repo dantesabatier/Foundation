@@ -8,12 +8,11 @@ use IteratorAggregate;
 use Traversable;
 
 /**
- * Class FlattenSequence
  * A sequence consisting of all the elements contained in each segment contained in some Base sequence.
+ *
  * The elements of this view are a concatenation of the elements of each sequence in the base.
  * The joined method is always lazy, but does not implicitly confer laziness on algorithms applied to its result.
- * @package Sabatier\Foundation
- * @template-covariant Base of Collection
+ * @template-covariant Base of Sequence
  * @implements Sequence<int, mixed>
  * @implements IteratorAggregate<int, mixed>
  */
@@ -25,9 +24,9 @@ class FlattenSequence extends ObjectClass implements Sequence, IteratorAggregate
 
     /**
      * Creates a view into the given collection that allows access to elements within the specified range.
-     * @param Base $base The collection to create a view into.
+     * @param Sequence $base The collection to create a view into.
      */
-    public function __construct(public readonly mixed $base)
+    public function __construct(public readonly Sequence $base)
     {
     }
 
@@ -49,33 +48,36 @@ class FlattenSequence extends ObjectClass implements Sequence, IteratorAggregate
      * @template Result
      * Returns a Collection containing the results of mapping the given closure over the collection's elements.
      * @param Closure(mixed, int=): Result $transform
-     * @return ArrayClass<Result>
+     * @return Sequence<int, Result>
      */
-    public function map(Closure $transform): ArrayClass
+    public function map(Closure $transform): Sequence
     {
-        return (new ArrayClass($this))->map($transform);
+        $baseClass = $this->base::class;
+        return (new $baseClass($this))->map($transform);
     }
 
     /**
      * @template Result
      * Returns a Collection containing the non-nil results of calling the given transformation with each element of this collection.
      * @param Closure(mixed, int=): Result $transform
-     * @return ArrayClass<Result>
+     * @return Sequence<int, Result>
      */
-    public function compactMap(Closure $transform): ArrayClass
+    public function compactMap(Closure $transform): Sequence
     {
-        return (new ArrayClass($this))->compactMap($transform);
+        $baseClass = $this->base::class;
+        return (new $baseClass($this))->compactMap($transform);
     }
 
     /**
      * @template Result
      * Returns a Collection containing the concatenated results of calling the given transformation with each element of this collection.
      * @param Closure(mixed, int=): iterable<Result> $transform
-     * @return ArrayClass<Result>
+     * @return Sequence<int, Result>
      */
-    public function flatMap(Closure $transform): ArrayClass
+    public function flatMap(Closure $transform): Sequence
     {
-        return (new ArrayClass($this))->flatMap($transform);
+        $baseClass = $this->base::class;
+        return (new $baseClass($this))->flatMap($transform);
     }
 
     public function getIterator(): Traversable
@@ -96,6 +98,16 @@ class FlattenSequence extends ObjectClass implements Sequence, IteratorAggregate
                 yield $element;
             }
         })();
+    }
+
+    public function count(): int
+    {
+        return iterator_count($this);
+    }
+
+    public function toArray(): array
+    {
+        return iterator_to_array($this);
     }
 
     public function description(): string

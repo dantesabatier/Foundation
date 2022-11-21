@@ -60,7 +60,9 @@
       "src/StandardAdditions.php",
       "src/URLAdditions.php",
       "src/UUIDAdditions.php",
-      "src/ValueInternal.php"
+      "src/ValueInternal.php",
+      "src/Networking/NetworkingConstants.php",
+      "src/Networking/ProxyTypes.php"
     ]
   },
   "autoload-dev": {

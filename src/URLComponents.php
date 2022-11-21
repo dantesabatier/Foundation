@@ -3,9 +3,7 @@
 namespace Sabatier\Foundation;
 
 /**
- * Class URLComponents
- * This structure parses and constructs URLs.
- * @package Sabatier\Foundation
+ * A structure that parses URLs into and constructs URLs from their constituent parts.
  * @property-read URL|null $url A URL created from the components.
  * @property-read string|null $string A URL derived from the components object, in string form.
  * @property ArrayClass<URLQueryItem>|null $queryItems An array of query items for the URL in the order in which they appear in the original query string. Each URLQueryItem represents a single key-value pair, Note that a name may appear more than once in a single query string, so the name values are not guaranteed to be unique. If the URLComponents has an empty query component, returns an empty array. If the URLComponents has no query component, returns nil. The setter combines an array containing any number of URLQueryItems, each of which represents a single key-value pair, into a query string and sets the URLComponents query property. Passing an empty array sets the query component of the URLComponents to an empty string. Passing nil removes the query component of the URLComponents.
@@ -114,6 +112,7 @@ class URLComponents extends ObjectClass
 
     /**
      * Returns a URL based on the component settings and relative to a given base URL.
+     *
      * If the URLComponents has an authority component (user, password, host or port) and a path component, then the path must either begin with “/” or be an empty string.
      * If the URLComponents does not have an authority component (user, password, host or port) and has a path component, the path component must not start with “//”. If those requirements are not met, nil is returned.
      */

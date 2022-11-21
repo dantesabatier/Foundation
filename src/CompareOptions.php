@@ -3,9 +3,7 @@
 namespace Sabatier\Foundation;
 
 /**
- * Class ComparisonOption
  * These values represent the options available to many of the string classes' search and comparison methods.
- * @package Sabatier\Foundation
  */
 class CompareOptions
 {

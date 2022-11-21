@@ -10,6 +10,7 @@ class NegateBooleanTransformer extends SharedValueTransformer
         return Number::class;
     }
 
+    /** @noinspection PhpMixedReturnTypeCanBeReducedInspection */
     public function transformedValue(mixed $value): mixed
     {
         assert($value instanceof Number);

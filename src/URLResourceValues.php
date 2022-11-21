@@ -5,9 +5,7 @@ namespace Sabatier\Foundation;
 use JetBrains\PhpStorm\ExpectedValues;
 
 /**
- * Class URLResourceValues
  * The properties supported by file system resources.
- * @package Sabatier\Foundation
  * @property-read bool|null $isDirectory True for directories.
  * @property-read string|null $fileResourceType Returns the file system object type.
  * @property-read int|null $fileSize Total file size in bytes.

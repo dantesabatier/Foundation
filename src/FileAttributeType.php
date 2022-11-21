@@ -3,9 +3,7 @@
 namespace Sabatier\Foundation;
 
 /**
- * Class FileAttributeType
  * Values representing a file's type attribute {@see FileAttributeKey::type}.
- * @package Sabatier\Foundation
  */
 class FileAttributeType
 {

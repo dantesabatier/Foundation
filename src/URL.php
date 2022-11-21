@@ -18,9 +18,7 @@ use JetBrains\PhpStorm\Pure;
 use SplFileInfo;
 
 /**
- * Class URL
  * A value that identifies the location of a resource, such as an item on a remote server or the path to a local file.
- * @package Sabatier\Foundation
  * @property-read string $absoluteString The absolute string for the URL.
  * @property-read URL $absoluteURL The absolute URL.
  * @property-read URL|null $baseURL The base URL.
@@ -39,7 +37,7 @@ use SplFileInfo;
  * @property-read URL $standardizedFileURL A standardized version of the path of a file URL.
  * @property-read string|null $user The user component of the URL if the URL conforms to RFC 1808 (the most common form of URL), otherwise nil.
  * @property-read string|null $password The password component of the URL if the URL conforms to RFC 1808 (the most common form of URL), otherwise nil.
- * @property-read bool $isFileURL A Boolean that is true if the scheme is {@see URLScheme::file}.
+ * @property-read bool $isFileURL A Boolean that is true if the scheme is "file".
  * @property-read bool $hasDirectoryPath A Boolean that is true if the URL path represents a directory.
  * @property-read string $fileSystemRepresentation A string containing the URL's file system path.
  */
@@ -179,7 +177,7 @@ final class URL extends ObjectClass
         } elseif ($name == 'password') {
             return $this->parse(PHP_URL_PASS);
         } elseif ($name == 'isFileURL') {
-            return $this->scheme == URLScheme::file;
+            return $this->scheme === "file";
         } elseif ($name == 'hasDirectoryPath') {
             return $this->isFileURL && is_dir($this->path) || $this->pathExtension === '';
         } elseif ($name == 'baseURL') {
@@ -234,10 +232,10 @@ final class URL extends ObjectClass
         }
         $scheme = parse_url($path, PHP_URL_SCHEME);
         if (empty($scheme) && !empty($path)) {
-            $scheme = URLScheme::file;
+            $scheme = "file";
             $string .= "$scheme:";
         }
-        if ($scheme !== URLScheme::file) {
+        if ($scheme !== "file") {
             throw new InvalidArgumentException("Invalid url scheme \"$scheme\"");
         }
         $string .= "//$path";
@@ -349,6 +347,7 @@ final class URL extends ObjectClass
 
     /**
      * Return a collection of resource values identified by the given resource keys.
+     *
      * This method first checks if the URL object already caches the resource value. If so, it returns the cached resource value to the caller. If not, then this method synchronously obtains the resource value from the backing store, adds the resource value to the URL object's cache, and returns the resource value to the caller. The type of the resource value varies by resource property (see {@see URLResourceKey}). If this method does not throw and the resulting value in the URLResourceValues is populated with nil, it means the resource property is not available for the specified resource and no errors occurred when determining the resource property was not available. This method is currently applicable only to URLs for file system resources.
      * Only the values for the keys specified in keys will be populated.
      * @param Set<string> $keys
@@ -362,6 +361,7 @@ final class URL extends ObjectClass
 
     /**
      * Returns the value of the resource property for the specified key.
+     *
      * This method first checks if the URL object already caches the resource value. If so, it returns the cached resource value to the caller. If not, then this method synchronously obtains the resource value from the backing store, adds the resource value to the URL object's cache, and returns the resource value to the caller.
      * The type of the returned resource value varies by resource property; for details, see the documentation for the key you want to access.
      * If this method returns true and the value is populated with nil, it means that the resource property is not available for the specified resource, and that no errors occurred when determining that the resource property was unavailable.
@@ -376,6 +376,7 @@ final class URL extends ObjectClass
 
     /**
      * Sets the resource value identified by a given resource key.
+     *
      * This method writes the new resource values out to the backing store. Attempts to set a read-only resource property or to set a resource property not supported by the resource are ignored and are not considered errors. This method is currently applicable only to URLs for file system resources.
      * URLResourceValues keeps track of which of its properties have been set. Those values are the ones used by this function to determine which properties to write.
      * @throws Exception
@@ -387,6 +388,7 @@ final class URL extends ObjectClass
 
     /**
      * Removes the cached resource value identified by a given resource value key from the URL object.
+     *
      * Removing a cached resource value may remove other cached resource values because some resource values are cached as a set of values, and because some resource values depend on other resource values (temporary resource values have no dependencies). This method is currently applicable only to URLs for file system resources.
      */
     public function removeCachedResourceValue(#[ExpectedValues(valuesFromClass: URLResourceKey::class)] string $key): void
@@ -405,6 +407,7 @@ final class URL extends ObjectClass
 
     /**
      * Sets a temporary resource value on the URL object.
+     *
      * Temporary resource values are for client use. Temporary resource values exist only in memory and are never written to the resource's backing store. Once set, a temporary resource value can be copied from the URL object with func {@see resourceValues()}. The values are stored in the loosely-typed allValues dictionary property.
      * To remove a temporary resource value from the URL object, use func {@see removeCachedResourceValue()}. Care should be taken to ensure the key that identifies a temporary resource value is unique and does not conflict with system defined keys (using reverse domain name notation in your temporary resource value keys is recommended). This method is currently applicable only to URLs for file system resources.
      */
@@ -427,6 +430,7 @@ final class URL extends ObjectClass
 
     /**
      * Resolves any symlinks in the path of a file URL.
+     *
      * If the isFileURL is false, this method does nothing.
      */
     public function resolveSymlinksInPath(): URL

@@ -2,6 +2,7 @@
 
 namespace Sabatier\Foundation;
 
+use Exception;
 use InvalidArgumentException;
 use JetBrains\PhpStorm\ExpectedValues;
 use SplFileInfo;
@@ -61,7 +62,7 @@ class URLResourceValuesStorage
             }
         }
         if (!$keysToFetch->isEmpty()) {
-            $found = $this->read($keysToFetch, $url)->compactMapValues(fn (mixed $value): mixed => $value);
+            $found = $this->read($keysToFetch, $url)->compactMapValues(fn(mixed $value): mixed => $value);
             $this->valuesCache->merge($found);
             $result->merge($found);
         }
@@ -112,8 +113,10 @@ class URLResourceValuesStorage
             } elseif ($key == URLResourceKey::isExecutableKey) {
                 $result[$key] = $info->isExecutable();
             } elseif ($key == URLResourceKey::isHiddenKey) {
-                /** @noinspection PhpUnhandledExceptionInspection */
-                $result[$key] = is_hidden($path);
+                try {
+                    $result[$key] = is_hidden($path);
+                } catch (Exception) {
+                }
             } elseif ($key == URLResourceKey::isReadableKey) {
                 $result[$key] = $info->isReadable();
             } elseif ($key == URLResourceKey::isWritableKey) {
@@ -132,8 +135,10 @@ class URLResourceValuesStorage
         /** @var string|null $value */
         $value = $keysAndValues[URLResourceKey::nameKey];
         if ($value) {
-            /** @noinspection PhpUnhandledExceptionInspection */
-            FileManager::default()->moveItem($url, $url->deletingLastPathComponent()->appendingPathComponent($value));
+            try {
+                FileManager::default()->moveItem($url, $url->deletingLastPathComponent()->appendingPathComponent($value));
+            } catch (Exception) {
+            }
         }
     }
 }

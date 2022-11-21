@@ -5,9 +5,8 @@ namespace Sabatier\Foundation;
 use JetBrains\PhpStorm\ExpectedValues;
 
 /**
- * Class PropertyListSerialization
- * @package Sabatier\Foundation
  * An object that converts between a property list and one of several serialized representations.
+ *
  * The PropertyListSerialization class provides methods that convert a property list to and from several serialized formats.
  * A property list is itself an array or dictionary that contains only data, string, array, dictionary, date, and number objects.
  */

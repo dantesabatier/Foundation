@@ -1,0 +1,30 @@
+<?php
+
+namespace Sabatier\Foundation\Networking;
+
+use Sabatier\Foundation\ArrayClass;
+
+/** @internal */
+class AuthParameter
+{
+    public function __construct(public readonly string $name, public readonly string $value)
+    {
+    }
+
+    /**
+     * @param string $parametersView
+     * @return ArrayClass<AuthParameter>
+     */
+    public static function parameters(string $parametersView): ArrayClass
+    {
+        /** @var ArrayClass<AuthParameter> */
+        return (new ArrayClass(explode(",", $parametersView)))->compactMap(function (string $e): ?AuthParameter {
+            /** @psalm-suppress TypeDoesNotContainType */
+            if (!($components = array_map(fn(string $e): string => trim($e), explode("=", $e))) || count($components) !== 2) {
+                return null;
+            }
+            [$name, $value] = $components;
+            return new AuthParameter($name, $value);
+        });
+    }
+}

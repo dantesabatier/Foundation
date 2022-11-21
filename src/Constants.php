@@ -12,32 +12,6 @@ const MimeTypeAVIF = 'image/avif';
 const TransliteratorDefault = 'Any-Latin; Latin-ASCII;';
 /** @var int A value indicating that a requested item couldn't be found or doesn't exist. NotFound is typically used by various methods and functions that search for items in serial data and return indices, such as characters in a string object or id objects in an array. */
 const NotFound = -1;
-/** The response length cannot be determined in advance of receiving the data from the server. For example, URLResponseUnknownLength is returned when the server HTTP response does not include a Content-Length header. */
-const URLResponseUnknownLength = -1;
-/** @var int The total size of the transfer cannot be determined. */
-const URLSessionTransferSizeUnknown = -1.0;
-/** @var string Use client certificate authentication for this protection space. */
-const URLAuthenticationMethodClientCertificate = 'URLAuthenticationMethodClientCertificate';
-/** @var string Negotiate whether to use Kerberos or NTLM authentication for this protection space. */
-const URLAuthenticationMethodNegotiate = 'URLAuthenticationMethodNegotiate';
-/** @var string Use NTLM authentication for this protection space. */
-const URLAuthenticationMethodNTLM = 'URLAuthenticationMethodNTLM';
-/** @var string Perform server trust authentication (certificate validation) for this protection space. */
-const URLAuthenticationMethodServerTrust = 'URLAuthenticationMethodServerTrust';
-/** @var string Use the default authentication method for a protocol. */
-const URLAuthenticationMethodDefault = 'URLAuthenticationMethodDefault';
-/** @var string Use HTML form authentication for this protection space. */
-const URLAuthenticationMethodHTMLForm = 'URLAuthenticationMethodHTMLForm';
-/** @var string Use HTTP basic authentication for this protection space. */
-const URLAuthenticationMethodHTTPBasic = 'Basic';
-/** @var string Use HTTP digest authentication for this protection space. */
-const URLAuthenticationMethodHTTPDigest = 'Digest';
-/** @var string The protocol type for HTTP. */
-const URLProtectionSpaceHTTP = 'HTTP';
-/** @var string The protocol type for HTTPS. */
-const URLProtectionSpaceHTTPS = 'HTTPS';
-/** @var string The protocol type for FTP. */
-const URLProtectionSpaceFTP = 'FTP';
 /** @var string This value transformer negates a boolean value, transforming true to false and false to true. This transformer is reversible. */
 const NegateBooleanTransformerName = "NegateBoolean";
 /** @var string This value transformer returns an object created by attempting to unarchive the data passed as the value. */

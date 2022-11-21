@@ -23,7 +23,7 @@ function request_url(): string
 {
     $elements = explode('?', $_SERVER['REQUEST_URI'] ?? '');
     $components = new URLComponents();
-    $components->scheme = (empty($_SERVER['HTTPS']) ? URLScheme::http : URLScheme::https);
+    $components->scheme = isset($_SERVER['HTTPS']) ? "https" : "http";
     $components->host = $_SERVER['HTTP_HOST'] ?? null;
     $components->path = $elements[0] ?? null;
     $components->query = $elements[1] ?? null;

@@ -4,6 +4,7 @@ namespace Sabatier\Foundation;
 
 /**
  * The formatting context for a formatter.
+ *
  * Use formatting contexts to specify where the result of formatting will appear, so that the formatter can provide the most appropriate result.
  */
 enum FormatterContext: int

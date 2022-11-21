@@ -8,8 +8,8 @@ use PHPUnit\Framework\TestCase;
 use Sabatier\Foundation\ArrayClass;
 use Sabatier\Foundation\Date;
 use Sabatier\Foundation\Dictionary;
-use Sabatier\Foundation\Expression;
-use Sabatier\Foundation\Predicate;
+use Sabatier\Foundation\Predicates\Expression;
+use Sabatier\Foundation\Predicates\Predicate;
 
 final class PredicateTest extends TestCase
 {

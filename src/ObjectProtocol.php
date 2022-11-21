@@ -10,9 +10,7 @@
 namespace Sabatier\Foundation;
 
 /**
- * Interface ObjectInterface
  * The group of methods that are fundamental to all Foundation objects.
- * @package Sabatier\Foundation
  */
 interface ObjectProtocol extends CustomDebugStringConvertible, Equatable
 {

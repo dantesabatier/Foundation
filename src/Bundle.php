@@ -17,9 +17,7 @@ use ReflectionClass;
 use Throwable;
 
 /**
- * Class Bundle
  * A representation of the code and resources stored in a bundle directory on disk.
- * @package Sabatier\Foundation
  */
 final class Bundle extends ObjectClass
 {
@@ -158,10 +156,10 @@ final class Bundle extends ObjectClass
 
     /**
      * Returns a Bundle object initialized to correspond to the specified file URL.
+     *
+     * This method initializes and returns a new instance only if there is no existing bundle associated with url, otherwise it deallocates self and returns the existing object.
      * @param URL $url The file URL to a directory. This must be a full URL for a directory; if it contains any symbolic links, they must be resolvable.
      * @return Bundle A Bundle object initialized to correspond to url.
-     * This method initializes and returns a new instance only if there is no existing bundle associated with url, otherwise it deallocates self and returns the existing object.
-     * If url doesn't exist or the user doesn't have access to it, returns nil.
      */
     public static function bundleWithURL(URL $url): Bundle
     {
@@ -187,6 +185,7 @@ final class Bundle extends ObjectClass
 
     /**
      * Returns the Bundle instance that has the specified bundle identifier.
+     *
      * This method creates and returns a new Bundle object if there is no existing bundle associated with identifier. Otherwise, the existing instance is returned.
      * @param string $identifier The identifier for an existing Bundle instance.
      * @return Bundle|null The Bundle object with the bundle identifier, or nil if the requested bundle is not found on the system.
@@ -198,6 +197,7 @@ final class Bundle extends ObjectClass
 
     /**
      * Returns the Bundle object with which the specified class is associated.
+     *
      * This method is typically used by frameworks and plug-ins to locate their own bundle at runtime.
      * This method may be somewhat more efficient than trying to locate the bundle using the init() method.
      * However, if the initial lookup of an already loaded and cached bundle with the specified identifier fails, this method uses potentially time-consuming heuristics to attempt to locate the bundle.
@@ -228,6 +228,7 @@ final class Bundle extends ObjectClass
 
     /**
      * Returns the bundle object that contains the current executable.
+     *
      * The main bundle lets you access the resources in the same directory as the currently running executable. For a running app, the main bundle offers access to the app's bundle directory. For code running in a framework, the main bundle offers access to the framework's bundle directory.
      * @return Bundle The Bundle object corresponding to the bundle directory that contains the current executable. This method may return a valid bundle object even for unbundled apps. It may also return nil if the bundle object could not be created, so always check the return value.
      */
@@ -248,6 +249,7 @@ final class Bundle extends ObjectClass
 
     /**
      * Returns an array of all the application's non-framework bundles.
+     *
      * The returned array includes the main bundle and all bundles that have been dynamically created
      * but doesn't contain any bundles that represent frameworks.
      * @return ArrayClass<Bundle> An array of all the application's non-framework bundles.

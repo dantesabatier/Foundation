@@ -3,10 +3,9 @@
 namespace Sabatier\Foundation;
 
 /**
- * Class DirectoryEnumerationOptions
  * Options for enumerating the contents of directories.
+ *
  * These options are used with the {@see FileManager::contentsOfDirectory()} method.
- * @package Sabatier\Foundation
  */
 class DirectoryEnumerationOptions
 {

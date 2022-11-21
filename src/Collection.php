@@ -11,17 +11,16 @@ namespace Sabatier\Foundation;
 
 use ArrayAccess;
 use Closure;
-use Countable;
+use Sabatier\Foundation\Predicates\Predicate;
 
 /**
  * A collection whose elements can be traversed multiple times, nondestructively, and accessed by an indexed subscript.
- * @package Sabatier\Foundation
  * @template Index of array-key
  * @template Element
  * @template-extends Sequence<Index, Element>
  * @template-extends ArrayAccess<Index, Element>
  */
-interface Collection extends Sequence, Countable, ArrayAccess
+interface Collection extends Sequence, ArrayAccess
 {
     /**
      * The position of the first element in a nonempty collection.
@@ -74,6 +73,7 @@ interface Collection extends Sequence, Countable, ArrayAccess
 
     /**
      * Returns the distance between two indices.
+     * 
      * @param int $start A valid index of the collection.
      * @param int $end Another valid index of the collection. If end is equal to start, the result is zero.
      * @return int The distance between start and end. The result can be negative only if the collection conforms to the BidirectionalCollection protocol.
@@ -99,6 +99,13 @@ interface Collection extends Sequence, Countable, ArrayAccess
      * Objects in the resulting array appear in the same order as they do in the receiver.
      */
     public function filtered(Predicate $predicate): Collection;
+
+    /**
+     * Sorts the collection in place.
+     * @param Closure(Element, Element): int $by
+     * @return Collection<Index, Element>
+     */
+    public function sort(Closure $by): Collection;
 
     /**
      * Returns a copy of the receiving sequence sorted as specified by a given array of sort descriptors.

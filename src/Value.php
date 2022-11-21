@@ -6,9 +6,7 @@ use JetBrains\PhpStorm\ArrayShape;
 use JetBrains\PhpStorm\Pure;
 
 /**
- * Class Value
  * A simple container for a single data item.
- * @package Sabatier\Foundation
  */
 class Value extends ObjectClass
 {

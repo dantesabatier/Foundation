@@ -3,9 +3,7 @@
 namespace Sabatier\Foundation;
 
 /**
- * Class URLQueryItem
  * A single name-value pair from the query portion of a URL.
- * @package Sabatier\Foundation
  */
 class URLQueryItem extends ObjectClass
 {

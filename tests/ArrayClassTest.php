@@ -7,7 +7,7 @@ use Sabatier\Foundation\ArrayClass;
 use Sabatier\Foundation\KeyValueCoding;
 use Sabatier\Foundation\Number;
 use Sabatier\Foundation\ObjectClass;
-use Sabatier\Foundation\Predicate;
+use Sabatier\Foundation\Predicates\Predicate;
 use Sabatier\Foundation\Set;
 
 final class ArrayClassTest extends TestCase
