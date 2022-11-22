@@ -4,7 +4,6 @@ namespace Sabatier\Foundation\Predicates;
 
 use InvalidArgumentException;
 use JetBrains\PhpStorm\ExpectedValues;
-use JetBrains\PhpStorm\Pure;
 use Sabatier\Foundation\ArrayClass;
 use Sabatier\Foundation\Dictionary;
 
@@ -32,7 +31,6 @@ class CompoundPredicate extends Predicate
      * @param ArrayClass<Predicate> $subpredicates An array of Predicate objects.
      * @return CompoundPredicate A new predicate formed by AND-ing the predicates specified by subpredicates.
      */
-    #[Pure]
     public static function andPredicateWithSubpredicates(ArrayClass $subpredicates): CompoundPredicate
     {
         return new CompoundPredicate(CompoundPredicateLogicalType::and, $subpredicates);
@@ -54,7 +52,6 @@ class CompoundPredicate extends Predicate
      * @param ArrayClass<Predicate> $subpredicates An array of Predicate objects.
      * @return CompoundPredicate A new predicate formed by OR-ing the predicates specified by subpredicates.
      */
-    #[Pure]
     public static function orPredicateWithSubpredicates(ArrayClass $subpredicates): CompoundPredicate
     {
         return new CompoundPredicate(CompoundPredicateLogicalType::or, $subpredicates);

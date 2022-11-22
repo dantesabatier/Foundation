@@ -359,7 +359,7 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
 
     /**
      * Returns the elements of this sequence of sequences, concatenated.
-     * @return FlattenSequence<Dictionary<Element>> A flattened view of the elements of this sequence of sequences.
+     * @return FlattenSequence<Element> A flattened view of the elements of this sequence of sequences.
      * @psalm-suppress LessSpecificReturnStatement, MoreSpecificReturnType
      */
     public function joined(): FlattenSequence

@@ -307,7 +307,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
 
     /**
      * Returns the elements of this sequence of sequences, concatenated.
-     * @return FlattenSequence<ArrayClass<Element>> A flattened view of the elements of this sequence of sequences.
+     * @return FlattenSequence<Element> A flattened view of the elements of this sequence of sequences.
      * @psalm-suppress LessSpecificReturnStatement, MoreSpecificReturnType
      */
     public function joined(): FlattenSequence

@@ -10,6 +10,8 @@
 namespace Sabatier\Foundation\Predicates;
 
 use InvalidArgumentException;
+
+use function Sabatier\Foundation\human_readable_value;
 use function Sabatier\Foundation\typeof;
 
 /** @internal */
@@ -22,6 +24,9 @@ class CustomPredicateOperator extends PredicateOperator
 
     public function performPrimitiveOperation(mixed $left, mixed $right): bool
     {
+        if (Predicate::$debugDefault) {
+            error_log(sprintf("Foundation: predicate operator %s: (%s)%s %s (%s)%s", $this->operatorType->name, typeof($left), human_readable_value($left), $this->symbol(), typeof($right), human_readable_value($right)));
+        }
         if (!is_object($left)) {
             throw new InvalidArgumentException(sprintf("invalid argument: expecting \"object\", \"%s\" given", typeof($left)));
         }

@@ -11,7 +11,6 @@ namespace Sabatier\Foundation\Predicates;
 
 use InvalidArgumentException;
 use JetBrains\PhpStorm\ExpectedValues;
-use JetBrains\PhpStorm\Pure;
 use Sabatier\Foundation\CompareOptions;
 use Sabatier\Foundation\ExpressibleByArrayLiteral;
 use Sabatier\Foundation\ObjectClass;
@@ -94,8 +93,7 @@ class PredicateOperator extends ObjectClass
             $visitor->visitPredicateOperator($this);
         }
     }
-
-    #[Pure]
+    
     #[ExpectedValues(flagsFromClass: CompareOptions::class)]
     public function compareOptions(): int
     {

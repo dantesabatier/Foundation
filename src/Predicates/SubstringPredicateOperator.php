@@ -12,10 +12,13 @@ namespace Sabatier\Foundation\Predicates;
 use JetBrains\PhpStorm\ExpectedValues;
 use Sabatier\Foundation\ArrayClass;
 use Sabatier\Foundation\Set;
+
+use function Sabatier\Foundation\human_readable_value;
 use function Sabatier\Foundation\in_string;
 use function Sabatier\Foundation\string_has_prefix;
 use function Sabatier\Foundation\string_has_suffix;
 use function Sabatier\Foundation\string_is_equal;
+use function Sabatier\Foundation\typeof;
 
 /** @internal */
 class SubstringPredicateOperator extends StringPredicateOperator
@@ -27,6 +30,9 @@ class SubstringPredicateOperator extends StringPredicateOperator
 
     public function performPrimitiveOperation(mixed $left, mixed $right): bool
     {
+        if (Predicate::$debugDefault) {
+            error_log(sprintf("Foundation: predicate operator %s: (%s)%s %s (%s)%s", $this->operatorType->name, typeof($left), human_readable_value($left), $this->symbol(), typeof($right), human_readable_value($right)));
+        }
         if ($left === null || $right === null) {
             return false;
         }

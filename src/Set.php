@@ -306,7 +306,7 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
 
     /**
      * Returns the elements of this sequence of sequences, concatenated.
-     * @return FlattenSequence<Set<Element>> A flattened view of the elements of this sequence of sequences.
+     * @return FlattenSequence<Element> A flattened view of the elements of this sequence of sequences.
      * @psalm-suppress LessSpecificReturnStatement, MoreSpecificReturnType
      */
     public function joined(): FlattenSequence

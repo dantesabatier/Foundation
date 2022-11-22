@@ -12,14 +12,14 @@ use Traversable;
  *
  * The elements of this view are a concatenation of the elements of each sequence in the base.
  * The joined method is always lazy, but does not implicitly confer laziness on algorithms applied to its result.
- * @template-covariant Base of Sequence
- * @implements Sequence<int, mixed>
- * @implements IteratorAggregate<int, mixed>
+ * @template Element
+ * @implements Sequence<int, Element>
+ * @implements IteratorAggregate<int, Element>
  */
 class FlattenSequence extends ObjectClass implements Sequence, IteratorAggregate
 {
     use SequenceAlgorithms {
-        reduce as protected sequenceReduce;
+        reduce as private sequenceReduce;
     }
 
     /**
@@ -105,6 +105,9 @@ class FlattenSequence extends ObjectClass implements Sequence, IteratorAggregate
         return iterator_count($this);
     }
 
+    /**
+     * @return Element[]
+     */
     public function toArray(): array
     {
         return iterator_to_array($this);

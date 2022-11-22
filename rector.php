@@ -7,6 +7,7 @@ use Rector\CodeQuality\Rector\If_\ExplicitBoolCompareRector;
 use Rector\Config\RectorConfig;
 use Rector\DeadCode\Rector\ClassMethod\RemoveUselessParamTagRector;
 use Rector\DeadCode\Rector\ClassMethod\RemoveUselessReturnTagRector;
+use Rector\Php70\Rector\FuncCall\RandomFunctionRector;
 use Rector\Php71\Rector\FuncCall\CountOnNullRector;
 use Rector\Php73\Rector\FuncCall\JsonThrowOnErrorRector;
 use Rector\Php80\Rector\Class_\ClassPropertyAssignToConstructorPromotionRector;
@@ -40,6 +41,9 @@ return static function (RectorConfig $rectorConfig): void {
             __DIR__ . '/src/Networking/URLRequest.php',
         ],
         ExplicitBoolCompareRector::class,
+        RandomFunctionRector::class => [
+            __DIR__ . '/src/SystemRandomNumberGenerator.php',
+        ],
         ReturnNeverTypeRector::class,
         NullToStrictStringFuncCallArgRector::class,
         UnionTypesRector::class,
