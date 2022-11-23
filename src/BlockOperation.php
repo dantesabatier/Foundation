@@ -12,7 +12,6 @@ namespace Sabatier\Foundation;
 use Closure;
 
 /**
- * Class BlockOperation
  * An operation that manages the concurrent execution of one or more blocks.
  */
 class BlockOperation extends Operation

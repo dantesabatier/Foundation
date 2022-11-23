@@ -7,7 +7,6 @@ use JetBrains\PhpStorm\ExpectedValues;
 use Sabatier\Foundation\CompareOptions;
 use Sabatier\Foundation\ComparisonResult;
 use Sabatier\Foundation\ObjectClass;
-
 use function Sabatier\Foundation\human_readable_value;
 use function Sabatier\Foundation\string_compare;
 use function Sabatier\Foundation\typeof;

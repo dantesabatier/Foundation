@@ -93,6 +93,7 @@ class Predicate extends ObjectClass
 
     /**
      * Forces a predicate that was securely decoded to allow evaluation.
+     *
      * When securely decoding Predicate objects that are encoded using SecureCoding, evaluation is disabled because it is potentially unsafe to evaluate predicates you get out of an archive.
      * Before you enable evaluation, you should validate key paths, selectors, and other details to ensure no erroneous or malicious code will be executed.
      * Once you've verified the predicate, you can enable the receiver for evaluation by calling allowEvaluation().

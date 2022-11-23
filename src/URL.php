@@ -14,7 +14,6 @@ use Exception;
 use InvalidArgumentException;
 use JetBrains\PhpStorm\ArrayShape;
 use JetBrains\PhpStorm\ExpectedValues;
-use JetBrains\PhpStorm\Pure;
 use SplFileInfo;
 
 /**
@@ -67,8 +66,7 @@ final class URL extends ObjectClass
         }
         $this->string = $string;
     }
-
-    #[Pure]
+    
     #[ArrayShape(['string' => "string", 'baseURL' => '\\' . URL::class])]
     public function __serialize(): array
     {

@@ -10,7 +10,6 @@
 namespace Sabatier\Foundation\Predicates;
 
 use Sabatier\Foundation\ArrayClass;
-
 use function Sabatier\Foundation\human_readable_value;
 use function Sabatier\Foundation\in_range;
 use function Sabatier\Foundation\typeof;

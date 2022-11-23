@@ -12,7 +12,6 @@ namespace Sabatier\Foundation\Predicates;
 use JetBrains\PhpStorm\ExpectedValues;
 use Sabatier\Foundation\ArrayClass;
 use Sabatier\Foundation\Set;
-
 use function Sabatier\Foundation\human_readable_value;
 use function Sabatier\Foundation\in_string;
 use function Sabatier\Foundation\string_has_prefix;

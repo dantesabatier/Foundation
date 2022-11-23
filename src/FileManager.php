@@ -189,6 +189,16 @@ final class FileManager extends ObjectClass
     }
 
     /**
+     * Performs a shallow search of the specified directory and returns the paths of any contained items.
+     * @param string $path The path to the directory whose contents you want to enumerate.
+     * @return ArrayClass<string> An array of string, each of which identifies a file, directory, or symbolic link contained in path. Returns an empty array if the directory exists but has no contents.
+     */
+    public function contentsOfDirectoryAtPath(string $path): ArrayClass
+    {
+        return $this->contentsOfDirectory(URL::fileURL($path), null, DirectoryEnumerationOptions::skipsHiddenFiles)->map(fn(URL $url): string => $url->path);
+    }
+
+    /**
      * Returns a directory iterator object that can be used to perform a deep iteration of the directory at the specified URL.
      * @param URL $url The location of the directory for which you want an enumeration.
      * This URL must not be a symbolic link that points to the desired directory.
