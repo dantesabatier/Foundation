@@ -242,39 +242,60 @@ class PredicateUtilities
         return new Date();
     }
 
-    public static function year(Date $value): Number
+    public static function year(?Date $date): ?Number
     {
-        return new Number(date('Y', (int)$value->timeIntervalSinceReferenceDate));
+        if (!$date instanceof Date) {
+            return null;
+        }
+        return new Number(date('Y', (int)$date->timeIntervalSinceReferenceDate));
     }
 
-    public static function month(Date $value): Number
+    public static function month(?Date $date): ?Number
     {
-        return new Number(date('n', (int)$value->timeIntervalSinceReferenceDate));
+        if (!$date instanceof Date) {
+            return null;
+        }
+        return new Number(date('n', (int)$date->timeIntervalSinceReferenceDate));
     }
 
-    public static function week(Date $value): Number
+    public static function week(?Date $date): ?Number
     {
-        return new Number(date('W', (int)$value->timeIntervalSinceReferenceDate));
+        if (!$date instanceof Date) {
+            return null;
+        }
+        return new Number(date('W', (int)$date->timeIntervalSinceReferenceDate));
     }
 
-    public static function day(Date $value): Number
+    public static function day(?Date $date): ?Number
     {
-        return new Number(date('j', (int)$value->timeIntervalSinceReferenceDate));
+        if (!$date instanceof Date) {
+            return null;
+        }
+        return new Number(date('j', (int)$date->timeIntervalSinceReferenceDate));
     }
 
-    public static function hour(Date $value): Number
+    public static function hour(?Date $date): ?Number
     {
-        return new Number(date('G', (int)$value->timeIntervalSinceReferenceDate));
+        if (!$date instanceof Date) {
+            return null;
+        }
+        return new Number(date('G', (int)$date->timeIntervalSinceReferenceDate));
     }
 
-    public static function minute(Date $value): Number
+    public static function minute(?Date $date): ?Number
     {
-        return new Number(date('i', (int)$value->timeIntervalSinceReferenceDate));
+        if (!$date instanceof Date) {
+            return null;
+        }
+        return new Number(date('i', (int)$date->timeIntervalSinceReferenceDate));
     }
 
-    public static function second(Date $value): Number
+    public static function second(?Date $date): ?Number
     {
-        return new Number(date('s', (int)$value->timeIntervalSinceReferenceDate));
+        if (!$date instanceof Date) {
+            return null;
+        }
+        return new Number(date('s', (int)$date->timeIntervalSinceReferenceDate));
     }
 
     public static function floor(Number|float $value): Number
