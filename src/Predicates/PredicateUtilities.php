@@ -41,11 +41,7 @@ class PredicateUtilities
     private static function reservedWords(): Set
     {
         if (self::$reservedWords === null) {
-            self::$reservedWords = new Set(["all", "and", "any", "anykey", "apply", "beginswith", "between",
-                "cast", "contains", "endswith", "false", "falsepredicate", "first", "function",
-                "in", "intersection", "last", "like", "matches", "minus", "nil", "no", "none",
-                "not", "null", "or", "self", "size", "some", "subquery", "tokenmatches", "true",
-                "truepredicate", "union", "yes"]);
+            self::$reservedWords = new Set(["all", "and", "any", "anykey", "apply", "beginswith", "between", "cast", "contains", "endswith", "false", "falsepredicate", "first", "function", "in", "intersection", "last", "like", "matches", "minus", "nil", "no", "none", "not", "null", "or", "self", "size", "some", "subquery", "tokenmatches", "true", "truepredicate", "union", "yes"]);
         }
         return self::$reservedWords;
     }

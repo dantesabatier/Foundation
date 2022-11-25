@@ -62,6 +62,7 @@ interface MutableCollection extends BidirectionalCollection
 
     /**
      * Inserts the given element into the collection unconditionally.
+     *
      * If an element equal to newElement is already contained in the collection, newElement replaces the existing element.
      * @param Element $element An element to insert into the collection.
      * @return Element|null An element equal to newElement if the collection already contained such a member; otherwise, nil.
@@ -122,6 +123,7 @@ interface MutableCollection extends BidirectionalCollection
 
     /**
      * Returns a subsequence containing all but the given number of initial elements.
+     *
      * If the number of elements to drop exceeds the number of elements in the collection, the result is an empty subsequence.
      * @param int $k The number of elements to drop from the beginning of the collection. k must be greater than or equal to zero.
      * @return Slice<Element> A subsequence starting after the specified number of elements.

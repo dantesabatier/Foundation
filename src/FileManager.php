@@ -243,6 +243,7 @@ final class FileManager extends ObjectClass
 
     /**
      * Creates a file with the specified content and attributes at the given location.
+     *
      * If you specify nil for the attributes' parameter, this method uses a default set of values for the owner, group, and permissions of any newly created directories in the path. Similarly, if you omit a specific attribute, the default value is used. The default values for newly created files are as follows:
      * Permissions are set according to the umask of the current process. For more information, see umask.
      * The owner ID is set to the effective user ID of the process.
