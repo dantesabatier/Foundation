@@ -11,7 +11,6 @@ namespace Sabatier\Foundation;
 
 use ArrayIterator;
 use Closure;
-use InvalidArgumentException;
 use IteratorAggregate;
 use Sabatier\Foundation\Predicates\Predicate;
 use Traversable;
@@ -41,16 +40,16 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
     }
 
     /**
-     * @param iterable<Element> $iterable
+     * @param iterable<string, Element> $iterable
      */
     public function __construct(iterable $iterable = [])
     {
         if ($iterable instanceof Dictionary) {
             $this->reserved = $iterable->toArray();
-        } elseif (is_array($iterable) && ($iterable === [] || !is_sequential($iterable))) {
-            $this->reserved = array_filter($iterable, fn(mixed $e): bool => $e !== null);
         } else {
-            throw new InvalidArgumentException();
+            foreach ($iterable as $key => $value) {
+                $this[$key] = $value;
+            }
         }
     }
 
@@ -298,7 +297,7 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
      * @param Closure(Element, string=, bool=): bool $isIncluded
      * @return Dictionary<Element>
      */
-    
+
     public function filter(Closure $isIncluded): self
     {
         $instance = new Dictionary();
@@ -457,6 +456,7 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
 
     /**
      * Removes the given key and its associated value from the dictionary.
+     *
      * If the key is found in the dictionary, this method returns the key's associated value. On removal, this method invalidates all indices with respect to the dictionary.
      * @param string $key The key to remove along with its associated value.
      * @return Element|null The value that was removed, or nil if the key was not present in the dictionary.
@@ -507,6 +507,9 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
         return sprintf("[%s]", $this->isEmpty() ? ":" : $this->mapValues(fn(mixed $value, string $key): string => sprintf("%s: %s", $key, human_readable_value($value)))->values->join(", "));
     }
 
+    /**
+     * @return Traversable<string, Element>
+     */
     public function getIterator(): Traversable
     {
         return new ArrayIterator($this->reserved);

@@ -81,11 +81,6 @@ interface Collection extends Sequence, ArrayAccess
     public function distance(int $start, int $end): int;
 
     /**
-     * A Boolean value indicating whether the sequence is empty.
-     */
-    public function isEmpty(): bool;
-
-    /**
      * Returns a Collection containing, in order, the elements of the collection that satisfy the given predicate.
      * @param Closure(Element, Index=, bool=): bool $isIncluded
      * @return Collection<Index, Element>

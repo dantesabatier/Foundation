@@ -32,6 +32,11 @@ trait SequenceAlgorithms
         return count($this->reserved);
     }
 
+    public function isEmpty(): bool
+    {
+        return $this->count() === 0;
+    }
+
     public function compare(mixed $other): ComparisonResult
     {
         if ($other instanceof self) {

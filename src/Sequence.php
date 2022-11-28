@@ -22,6 +22,11 @@ use Traversable;
 interface Sequence extends Traversable, Countable, Comparable, ExpressibleByArrayLiteral
 {
     /**
+     * A Boolean value indicating whether the sequence is empty.
+     */
+    public function isEmpty(): bool;
+
+    /**
      * Returns a Boolean value indicating whether the sequence contains an element that satisfies the given predicate.
      * @param Closure(Element, Index=): bool $predicate A closure that takes an element of the sequence as its argument and returns a Boolean value that indicates whether the passed element represents a match.
      * @return bool true if the sequence contains an element that satisfies predicate; otherwise, false.
@@ -30,7 +35,7 @@ interface Sequence extends Traversable, Countable, Comparable, ExpressibleByArra
 
     /**
      * Returns a bool value indicating whether the sequence contains an element that satisfies the given predicate.
-     * 
+     *
      * Available when Element conforms to {@see Equatable}.
      * @param Element $element The element to find in the sequence.
      * @return bool {@see true} if the element was found in the sequence; otherwise, {@see false}.
@@ -66,7 +71,7 @@ interface Sequence extends Traversable, Countable, Comparable, ExpressibleByArra
 
     /**
      * Returns the result of combining the elements of the sequence using the given closure.
-     * 
+     *
      * Use the {@see Sequence::reduce()} method to produce a single value from the elements of an entire sequence.
      * For example, you can use this method on an array of integers to filter adjacent equal entries or count frequencies.
      * @template Result
