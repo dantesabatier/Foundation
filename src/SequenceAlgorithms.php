@@ -73,10 +73,10 @@ trait SequenceAlgorithms
     
     public function elementsEqual(Sequence $sequence, ?Closure $areEquivalent = null): bool
     {
-        if ($this->compare($sequence) !== ComparisonResult::orderedSame) {
+        if ($this->compare($sequence) != ComparisonResult::orderedSame) {
             return false;
         }
-        $areEquivalent ??= fn(mixed $e1, mixed $e2): bool => equivalent($e1, $e2);
+        $areEquivalent ??= fn(mixed $e0, mixed $e1): bool => equivalent($e0, $e1);
         foreach ($this as $i => $e) {
             if (!$areEquivalent($e, $sequence->first(fn(mixed $v, string|int $k): bool => $k === $i))) {
                 return false;

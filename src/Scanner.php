@@ -95,6 +95,7 @@ class Scanner extends ObjectClass
 
     /**
      * Scans a given string, returning an equivalent string object by reference if a match is found.
+     *
      * If string is present at the current scan location, then the current scan location is advanced to after the string; otherwise the scan location does not change.
      * @param string $string The string for which to scan at the current scan location.
      * @param string|null $into Upon return, if the receiver contains a string equivalent to string at the current scan location, contains a string equivalent to string.
