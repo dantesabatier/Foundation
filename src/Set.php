@@ -673,6 +673,9 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
         return !$this->contains(fn(mixed $member): bool => $other->containsElement($member));
     }
 
+    /**
+     * @param Set<Element> $set
+     */
     public function setSet(Set $set): void
     {
         $this->reserved = $set->toArray();

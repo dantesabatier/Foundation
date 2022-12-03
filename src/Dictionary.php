@@ -481,6 +481,9 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
         $this->reserved = $this->filter(fn(mixed $e, string $i): bool => !$where($e, $i))->reserved;
     }
 
+    /**
+     * @param Dictionary<Element> $dictionary
+     */
     public function setDictionary(Dictionary $dictionary): void
     {
         $this->reserved = $dictionary->toArray();

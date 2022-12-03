@@ -692,6 +692,9 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
         }
     }
 
+    /**
+     * @param ArrayClass<Element> $array
+     */
     public function setArray(ArrayClass $array): void
     {
         $this->reserved = $array->toArray();
