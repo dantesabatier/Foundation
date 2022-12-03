@@ -83,6 +83,8 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
     {
         if ($iterable instanceof ArrayClass || $iterable instanceof Set) {
             $this->reserved = $iterable->toArray();
+        } elseif ($iterable instanceof Dictionary) {
+            $this->reserved = $iterable->values->toArray();
         } elseif (is_array($iterable) && is_sequential($iterable)) {
             $this->reserved = $iterable;
         } else {
@@ -368,8 +370,8 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
      */
     public function appendContentsOf(iterable $newElements): void
     {
-       $this->mutableCollectionAppendContentsOf($newElements);
-    }    
+        $this->mutableCollectionAppendContentsOf($newElements);
+    }
 
     /**
      * Removes the given element and any elements subsumed by the given element.
@@ -724,7 +726,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
     {
         return $this->collectionOffsetExists($offset);
     }
-    
+
     /**
      * @param int $offset
      * @return Element
@@ -733,7 +735,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
     {
         return $this->collectionOffsetGet($offset);
     }
-    
+
     /**
      * @param int|null $offset
      * @param Element $value
@@ -742,7 +744,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
     {
         $this->collectionOffsetSet($offset, $value);
     }
-    
+
     /**
      * @param int $offset
      */
