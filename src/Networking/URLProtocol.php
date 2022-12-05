@@ -35,7 +35,7 @@ abstract class URLProtocol extends ObjectClass
     {
         $this->task = $task;
         $this->cachedResponse = $cachedResponse;
-        $this->request = $task->currentRequest ?? throw new InvalidArgumentException("A protocol class was requested, but we do not have a current request");
+        $this->request = $task->originalRequest ?? throw new InvalidArgumentException("A protocol class was requested, but we do not have a request");
         $this->client = $client ?? new ProtocolClient();
     }
 
