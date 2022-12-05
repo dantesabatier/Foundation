@@ -32,6 +32,8 @@ const kCFBundleVersionKey = 'CFBundleVersion';
 const kCFBundleDevelopmentRegionKey = 'CFBundleDevelopmentRegion';
 /** @var string Allows an unbundled application that handles localization itself to specify which localizations it has available. */
 const kCFBundleLocalizationsKey = 'CFBundleLocalizations';
+const kCFBundleDocumentTypesKey = "CFBundleDocumentTypes";
+const kCFBundleTypeNameKey = "CFBundleTypeName";
 /** @var string The human-readable name of the bundle. */
 const kCFBundleNameKey = 'CFBundleName';
 const kCFBundlePackageTypeKey = 'CFBundlePackageType';

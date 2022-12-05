@@ -42,8 +42,8 @@ class PropertyListSerializer
             $element->appendChild($document->createElement('real', (string)$obj));
         } elseif ($obj instanceof Date) {
             $element->appendChild($document->createElement('date', (string)$obj));
-        } elseif ($obj instanceof ArrayClass || $obj instanceof Dictionary || is_array($obj)) {
-            $parent = $document->createElement(($obj instanceof ArrayClass || (is_array($obj) && is_sequential($obj))) ? 'array' : 'dict');
+        } elseif ($obj instanceof ArrayClass || $obj instanceof Set || $obj instanceof Dictionary || is_array($obj)) {
+            $parent = $document->createElement(($obj instanceof ArrayClass || $obj instanceof Set || (is_array($obj) && is_sequential($obj))) ? 'array' : 'dict');
             $element->appendChild($parent);
             foreach ($obj as $key => $value) {
                 if (is_string($key)) {
@@ -107,24 +107,21 @@ class PropertyListSerializer
 
     public function data(/** @noinspection PhpUnusedParameterInspection */ mixed $plist, PropertyListSerializationFormat $format = PropertyListSerializationFormat::xml, int $options = 0): string
     {
-        $document = $this->document;
-        $this->append($plist, $document->documentElement);
-        return $document->saveXML();
+        $this->append($plist, $this->document->documentElement);
+        return $this->document->saveXML();
     }
 
     public function writePropertyList(/** @noinspection PhpUnusedParameterInspection */ mixed $plist, URL $url, PropertyListSerializationFormat $format = PropertyListSerializationFormat::xml, int $options = 0): int
     {
-        $document = $this->document;
-        $this->append($plist, $document->documentElement);
-        return (int)$document->save($url->path);
+        $this->append($plist, $this->document->documentElement);
+        return (int)$this->document->save($url->path);
     }
 
     public function propertyList(/** @noinspection PhpUnusedParameterInspection */ string $data, #[ExpectedValues(flagsFromClass: PropertyListSerializationMutabilityOptions::class)] int $options = 0, PropertyListSerializationFormat &$format = null): mixed
     {
-        $document = $this->document;
         /** @psalm-suppress ArgumentTypeCoercion */
-        $document->loadXML($data) ?: throw new InternalInconsistencyException();
-        $value = $this->value($document->documentElement) ?? throw new InternalInconsistencyException();
+        $this->document->loadXML($data) ?: throw new InternalInconsistencyException();
+        $value = $this->value($this->document->documentElement) ?? throw new InternalInconsistencyException();
         $format = PropertyListSerializationFormat::xml;
         return $value;
     }

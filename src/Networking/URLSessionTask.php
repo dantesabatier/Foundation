@@ -141,20 +141,17 @@ abstract class URLSessionTask extends ObjectClass
                     $callback(null);
                     return;
                 }
-                if (!($request = $this->currentRequest)) {
-                    fatal_error("A protocol class was requested, but we do not have a current request");
-                }
                 if ($this instanceof URLSessionDataTask && ($cache = $this->session->configuration->urlCache)) {
                     /** @var Bag<Closure(URLProtocol|null):void> $bag */
                     $bag = new Bag();
                     $bag->values->append($callback);
                     $this->protocolStorage = ProtocolState::awaitingCacheReply($bag);
-                    $cache->getCachedResponse($this, function (?CachedURLResponse $cachedResponse) use ($request, $protocolClass): void {
-                        $protocol = new $protocolClass($request, $this, $cachedResponse);
+                    $cache->getCachedResponse($this, function (?CachedURLResponse $cachedResponse) use ($protocolClass): void {
+                        $protocol = new $protocolClass($this, $cachedResponse);
                         $this->satisfyProtocolRequest($protocol);
                     });
                 } else {
-                    $protocol = new $protocolClass($request, $this);
+                    $protocol = new $protocolClass($this);
                     $this->protocolStorage = ProtocolState::existing($protocol);
                     $callback($protocol);
                 }
