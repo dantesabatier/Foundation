@@ -292,7 +292,7 @@ function document_root_directory(): string
 {
     /** @psalm-suppress PossiblyUndefinedArrayOffset */
     $path = $_SERVER['DOCUMENT_ROOT'];
-    if (is_running_from_cli()) {
+    if (RUNNING_FROM_CLI) {
         if (isset($_SERVER['PWD'])) {
             $path = $_SERVER['PWD'];
         }
@@ -346,7 +346,7 @@ function temporary_directory(): string
 function is_hidden(string $filename): bool
 {
     /** @phpstan-ignore-next-line */
-    if (USE_UNSAFE_FUNCTIONS && target_os_win()) {
+    if (USE_UNSAFE_FUNCTIONS && TARGET_OS_WINDOWS) {
         $attributes = trim(unsafe_value(fn(): string|bool|null => shell_exec("FOR %A IN (" . "\"" . $filename . "\"" . ") DO @ECHO %~aA")));
         return $attributes[3] === 'h' || $attributes[4] === 's';
     }

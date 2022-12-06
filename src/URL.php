@@ -225,7 +225,7 @@ final class URL extends ObjectClass
     public static function fileURL(string $path): URL
     {
         $string = "";
-        if (target_os_win()) {
+        if (TARGET_OS_WINDOWS) {
             $path = str_replace("\\", "/", (string)parse_url($path, PHP_URL_PATH));
         }
         $scheme = parse_url($path, PHP_URL_SCHEME);

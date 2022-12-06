@@ -11,14 +11,12 @@ use JetBrains\PhpStorm\Deprecated;
 use JetBrains\PhpStorm\Pure;
 use Stringable;
 
-function target_os_win(): bool
-{
-    return string_has_prefix(PHP_OS, 'Win', CompareOptions::caseInsensitive);
+if (!defined("TARGET_OS_WINDOWS")) {
+    define("TARGET_OS_WINDOWS", str_contains(PHP_OS, "WIN"));
 }
 
-function is_running_from_cli(): bool
-{
-    return ((PHP_SAPI === 'cli') || (stristr(PHP_SAPI, 'cgi') && getenv('TERM')));
+if (!defined("RUNNING_FROM_CLI")) {
+    define("RUNNING_FROM_CLI", ((PHP_SAPI === 'cli') || (stristr(PHP_SAPI, 'cgi') && getenv('TERM'))));
 }
 
 function debuglog(string $string): void

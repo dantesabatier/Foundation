@@ -75,7 +75,7 @@ class ProcessInfo extends ObjectClass
             return $this->$name;
         } elseif ($name == 'processName') {
             $processName = 'Unknown';
-            if (is_running_from_cli()) {
+            if (RUNNING_FROM_CLI) {
                 $processTitle = cli_get_process_title();
                 if ($processTitle !== null) {
                     $processName = $processTitle;
