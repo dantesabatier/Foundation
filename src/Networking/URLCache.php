@@ -90,7 +90,7 @@ class URLCache extends ObjectClass
     {
         $keys = new ArrayClass([URLResourceKey::fileSizeKey]);
         $entries = $this->diskEntries($keys);
-        $entries->sort(fn(DiskEntry $e0, DiskEntry $e1): int => $e0->date->timeIntervalSinceReferenceDate <=> $e1->date->timeIntervalSinceReferenceDate);
+        $entries->sort(fn(DiskEntry $e0, DiskEntry $e1): int => $e0->date->compare($e1->date)->value);
         $sizes = $entries->map(fn(DiskEntry $entry): int => $entry->url->resourceValues(new Set($keys))->fileSize ?? 0);
         $totalSize = $sizes->sum();
         foreach ($entries as $index => $entry) {
@@ -271,7 +271,7 @@ class URLCache extends ObjectClass
                     FileManager::default()->createFile($newURL->path, $serialized);
                 }
                 if ($identifier = $locators?->identifier) {
-                    $entriesToRemove = $this->diskEntries()->filter(fn(DiskEntry $entry): bool => $entry->identifier === $identifier)->sort(fn(DiskEntry $e0, DiskEntry $e1): int => $e0->date->timeIntervalSinceReferenceDate <=> $e1->date->timeIntervalSinceReferenceDate);
+                    $entriesToRemove = $this->diskEntries()->filter(fn(DiskEntry $entry): bool => $entry->identifier === $identifier)->sort(fn(DiskEntry $e0, DiskEntry $e1): int => $e0->date->compare($e1->date)->value);
                     $entriesToRemove->popFirst();
                     foreach ($entriesToRemove as $entry) {
                         FileManager::default()->removeItem($entry->url);

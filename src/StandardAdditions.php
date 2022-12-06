@@ -324,6 +324,7 @@ function home_directory(): string
 function full_user_name(): string
 {
     if (function_exists('posix_getpwuid')) {
+        /** @noinspection PhpComposerExtensionStubsInspection */
         return posix_getpwuid(posix_geteuid())['name'] ?? get_current_user();
     }
     return get_current_user();
@@ -415,4 +416,9 @@ function is_serialized(mixed $value, bool $strict = true): bool
 function equivalent(mixed $a, mixed $b): bool
 {
     return $a instanceof Equatable ? $a->isEqual($b) : $a === $b;
+}
+
+function compare(mixed $a, mixed $b): int
+{
+    return $a instanceof Comparable && $b instanceof Comparable ? $a->compare($b)->value : $a <=> $b;
 }

@@ -326,11 +326,12 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
 
     /**
      * Sorts the collection in place.
-     * @param Closure(Element, Element): int $by
+     * @param Closure(Element, Element): int|null $by
      * @return Dictionary<Element>
      */
-    public function sort(Closure $by): Dictionary
+    public function sort(?Closure $by = null): Dictionary
     {
+        $by ??= fn(mixed $e0, mixed $e1): int => compare($e0, $e1);
         uasort($this->reserved, $by);
         return $this;
     }

@@ -289,10 +289,10 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
 
     /**
      * Sorts the collection in place.
-     * @param Closure(Element, Element): int $by
+     * @param Closure(Element, Element): int|null $by
      * @return ArrayClass<Element>
      */
-    public function sort(Closure $by): ArrayClass
+    public function sort(?Closure $by = null): ArrayClass
     {
         return $this->collectionSort($by);
     }

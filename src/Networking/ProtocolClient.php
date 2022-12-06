@@ -239,7 +239,7 @@ class ProtocolClient implements URLProtocolClient
             };
             if ($storage = $session->configuration->urlCredentialStorage) {
                 $storage->getCredentials($protectionSpace, $task, function (?Dictionary $credentials) use ($task, $storage, $protectionSpace, $proceed): void {
-                    if (($firstKeyLexicographically = $credentials?->keys?->sort(fn($e0, $e1): int => $e0 <=> $e1)->first())) {
+                    if (($firstKeyLexicographically = $credentials?->keys?->sort()->first())) {
                         /** @psalm-suppress PossiblyNullArrayAccess, PossiblyNullReference */
                         $proceed($credentials[$firstKeyLexicographically]);
                     } else {

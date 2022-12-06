@@ -73,7 +73,7 @@ interface Collection extends Sequence, ArrayAccess
 
     /**
      * Returns the distance between two indices.
-     * 
+     *
      * @param int $start A valid index of the collection.
      * @param int $end Another valid index of the collection. If end is equal to start, the result is zero.
      * @return int The distance between start and end. The result can be negative only if the collection conforms to the BidirectionalCollection protocol.
@@ -97,10 +97,10 @@ interface Collection extends Sequence, ArrayAccess
 
     /**
      * Sorts the collection in place.
-     * @param Closure(Element, Element): int $by
+     * @param Closure(Element, Element): int|null $by
      * @return Collection<Index, Element>
      */
-    public function sort(Closure $by): Collection;
+    public function sort(?Closure $by = null): Collection;
 
     /**
      * Returns a copy of the receiving sequence sorted as specified by a given array of sort descriptors.

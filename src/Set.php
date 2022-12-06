@@ -267,10 +267,10 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
 
     /**
      * Sorts the collection in place.
-     * @param Closure(Element, Element): int $by
+     * @param Closure(Element, Element): int|null $by
      * @return Set<Element>
      */
-    public function sort(Closure $by): Set
+    public function sort(?Closure $by = null): Set
     {
         return $this->collectionSort($by);
     }
