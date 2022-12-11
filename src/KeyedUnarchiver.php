@@ -14,6 +14,6 @@ class KeyedUnarchiver
      */
     public static function unarchiveTopLevelObjectWithData(string $data): mixed
     {
-        return unsafe_value(fn(): mixed => unserialize($data));
+        return unsafe_value(fn(): mixed => ($decoded = base64_decode($data, true)) && is_serialized($decoded) ? unserialize($decoded) : $data);
     }
 }

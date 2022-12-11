@@ -2,26 +2,28 @@
 
 namespace Sabatier\Foundation;
 
+use Exception;
+
 /** @internal */
 class UnarchiveFromDataTransformer extends SharedValueTransformer
 {
-    public function transformedValue(mixed $value): mixed
+    /**
+     * @throws Exception
+     */
+    public function transformedValue(mixed $value): ?string
     {
         if ($value === null) {
             return null;
         }
-        if (!is_serialized($value)) {
-            return serialize($value);
-        }
-        return $value;
+        return KeyedArchiver::archivedData($value);
     }
 
+    /**
+     * @throws Exception
+     */
     public function reverseTransformedValue(mixed $value): mixed
     {
-        if (is_serialized($value)) {
-            return unserialize($value);
-        }
-        return $value;
+        return is_string($value) ? KeyedUnarchiver::unarchiveTopLevelObjectWithData($value) : $value;
     }
 
     public function description(): string
