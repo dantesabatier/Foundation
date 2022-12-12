@@ -23,7 +23,10 @@ class UnarchiveFromDataTransformer extends SharedValueTransformer
      */
     public function reverseTransformedValue(mixed $value): mixed
     {
-        return is_string($value) ? KeyedUnarchiver::unarchiveTopLevelObjectWithData($value) : $value;
+        if (is_string($value)) {
+            return KeyedUnarchiver::unarchiveTopLevelObjectWithData($value);
+        }
+        return $value;
     }
 
     public function description(): string
