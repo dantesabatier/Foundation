@@ -4,9 +4,9 @@ namespace Sabatier\Foundation\Networking;
 
 use const Sabatier\Foundation\URLErrorUnknown;
 
-class CompletionAction
+readonly class CompletionAction
 {
-    private function __construct(public readonly CompletionActionRawValue $rawValue, public readonly ?URLRequest $newRequest = null, public readonly int $errorCode = URLErrorUnknown)
+    private function __construct(public CompletionActionRawValue $rawValue, public ?URLRequest $newRequest = null, public int $errorCode = URLErrorUnknown)
     {
     }
 

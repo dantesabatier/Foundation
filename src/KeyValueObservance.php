@@ -12,9 +12,9 @@ namespace Sabatier\Foundation;
 use Closure;
 
 /** @internal */
-class KeyValueObservance
+readonly class KeyValueObservance
 {
-    public function __construct(public readonly object $observer, public readonly string $keyPath, public readonly int $options, public readonly mixed $context = null, public readonly ?Closure $handler = null)
+    public function __construct(public object $observer, public string $keyPath, public int $options, public mixed $context = null, public ?Closure $handler = null)
     {
     }
 }

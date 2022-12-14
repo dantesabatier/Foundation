@@ -9,7 +9,7 @@ use Closure;
  * @psalm-import-type DataCompletionHandler from URLSession
  * @psalm-import-type DownloadCompletionHandler from URLSession
  */
-class TaskBehaviour
+readonly class TaskBehaviour
 {
     /**
      * @param TaskBehaviourRawValue $rawValue 
@@ -17,7 +17,7 @@ class TaskBehaviour
      * @param DownloadCompletionHandler|null $downloadCompletionHandler 
      * @param URLSessionDelegate|null $taskDelegate 
      */
-    public function __construct(public readonly TaskBehaviourRawValue $rawValue, public readonly ?Closure $dataCompletionHandler = null, public readonly ?Closure $downloadCompletionHandler = null, public readonly ?URLSessionDelegate $taskDelegate = null)
+    public function __construct(public TaskBehaviourRawValue $rawValue, public ?Closure $dataCompletionHandler = null, public ?Closure $downloadCompletionHandler = null, public ?URLSessionDelegate $taskDelegate = null)
     {
     }
 

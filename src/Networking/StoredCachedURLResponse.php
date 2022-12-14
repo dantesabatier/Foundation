@@ -3,9 +3,9 @@
 namespace Sabatier\Foundation\Networking;
 
 /** @internal */
-class StoredCachedURLResponse
+readonly class StoredCachedURLResponse
 {
-    public function __construct(public readonly CachedURLResponse $cachedURLResponse)
+    public function __construct(public CachedURLResponse $cachedURLResponse)
     {
     }
 }

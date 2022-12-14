@@ -11,13 +11,13 @@ use function Sabatier\Foundation\substring_from_index;
 use function Sabatier\Foundation\substring_to_index;
 
 /** @internal */
-class Challenge
+readonly class Challenge
 {
     /**
      * @param string $authScheme
      * @param ArrayClass<AuthParameter> $authParameters
      */
-    public function __construct(public readonly string $authScheme, public readonly ArrayClass $authParameters)
+    public function __construct(public string $authScheme, public ArrayClass $authParameters)
     {
     }
 

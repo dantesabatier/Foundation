@@ -5,13 +5,13 @@ namespace Sabatier\Foundation;
 use Exception;
 
 /** @internal */
-class ApplicationPreferences
+readonly class ApplicationPreferences
 {
-    public readonly URL $url;
+    public URL $url;
     /** @var Dictionary<mixed> */
-    public readonly Dictionary $dictionaryRepresentation;
+    public Dictionary $dictionaryRepresentation;
 
-    public function __construct(public readonly string $domainName)
+    public function __construct(public string $domainName)
     {
         try {
             $fileManager = FileManager::default();

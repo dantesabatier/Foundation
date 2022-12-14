@@ -5,12 +5,12 @@ namespace Sabatier\Foundation;
 use Exception;
 
 /** @internal */
-final class URLFileTypeMappingsInternal
+final readonly class URLFileTypeMappingsInternal
 {
     /** @var Dictionary<ArrayClass<string>> */
-    public readonly Dictionary $MIMETypeToExtensionList;
+    public Dictionary $MIMETypeToExtensionList;
     /** @var Dictionary<string> */
-    public readonly Dictionary $extensionToMIMEType;
+    public Dictionary $extensionToMIMEType;
 
     public function __construct()
     {

@@ -3,9 +3,9 @@
 namespace Sabatier\Foundation\Networking;
 
 /** @internal */
-class ProtocolState
+readonly class ProtocolState
 {
-    private function __construct(public readonly ProtocolStateRawValue $rawValue, public readonly ?Bag $bag = null, public readonly ?URLProtocol $protocol = null)
+    private function __construct(public ProtocolStateRawValue $rawValue, public ?Bag $bag = null, public ?URLProtocol $protocol = null)
     {
     }
 

@@ -12,7 +12,7 @@ namespace Sabatier\Foundation;
 /**
  * A container for information broadcast through a notification center to all registered observers.
  */
-class Notification implements CustomStringConvertible
+readonly class Notification implements CustomStringConvertible
 {
     /**
      * Initializes a new notification.
@@ -21,7 +21,7 @@ class Notification implements CustomStringConvertible
      * @param mixed $object The object for the new notification.
      * @param Dictionary<mixed>|null $userInfo The user information dictionary for the new notification. May be nil.
      */
-    public function __construct(public readonly string $name, public readonly mixed $object = null, public readonly ?Dictionary $userInfo = null)
+    public function __construct(public string $name, public mixed $object = null, public ?Dictionary $userInfo = null)
     {
     }
 

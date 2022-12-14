@@ -399,7 +399,7 @@ abstract class NativeProtocol extends URLProtocol implements EasyHandleDelegate
         }
     }
 
-    public function redirectFor(/** @noinspection PhpUnusedParameterInspection */ URLRequest $request): void
+    public function redirectFor(URLRequest $request): void
     {
         request_concrete_implementation($this, __FUNCTION__);
     }
@@ -427,7 +427,7 @@ abstract class NativeProtocol extends URLProtocol implements EasyHandleDelegate
         $task->session->remove($this->easyHandle);
     }
 
-    public function completionAction(/** @noinspection PhpUnusedParameterInspection */ URLRequest $request, URLResponse $response): CompletionAction
+    public function completionAction(URLRequest $request, URLResponse $response): CompletionAction
     {
         return CompletionAction::completeTask();
     }

@@ -5,9 +5,9 @@ namespace Sabatier\Foundation\Networking;
 use Sabatier\Foundation\ArrayClass;
 
 /** @internal */
-class AuthParameter
+readonly class AuthParameter
 {
-    public function __construct(public readonly string $name, public readonly string $value)
+    public function __construct(public string $name, public string $value)
     {
     }
 

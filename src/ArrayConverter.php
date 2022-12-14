@@ -3,9 +3,9 @@
 namespace Sabatier\Foundation;
 
 /** @internal */
-class ArrayConverter
+readonly class ArrayConverter
 {
-    private function __construct(private readonly array $array)
+    private function __construct(private array $array)
     {
     }
 

@@ -3,9 +3,9 @@
 namespace Sabatier\Foundation\Networking;
 
 /** @internal */
-class InternalState
+readonly class InternalState
 {
-    private function __construct(public readonly InternalStateRawValue $rawValue, public readonly ?CachedURLResponse $cachedURLResponse = null, public readonly ?TransferState $transferState = null, public readonly ?URLResponse $response = null, public readonly ?DataDrain $bodyDataDrain = null)
+    private function __construct(public InternalStateRawValue $rawValue, public ?CachedURLResponse $cachedURLResponse = null, public ?TransferState $transferState = null, public ?URLResponse $response = null, public ?DataDrain $bodyDataDrain = null)
     {
     }
 

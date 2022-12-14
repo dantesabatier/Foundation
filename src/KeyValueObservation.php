@@ -9,9 +9,9 @@
 
 namespace Sabatier\Foundation;
 
-class KeyValueObservation
+readonly class KeyValueObservation
 {
-    public function __construct(public readonly KeyValueObserving $object, public readonly string $keyPath)
+    public function __construct(public KeyValueObserving $object, public string $keyPath)
     {
     }
 

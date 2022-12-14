@@ -3,9 +3,9 @@
 namespace Sabatier\Foundation\Networking;
 
 /** @internal */
-class EasyHandleWriteBufferResult
+readonly class EasyHandleWriteBufferResult
 {
-    private function __construct(public readonly EasyHandleWriteBufferResultRawValue $rawValue, public readonly ?string $bytes = null)
+    private function __construct(public EasyHandleWriteBufferResultRawValue $rawValue, public ?string $bytes = null)
     {
     }
 

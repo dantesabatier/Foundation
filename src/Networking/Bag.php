@@ -8,10 +8,10 @@ use Sabatier\Foundation\ArrayClass;
  * @template Element
  * @internal
  */
-class Bag
+readonly class Bag
 {
     /** @var ArrayClass<Element> */
-    public readonly ArrayClass $values;
+    public ArrayClass $values;
 
     public function __construct()
     {

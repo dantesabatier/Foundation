@@ -5,9 +5,9 @@ namespace Sabatier\Foundation\Networking;
 /**
  * An enumeration of the types of messages sent and received.
  */
-class URLSessionWebSocketTaskMessage
+readonly class URLSessionWebSocketTaskMessage
 {
-    private function __construct(public readonly URLSessionWebSocketTaskMessageRawValue $rawValue, public readonly ?string $data = null, public readonly ?string $string = null)
+    private function __construct(public URLSessionWebSocketTaskMessageRawValue $rawValue, public ?string $data = null, public ?string $string = null)
     {
     }
 

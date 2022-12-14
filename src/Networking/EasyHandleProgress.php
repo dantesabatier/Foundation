@@ -3,9 +3,9 @@
 namespace Sabatier\Foundation\Networking;
 
 /** @internal */
-class EasyHandleProgress
+readonly class EasyHandleProgress
 {
-    public function __construct(public readonly float $totalBytesSent, public readonly float $totalBytesExpectedToSend, public readonly float $totalBytesReceived, public readonly float $totalBytesExpectedToReceive)
+    public function __construct(public float $totalBytesSent, public float $totalBytesExpectedToSend, public float $totalBytesReceived, public float $totalBytesExpectedToReceive)
     {
     }
 }

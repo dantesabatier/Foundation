@@ -13,11 +13,11 @@ use const Sabatier\Foundation\LocalizedFailureReasonErrorKey;
 use const Sabatier\Foundation\URLErrorDomain;
 
 /** @internal */
-final class MultiHandle
+final readonly class MultiHandle
 {
-    private readonly CurlMultiHandle $rawHandle;
+    private CurlMultiHandle $rawHandle;
     /** @var ArrayClass<EasyHandle> */
-    private readonly ArrayClass $easyHandles;
+    private ArrayClass $easyHandles;
 
     public function __construct(URLSessionConfiguration $configuration)
     {

@@ -10,9 +10,9 @@ use DOMNode;
 use JetBrains\PhpStorm\ExpectedValues;
 
 /** @internal */
-class PropertyListSerializer
+readonly class PropertyListSerializer
 {
-    private readonly DOMDocument $document;
+    private DOMDocument $document;
 
     /** @noinspection PhpUnhandledExceptionInspection */
     public function __construct()
