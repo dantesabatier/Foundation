@@ -39,6 +39,7 @@ const kCFBundleNameKey = 'CFBundleName';
 const kCFBundlePackageTypeKey = 'CFBundlePackageType';
 const kCFBundleDisplayNameKey = 'CFBundleDisplayName';
 const kCFBundleShortVersionStringKey = 'CFBundleShortVersionString';
+const kCFBundleHumanReadableCopyright = "NSHumanReadableCopyright";
 const kCFBundleExecutablePathKey = 'CFBundleExecutablePath';
 const kCFBundlePrincipalClassKey = 'NSPrincipalClass';
 /** @var string The domain consisting of defaults parsed from the application's arguments. These are one or more pairs of the form -default value included in the command-line invocation of the application. */
