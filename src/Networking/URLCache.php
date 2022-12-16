@@ -126,16 +126,18 @@ class URLCache extends ObjectClass
         if (!($directory = $this->cacheDirectory)) {
             return;
         }
-        if ($enumerator = FileManager::default()->enumerator($directory, $keys, DirectoryEnumerationOptions::skipsSubdirectoryDescendants | DirectoryEnumerationOptions::skipsPackageDescendants | DirectoryEnumerationOptions::skipsHiddenFiles, fn(URL $url, Error $error): bool => false)) {
-            foreach ($enumerator as $url) {
-                if ($entry = DiskEntry::entry($url)) {
-                    $stop = false;
-                    $block($entry, $stop);
-                    /** @psalm-suppress TypeDoesNotContainType */
-                    if (/** @phpstan-ignore-line */ $stop) {
-                        break;
-                    }
-                }
+        if (!($enumerator = FileManager::default()->enumerator($directory, $keys, DirectoryEnumerationOptions::skipsSubdirectoryDescendants | DirectoryEnumerationOptions::skipsPackageDescendants | DirectoryEnumerationOptions::skipsHiddenFiles, fn(URL $url, Error $error): bool => false))) {
+            return;
+        }
+        foreach ($enumerator as $url) {
+            if (!($entry = DiskEntry::entry($url))) {
+                continue;
+            }
+            $stop = false;
+            $block($entry, $stop);
+            /** @psalm-suppress TypeDoesNotContainType */
+            if (/** @phpstan-ignore-line */ $stop) {
+                break;
             }
         }
     }
