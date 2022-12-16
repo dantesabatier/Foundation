@@ -66,7 +66,7 @@ final class URL extends ObjectClass
         }
         $this->string = $string;
     }
-    
+
     #[ArrayShape(['string' => "string", 'baseURL' => '\\' . URL::class])]
     public function __serialize(): array
     {
@@ -225,7 +225,7 @@ final class URL extends ObjectClass
     public static function fileURL(string $path): URL
     {
         $string = "";
-        if (TARGET_OS_WINDOWS) {
+        if (/** @phpstan-ignore-line */ TARGET_OS_WINDOWS) {
             $path = str_replace("\\", "/", (string)parse_url($path, PHP_URL_PATH));
         }
         $scheme = parse_url($path, PHP_URL_SCHEME);

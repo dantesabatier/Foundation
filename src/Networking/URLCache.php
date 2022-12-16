@@ -132,7 +132,7 @@ class URLCache extends ObjectClass
                     $stop = false;
                     $block($entry, $stop);
                     /** @psalm-suppress TypeDoesNotContainType */
-                    if ($stop) {
+                    if (/** @phpstan-ignore-line */ $stop) {
                         break;
                     }
                 }
