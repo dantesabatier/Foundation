@@ -91,7 +91,10 @@ class UserDefaults
     public function url(string $key): ?URL
     {
         if ($object = $this->object($key)) {
-            return unserialize($object);
+            try {
+                return KeyedUnarchiver::unarchiveTopLevelObjectWithData($object);
+            } catch (Exception) {
+            }
         }
         return null;
     }
@@ -130,9 +133,6 @@ class UserDefaults
     public function string(string $key): ?string
     {
         $object = $this->object($key);
-        if ($object === null) {
-           return null; 
-        }
         if (is_bool($object) || is_int($object) || is_float($object)) {
             return (new Number($object))->stringValue;
         } elseif (is_string($object)) {
@@ -253,11 +253,13 @@ class UserDefaults
      * This is a convenience method for calling {@see setObject()}.
      * @param URL|null $value The URL to store in the defaults database.
      * @param string $key The key with which to associate the value.
-     * @throws Exception
      */
     public function setURL(?URL $value, string $key): void
     {
-        $this->setObject($value ? serialize($value) : null, $key);
+        try {
+            $this->setObject($value ? KeyedArchiver::archivedData($value) : null, $key);
+        } catch (Exception) {
+        }
     }
 
     /**
