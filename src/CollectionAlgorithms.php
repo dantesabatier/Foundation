@@ -175,7 +175,7 @@ trait CollectionAlgorithms
 
     public function valueForKeyPath(string $keyPath): mixed
     {
-        if ($keyPath === '' || $keyPath[0] !== '@') {
+        if ($keyPath === "" || $keyPath[0] !== "@") {
             return parent::valueForKeyPath($keyPath);
         }
         $components = components_from_key_path($keyPath);

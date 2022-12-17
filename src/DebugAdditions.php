@@ -79,9 +79,9 @@ function human_readable_time(float $interval): string
     $h = (int)floor(((int)$interval % 86400) / 3600);
     $d = (int)floor(((int)$interval % 2_592_000) / 86400);
     $M = (int)floor((int)$interval / 2_592_000);
-    $string = '';
+    $string = "";
     if ($M) {
-        $string .= sprintf("%d month%s", $M, ($M > 1) ? "s" : '');
+        $string .= sprintf("%d month%s", $M, ($M > 1) ? "s" : "");
         $string .= " ";
         $interval -= $M * 2_592_000;
     }
@@ -114,7 +114,7 @@ function human_readable_time(float $interval): string
  * @param int $line The line number to print along with message. The default is the file where fatal_error() is called.
  * @throws Exception
  */
-function fatal_error(string $message = '', string $file = '', int $line = 0): never
+function fatal_error(string $message = "", string $file = "", int $line = 0): never
 {
     if (!$file || !$line) {
         $backtrace = debug_backtrace()[0] ?? [];

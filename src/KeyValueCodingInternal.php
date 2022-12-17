@@ -7,7 +7,7 @@ function components_from_key_path(string $keyPath): KeyPathComponents
     $remainderPath = null;
     $idx = strpos($keyPath, ".");
     if ($idx !== false) {
-        $remainderPath = '';
+        $remainderPath = "";
         $subKey = substring_to_index($keyPath, $idx);
         if ($idx < strlen($keyPath) - 1) {
             $remainderPath = substring_from_index($keyPath, $idx + 1);
@@ -19,7 +19,7 @@ function components_from_key_path(string $keyPath): KeyPathComponents
 
 function kvc_operator_from_key(string $key): ?string
 {
-    if ($key === '' || $key[0] !== "@") {
+    if ($key === "" || $key[0] !== "@") {
         return null;
     }
     $name = substring_from_index($key, 1);
@@ -39,8 +39,8 @@ function kvc_components(string $keyPath): array
     if ($idx === false) {
         return [];
     }
-    $collection = '';
-    $property = '';
+    $collection = "";
+    $property = "";
     $components = preg_split(sprintf("/%s/", preg_quote(".", "/")), substring_to_index($keyPath, $idx), -1, PREG_SPLIT_NO_EMPTY);
     $numberOfComponents = count($components);
     if ($numberOfComponents) {

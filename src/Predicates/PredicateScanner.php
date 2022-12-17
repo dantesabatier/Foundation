@@ -346,9 +346,9 @@ class PredicateScanner extends Scanner
             $this->scanLocation = $scanLocation;
         }
         if ($this->scanString("\"")) {
-            $value = '';
+            $value = "";
             $characters = $this->charactersToBeSkipped;
-            $this->charactersToBeSkipped = '';
+            $this->charactersToBeSkipped = "";
             $this->scanUpString("\"", $value);
             if (!$this->scanString("\"")) {
                 throw new InvalidArgumentException("Invalid argument: missing closing \"\"\" at index $this->scanLocation");
@@ -432,7 +432,7 @@ class PredicateScanner extends Scanner
             return Expression::expressionForSelector($operand, $expression->constantValue(), new ArrayClass($arguments->dropFirst(2)));
         }
         $this->scanString("#");
-        $value = '';
+        $value = "";
         $identifier = "_\$abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
         if (!$this->scanCharacters($identifier, $value)) {
             throw new InvalidArgumentException("Invalid argument: parsing error at index $this->scanLocation");
@@ -486,7 +486,7 @@ class PredicateScanner extends Scanner
                 }
                 $function = "$keyPath:";
                 if (!$this->scanString("(")) {
-                    $string = '';
+                    $string = "";
                     $this->scanCharacters("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ", $string);
                     if (!$this->scanString(":(")) {
                         throw new InvalidArgumentException("Invalid argument: expecting expression at index $this->scanLocation");

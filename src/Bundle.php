@@ -275,7 +275,7 @@ final class Bundle extends ObjectClass
                 /** @psalm-suppress InvalidScalarArgument */
                 $extensions->append($extension);
             }
-            $languages ??= new ArrayClass(['']);
+            $languages ??= new ArrayClass([""]);
             $resources = $languages->flatMap(fn(string $language): iterable => FileManager::default()->contentsOfDirectory($language ? $baseURL->appendingPathComponent($language) : $baseURL, null, DirectoryEnumerationOptions::skipsHiddenFiles))->filter(function (URL $url, int $idx, bool &$stop) use ($name, $extensions, $limit): bool {
                 $pathExtension = $url->pathExtension;
                 /** @psalm-suppress InvalidScalarArgument */
@@ -412,7 +412,7 @@ final class Bundle extends ObjectClass
      */
     public function localizedString(string $key, string $value = null, string $table = null): string
     {
-        $string = localized_string($key, $table ?? "Localizable", $this->resourceURL?->path ?? '');
+        $string = localized_string($key, $table ?? "Localizable", $this->resourceURL?->path ?? "");
         if (string_is_equal($key, $string) && $value) {
             return $value;
         }

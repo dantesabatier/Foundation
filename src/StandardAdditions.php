@@ -269,7 +269,7 @@ function string_contains(string $string, string $substring, #[ExpectedValues(fla
  * @return string The localized string.
  * @noinspection PhpUnusedParameterInspection
  */
-function localized_string(string $string, string $domain = "Localizable", string $directory = '', string $comment = ''): string
+function localized_string(string $string, string $domain = "Localizable", string $directory = "", string $comment = ""): string
 {
     $fileManager = FileManager::default();
     if (!$fileManager->fileExists($directory, $isDirectory) || !$isDirectory) {
@@ -407,7 +407,7 @@ function is_serialized(mixed $value, bool $strict = true): bool
         case "b":
         case "i":
         case "d":
-            $end = $strict ? "$" : '';
+            $end = $strict ? "$" : "";
             return (bool)preg_match("/^$token:[\d.E+-]+;$end/", $value);
     }
     return false;

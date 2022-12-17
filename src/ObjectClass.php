@@ -276,7 +276,7 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
     {
         $components = components_from_key_path($keyPath);
         $key = $components->key;
-        if ($key === '' || $key === $keyPath) {
+        if ($key === "" || $key === $keyPath) {
             return $this->valueForKey($keyPath);
         }
         $obj = $this->valueForKeyPath($key);

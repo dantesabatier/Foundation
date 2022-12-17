@@ -54,7 +54,7 @@ class KeyPathExpression extends FunctionExpression
 
     public function predicateFormat(): string
     {
-        $format = '';
+        $format = "";
         if (($operand = $this->operand()) && ($operand->expressionType !== ExpressionType::evaluatedObject)) {
             $format .= $operand->description();
             $format .= ".";

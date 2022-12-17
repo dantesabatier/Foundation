@@ -258,7 +258,7 @@ final class FileManager extends ObjectClass
     public function createFile(string $path, ?string $data, ?Dictionary $attributes = null): bool
     {
         return unsafe_value(function () use ($path, $data, $attributes): bool {
-            $result = file_put_contents($path, $data ?? '');
+            $result = file_put_contents($path, $data ?? "");
             if ($result === false) {
                 return false;
             }
@@ -315,7 +315,7 @@ final class FileManager extends ObjectClass
         $filename = (function (string $name, string $extension, URL $directoryUrl): string {
             $index = 1;
             while ($this->fileExists($directoryUrl->appendingPathComponent("$name")->appendingPathExtension($extension)->path)) {
-                $name = preg_replace("/\d+/u", '', $name) . $index;
+                $name = preg_replace("/\d+/u", "", $name) . $index;
                 $index++;
             }
             return "$name.$extension";

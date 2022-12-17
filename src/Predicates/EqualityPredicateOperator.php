@@ -36,10 +36,10 @@ class EqualityPredicateOperator extends PredicateOperator
         if ($right instanceof Value) {
             $right = $right->value;
         }
-        if ($left === '') {
+        if ($left === "") {
             $left = null;
         }
-        if ($right === '') {
+        if ($right === "") {
             $right = null;
         }
         $isNegation = $this->isNegation;

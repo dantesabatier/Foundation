@@ -42,7 +42,7 @@ class ComparisonPredicate extends Predicate
 
     public function predicateFormat(): string
     {
-        $modifierDescription = '';
+        $modifierDescription = "";
         $modifier = $this->comparisonPredicateModifier;
         switch ($modifier) {
             case ComparisonPredicateModifier::all:

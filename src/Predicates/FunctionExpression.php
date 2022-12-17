@@ -88,7 +88,7 @@ class FunctionExpression extends Expression
 
     public function predicateFormat(): string
     {
-        $format = '';
+        $format = "";
         $operand = $this->operand;
         if ($operand instanceof ExpressionOperator) {
             $format .= $operand->function();

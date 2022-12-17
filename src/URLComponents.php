@@ -62,7 +62,7 @@ class URLComponents extends ObjectClass
             }
             $path = $this->path;
             if ($path) {
-                $tu = '';
+                $tu = "";
                 $tok = strtok($path, "\\/");
                 while (strlen($tok)) {
                     $tu .= rawurlencode($tok) . "/";
@@ -78,7 +78,7 @@ class URLComponents extends ObjectClass
             if ($fragment) {
                 $fragment = "#" . $fragment;
             }
-            $string = (new ArrayClass([$scheme, $user, $password, $host, $port, $path, $query, $fragment]))->compactMap(fn(string|int|null $element): string|int|null => $element)->join('');
+            $string = (new ArrayClass([$scheme, $user, $password, $host, $port, $path, $query, $fragment]))->compactMap(fn(string|int|null $element): string|int|null => $element)->join("");
             return empty($string) ? null : $string;
         } elseif ($name == "queryItems") {
             return ($this->query === null) ? null : (new ArrayClass(explode("&", $this->query)))->map(function (string $pair): URLQueryItem {

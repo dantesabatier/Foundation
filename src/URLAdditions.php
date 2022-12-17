@@ -21,13 +21,13 @@ function url_encode(string $url, string $endpoint, array $parameters = []): stri
 
 function request_url(): string
 {
-    $elements = explode("?", $_SERVER["REQUEST_URI"] ?? '');
+    $elements = explode("?", $_SERVER["REQUEST_URI"] ?? "");
     $components = new URLComponents();
     $components->scheme = isset($_SERVER["HTTPS"]) ? "https" : "http";
     $components->host = $_SERVER["HTTP_HOST"] ?? null;
     $components->path = $elements[0] ?? null;
     $components->query = $elements[1] ?? null;
-    return $components->string ?? '';
+    return $components->string ?? "";
 }
 
 /**
@@ -58,7 +58,7 @@ function getallheaders(): array
         if (isset($_SERVER["REDIRECT_HTTP_AUTHORIZATION"])) {
             $headers["Authorization"] = $_SERVER["REDIRECT_HTTP_AUTHORIZATION"];
         } elseif (isset($_SERVER["PHP_AUTH_USER"])) {
-            $headers["Authorization"] = "Basic " . base64_encode(sprintf("%s:%s", $_SERVER["PHP_AUTH_USER"], $_SERVER["PHP_AUTH_PW"] ?? ''));
+            $headers["Authorization"] = "Basic " . base64_encode(sprintf("%s:%s", $_SERVER["PHP_AUTH_USER"], $_SERVER["PHP_AUTH_PW"] ?? ""));
         } elseif (isset($_SERVER["PHP_AUTH_DIGEST"])) {
             $headers["Authorization"] = $_SERVER["PHP_AUTH_DIGEST"];
         }

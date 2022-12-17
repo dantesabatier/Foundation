@@ -141,13 +141,13 @@ final class URL extends ObjectClass
         } elseif ($name == "standardizedFileURL") {
             return $this->standardized;
         } elseif ($name == "scheme") {
-            return $this->parse(PHP_URL_SCHEME) ?? '';
+            return $this->parse(PHP_URL_SCHEME) ?? "";
         } elseif ($name == "host") {
             return $this->parse(PHP_URL_HOST);
         } elseif ($name == "lastPathComponent") {
             return basename($this->path);
         } elseif ($name == "path") {
-            $path = $this->parse(PHP_URL_PATH) ?? '';
+            $path = $this->parse(PHP_URL_PATH) ?? "";
             if ($this->isFileURL) {
                 $path = rawurldecode($path);
             }
@@ -177,7 +177,7 @@ final class URL extends ObjectClass
         } elseif ($name == "isFileURL") {
             return $this->scheme === "file";
         } elseif ($name == "hasDirectoryPath") {
-            return $this->isFileURL && is_dir($this->path) || $this->pathExtension === '';
+            return $this->isFileURL && is_dir($this->path) || $this->pathExtension === "";
         } elseif ($name == "baseURL") {
             return $this->$name;
         } else {
