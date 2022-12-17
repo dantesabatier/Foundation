@@ -52,12 +52,6 @@ class ComparisonPredicateOperator extends PredicateOperator
         if ($right instanceof ObjectClass) {
             $right = $right->description();
         }
-        if (is_numeric($right) && is_string($left)) {
-            $left = strlen($left);
-        }
-        if (is_numeric($left) && is_string($right)) {
-            $right = strlen($right);
-        }
         return match ($variant) {
             PredicateOperatorType::lessThan => $left < $right,
             PredicateOperatorType::lessThanOrEqualTo => $left <= $right,
