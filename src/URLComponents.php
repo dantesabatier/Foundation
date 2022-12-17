@@ -40,20 +40,20 @@ class URLComponents extends ObjectClass
 
     public function __get(string $name)
     {
-        if ($name == 'url') {
+        if ($name == "url") {
             return $this->urlRelativeTo(null);
-        } elseif ($name == 'string') {
+        } elseif ($name == "string") {
             $scheme = $this->scheme;
             if ($scheme) {
-                $scheme .= '://';
+                $scheme .= "://";
             }
             $user = $this->user;
             $password = $this->password;
             if ($password && $user) {
-                $user .= ':';
-                $password = rawurlencode($password) . '@';
+                $user .= ":";
+                $password = rawurlencode($password) . "@";
             } elseif ($user) {
-                $user .= '@';
+                $user .= "@";
             }
             $host = $this->host;
             $port = $this->port;
@@ -65,24 +65,24 @@ class URLComponents extends ObjectClass
                 $tu = '';
                 $tok = strtok($path, "\\/");
                 while (strlen($tok)) {
-                    $tu .= rawurlencode($tok) . '/';
+                    $tu .= rawurlencode($tok) . "/";
                     $tok = strtok("\\/");
                 }
-                $path = '/' . trim($tu, '/');
+                $path = "/" . trim($tu, "/");
             }
             $query = $this->query;
             if ($query) {
-                $query = '?' . $query;
+                $query = "?" . $query;
             }
             $fragment = $this->fragment;
             if ($fragment) {
-                $fragment = '#' . $fragment;
+                $fragment = "#" . $fragment;
             }
             $string = (new ArrayClass([$scheme, $user, $password, $host, $port, $path, $query, $fragment]))->compactMap(fn(string|int|null $element): string|int|null => $element)->join('');
             return empty($string) ? null : $string;
-        } elseif ($name == 'queryItems') {
-            return ($this->query === null) ? null : (new ArrayClass(explode('&', $this->query)))->map(function (string $pair): URLQueryItem {
-                $components = explode('=', $pair);
+        } elseif ($name == "queryItems") {
+            return ($this->query === null) ? null : (new ArrayClass(explode("&", $this->query)))->map(function (string $pair): URLQueryItem {
+                $components = explode("=", $pair);
                 $name = $components[0];
                 $value = (count($components) === 2) ? urldecode($components[1]) : null;
                 if ($value) {
@@ -97,9 +97,9 @@ class URLComponents extends ObjectClass
 
     public function __set(string $name, mixed $value): void
     {
-        if ($name == 'pass') {
+        if ($name == "pass") {
             $this->password = $value;
-        } elseif ($name == 'queryItems') {
+        } elseif ($name == "queryItems") {
             if ($value === null) {
                 $this->query = null;
             } else {

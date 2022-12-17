@@ -17,7 +17,7 @@ trait CollectionAlgorithms
 
     public function offsetGet(mixed $offset): mixed
     {
-        assert(is_int($offset), sprintf("invalid argument: expecting int, \"%s\" given", typeof($offset)));
+        assert(is_int($offset), sprintf("Invalid argument: expecting int, \"%s\" given", typeof($offset)));
         assert(in_range($offset, $this->startIndex(), $this->endIndex()), sprintf("%s %s(%s) index \"%s\" out of bounds [%s...<%s]", $this->debugDescription(), __FUNCTION__, $offset, $offset, $this->startIndex(), $this->endIndex()));
         return $this->reserved[$offset];
     }
@@ -160,7 +160,7 @@ trait CollectionAlgorithms
     public function valueForKey(string $key): self
     {
         return $this->map(function (KeyValueCoding $e) use ($key): mixed {
-            assert($e instanceof KeyValueCoding, sprintf("invalid argument: expecting %s, \"%s\" given", KeyValueCoding::class, typeof($e)));
+            assert($e instanceof KeyValueCoding, sprintf("Invalid argument: expecting %s, \"%s\" given", KeyValueCoding::class, typeof($e)));
             return $e->valueForKey($key);
         });
     }
@@ -168,7 +168,7 @@ trait CollectionAlgorithms
     public function setValueForKey(mixed $value, string $key): void
     {
         foreach ($this as $e) {
-            assert($e instanceof KeyValueCoding, sprintf("invalid argument: expecting %s, \"%s\" given", KeyValueCoding::class, typeof($e)));
+            assert($e instanceof KeyValueCoding, sprintf("Invalid argument: expecting %s, \"%s\" given", KeyValueCoding::class, typeof($e)));
             $e->setValueForKey($value, $key);
         }
     }

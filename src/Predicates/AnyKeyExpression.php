@@ -25,11 +25,11 @@ class AnyKeyExpression extends Expression
 
     public function expressionValue(mixed $object = null, ?Dictionary $context = null): mixed
     {
-        throw new LogicException('Cannot evaluate any key expression');
+        throw new LogicException("Cannot evaluate any key expression");
     }
 
     public function predicateFormat(): string
     {
-        return 'ANYKEY';
+        return "ANYKEY";
     }
 }

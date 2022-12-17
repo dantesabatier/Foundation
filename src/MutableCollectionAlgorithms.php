@@ -26,9 +26,9 @@ trait MutableCollectionAlgorithms
         $oldElement = $this->first(fn(mixed $e): bool => $e instanceof Equatable ? $e->isEqual($newElement) : $e === $newElement);
         if ($oldElement === null) {
             $this->append($newElement);
-            return ['inserted' => true, 'elementAfterInsert' => $newElement];
+            return ["inserted" => true, "elementAfterInsert" => $newElement];
         }
-        return ['inserted' => false, 'elementAfterInsert' => $oldElement];
+        return ["inserted" => false, "elementAfterInsert" => $oldElement];
     }
     
     public function insertAt(mixed $element, int $at): void
@@ -134,13 +134,13 @@ trait MutableCollectionAlgorithms
     
     public function dropFirst(int $k): Slice
     {
-        assert($k >= 0, "invalid argument: k must be zero or greater");
+        assert($k >= 0, "Invalid argument: k must be zero or greater");
         return new Slice($this, new Range($k, $this->endIndex()));
     }
     
     public function dropLast(int $k): Slice
     {
-        assert($k >= 0, "invalid argument: k must be zero or greater");
+        assert($k >= 0, "Invalid argument: k must be zero or greater");
         return new Slice($this, new Range($this->startIndex(), max($this->endIndex() - $k, 0)));
     }
 }

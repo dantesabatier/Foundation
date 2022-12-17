@@ -26,7 +26,7 @@ class SortDescriptor extends ObjectClass
     public function __get(string $name)
     {
         return $this->$name = match ($name) {
-            'reversedSortDescriptor' => new SortDescriptor($this->key, !$this->ascending, $this->comparator),
+            "reversedSortDescriptor" => new SortDescriptor($this->key, !$this->ascending, $this->comparator),
             default => $this->valueForUndefinedKey($name)
         };
     }
@@ -43,7 +43,7 @@ class SortDescriptor extends ObjectClass
         if ($comparator) {
             return $comparator($object1, $object2);
         }
-        assert($object1 instanceof KeyValueCoding && $object2 instanceof KeyValueCoding, sprintf("invalid arguments, sort descriptors are meant to be used with %s objects exclusively, %s given", KeyValueCoding::class, human_readable_value([$object1, $object2])));
+        assert($object1 instanceof KeyValueCoding && $object2 instanceof KeyValueCoding, sprintf("Invalid arguments, sort descriptors are meant to be used with %s objects exclusively, %s given", KeyValueCoding::class, human_readable_value([$object1, $object2])));
         return ComparisonResult::from(($this->ascending ? ComparisonResult::orderedAscending->value : ComparisonResult::orderedDescending->value) * ($object1->valueForKeyPath($this->key) <=> $object2->valueForKeyPath($this->key)));
     }
 

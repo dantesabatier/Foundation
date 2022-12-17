@@ -60,19 +60,19 @@ abstract class Operation extends ObjectClass
             $fiber = new Fiber(function (): void {
                 Fiber::suspend();
                 $this->queue->isCurrentQueue = true;
-                $this->willChangeValueForKey('isExecuting');
+                $this->willChangeValueForKey("isExecuting");
                 $this->isExecuting = true;
-                $this->didChangeValueForKey('isExecuting');
+                $this->didChangeValueForKey("isExecuting");
                 $this->main();
-                $this->willChangeValueForKey('isExecuting');
+                $this->willChangeValueForKey("isExecuting");
                 $this->isExecuting = false;
-                $this->didChangeValueForKey('isExecuting');
+                $this->didChangeValueForKey("isExecuting");
                 if ($completionBlock = $this->completionBlock) {
                     $completionBlock();
                 }
-                $this->willChangeValueForKey('isFinished');
+                $this->willChangeValueForKey("isFinished");
                 $this->isFinished = true;
-                $this->didChangeValueForKey('isFinished');
+                $this->didChangeValueForKey("isFinished");
                 $this->queue->isCurrentQueue = false;
             });
             $fiber->start();
@@ -105,10 +105,10 @@ abstract class Operation extends ObjectClass
         if ($this->isCancelled) {
             return;
         }
-        $this->willChangeValueForKey('isCancelled');
+        $this->willChangeValueForKey("isCancelled");
         $this->isCancelled = true;
-        $this->didChangeValueForKey('isCancelled');
-        $this->dependencies->setValueForKey($this->isCancelled, 'isCancelled');
+        $this->didChangeValueForKey("isCancelled");
+        $this->dependencies->setValueForKey($this->isCancelled, "isCancelled");
     }
 
     /**
@@ -120,10 +120,10 @@ abstract class Operation extends ObjectClass
      */
     public function addDependency(Operation $operation): void
     {
-        $this->willChangeValueForKey('isReady');
+        $this->willChangeValueForKey("isReady");
         $this->isReady = false;
-        $this->didChangeValueForKey('isReady');
-        $operation->observe('isFinished', KeyValueObservingOptions::new, function (Operation $operation): void {
+        $this->didChangeValueForKey("isReady");
+        $operation->observe("isFinished", KeyValueObservingOptions::new, function (Operation $operation): void {
             if ($operation->isFinished) {
                 $this->removeDependency($operation);
             }
@@ -140,9 +140,9 @@ abstract class Operation extends ObjectClass
     public function removeDependency(Operation $operation): void
     {
         $this->dependencies->remove($operation);
-        $this->willChangeValueForKey('isReady');
+        $this->willChangeValueForKey("isReady");
         $this->isReady = $this->dependencies->isEmpty();
-        $this->didChangeValueForKey('isReady');
+        $this->didChangeValueForKey("isReady");
     }
 
     /**

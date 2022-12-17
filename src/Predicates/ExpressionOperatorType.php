@@ -81,107 +81,107 @@ enum ExpressionOperatorType: int
 
     public static function operatorType(string $functionName): ExpressionOperatorType
     {
-        if (string_is_equal($functionName, 'average:', CompareOptions::caseInsensitive) || string_is_equal($functionName, 'avg:', CompareOptions::caseInsensitive)) {
+        if (string_is_equal($functionName, "average:", CompareOptions::caseInsensitive) || string_is_equal($functionName, "avg:", CompareOptions::caseInsensitive)) {
             return ExpressionOperatorType::average;
-        } elseif (string_is_equal($functionName, 'sum:', CompareOptions::caseInsensitive)) {
+        } elseif (string_is_equal($functionName, "sum:", CompareOptions::caseInsensitive)) {
             return ExpressionOperatorType::sum;
-        } elseif (string_is_equal($functionName, 'count:', CompareOptions::caseInsensitive)) {
+        } elseif (string_is_equal($functionName, "count:", CompareOptions::caseInsensitive)) {
             return ExpressionOperatorType::count;
-        } elseif (string_is_equal($functionName, 'min:', CompareOptions::caseInsensitive)) {
+        } elseif (string_is_equal($functionName, "min:", CompareOptions::caseInsensitive)) {
             return ExpressionOperatorType::min;
-        } elseif (string_is_equal($functionName, 'max:', CompareOptions::caseInsensitive)) {
+        } elseif (string_is_equal($functionName, "max:", CompareOptions::caseInsensitive)) {
             return ExpressionOperatorType::max;
-        } elseif (string_is_equal($functionName, 'median:', CompareOptions::caseInsensitive)) {
+        } elseif (string_is_equal($functionName, "median:", CompareOptions::caseInsensitive)) {
             return ExpressionOperatorType::median;
-        } elseif (string_is_equal($functionName, 'mode:', CompareOptions::caseInsensitive)) {
+        } elseif (string_is_equal($functionName, "mode:", CompareOptions::caseInsensitive)) {
             return ExpressionOperatorType::mode;
-        } elseif (string_is_equal($functionName, 'stddev:', CompareOptions::caseInsensitive)) {
+        } elseif (string_is_equal($functionName, "stddev:", CompareOptions::caseInsensitive)) {
             return ExpressionOperatorType::stddev;
-        } elseif (string_is_equal($functionName, 'add:to:', CompareOptions::caseInsensitive)) {
+        } elseif (string_is_equal($functionName, "add:to:", CompareOptions::caseInsensitive)) {
             return ExpressionOperatorType::addTo;
-        } elseif (string_is_equal($functionName, 'from:subtract:', CompareOptions::caseInsensitive)) {
+        } elseif (string_is_equal($functionName, "from:subtract:", CompareOptions::caseInsensitive)) {
             return ExpressionOperatorType::fromSubtract;
-        } elseif (string_is_equal($functionName, 'multiply:by:', CompareOptions::caseInsensitive)) {
+        } elseif (string_is_equal($functionName, "multiply:by:", CompareOptions::caseInsensitive)) {
             return ExpressionOperatorType::multiplyBy;
-        } elseif (string_is_equal($functionName, 'divide:by:', CompareOptions::caseInsensitive)) {
+        } elseif (string_is_equal($functionName, "divide:by:", CompareOptions::caseInsensitive)) {
             return ExpressionOperatorType::divideBy;
-        } elseif (string_is_equal($functionName, 'modulus:by:', CompareOptions::caseInsensitive)) {
+        } elseif (string_is_equal($functionName, "modulus:by:", CompareOptions::caseInsensitive)) {
             return ExpressionOperatorType::modulusBy;
-        } elseif (string_is_equal($functionName, 'sqrt:', CompareOptions::caseInsensitive)) {
+        } elseif (string_is_equal($functionName, "sqrt:", CompareOptions::caseInsensitive)) {
             return ExpressionOperatorType::sqrt;
-        } elseif (string_is_equal($functionName, 'ln:', CompareOptions::caseInsensitive)) {
+        } elseif (string_is_equal($functionName, "ln:", CompareOptions::caseInsensitive)) {
             return ExpressionOperatorType::ln;
-        } elseif (string_is_equal($functionName, 'log:', CompareOptions::caseInsensitive)) {
+        } elseif (string_is_equal($functionName, "log:", CompareOptions::caseInsensitive)) {
             return ExpressionOperatorType::log;
-        } elseif (string_is_equal($functionName, 'raise:toPower:', CompareOptions::caseInsensitive)) {
+        } elseif (string_is_equal($functionName, "raise:toPower:", CompareOptions::caseInsensitive)) {
             return ExpressionOperatorType::raiseToPower;
-        } elseif (string_is_equal($functionName, 'exp:', CompareOptions::caseInsensitive)) {
+        } elseif (string_is_equal($functionName, "exp:", CompareOptions::caseInsensitive)) {
             return ExpressionOperatorType::exp;
-        } elseif (string_is_equal($functionName, 'ceiling:', CompareOptions::caseInsensitive)) {
+        } elseif (string_is_equal($functionName, "ceiling:", CompareOptions::caseInsensitive)) {
             return ExpressionOperatorType::ceiling;
-        } elseif (string_is_equal($functionName, 'abs:', CompareOptions::caseInsensitive)) {
+        } elseif (string_is_equal($functionName, "abs:", CompareOptions::caseInsensitive)) {
             return ExpressionOperatorType::abs;
-        } elseif (string_is_equal($functionName, 'trunc:', CompareOptions::caseInsensitive)) {
+        } elseif (string_is_equal($functionName, "trunc:", CompareOptions::caseInsensitive)) {
             return ExpressionOperatorType::trunc;
-        } elseif (string_is_equal($functionName, 'random:', CompareOptions::caseInsensitive)) {
+        } elseif (string_is_equal($functionName, "random:", CompareOptions::caseInsensitive)) {
             return ExpressionOperatorType::random;
-        } elseif (string_is_equal($functionName, 'now:', CompareOptions::caseInsensitive)) {
+        } elseif (string_is_equal($functionName, "now:", CompareOptions::caseInsensitive)) {
             return ExpressionOperatorType::now;
-        } elseif (string_is_equal($functionName, 'floor:', CompareOptions::caseInsensitive)) {
+        } elseif (string_is_equal($functionName, "floor:", CompareOptions::caseInsensitive)) {
             return ExpressionOperatorType::floor;
-        } elseif (string_is_equal($functionName, 'uppercase:', CompareOptions::caseInsensitive)) {
+        } elseif (string_is_equal($functionName, "uppercase:", CompareOptions::caseInsensitive)) {
             return ExpressionOperatorType::uppercase;
-        } elseif (string_is_equal($functionName, 'lowercase:', CompareOptions::caseInsensitive)) {
+        } elseif (string_is_equal($functionName, "lowercase:", CompareOptions::caseInsensitive)) {
             return ExpressionOperatorType::lowercase;
-        } elseif (string_is_equal($functionName, 'canonical:', CompareOptions::caseInsensitive)) {
+        } elseif (string_is_equal($functionName, "canonical:", CompareOptions::caseInsensitive)) {
             return ExpressionOperatorType::canonical;
-        } elseif (string_is_equal($functionName, 'bitwiseAnd:with:', CompareOptions::caseInsensitive)) {
+        } elseif (string_is_equal($functionName, "bitwiseAnd:with:", CompareOptions::caseInsensitive)) {
             return ExpressionOperatorType::bitwiseAndWith;
-        } elseif (string_is_equal($functionName, 'bitwiseOr:with:', CompareOptions::caseInsensitive)) {
+        } elseif (string_is_equal($functionName, "bitwiseOr:with:", CompareOptions::caseInsensitive)) {
             return ExpressionOperatorType::bitwiseOrWith;
-        } elseif (string_is_equal($functionName, 'bitwiseXor:with:', CompareOptions::caseInsensitive)) {
+        } elseif (string_is_equal($functionName, "bitwiseXor:with:", CompareOptions::caseInsensitive)) {
             return ExpressionOperatorType::bitwiseXorWith;
-        } elseif (string_is_equal($functionName, 'leftshift:by:', CompareOptions::caseInsensitive)) {
+        } elseif (string_is_equal($functionName, "leftshift:by:", CompareOptions::caseInsensitive)) {
             return ExpressionOperatorType::leftshiftBy;
-        } elseif (string_is_equal($functionName, 'rightshift:by:', CompareOptions::caseInsensitive)) {
+        } elseif (string_is_equal($functionName, "rightshift:by:", CompareOptions::caseInsensitive)) {
             return ExpressionOperatorType::rightshiftBy;
-        } elseif (string_is_equal($functionName, 'onesComplement:', CompareOptions::caseInsensitive)) {
+        } elseif (string_is_equal($functionName, "onesComplement:", CompareOptions::caseInsensitive)) {
             return ExpressionOperatorType::onesComplement;
-        } elseif (string_is_equal($functionName, 'index:', CompareOptions::caseInsensitive)) {
+        } elseif (string_is_equal($functionName, "index:", CompareOptions::caseInsensitive)) {
             return ExpressionOperatorType::index;
-        } elseif (string_is_equal($functionName, 'first:', CompareOptions::caseInsensitive)) {
+        } elseif (string_is_equal($functionName, "first:", CompareOptions::caseInsensitive)) {
             return ExpressionOperatorType::indexFirst;
-        } elseif (string_is_equal($functionName, 'last:', CompareOptions::caseInsensitive)) {
+        } elseif (string_is_equal($functionName, "last:", CompareOptions::caseInsensitive)) {
             return ExpressionOperatorType::indexLast;
-        } elseif (string_is_equal($functionName, 'size:', CompareOptions::caseInsensitive)) {
+        } elseif (string_is_equal($functionName, "size:", CompareOptions::caseInsensitive)) {
             return ExpressionOperatorType::indexSize;
-        } elseif (string_is_equal($functionName, 'cast:', CompareOptions::caseInsensitive)) {
+        } elseif (string_is_equal($functionName, "cast:", CompareOptions::caseInsensitive)) {
             return ExpressionOperatorType::cast;
-        } elseif (string_is_equal($functionName, 'chs:', CompareOptions::caseInsensitive)) {
+        } elseif (string_is_equal($functionName, "chs:", CompareOptions::caseInsensitive)) {
             return ExpressionOperatorType::chs;
-        } elseif (string_is_equal($functionName, 'year:', CompareOptions::caseInsensitive)) {
+        } elseif (string_is_equal($functionName, "year:", CompareOptions::caseInsensitive)) {
             return ExpressionOperatorType::year;
-        } elseif (string_is_equal($functionName, 'month:', CompareOptions::caseInsensitive)) {
+        } elseif (string_is_equal($functionName, "month:", CompareOptions::caseInsensitive)) {
             return ExpressionOperatorType::month;
-        } elseif (string_is_equal($functionName, 'week:', CompareOptions::caseInsensitive)) {
+        } elseif (string_is_equal($functionName, "week:", CompareOptions::caseInsensitive)) {
             return ExpressionOperatorType::week;
-        } elseif (string_is_equal($functionName, 'day:', CompareOptions::caseInsensitive)) {
+        } elseif (string_is_equal($functionName, "day:", CompareOptions::caseInsensitive)) {
             return ExpressionOperatorType::day;
-        } elseif (string_is_equal($functionName, 'hour:', CompareOptions::caseInsensitive)) {
+        } elseif (string_is_equal($functionName, "hour:", CompareOptions::caseInsensitive)) {
             return ExpressionOperatorType::hour;
-        } elseif (string_is_equal($functionName, 'minute:', CompareOptions::caseInsensitive)) {
+        } elseif (string_is_equal($functionName, "minute:", CompareOptions::caseInsensitive)) {
             return ExpressionOperatorType::minute;
-        } elseif (string_is_equal($functionName, 'second:', CompareOptions::caseInsensitive)) {
+        } elseif (string_is_equal($functionName, "second:", CompareOptions::caseInsensitive)) {
             return ExpressionOperatorType::second;
-        } elseif (string_is_equal($functionName, 'uuid:', CompareOptions::caseInsensitive)) {
+        } elseif (string_is_equal($functionName, "uuid:", CompareOptions::caseInsensitive)) {
             return ExpressionOperatorType::uuid;
-        } elseif (string_is_equal($functionName, 'concat:', CompareOptions::caseInsensitive)) {
+        } elseif (string_is_equal($functionName, "concat:", CompareOptions::caseInsensitive)) {
             return ExpressionOperatorType::concat;
-        } elseif (string_is_equal($functionName, 'isNull:', CompareOptions::caseInsensitive)) {
+        } elseif (string_is_equal($functionName, "isNull:", CompareOptions::caseInsensitive)) {
             return ExpressionOperatorType::isNull;
-        } elseif (string_is_equal($functionName, 'ifNull:', CompareOptions::caseInsensitive)) {
+        } elseif (string_is_equal($functionName, "ifNull:", CompareOptions::caseInsensitive)) {
             return ExpressionOperatorType::ifNull;
-        } elseif (string_is_equal($functionName, 'nullIf:', CompareOptions::caseInsensitive)) {
+        } elseif (string_is_equal($functionName, "nullIf:", CompareOptions::caseInsensitive)) {
             return ExpressionOperatorType::nullIf;
         } else {
             throw new InvalidArgumentException(sprintf("%s unable to parse selector name \"%s\" into supported method", ExpressionOperatorType::class, $functionName));
@@ -191,20 +191,20 @@ enum ExpressionOperatorType: int
     public static function functionName(ExpressionOperatorType $operator): string
     {
         return match ($operator) {
-            ExpressionOperatorType::addTo => 'add:to:',
-            ExpressionOperatorType::fromSubtract => 'from:subtract:',
-            ExpressionOperatorType::multiplyBy => 'multiply:by:',
-            ExpressionOperatorType::divideBy => 'divide:by:',
-            ExpressionOperatorType::modulusBy => 'modulus:by:',
-            ExpressionOperatorType::raiseToPower => 'raise:toPower:',
-            ExpressionOperatorType::bitwiseAndWith => 'bitwiseAnd:with:',
-            ExpressionOperatorType::bitwiseOrWith => 'bitwiseOr:with:',
-            ExpressionOperatorType::bitwiseXorWith => 'bitwiseXor:with:',
-            ExpressionOperatorType::leftshiftBy => 'leftshift:by:',
-            ExpressionOperatorType::rightshiftBy => 'rightshift:by:',
-            ExpressionOperatorType::indexFirst => 'first:',
-            ExpressionOperatorType::indexLast => 'last:',
-            ExpressionOperatorType::indexSize => 'size:',
+            ExpressionOperatorType::addTo => "add:to:",
+            ExpressionOperatorType::fromSubtract => "from:subtract:",
+            ExpressionOperatorType::multiplyBy => "multiply:by:",
+            ExpressionOperatorType::divideBy => "divide:by:",
+            ExpressionOperatorType::modulusBy => "modulus:by:",
+            ExpressionOperatorType::raiseToPower => "raise:toPower:",
+            ExpressionOperatorType::bitwiseAndWith => "bitwiseAnd:with:",
+            ExpressionOperatorType::bitwiseOrWith => "bitwiseOr:with:",
+            ExpressionOperatorType::bitwiseXorWith => "bitwiseXor:with:",
+            ExpressionOperatorType::leftshiftBy => "leftshift:by:",
+            ExpressionOperatorType::rightshiftBy => "rightshift:by:",
+            ExpressionOperatorType::indexFirst => "first:",
+            ExpressionOperatorType::indexLast => "last:",
+            ExpressionOperatorType::indexSize => "size:",
             default => "$operator->name:",
         };
     }

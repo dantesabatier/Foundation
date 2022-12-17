@@ -213,13 +213,13 @@ class PredicateUtilities
         if ($type === null) {
             return $value;
         }
-        if (string_is_equal($type, 'string', CompareOptions::caseInsensitive)) {
+        if (string_is_equal($type, "string", CompareOptions::caseInsensitive)) {
             return human_readable_value($value);
-        } elseif (string_is_equal($type, 'int', CompareOptions::caseInsensitive) || string_is_equal($type, 'integer', CompareOptions::caseInsensitive)) {
+        } elseif (string_is_equal($type, "int", CompareOptions::caseInsensitive) || string_is_equal($type, "integer", CompareOptions::caseInsensitive)) {
             return (new Number($value))->intValue;
-        } elseif (string_is_equal($type, 'float', CompareOptions::caseInsensitive) || string_is_equal($type, 'double', CompareOptions::caseInsensitive)) {
+        } elseif (string_is_equal($type, "float", CompareOptions::caseInsensitive) || string_is_equal($type, "double", CompareOptions::caseInsensitive)) {
             return (new Number($value))->floatValue;
-        } elseif (string_is_equal($type, 'bool', CompareOptions::caseInsensitive) || string_is_equal($type, 'boolean', CompareOptions::caseInsensitive)) {
+        } elseif (string_is_equal($type, "bool", CompareOptions::caseInsensitive) || string_is_equal($type, "boolean", CompareOptions::caseInsensitive)) {
             return (new Number($value))->boolValue;
         }
         if (!class_exists($type)) {
@@ -243,7 +243,7 @@ class PredicateUtilities
         if (!$date instanceof Date) {
             return null;
         }
-        return new Number(date('Y', (int)$date->timeIntervalSinceReferenceDate));
+        return new Number(date("Y", (int)$date->timeIntervalSinceReferenceDate));
     }
 
     public static function month(?Date $date): ?Number
@@ -251,7 +251,7 @@ class PredicateUtilities
         if (!$date instanceof Date) {
             return null;
         }
-        return new Number(date('n', (int)$date->timeIntervalSinceReferenceDate));
+        return new Number(date("n", (int)$date->timeIntervalSinceReferenceDate));
     }
 
     public static function week(?Date $date): ?Number
@@ -259,7 +259,7 @@ class PredicateUtilities
         if (!$date instanceof Date) {
             return null;
         }
-        return new Number(date('W', (int)$date->timeIntervalSinceReferenceDate));
+        return new Number(date("W", (int)$date->timeIntervalSinceReferenceDate));
     }
 
     public static function day(?Date $date): ?Number
@@ -267,7 +267,7 @@ class PredicateUtilities
         if (!$date instanceof Date) {
             return null;
         }
-        return new Number(date('j', (int)$date->timeIntervalSinceReferenceDate));
+        return new Number(date("j", (int)$date->timeIntervalSinceReferenceDate));
     }
 
     public static function hour(?Date $date): ?Number
@@ -275,7 +275,7 @@ class PredicateUtilities
         if (!$date instanceof Date) {
             return null;
         }
-        return new Number(date('G', (int)$date->timeIntervalSinceReferenceDate));
+        return new Number(date("G", (int)$date->timeIntervalSinceReferenceDate));
     }
 
     public static function minute(?Date $date): ?Number
@@ -283,7 +283,7 @@ class PredicateUtilities
         if (!$date instanceof Date) {
             return null;
         }
-        return new Number(date('i', (int)$date->timeIntervalSinceReferenceDate));
+        return new Number(date("i", (int)$date->timeIntervalSinceReferenceDate));
     }
 
     public static function second(?Date $date): ?Number
@@ -291,7 +291,7 @@ class PredicateUtilities
         if (!$date instanceof Date) {
             return null;
         }
-        return new Number(date('s', (int)$date->timeIntervalSinceReferenceDate));
+        return new Number(date("s", (int)$date->timeIntervalSinceReferenceDate));
     }
 
     public static function floor(Number|float $value): Number

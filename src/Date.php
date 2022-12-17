@@ -27,17 +27,17 @@ class Date extends ObjectClass
     }
 
     #[Pure]
-    #[ArrayShape(['timeIntervalSinceReferenceDate' => "float", 'timeIntervalSinceNow' => "float", 'timeIntervalSince1970' => "float"])]
+    #[ArrayShape(["timeIntervalSinceReferenceDate" => "float", "timeIntervalSinceNow" => "float", "timeIntervalSince1970" => "float"])]
     public function __serialize(): array
     {
-        return ['timeIntervalSinceReferenceDate' => $this->timeIntervalSinceReferenceDate];
+        return ["timeIntervalSinceReferenceDate" => $this->timeIntervalSinceReferenceDate];
     }
 
     public function __unserialize(array $data): void
     {
-        $this->timeIntervalSinceReferenceDate = $data['timeIntervalSinceReferenceDate'];
-        $this->timeIntervalSinceNow = $data['timeIntervalSinceNow'];
-        $this->timeIntervalSince1970 = $data['timeIntervalSince1970'];
+        $this->timeIntervalSinceReferenceDate = $data["timeIntervalSinceReferenceDate"];
+        $this->timeIntervalSinceNow = $data["timeIntervalSinceNow"];
+        $this->timeIntervalSince1970 = $data["timeIntervalSince1970"];
     }
 
     /**
@@ -181,7 +181,7 @@ class Date extends ObjectClass
      */
     public function formatted(): string
     {
-        return date('Y-m-d H:i:s', (int)$this->timeIntervalSinceReferenceDate);
+        return date("Y-m-d H:i:s", (int)$this->timeIntervalSinceReferenceDate);
     }
 
     public function description(): string

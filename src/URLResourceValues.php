@@ -42,7 +42,7 @@ class URLResourceValues extends ObjectClass
     public function __get(string $name)
     {
         return match ($name) {
-            'allValues' => $this->values,
+            "allValues" => $this->values,
             URLResourceKey::isApplicationKey, URLResourceKey::isDirectoryKey, URLResourceKey::parentDirectoryURLKey, URLResourceKey::fileResourceTypeKey, URLResourceKey::fileSizeKey, URLResourceKey::isExecutableKey, URLResourceKey::isRegularFileKey, URLResourceKey::attributeModificationDateKey, URLResourceKey::creationDateKey, URLResourceKey::isAliasFileKey, URLResourceKey::isHiddenKey, URLResourceKey::isReadableKey, URLResourceKey::isSymbolicLinkKey, URLResourceKey::isWritableKey, URLResourceKey::nameKey, URLResourceKey::pathKey => $this->values[$name],
             default => $this->valueForUndefinedKey($name)
         };

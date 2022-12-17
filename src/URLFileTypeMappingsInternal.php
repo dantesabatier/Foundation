@@ -19,11 +19,11 @@ final readonly class URLFileTypeMappingsInternal
         /** @var Dictionary<string> $extensionToMIMEType */
         $extensionToMIMEType = new Dictionary();
         try {
-            if (($url = Bundle::bundleForClass(self::class)->url('mime.types')) && ($contents = FileManager::default()->contents($url->path))) {
+            if (($url = Bundle::bundleForClass(self::class)->url("mime.types")) && ($contents = FileManager::default()->contents($url->path))) {
                 $scanner = new Scanner($contents);
                 $scanner->charactersToBeSkipped = PHP_EOL;
                 while ($scanner->scanUpCharacters(PHP_EOL, $line)) {
-                    if (isset($line[0]) && $line[0] !== '#' && preg_match_all('#(\S+)#', $line, $matches) && isset($matches[1]) && (count($matches[1])) > 1) {
+                    if (isset($line[0]) && $line[0] !== "#" && preg_match_all("#(\S+)#", $line, $matches) && isset($matches[1]) && (count($matches[1])) > 1) {
                         $array = new ArrayClass($matches[1]);
                         $mimeType = $array[0];
                         $extensions = new ArrayClass($array->dropFirst(1));

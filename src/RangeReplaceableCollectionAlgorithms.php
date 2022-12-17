@@ -11,7 +11,7 @@ trait RangeReplaceableCollectionAlgorithms
 
     public function replaceSubrange(Range $subrange, Collection $newElements): void
     {
-        assert($subrange->count() <= $this->count() && $subrange->count() === $newElements->count(), "invalid argument: the range's upper bound must be less or equal to the count of the receiver and, range and collection must have the same number of elements");
+        assert($subrange->count() <= $this->count() && $subrange->count() === $newElements->count(), "Invalid argument: the range's upper bound must be less or equal to the count of the receiver and, range and collection must have the same number of elements");
         foreach ($subrange as $idx => $bound) {
             $this->removeAt($bound);
             $this->insertAt($newElements[$idx], $bound);
@@ -25,7 +25,7 @@ trait RangeReplaceableCollectionAlgorithms
 
     public static function repeating(mixed $value, int $count): self
     {
-        assert($count >= 0, "invalid argument: count must be zero or greater");
+        assert($count >= 0, "Invalid argument: count must be zero or greater");
         return new self(array_fill(0, $count, $value));
     }
 }

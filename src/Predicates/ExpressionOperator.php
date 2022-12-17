@@ -81,9 +81,9 @@ class ExpressionOperator extends Expression
                 break;
             default:
                 $format = $this->function();
-                $format .= '(';
-                $format .= $arguments->join(', ');
-                $format .= ')';
+                $format .= "(";
+                $format .= $arguments->join(", ");
+                $format .= ")";
                 break;
         }
         return $format;

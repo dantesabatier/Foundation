@@ -224,7 +224,7 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
 
     public function validateValueForKeyPath(mixed &$value, string $keyPath): bool
     {
-        $idx = strpos($keyPath, '.');
+        $idx = strpos($keyPath, ".");
         if (!$idx) {
             return $this->validateValueForKey($value, $keyPath);
         }
@@ -235,19 +235,19 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
         }
         $keyPath = substring_from_index($keyPath, $idx + 1);
         if (!$obj instanceof KeyValueCoding) {
-            throw new UndefinedKeyException(sprintf('%s %s() "%s" is not key value coding compliant for the key "%s"', $this->debugDescription(), __FUNCTION__, typeof($value), $keyPath));
+            throw new UndefinedKeyException(sprintf("%s %s() \"%s\" is not key value coding compliant for the key \"%s\"", $this->debugDescription(), __FUNCTION__, typeof($value), $keyPath));
         }
         return $obj->validateValueForKeyPath($value, $keyPath);
     }
 
     public function valueForUndefinedKey(string $key): mixed
     {
-        throw new UndefinedKeyException(sprintf('%s is not key value coding compliant for the key "%s"', $this->debugDescription(), $key));
+        throw new UndefinedKeyException(sprintf("%s is not key value coding compliant for the key \"%s\"", $this->debugDescription(), $key));
     }
 
     public function setValueForUndefinedKey(mixed $value, string $key): void
     {
-        throw new UndefinedKeyException(sprintf('%s is not key value coding compliant for the key "%s"', $this->debugDescription(), $key));
+        throw new UndefinedKeyException(sprintf("%s is not key value coding compliant for the key \"%s\"", $this->debugDescription(), $key));
     }
 
     public function valueForKey(string $key)
@@ -288,7 +288,7 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
             return null;
         }
         if (!$obj instanceof KeyValueCoding) {
-            throw new UndefinedKeyException(sprintf('%s %s() "%s" is not key value coding compliant for the key "%s"', $this->debugDescription(), __FUNCTION__, typeof($obj), $remainderPath));
+            throw new UndefinedKeyException(sprintf("%s %s() \"%s\" is not key value coding compliant for the key \"%s\"", $this->debugDescription(), __FUNCTION__, typeof($obj), $remainderPath));
         }
         return $obj->valueForKeyPath($remainderPath);
     }
@@ -298,7 +298,7 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
         if (!$this->validateValueForKeyPath($value, $keyPath)) {
             return;
         }
-        $idx = strpos($keyPath, '.');
+        $idx = strpos($keyPath, ".");
         if (!$idx) {
             $this->setValueForKey($value, $keyPath);
             return;
@@ -310,7 +310,7 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
         }
         $keyPath = substring_from_index($keyPath, $idx + 1);
         if (!$obj instanceof KeyValueCoding) {
-            throw new UndefinedKeyException(sprintf('%s %s() "%s" is not key value coding compliant for the key "%s"', $this->debugDescription(), __FUNCTION__, typeof($value), $keyPath));
+            throw new UndefinedKeyException(sprintf("%s %s() \"%s\" is not key value coding compliant for the key \"%s\"", $this->debugDescription(), __FUNCTION__, typeof($value), $keyPath));
         }
         $obj->setValueForKeyPath($value, $keyPath);
     }

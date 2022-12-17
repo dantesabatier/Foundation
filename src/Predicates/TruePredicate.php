@@ -39,6 +39,6 @@ final class TruePredicate extends Predicate
     #[Pure]
     public function description(): string
     {
-        return 'TRUEPREDICATE';
+        return "TRUEPREDICATE";
     }
 }

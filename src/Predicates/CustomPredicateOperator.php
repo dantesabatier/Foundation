@@ -28,7 +28,7 @@ class CustomPredicateOperator extends PredicateOperator
             error_log(sprintf("Foundation: predicate operator %s: (%s)%s %s (%s)%s", $this->operatorType->name, typeof($left), human_readable_value($left), $this->symbol(), typeof($right), human_readable_value($right)));
         }
         if (!is_object($left)) {
-            throw new InvalidArgumentException(sprintf("invalid argument: expecting \"object\", \"%s\" given", typeof($left)));
+            throw new InvalidArgumentException(sprintf("Invalid argument: expecting \"object\", \"%s\" given", typeof($left)));
         }
         $selector = $this->selector;
         $arguments = [$right];

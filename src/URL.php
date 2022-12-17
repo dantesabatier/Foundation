@@ -61,31 +61,31 @@ final class URL extends ObjectClass
                 }
             }
             if (!url_validate($string)) {
-                throw new InvalidArgumentException(sprintf("invalid argument: expecting url string, \"%s\" given", $string));
+                throw new InvalidArgumentException(sprintf("Invalid argument: expecting url string, \"%s\" given", $string));
             }
         }
         $this->string = $string;
     }
 
-    #[ArrayShape(['string' => "string", 'baseURL' => '\\' . URL::class])]
+    #[ArrayShape(["string" => "string", "baseURL" => "\\" . URL::class])]
     public function __serialize(): array
     {
-        $serialization = ['string' => $this->string];
+        $serialization = ["string" => $this->string];
         if ($baseURL = $this->baseURL) {
-            $serialization['baseURL'] = $baseURL;
+            $serialization["baseURL"] = $baseURL;
         }
         return $serialization;
     }
 
     public function __unserialize(array $data): void
     {
-        $this->string = $data['string'];
-        $this->baseURL = $data['baseURL'] ?? null;
+        $this->string = $data["string"];
+        $this->baseURL = $data["baseURL"] ?? null;
     }
 
     public function __get(string $name)
     {
-        if ($name == 'absoluteURL') {
+        if ($name == "absoluteURL") {
             $baseURL = $this->baseURL;
             if (!$baseURL instanceof URL) {
                 return $this;
@@ -94,12 +94,12 @@ final class URL extends ObjectClass
                 $baseURL = $baseURL->deletingLastPathComponent();
             }
             $relative = $this->string;
-            if (string_has_prefix($relative, '/')) {
+            if (string_has_prefix($relative, "/")) {
                 $relative = substring_from_index($relative, 1);
-            } elseif (string_has_prefix($relative, './')) {
+            } elseif (string_has_prefix($relative, "./")) {
                 $relative = substring_from_index($relative, 2);
-            } elseif (string_has_prefix($relative, '../')) {
-                $steps = substr_count($relative, '../');
+            } elseif (string_has_prefix($relative, "../")) {
+                $steps = substr_count($relative, "../");
                 $numberOfComponents = $baseURL->pathComponents->count();
                 if ($steps >= $numberOfComponents) {
                     trigger_error("{$this->debugDescription()} components in the relative url are too many", E_USER_WARNING);
@@ -115,44 +115,44 @@ final class URL extends ObjectClass
                 return $baseURL;
             }
             return $baseURL->appendingPathComponent($relative);
-        } elseif ($name == 'absoluteString') {
+        } elseif ($name == "absoluteString") {
             if ($this->baseURL === null) {
                 return $this->string;
             }
             return $this->absoluteURL->absoluteString;
-        } elseif ($name == 'relativePath') {
+        } elseif ($name == "relativePath") {
             if ($this->baseURL === null) {
                 return $this->path;
             }
             return $this->absoluteURL->path;
-        } elseif ($name == 'relativeString') {
+        } elseif ($name == "relativeString") {
             if ($this->baseURL === null) {
                 return $this->absoluteString;
             }
             return $this->absoluteURL->absoluteString;
-        } elseif ($name == 'fileSystemRepresentation') {
+        } elseif ($name == "fileSystemRepresentation") {
             return (new SplFileInfo($this->path))->getRealPath();
-        } elseif ($name == 'fragment') {
+        } elseif ($name == "fragment") {
             return $this->parse(PHP_URL_FRAGMENT);
-        } elseif ($name == 'standardized') {
+        } elseif ($name == "standardized") {
             $url = clone $this->absoluteURL;
             $url->standardize();
             return $url;
-        } elseif ($name == 'standardizedFileURL') {
+        } elseif ($name == "standardizedFileURL") {
             return $this->standardized;
-        } elseif ($name == 'scheme') {
+        } elseif ($name == "scheme") {
             return $this->parse(PHP_URL_SCHEME) ?? '';
-        } elseif ($name == 'host') {
+        } elseif ($name == "host") {
             return $this->parse(PHP_URL_HOST);
-        } elseif ($name == 'lastPathComponent') {
+        } elseif ($name == "lastPathComponent") {
             return basename($this->path);
-        } elseif ($name == 'path') {
+        } elseif ($name == "path") {
             $path = $this->parse(PHP_URL_PATH) ?? '';
             if ($this->isFileURL) {
                 $path = rawurldecode($path);
             }
             return $path;
-        } elseif ($name == 'pathComponents') {
+        } elseif ($name == "pathComponents") {
             $path = $this->path;
             /** @var ArrayClass<string> $components */
             $components = new ArrayClass();
@@ -164,21 +164,21 @@ final class URL extends ObjectClass
                 $components->append("/");
             }
             return $components;
-        } elseif ($name == 'pathExtension') {
+        } elseif ($name == "pathExtension") {
             return pathinfo($this->path, PATHINFO_EXTENSION);
-        } elseif ($name == 'port') {
+        } elseif ($name == "port") {
             return $this->parse(PHP_URL_PORT);
-        } elseif ($name == 'query') {
+        } elseif ($name == "query") {
             return $this->parse(PHP_URL_QUERY);
-        } elseif ($name == 'user') {
+        } elseif ($name == "user") {
             return $this->parse(PHP_URL_USER);
-        } elseif ($name == 'password') {
+        } elseif ($name == "password") {
             return $this->parse(PHP_URL_PASS);
-        } elseif ($name == 'isFileURL') {
+        } elseif ($name == "isFileURL") {
             return $this->scheme === "file";
-        } elseif ($name == 'hasDirectoryPath') {
+        } elseif ($name == "hasDirectoryPath") {
             return $this->isFileURL && is_dir($this->path) || $this->pathExtension === '';
-        } elseif ($name == 'baseURL') {
+        } elseif ($name == "baseURL") {
             return $this->$name;
         } else {
             return $this->valueForUndefinedKey($name);
@@ -247,11 +247,11 @@ final class URL extends ObjectClass
     public function appendPathComponent(string $component): URL
     {
         $path = $this->path;
-        if (!string_has_suffix($path, '/')) {
+        if (!string_has_suffix($path, "/")) {
             if ($this->isFileURL && FileManager::default()->fileExists($path, $isDirectory) && !$isDirectory) {
                 throw new InternalInconsistencyException("Cannot append components to a file");
             }
-            $path .= '/';
+            $path .= "/";
         }
         $path .= $component;
         $this->rebuild($path);
@@ -277,8 +277,8 @@ final class URL extends ObjectClass
     {
         if (strlen($extension)) {
             $path = $this->path;
-            if (!string_has_suffix($path, '.') && !string_has_prefix($extension, '.')) {
-                $path .= '.';
+            if (!string_has_suffix($path, ".") && !string_has_prefix($extension, ".")) {
+                $path .= ".";
             }
             $path .= $extension;
             $this->rebuild($path);

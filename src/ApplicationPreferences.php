@@ -15,11 +15,11 @@ readonly class ApplicationPreferences
     {
         try {
             $fileManager = FileManager::default();
-            $directory = $fileManager->url(SearchPathDirectory::libraryDirectory)->appendingPathComponent('Preferences');
+            $directory = $fileManager->url(SearchPathDirectory::libraryDirectory)->appendingPathComponent("Preferences");
             if (!$fileManager->fileExists($directory->path)) {
                 $fileManager->createDirectory($directory, true);
             }
-            $this->url = $directory->appendingPathComponent($this->domainName)->appendingPathExtension('plist');
+            $this->url = $directory->appendingPathComponent($this->domainName)->appendingPathExtension("plist");
             $this->dictionaryRepresentation = PropertyListSerialization::propertyListWithURL($this->url) ?? new Dictionary();
             NotificationCenter::default()->addObserverForName(UserDefaults::didChangeNotification, null, function (Notification $notification): void {
                 /** @var UserDefaults $object */

@@ -73,13 +73,13 @@ class SetExpression extends Expression
         $format = $leftExpression->description();
         switch ($this->expressionType) {
             case ExpressionType::minusSet:
-                $format .= ' MINUS ';
+                $format .= " MINUS ";
                 break;
             case ExpressionType::intersectSet:
-                $format .= ' INTERSECT ';
+                $format .= " INTERSECT ";
                 break;
             case ExpressionType::unionSet:
-                $format .= ' UNION ';
+                $format .= " UNION ";
                 break;
             default:
                 break;

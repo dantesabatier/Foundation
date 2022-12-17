@@ -20,7 +20,7 @@ class Range extends ObjectClass implements ExpressibleByArrayLiteral, IteratorAg
      */
     public function __construct(public readonly int $lowerBound, public readonly int $upperBound)
     {
-        assert($this->lowerBound <= $this->upperBound, 'lower bound cannot be grater that the upper bound');
+        assert($this->lowerBound <= $this->upperBound, "lower bound cannot be grater that the upper bound");
     }
 
     public function count(): int
@@ -50,7 +50,7 @@ class Range extends ObjectClass implements ExpressibleByArrayLiteral, IteratorAg
         return !$this->isEmpty() && (($element >= $this->lowerBound) && ($element < $this->upperBound));
     }
 
-    #[Deprecated('since Foundation 0.1, use contains() instead', '%class%->contains(%parameter0%)')]
+    #[Deprecated("since Foundation 0.1, use contains() instead", "%class%->contains(%parameter0%)")]
     public function containsElement(int $element): bool
     {
         trigger_error(sprintf("%s() is deprecated, use contains() instead", __METHOD__), E_USER_DEPRECATED);

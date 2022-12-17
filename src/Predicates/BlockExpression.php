@@ -73,13 +73,13 @@ class BlockExpression extends Expression
 
     public function predicateFormat(): string
     {
-        $format = 'BLOCK(function';
+        $format = "BLOCK(function";
         if ($arguments = $this->arguments) {
             if (!$arguments->isEmpty()) {
-                $format .= ', ';
+                $format .= ", ";
             }
-            $format .= $arguments->join(', ');
+            $format .= $arguments->join(", ");
         }
-        return $format . ')';
+        return $format . ")";
     }
 }

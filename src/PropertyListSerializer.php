@@ -17,11 +17,11 @@ readonly class PropertyListSerializer
     /** @noinspection PhpUnhandledExceptionInspection */
     public function __construct()
     {
-        $document = new DOMDocument('1.0', 'UTF-8');
+        $document = new DOMDocument("1.0", "UTF-8");
         $implementation = new DOMImplementation();
-        $documentType = $implementation->createDocumentType('plist', "-//Apple//DTD PLIST 1.0//EN", "https://www.apple.com/DTDs/PropertyList-1.0.dtd");
+        $documentType = $implementation->createDocumentType("plist", "-//Apple//DTD PLIST 1.0//EN", "https://www.apple.com/DTDs/PropertyList-1.0.dtd");
         $document->appendChild($documentType);
-        $element = $document->createElement('plist');
+        $element = $document->createElement("plist");
         $document->appendChild($element);
         $this->document = $document;
     }
@@ -31,23 +31,23 @@ readonly class PropertyListSerializer
     {
         $document = $this->document;
         if (is_null($obj)) {
-            $element->appendChild($document->createElement('string', (string)$obj));
+            $element->appendChild($document->createElement("string", (string)$obj));
         } elseif (is_string($obj)) {
-            $element->appendChild($document->createElement('string', $obj));
+            $element->appendChild($document->createElement("string", $obj));
         } elseif (is_bool($obj)) {
-            $element->appendChild($document->createElement($obj ? 'true' : 'false'));
+            $element->appendChild($document->createElement($obj ? "true" : "false"));
         } elseif (is_int($obj)) {
-            $element->appendChild($document->createElement('integer', (string)$obj));
+            $element->appendChild($document->createElement("integer", (string)$obj));
         } elseif (is_float($obj)) {
-            $element->appendChild($document->createElement('real', (string)$obj));
+            $element->appendChild($document->createElement("real", (string)$obj));
         } elseif ($obj instanceof Date) {
-            $element->appendChild($document->createElement('date', (string)$obj));
+            $element->appendChild($document->createElement("date", (string)$obj));
         } elseif ($obj instanceof ArrayClass || $obj instanceof Set || $obj instanceof Dictionary || is_array($obj)) {
-            $parent = $document->createElement(($obj instanceof ArrayClass || $obj instanceof Set || (is_array($obj) && is_sequential($obj))) ? 'array' : 'dict');
+            $parent = $document->createElement(($obj instanceof ArrayClass || $obj instanceof Set || (is_array($obj) && is_sequential($obj))) ? "array" : "dict");
             $element->appendChild($parent);
             foreach ($obj as $key => $value) {
                 if (is_string($key)) {
-                    $parent->appendChild($document->createElement('key', $key));
+                    $parent->appendChild($document->createElement("key", $key));
                 }
                 $this->append($value, $parent);
             }
@@ -71,13 +71,13 @@ readonly class PropertyListSerializer
     private function value(DOMElement $element): mixed
     {
         return match ($element->tagName) {
-            'plist' => ($element->firstChild && ($e = $this->element($element->firstChild))) ? $this->value($e) : null,
-            'array' => $this->array($element),
-            'dict' => $this->dict($element),
-            'integer' => (int)$element->nodeValue,
-            'real' => (float)$element->nodeValue,
-            'true', 'false' => filter_var($element->nodeName, FILTER_VALIDATE_BOOLEAN),
-            'date' => new Date((new DateTime($element->nodeValue ?? 'now'))->getTimestamp()),
+            "plist" => ($element->firstChild && ($e = $this->element($element->firstChild))) ? $this->value($e) : null,
+            "array" => $this->array($element),
+            "dict" => $this->dict($element),
+            "integer" => (int)$element->nodeValue,
+            "real" => (float)$element->nodeValue,
+            "true", "false" => filter_var($element->nodeName, FILTER_VALIDATE_BOOLEAN),
+            "date" => new Date((new DateTime($element->nodeValue ?? "now"))->getTimestamp()),
             default => $element->nodeValue,
         };
     }
@@ -97,7 +97,7 @@ readonly class PropertyListSerializer
     {
         $dictionary = new Dictionary();
         for ($node = $for->firstChild; $node !== null; $node = $node->nextSibling) {
-            if (!($node instanceof DOMElement) || ($node->tagName !== 'key') || (!$next = $node->nextSibling) || !($key = $node->nodeValue) || !($value = $this->element($next))) {
+            if (!($node instanceof DOMElement) || ($node->tagName !== "key") || (!$next = $node->nextSibling) || !($key = $node->nodeValue) || !($value = $this->element($next))) {
                 continue;
             }
             $dictionary->setValueForKey($this->value($value), $key);

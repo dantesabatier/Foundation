@@ -28,7 +28,7 @@ class BetweenPredicateOperator extends PredicateOperator
         if ($left === null || $right === null) {
             return false;
         }
-        assert($right instanceof ArrayClass && $right->count() === 2, sprintf("invalid argument: the right expression must be a \"%s\" with exactly two elements, \"%s\" given", ArrayClass::class, typeof($right)));
+        assert($right instanceof ArrayClass && $right->count() === 2, sprintf("Invalid argument: the right expression must be a \"%s\" with exactly two elements, \"%s\" given", ArrayClass::class, typeof($right)));
         return in_range($left, $right->first(), $right->last());
     }
 }

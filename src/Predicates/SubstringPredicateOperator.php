@@ -47,7 +47,7 @@ class SubstringPredicateOperator extends StringPredicateOperator
                 SubstringPredicateOperatorPosition::contains => $left->contains(fn(string $string): bool => string_is_equal($string, $right, $options)),
             };
         }
-        assert(is_string($left) && is_string($right), sprintf('cannot perform substring check on non-strings %s and %s', $left, $right));
+        assert(is_string($left) && is_string($right), sprintf("Cannot perform substring check on non-strings %s and %s", $left, $right));
         return match ($position) {
             SubstringPredicateOperatorPosition::beginsWith => string_has_prefix($left, $right, $options),
             SubstringPredicateOperatorPosition::endsWith => string_has_suffix($left, $right, $options),

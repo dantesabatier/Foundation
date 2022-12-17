@@ -20,20 +20,20 @@ class UUID extends ObjectClass
     public function __construct(?string $uuidString = null)
     {
         if ($uuidString && !uuid_validate($uuidString)) {
-            throw new InvalidArgumentException(sprintf("invalid argument: expecting uuid string, \"%s\" given", $uuidString));
+            throw new InvalidArgumentException(sprintf("Invalid argument: expecting uuid string, \"%s\" given", $uuidString));
         }
         $this->uuidString = $uuidString ?? uuid_generate();
     }
 
-    #[ArrayShape(['uuidString' => "string"])]
+    #[ArrayShape(["uuidString" => "string"])]
     public function __serialize(): array
     {
-        return ['uuidString' => $this->uuidString];
+        return ["uuidString" => $this->uuidString];
     }
 
     public function __unserialize(array $data): void
     {
-        $this->uuidString = $data['uuidString'];
+        $this->uuidString = $data["uuidString"];
     }
 
     public function compare(mixed $other): ComparisonResult

@@ -29,7 +29,7 @@ class ComparisonPredicateOperator extends PredicateOperator
             return match ($variant) {
                 PredicateOperatorType::lessThan, PredicateOperatorType::lessThanOrEqualTo => false,
                 PredicateOperatorType::greaterThan, PredicateOperatorType::greaterThanOrEqualTo => true,
-                default => throw new InvalidArgumentException(sprintf("invalid predicate operator variant: %s", $variant->name)),
+                default => throw new InvalidArgumentException("Invalid predicate operator variant: $variant->name"),
             };
         }
         if ($left === null || $right === null) {
@@ -43,7 +43,7 @@ class ComparisonPredicateOperator extends PredicateOperator
                 PredicateOperatorType::lessThanOrEqualTo => $comparison !== ComparisonResult::orderedDescending,
                 PredicateOperatorType::greaterThan => $comparison === ComparisonResult::orderedDescending,
                 PredicateOperatorType::greaterThanOrEqualTo => $comparison !== ComparisonResult::orderedAscending,
-                default => throw new InvalidArgumentException(sprintf("invalid predicate operator variant: %s", $variant->name)),
+                default => throw new InvalidArgumentException("Invalid predicate operator variant: $variant->name"),
             };
         }
         if ($left instanceof ObjectClass) {
@@ -63,7 +63,7 @@ class ComparisonPredicateOperator extends PredicateOperator
             PredicateOperatorType::lessThanOrEqualTo => $left <= $right,
             PredicateOperatorType::greaterThan => $left > $right,
             PredicateOperatorType::greaterThanOrEqualTo => $left >= $right,
-            default => throw new InvalidArgumentException(sprintf("invalid predicate operator variant: %s", $variant->name)),
+            default => throw new InvalidArgumentException("Invalid predicate operator variant: $variant->name"),
         };
     }
 }

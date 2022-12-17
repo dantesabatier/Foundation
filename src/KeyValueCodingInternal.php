@@ -5,7 +5,7 @@ namespace Sabatier\Foundation;
 function components_from_key_path(string $keyPath): KeyPathComponents
 {
     $remainderPath = null;
-    $idx = strpos($keyPath, '.');
+    $idx = strpos($keyPath, ".");
     if ($idx !== false) {
         $remainderPath = '';
         $subKey = substring_to_index($keyPath, $idx);
@@ -19,7 +19,7 @@ function components_from_key_path(string $keyPath): KeyPathComponents
 
 function kvc_operator_from_key(string $key): ?string
 {
-    if ($key === '' || $key[0] !== '@') {
+    if ($key === '' || $key[0] !== "@") {
         return null;
     }
     $name = substring_from_index($key, 1);
@@ -35,7 +35,7 @@ function kvc_operator_from_key(string $key): ?string
  */
 function kvc_components(string $keyPath): array
 {
-    $idx = strpos($keyPath, '@');
+    $idx = strpos($keyPath, "@");
     if ($idx === false) {
         return [];
     }

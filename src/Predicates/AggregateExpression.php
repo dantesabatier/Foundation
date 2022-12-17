@@ -52,6 +52,6 @@ class AggregateExpression extends Expression
 
     public function predicateFormat(): string
     {
-        return "{" . $this->collection()->join(', ') . "}";
+        return "{" . $this->collection()->join(", ") . "}";
     }
 }

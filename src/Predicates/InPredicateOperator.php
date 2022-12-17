@@ -30,6 +30,6 @@ class InPredicateOperator extends PredicateOperator
         } elseif ($right instanceof Sequence) {
             return $right->contains(fn(string $string): bool => string_is_equal($string, $left, $options));
         }
-        throw new InvalidArgumentException(sprintf("invalid argument: expecting \"string, %s\", \"%s\" given", Sequence::class, typeof($right)));
+        throw new InvalidArgumentException(sprintf("Invalid argument: expecting \"string, %s\", \"%s\" given", Sequence::class, typeof($right)));
     }
 }

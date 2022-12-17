@@ -39,6 +39,6 @@ final class FalsePredicate extends Predicate
     #[Pure]
     public function description(): string
     {
-        return 'FALSEPREDICATE';
+        return "FALSEPREDICATE";
     }
 }

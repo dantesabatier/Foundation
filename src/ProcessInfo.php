@@ -44,20 +44,20 @@ class ProcessInfo extends ObjectClass
      */
     public function __get(string $name)
     {
-        if ($name == 'arguments') {
-            $this->$name = new ArrayClass($_SERVER['argv'] ?? []);
+        if ($name == "arguments") {
+            $this->$name = new ArrayClass($_SERVER["argv"] ?? []);
             return $this->$name;
-        } elseif ($name == 'environment') {
+        } elseif ($name == "environment") {
             /** @var Dictionary<string> $environment */
             $environment = new Dictionary();
             $fileManager = FileManager::default();
-            $url = $fileManager->documentRootDirectory->appendingPathComponent('.env');
+            $url = $fileManager->documentRootDirectory->appendingPathComponent(".env");
             $path = $url->path;
             if ($fileManager->fileExists($path) && ($string = $fileManager->contents($path))) {
                 $scanner = new Scanner($string);
                 $scanner->charactersToBeSkipped = PHP_EOL;
                 while ($scanner->scanUpCharacters(PHP_EOL, $line) && $line) {
-                    $components = explode('=', $line, 2);
+                    $components = explode("=", $line, 2);
                     if (count($components) == 2) {
                         [$key, $value] = $components;
                         $environment[trim($key)] = trim($value, "\"' ");
@@ -67,14 +67,14 @@ class ProcessInfo extends ObjectClass
             }
             $this->$name = $environment;
             return $this->$name;
-        } elseif ($name == 'globallyUniqueString') {
+        } elseif ($name == "globallyUniqueString") {
             $this->$name = md5((string)$this->processIdentifier);
             return $this->$name;
-        } elseif ($name == 'processIdentifier') {
+        } elseif ($name == "processIdentifier") {
             $this->$name = getmypid();
             return $this->$name;
-        } elseif ($name == 'processName') {
-            $processName = 'Unknown';
+        } elseif ($name == "processName") {
+            $processName = "Unknown";
             if (RUNNING_FROM_CLI) {
                 $processTitle = cli_get_process_title();
                 if ($processTitle !== null) {
@@ -83,13 +83,13 @@ class ProcessInfo extends ObjectClass
             }
             $this->$name = $processName;
             return $this->$name;
-        } elseif ($name == 'userName') {
+        } elseif ($name == "userName") {
             $this->$name = get_current_user();
             return $this->$name;
-        } elseif ($name == 'fullUserName') {
+        } elseif ($name == "fullUserName") {
             $this->$name = full_user_name();
             return $this->$name;
-        } elseif ($name == 'hostName') {
+        } elseif ($name == "hostName") {
             $this->$name = gethostname();
             return $this->$name;
         } else {

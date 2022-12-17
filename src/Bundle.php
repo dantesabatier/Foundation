@@ -86,46 +86,46 @@ final class Bundle extends ObjectClass
 
     public function __get(string $name)
     {
-        if ($name == 'resourceURL') {
-            $this->$name = $this->directoryURL($this->bundleURL, 'Resources');
+        if ($name == "resourceURL") {
+            $this->$name = $this->directoryURL($this->bundleURL, "Resources");
             return $this->$name;
-        } elseif ($name == 'executableURL') {
-            $this->$name = $this->directoryURL($this->bundleURL->appendingPathComponent('OS'), $this->object(kCFBundleExecutableKey) ?? $this->object(kCFBundleNameKey));
+        } elseif ($name == "executableURL") {
+            $this->$name = $this->directoryURL($this->bundleURL->appendingPathComponent("OS"), $this->object(kCFBundleExecutableKey) ?? $this->object(kCFBundleNameKey));
             return $this->$name;
-        } elseif ($name == 'privateFrameworksURL') {
-            $this->$name = $this->directoryURL($this->bundleURL, 'PrivateFrameworks');
+        } elseif ($name == "privateFrameworksURL") {
+            $this->$name = $this->directoryURL($this->bundleURL, "PrivateFrameworks");
             return $this->$name;
-        } elseif ($name == 'sharedFrameworksURL') {
-            $this->$name = $this->directoryURL($this->bundleURL, 'Frameworks');
+        } elseif ($name == "sharedFrameworksURL") {
+            $this->$name = $this->directoryURL($this->bundleURL, "Frameworks");
             return $this->$name;
-        } elseif ($name == 'builtInPlugInsURL') {
-            $this->$name = $this->directoryURL($this->bundleURL, 'Plugins');
+        } elseif ($name == "builtInPlugInsURL") {
+            $this->$name = $this->directoryURL($this->bundleURL, "Plugins");
             return $this->$name;
-        } elseif ($name == 'sharedSupportURL') {
-            $this->$name = $this->directoryURL($this->bundleURL, 'SharedSupport');
+        } elseif ($name == "sharedSupportURL") {
+            $this->$name = $this->directoryURL($this->bundleURL, "SharedSupport");
             return $this->$name;
-        } elseif ($name == 'bundleIdentifier') {
+        } elseif ($name == "bundleIdentifier") {
             $this->$name = $this->object(kCFBundleIdentifierKey);
             return $this->$name;
-        } elseif ($name == 'infoDictionary') {
-            $infoUrl = $this->bundleURL->appendingPathComponent('Info')->appendingPathExtension('plist');
+        } elseif ($name == "infoDictionary") {
+            $infoUrl = $this->bundleURL->appendingPathComponent("Info")->appendingPathExtension("plist");
             $this->$name = FileManager::default()->fileExists($infoUrl->path) ? PropertyListSerialization::propertyListWithURL($infoUrl) : null;
             return $this->$name;
-        } elseif ($name == 'localizations') {
+        } elseif ($name == "localizations") {
             $this->$name = $this->object(kCFBundleLocalizationsKey) ?? new ArrayClass();
             return $this->$name;
-        } elseif ($name == 'preferredLocalizations') {
+        } elseif ($name == "preferredLocalizations") {
             $preferredLocalizations = clone $this->localizations;
             $preferredLocalizations->partition(fn(string $localization): bool => $localization !== Locale::getPrimaryLanguage(Locale::getDefault()));
             $this->$name = $preferredLocalizations;
             return $this->$name;
-        } elseif ($name == 'developmentLocalization') {
+        } elseif ($name == "developmentLocalization") {
             $this->$name = $this->object(kCFBundleDevelopmentRegionKey);
             return $this->$name;
-        } elseif ($name == 'localizedInfoDictionary') {
+        } elseif ($name == "localizedInfoDictionary") {
             $this->$name = $this->infoDictionary;
             return $this->$name;
-        } elseif ($name == 'principalClass') {
+        } elseif ($name == "principalClass") {
             $principalClass = $this->object(kCFBundlePrincipalClassKey);
             $this->$name = empty($principalClass) ? null : $this->classNamed($principalClass);
             return $this->$name;
@@ -213,9 +213,9 @@ final class Bundle extends ObjectClass
                 throw new InvalidArgumentException();
             }
             $url = URL::fileURL($path);
-            while ($url->path !== '/') {
+            while ($url->path !== "/") {
                 $url->deleteLastPathComponent();
-                if (string_is_equal($url->lastPathComponent, 'src', CompareOptions::caseInsensitive)) {
+                if (string_is_equal($url->lastPathComponent, "src", CompareOptions::caseInsensitive)) {
                     $url->deleteLastPathComponent();
                     break;
                 }
@@ -244,7 +244,7 @@ final class Bundle extends ObjectClass
      */
     public static function allFrameworks(): ArrayClass
     {
-        return self::loadedBundles()->filter(fn(Bundle $bundle): bool => $bundle->object(kCFBundlePackageTypeKey) === 'FMWK')->values;
+        return self::loadedBundles()->filter(fn(Bundle $bundle): bool => $bundle->object(kCFBundlePackageTypeKey) === "FMWK")->values;
     }
 
     /**
@@ -256,7 +256,7 @@ final class Bundle extends ObjectClass
      */
     public static function allBundles(): ArrayClass
     {
-        return self::loadedBundles()->filter(fn(Bundle $bundle): bool => $bundle->object(kCFBundlePackageTypeKey) !== 'FMWK')->values;
+        return self::loadedBundles()->filter(fn(Bundle $bundle): bool => $bundle->object(kCFBundlePackageTypeKey) !== "FMWK")->values;
     }
 
     /**
@@ -400,7 +400,7 @@ final class Bundle extends ObjectClass
      */
     public function pathForSoundResource(string $name): ?string
     {
-        return self::findBundleResources($this->resourceURL ?? $this->bundleURL, $name, new ArrayClass(['mp3']), null, 1)?->first()?->path;
+        return self::findBundleResources($this->resourceURL ?? $this->bundleURL, $name, new ArrayClass(["mp3"]), null, 1)?->first()?->path;
     }
 
     /**
@@ -412,7 +412,7 @@ final class Bundle extends ObjectClass
      */
     public function localizedString(string $key, string $value = null, string $table = null): string
     {
-        $string = localized_string($key, $table ?? 'Localizable', $this->resourceURL?->path ?? '');
+        $string = localized_string($key, $table ?? "Localizable", $this->resourceURL?->path ?? '');
         if (string_is_equal($key, $string) && $value) {
             return $value;
         }
@@ -444,10 +444,10 @@ final class Bundle extends ObjectClass
             return $className;
         }
         $name = array_last(explode("\\", $className)) ?? $className;
-        if ($enumerator = FileManager::default()->enumerator($this->bundleURL->appendingPathComponent('src'), null, DirectoryEnumerationOptions::skipsHiddenFiles)) {
+        if ($enumerator = FileManager::default()->enumerator($this->bundleURL->appendingPathComponent("src"), null, DirectoryEnumerationOptions::skipsHiddenFiles)) {
             foreach ($enumerator as $url) {
                 $path = $url->path;
-                if (string_is_equal($url->pathExtension, 'php', CompareOptions::caseInsensitive) && string_is_equal(pathinfo($path, PATHINFO_FILENAME), $name, CompareOptions::caseInsensitive)) {
+                if (string_is_equal($url->pathExtension, "php", CompareOptions::caseInsensitive) && string_is_equal(pathinfo($path, PATHINFO_FILENAME), $name, CompareOptions::caseInsensitive)) {
                     require_once $path;
                     if (($class = array_last(get_declared_classes(), fn(string $class): bool => string_has_suffix($class, $className))) && class_exists($class)) {
                         NotificationCenter::default()->postNotificationName(self::didLoadNotification, $this, new Dictionary([LoadedClasses => new ArrayClass([$class])]));

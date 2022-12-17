@@ -47,12 +47,12 @@ class ComparisonPredicate extends Predicate
         switch ($modifier) {
             case ComparisonPredicateModifier::all:
             case ComparisonPredicateModifier::any:
-                $modifierDescription = strtoupper($modifier->name) . ' ';
+                $modifierDescription = strtoupper($modifier->name) . " ";
                 break;
             default:
                 break;
         }
-        return sprintf('%s%s %s %s', $modifierDescription, $this->leftExpression->predicateFormat(), $this->predicateOperator->predicateFormat(), $this->rightExpression->predicateFormat());
+        return sprintf("%s%s %s %s", $modifierDescription, $this->leftExpression->predicateFormat(), $this->predicateOperator->predicateFormat(), $this->rightExpression->predicateFormat());
     }
 
     public function withSubstitutionVariables(Dictionary $variables): Predicate

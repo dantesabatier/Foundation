@@ -53,7 +53,7 @@ class VariableAssignmentExpression extends Expression
     public function withSubstitutionVariables(Dictionary $variables): Expression
     {
         $assignmentVariable = $this->assignmentVariable()->withSubstitutionVariables($variables);
-        assert($assignmentVariable instanceof VariableExpression, sprintf("invalid argument: expecting \"%s\", \"%s\" given", VariableExpression::class, typeof($assignmentVariable)));
+        assert($assignmentVariable instanceof VariableExpression, sprintf("Invalid argument: expecting \"%s\", \"%s\" given", VariableExpression::class, typeof($assignmentVariable)));
         return new VariableAssignmentExpression($assignmentVariable, $this->subexpression()->withSubstitutionVariables($variables));
     }
 

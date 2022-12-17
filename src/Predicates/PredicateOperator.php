@@ -37,7 +37,7 @@ class PredicateOperator extends ObjectClass
             PredicateOperatorType::contains => new SubstringPredicateOperator($type, $modifier, $options, SubstringPredicateOperatorPosition::contains),
             PredicateOperatorType::in => new InPredicateOperator($type, $modifier, $options),
             PredicateOperatorType::between => new BetweenPredicateOperator($type, $modifier, $options),
-            default => throw new InvalidArgumentException(sprintf("invalid argument: %s", $type->name)),
+            default => throw new InvalidArgumentException(sprintf("Invalid argument: %s", $type->name)),
         };
     }
 
@@ -50,7 +50,7 @@ class PredicateOperator extends ObjectClass
             return match ($this->modifier) {
                 ComparisonPredicateModifier::all => true,
                 ComparisonPredicateModifier::any => false,
-                default => throw new InvalidArgumentException(sprintf("invalid argument: %s", $this->modifier->name)),
+                default => throw new InvalidArgumentException("Invalid argument: {$this->modifier->name}"),
             };
         }
         if ($left instanceof ExpressibleByArrayLiteral) {
@@ -78,7 +78,7 @@ class PredicateOperator extends ObjectClass
                 }
                 return false;
             default:
-                throw new InvalidArgumentException(sprintf("Bad predicate operator modifier: %s", $this->modifier->name));
+                throw new InvalidArgumentException("Bad predicate operator modifier: {$this->modifier->name}");
         }
     }
 

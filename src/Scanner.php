@@ -14,7 +14,7 @@ class Scanner extends ObjectClass
     public bool $caseSensitive = false;
     /** @var string Character set containing the characters the scanner ignores when looking for a scannable element. Characters to be skipped are skipped prior to the scanner examining the target. For example, if a scanner ignores spaces, and you send it a {@see scanInt()} message, it skips spaces until it finds a decimal digit or other character. While an element is being scanned, no characters are skipped. If you scan for something made of characters in the set to be skipped (for example, using {@see scanInt()} when the set of characters to be skipped is the decimal digits), the result is undefined. The characters to be skipped are treated as single values. A scanner doesn't apply its case sensitivity setting to these characters and doesn't attempt to match composed character sequences with anything in the set of characters to be skipped (though it does match pre-composed characters individually). If you want to skip all vowels while scanning a string, for example, you can set the characters to be skipped to those in the string “AEIOUaeiou” (plus any accented variants with pre-composed characters). The default set to skip is the whitespace and newline character set.
      */
-    public string $charactersToBeSkipped = ' ';
+    public string $charactersToBeSkipped = " ";
 
     /**
      * Returns a Scanner object initialized to scan a given string.
@@ -27,15 +27,15 @@ class Scanner extends ObjectClass
     public function __get(string $name)
     {
         return match ($name) {
-            'scanLocation' => $this->$name,
-            'isAtEnd' => $this->scanLocation >= strlen($this->string),
+            "scanLocation" => $this->$name,
+            "isAtEnd" => $this->scanLocation >= strlen($this->string),
             default => $this->valueForUndefinedKey($name),
         };
     }
 
     public function __set(string $name, mixed $value): void
     {
-        if ($name == 'scanLocation') {
+        if ($name == "scanLocation") {
             $this->$name = min(max($value, 0), strlen($this->string));
         } else {
             $this->setValueForUndefinedKey($value, $name);
@@ -57,7 +57,7 @@ class Scanner extends ObjectClass
             }
             if (!in_string($this->charactersToBeSkipped, $character)) {
                 if (!$substring) {
-                    $substring = '';
+                    $substring = "";
                 }
                 $substring .= $character;
             }

@@ -39,16 +39,16 @@ class Error extends ObjectClass
 
     public function __get(string $name)
     {
-        if ($name == 'localizedDescription') {
+        if ($name == "localizedDescription") {
             $this->$name = $this->userInfo?->valueForKey(LocalizedDescriptionKey) ?? "The operation couldn't be completed." . " " . ($this->localizedFailureReason ?? "($this->domain error $this->code.)");
             return $this->$name;
-        } elseif ($name == 'localizedRecoveryOptions') {
+        } elseif ($name == "localizedRecoveryOptions") {
             $this->$name = $this->userInfo?->valueForKey(LocalizedRecoveryOptionsErrorKey);
             return $this->$name;
-        } elseif ($name == 'localizedRecoverySuggestion') {
+        } elseif ($name == "localizedRecoverySuggestion") {
             $this->$name = $this->userInfo?->valueForKey(LocalizedRecoverySuggestionErrorKey);
             return $this->$name;
-        } elseif ($name == 'localizedFailureReason') {
+        } elseif ($name == "localizedFailureReason") {
             $localizedFailureReason = $this->userInfo?->valueForKey(LocalizedFailureReasonErrorKey);
             if (!$localizedFailureReason) {
                 switch ($this->domain) {
@@ -84,7 +84,7 @@ class Error extends ObjectClass
                         break;
                     case POSIXErrorDomain:
                         /** @noinspection SpellCheckingInspection */
-                        if (function_exists('posix_strerror')) {
+                        if (function_exists("posix_strerror")) {
                             $localizedFailureReason = posix_strerror($this->code);
                         }
                         break;
@@ -94,7 +94,7 @@ class Error extends ObjectClass
             }
             $this->$name = $localizedFailureReason;
             return $this->$name;
-        } elseif ($name == 'recoveryAttempter') {
+        } elseif ($name == "recoveryAttempter") {
             $this->$name = $this->userInfo?->valueForKey(RecoveryAttempterErrorKey);
             return $this->$name;
         } else {

@@ -27,7 +27,7 @@ class Value extends ObjectClass
             } elseif (string_is_equal($value, "TRUE", CompareOptions::caseInsensitive) || string_is_equal($value, "FALSE", CompareOptions::caseInsensitive) || string_is_equal($value, "YES", CompareOptions::caseInsensitive) || string_is_equal($value, "NO", CompareOptions::caseInsensitive)) {
                 $value = filter_var($value, FILTER_VALIDATE_BOOLEAN);
             } elseif (is_numeric($value)) {
-                if (string_contains($value, '.')) {
+                if (string_contains($value, ".")) {
                     $value = filter_var($value, FILTER_VALIDATE_FLOAT);
                 } else {
                     $value = filter_var($value, FILTER_VALIDATE_INT);
@@ -41,15 +41,15 @@ class Value extends ObjectClass
     }
 
     #[Pure]
-    #[ArrayShape(['value' => "mixed"])]
+    #[ArrayShape(["value" => "mixed"])]
     public function __serialize(): array
     {
-        return ['value' => $this->value];
+        return ["value" => $this->value];
     }
 
     public function __unserialize(array $data): void
     {
-        $this->value = $data['value'];
+        $this->value = $data["value"];
     }
 
     public function compare(mixed $other): ComparisonResult

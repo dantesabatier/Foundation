@@ -30,15 +30,15 @@ class KeyPathSpecifierExpression extends Expression
 
     public function predicateFormat(): string
     {
-        $format = '';
+        $format = "";
         $useDot = false;
-        $components = explode('.', $this->keyPath());
+        $components = explode(".", $this->keyPath());
         foreach ($components as $component) {
             if ($useDot) {
-                $format .= '.';
+                $format .= ".";
             }
             if (PredicateUtilities::isReserved($component)) {
-                $format .= '#';
+                $format .= "#";
             }
             $format .= $component;
             $useDot = true;

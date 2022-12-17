@@ -92,20 +92,20 @@ class FunctionExpression extends Expression
         $operand = $this->operand;
         if ($operand instanceof ExpressionOperator) {
             $format .= $operand->function();
-            $format .= '(';
+            $format .= "(";
         } else {
             $format .= "FUNCTION";
-            $format .= '(';
+            $format .= "(";
             $format .= $operand->description();
-            $format .= ', ';
+            $format .= ", ";
             if ($selector = $this->selector) {
                 $format .= $selector;
                 if (!$this->arguments?->isEmpty()) {
-                    $format .= ', ';
+                    $format .= ", ";
                 }
             }
         }
-        $format .= $this->arguments?->join(', ') ?? '';
-        return $format . ')';
+        $format .= $this->arguments?->join(", ") ?? "";
+        return $format . ")";
     }
 }

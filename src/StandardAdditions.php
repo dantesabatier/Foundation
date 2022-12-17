@@ -15,7 +15,7 @@ use RuntimeException;
 function absolute_time_get_current(): float
 {
     $tv = gettimeofday();
-    return $tv['sec'] + (1.0e-6 * (float)$tv['usec']);
+    return $tv["sec"] + (1.0e-6 * (float)$tv["usec"]);
 }
 
 #[Pure]
@@ -167,7 +167,7 @@ function in_string(string $string, string $substring, #[ExpectedValues(flagsFrom
  */
 function string_compare(string $string, string $other, #[ExpectedValues(flagsFromClass: CompareOptions::class)] int $options = CompareOptions::none): int
 {
-    if (($options !== CompareOptions::none) && ($collator = Collator::create('root'))) {
+    if (($options !== CompareOptions::none) && ($collator = Collator::create("root"))) {
         $collator->setAttribute(Collator::STRENGTH, Collator::PRIMARY);
         if (!($options & CompareOptions::diacriticInsensitive)) {
             $collator->setAttribute(Collator::STRENGTH, Collator::SECONDARY);
@@ -224,16 +224,16 @@ function string_search(string $string, string $needle, SearchMethod $method = Se
     if (!($options & CompareOptions::quoted)) {
         $needle = preg_quote($needle);
     }
-    $pattern = '/';
+    $pattern = "/";
     $pattern .= match ($method) {
         SearchMethod::matches => "^$needle$",
         SearchMethod::beginsWith => "^$needle",
         SearchMethod::endsWith => "$needle$",
         SearchMethod::contains => ($options & CompareOptions::words) ? "(?:^|\W)$needle(?:$|\W)" : $needle
     };
-    $pattern .= '/';
+    $pattern .= "/";
     if ($options & CompareOptions::caseInsensitive) {
-        $pattern .= 'i';
+        $pattern .= "i";
     }
     $value = preg_match_all($pattern, $string, $matches);
     $matches = array_map(fn($match): string => trim($match), $matches[0]);
@@ -269,21 +269,21 @@ function string_contains(string $string, string $substring, #[ExpectedValues(fla
  * @return string The localized string.
  * @noinspection PhpUnusedParameterInspection
  */
-function localized_string(string $string, string $domain = 'Localizable', string $directory = '', string $comment = ''): string
+function localized_string(string $string, string $domain = "Localizable", string $directory = '', string $comment = ''): string
 {
     $fileManager = FileManager::default();
     if (!$fileManager->fileExists($directory, $isDirectory) || !$isDirectory) {
-        $directory = $fileManager->documentRootDirectory->appendingPathComponent('Resources')->path;
+        $directory = $fileManager->documentRootDirectory->appendingPathComponent("Resources")->path;
     }
     $directoryUrl = URL::fileURL($directory);
     if ((!$fileManager->fileExists($directoryUrl->path, $isDirectory) || !$isDirectory)) {
         $directoryUrl = Bundle::bundleForClass(FileManager::class)->bundleURL;
     }
-    if (!string_is_equal($directoryUrl->lastPathComponent, 'Resources')) {
-        $directoryUrl = $directoryUrl->appendingPathComponent('Resources');
+    if (!string_is_equal($directoryUrl->lastPathComponent, "Resources")) {
+        $directoryUrl = $directoryUrl->appendingPathComponent("Resources");
     }
     bindtextdomain($domain, $directoryUrl->path);
-    bind_textdomain_codeset($domain, 'UTF-8');
+    bind_textdomain_codeset($domain, "UTF-8");
     textdomain($domain);
     return gettext($string);
 }
@@ -291,10 +291,10 @@ function localized_string(string $string, string $domain = 'Localizable', string
 function document_root_directory(): string
 {
     /** @psalm-suppress PossiblyUndefinedArrayOffset */
-    $path = $_SERVER['DOCUMENT_ROOT'];
+    $path = $_SERVER["DOCUMENT_ROOT"];
     if (RUNNING_FROM_CLI) {
-        if (isset($_SERVER['PWD'])) {
-            $path = $_SERVER['PWD'];
+        if (isset($_SERVER["PWD"])) {
+            $path = $_SERVER["PWD"];
         }
         if (empty($path)) {
             $path = getcwd();
@@ -309,10 +309,10 @@ function document_root_directory(): string
  */
 function home_directory(): string
 {
-    if ($path = getenv('HOME')) {
-        return rtrim($path, '/');
-    } elseif (!empty($_SERVER['HOMEDRIVE']) && !empty($_SERVER['HOMEPATH'])) {
-        return rtrim($_SERVER['HOMEDRIVE'] . $_SERVER['HOMEPATH'], '\\/');
+    if ($path = getenv("HOME")) {
+        return rtrim($path, "/");
+    } elseif (!empty($_SERVER["HOMEDRIVE"]) && !empty($_SERVER["HOMEPATH"])) {
+        return rtrim($_SERVER["HOMEDRIVE"] . $_SERVER["HOMEPATH"], "\\/");
     } else {
         throw new RuntimeException("failed to get current user directory");
     }
@@ -323,9 +323,9 @@ function home_directory(): string
  */
 function full_user_name(): string
 {
-    if (function_exists('posix_getpwuid')) {
+    if (function_exists("posix_getpwuid")) {
         /** @noinspection PhpComposerExtensionStubsInspection */
-        return posix_getpwuid(posix_geteuid())['name'] ?? get_current_user();
+        return posix_getpwuid(posix_geteuid())["name"] ?? get_current_user();
     }
     return get_current_user();
 }
@@ -348,9 +348,9 @@ function is_hidden(string $filename): bool
     /** @phpstan-ignore-next-line */
     if (USE_UNSAFE_FUNCTIONS && TARGET_OS_WINDOWS) {
         $attributes = trim(unsafe_value(fn(): string|bool|null => shell_exec("FOR %A IN (" . "\"" . $filename . "\"" . ") DO @ECHO %~aA")));
-        return $attributes[3] === 'h' || $attributes[4] === 's';
+        return $attributes[3] === "h" || $attributes[4] === "s";
     }
-    return string_has_prefix($filename, '.');
+    return string_has_prefix($filename, ".");
 }
 
 function is_serialized(mixed $value, bool $strict = true): bool
@@ -360,23 +360,23 @@ function is_serialized(mixed $value, bool $strict = true): bool
         return false;
     }
     $value = trim($value);
-    if ('N;' === $value) {
+    if ("N;" === $value) {
         return true;
     }
     if (strlen($value) < 4) {
         return false;
     }
-    if (':' !== $value[1]) {
+    if (":" !== $value[1]) {
         return false;
     }
     if ($strict) {
         $last = substr($value, -1);
-        if (';' !== $last && '}' !== $last) {
+        if (";" !== $last && "}" !== $last) {
             return false;
         }
     } else {
-        $semicolon = strpos($value, ';');
-        $brace = strpos($value, '}');
+        $semicolon = strpos($value, ";");
+        $brace = strpos($value, "}");
         // Either ; or } must exist.
         if (false === $semicolon && false === $brace) {
             return false;
@@ -391,23 +391,23 @@ function is_serialized(mixed $value, bool $strict = true): bool
     }
     $token = $value[0];
     switch ($token) {
-        case 's':
+        case "s":
             if ($strict) {
-                if ('"' !== substr($value, -2, 1)) {
+                if ("\"" !== substr($value, -2, 1)) {
                     return false;
                 }
-            } elseif (!str_contains($value, '"')) {
+            } elseif (!str_contains($value, "\"")) {
                 return false;
             }
             break;
         // Or else fall through.
-        case 'a':
-        case 'O':
+        case "a":
+        case "O":
             return (bool)preg_match("/^$token:\d+:/s", $value);
-        case 'b':
-        case 'i':
-        case 'd':
-            $end = $strict ? '$' : '';
+        case "b":
+        case "i":
+        case "d":
+            $end = $strict ? "$" : '';
             return (bool)preg_match("/^$token:[\d.E+-]+;$end/", $value);
     }
     return false;

@@ -38,11 +38,11 @@ class StringPredicateOperator extends PredicateOperator
         $symbol = parent::symbol();
         $options = $this->options;
         if ($options) {
-            $symbol .= '[';
+            $symbol .= "[";
             if ($options & ComparisonPredicateOptions::caseInsensitive) {
-                $symbol .= 'c';
+                $symbol .= "c";
                 if ($options & ComparisonPredicateOptions::diacriticInsensitive) {
-                    $symbol .= 'd';
+                    $symbol .= "d";
                     if ($options & ComparisonPredicateOptions::normalized) {
                         $symbol .= "n";
                     }
@@ -51,7 +51,7 @@ class StringPredicateOperator extends PredicateOperator
             if ($options & ComparisonPredicateOptions::localeSensitive) {
                 $symbol .= "l";
             }
-            $symbol .= ']';
+            $symbol .= "]";
         }
         return $symbol;
     }

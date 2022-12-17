@@ -25,17 +25,17 @@ function pn(string|int|float|Number $n): int|float
 function string_with_options(string $string, #[ExpectedValues(flagsFromClass: CompareOptions::class)] int $options): string
 {
     if (($options & CompareOptions::caseInsensitive) && ($options & CompareOptions::diacriticInsensitive)) {
-        if (function_exists('transliterator_transliterate')) :
+        if (function_exists("transliterator_transliterate")) :
             $string = transliterator_transliterate(TransliteratorDefault, $string);
             if ($string === false) {
-                throw new RuntimeException(sprintf('%s() %s', __FUNCTION__, intl_get_error_message()));
+                throw new RuntimeException(sprintf("%s() %s", __FUNCTION__, intl_get_error_message()));
             }
         endif;
-        if (!($options & CompareOptions::normalized) && function_exists('normalizer_normalize')) {
+        if (!($options & CompareOptions::normalized) && function_exists("normalizer_normalize")) {
             $string = normalizer_normalize($string);
             /** @psalm-suppress TypeDoesNotContainType */
             if ($string === false) {
-                throw new RuntimeException(sprintf('%s() %s', __FUNCTION__, intl_get_error_message()));
+                throw new RuntimeException(sprintf("%s() %s", __FUNCTION__, intl_get_error_message()));
             }
         }
     }

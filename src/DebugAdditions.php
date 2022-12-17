@@ -16,7 +16,7 @@ if (!defined("TARGET_OS_WINDOWS")) {
 }
 
 if (!defined("RUNNING_FROM_CLI")) {
-    define("RUNNING_FROM_CLI", ((PHP_SAPI === 'cli') || (stristr(PHP_SAPI, 'cgi') && getenv('TERM'))));
+    define("RUNNING_FROM_CLI", ((PHP_SAPI === "cli") || (stristr(PHP_SAPI, "cgi") && getenv("TERM"))));
 }
 
 function debuglog(string $string): void
@@ -38,10 +38,10 @@ function escape_sequence(string $string, EscapeSequenceTextAttribute $textAttrib
 
 function has_escape_sequences(): bool
 {
-    if (function_exists('posix_isatty')) {
+    if (function_exists("posix_isatty")) {
         return posix_isatty(STDOUT);
     }
-    return getenv('ANSICON') !== false || getenv('ConEmuANSI') === 'ON';
+    return getenv("ANSICON") !== false || getenv("ConEmuANSI") === "ON";
 }
 
 function typeof(mixed $value): string
@@ -54,11 +54,11 @@ function human_readable_value(mixed $value): string
     if (is_string($value)) {
         return $value;
     } elseif (is_null($value)) {
-        return 'null';
+        return "null";
     } elseif (is_bool($value)) {
-        return $value ? 'true' : 'false';
+        return $value ? "true" : "false";
     } elseif (is_array($value)) {
-        return "[" . implode(', ', array_map(fn(mixed $index, mixed $element): string => sprintf("%s: %s", $index, human_readable_value($element)), array_keys($value), array_values($value))) . "]";
+        return "[" . implode(", ", array_map(fn(mixed $index, mixed $element): string => sprintf("%s: %s", $index, human_readable_value($element)), array_keys($value), array_values($value))) . "]";
     } elseif (is_scalar($value)) {
         return (string)$value;
     } elseif (is_object($value)) {
@@ -81,31 +81,31 @@ function human_readable_time(float $interval): string
     $M = (int)floor((int)$interval / 2_592_000);
     $string = '';
     if ($M) {
-        $string .= sprintf('%d month%s', $M, ($M > 1) ? 's' : '');
-        $string .= ' ';
+        $string .= sprintf("%d month%s", $M, ($M > 1) ? "s" : '');
+        $string .= " ";
         $interval -= $M * 2_592_000;
     }
     if ($d) {
-        $string .= sprintf('%d day%s', $d, ($d > 1) ? 's' : '');
-        $string .= ' ';
+        $string .= sprintf("%d day%s", $d, ($d > 1) ? "s" : "");
+        $string .= " ";
         $interval -= $d * 86400;
     }
     if ($h) {
-        $string .= sprintf('%d hour%s', $h, ($h > 1) ? 's' : '');
-        $string .= ' ';
+        $string .= sprintf("%d hour%s", $h, ($h > 1) ? "s" : "");
+        $string .= " ";
         $interval -= $h * 3600;
     }
     if ($m) {
-        $string .= sprintf('%d minute%s', $m, ($m > 1) ? 's' : '');
-        $string .= ' ';
+        $string .= sprintf("%d minute%s", $m, ($m > 1) ? "s" : "");
+        $string .= " ";
         $interval -= $m * 60;
     }
     if ($s) {
-        $string .= sprintf('%d second%s', $s, ($s > 1) ? 's' : '');
-        $string .= ' ';
+        $string .= sprintf("%d second%s", $s, ($s > 1) ? "s" : "");
+        $string .= " ";
         $interval -= $s;
     }
-    return $string . sprintf('%.f seconds', $interval);
+    return $string . sprintf("%.f seconds", $interval);
 }
 
 /**
@@ -118,11 +118,11 @@ function fatal_error(string $message = '', string $file = '', int $line = 0): ne
 {
     if (!$file || !$line) {
         $backtrace = debug_backtrace()[0] ?? [];
-        if (isset($backtrace['file'])) {
-            $file = $backtrace['file'];
+        if (isset($backtrace["file"])) {
+            $file = $backtrace["file"];
         }
-        if (isset($backtrace['line'])) {
-            $line = $backtrace['line'];
+        if (isset($backtrace["line"])) {
+            $line = $backtrace["line"];
         }
     }
     throw new ErrorException($message, 0, 0, $file, $line);
@@ -166,11 +166,11 @@ function class_name(string $class): string
 function get_calling_class(): ?string
 {
     $backtrace = debug_backtrace();
-    $object = $backtrace[1]['object'] ?? null;
+    $object = $backtrace[1]["object"] ?? null;
     $backtraceCount = count($backtrace);
     for ($i = 1; $i < $backtraceCount; $i++) {
         if (isset($backtrace[$i])) {
-            $current = $backtrace[$i]['object'] ?? null;
+            $current = $backtrace[$i]["object"] ?? null;
             if ($object !== $current) {
                 if (is_object($current)) {
                     $current = $current::class;

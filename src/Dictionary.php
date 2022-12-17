@@ -56,8 +56,8 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
     public function __get(string $name)
     {
         return match ($name) {
-            'keys' => new ArrayClass(array_keys($this->reserved)),
-            'values' => new ArrayClass(array_values($this->reserved)),
+            "keys" => new ArrayClass(array_keys($this->reserved)),
+            "values" => new ArrayClass(array_values($this->reserved)),
             default => $this->valueForUndefinedKey($name),
         };
     }

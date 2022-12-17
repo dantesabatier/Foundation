@@ -42,10 +42,10 @@ final class FileManager extends ObjectClass
     public function __get(string $name)
     {
         return $this->$name = match ($name) {
-            'systemRootDirectory' => URL::fileURL('/'),
-            'homeDirectoryForCurrentUser' => URL::fileURL(home_directory()),
-            'temporaryDirectory' => URL::fileURL(temporary_directory()),
-            'documentRootDirectory' => URL::fileURL(document_root_directory()),
+            "systemRootDirectory" => URL::fileURL("/"),
+            "homeDirectoryForCurrentUser" => URL::fileURL(home_directory()),
+            "temporaryDirectory" => URL::fileURL(temporary_directory()),
+            "documentRootDirectory" => URL::fileURL(document_root_directory()),
             default => $this->valueForUndefinedKey($name)
         };
     }
@@ -75,19 +75,19 @@ final class FileManager extends ObjectClass
         /** @var ArrayClass<URL> $urls */
         $urls = new ArrayClass();
         $dirname = match ($directory) {
-            SearchPathDirectory::applicationsDirectory => 'Applications',
-            SearchPathDirectory::libraryDirectory => 'Library',
-            SearchPathDirectory::documentsDirectory => 'Documents',
-            SearchPathDirectory::desktopDirectory => 'Desktop',
-            SearchPathDirectory::cachesDirectory => 'Caches',
-            SearchPathDirectory::applicationSupportDirectory => 'Application Support',
-            SearchPathDirectory::downloadsDirectory => 'Downloads',
-            SearchPathDirectory::moviesDirectory => 'Movies',
-            SearchPathDirectory::musicDirectory => 'Music',
-            SearchPathDirectory::picturesDirectory => 'Pictures',
-            SearchPathDirectory::sharedPublicDirectory => 'Public',
-            SearchPathDirectory::itemReplacementDirectory => 'Temp',
-            SearchPathDirectory::trashDirectory => 'Trash'
+            SearchPathDirectory::applicationsDirectory => "Applications",
+            SearchPathDirectory::libraryDirectory => "Library",
+            SearchPathDirectory::documentsDirectory => "Documents",
+            SearchPathDirectory::desktopDirectory => "Desktop",
+            SearchPathDirectory::cachesDirectory => "Caches",
+            SearchPathDirectory::applicationSupportDirectory => "Application Support",
+            SearchPathDirectory::downloadsDirectory => "Downloads",
+            SearchPathDirectory::moviesDirectory => "Movies",
+            SearchPathDirectory::musicDirectory => "Music",
+            SearchPathDirectory::picturesDirectory => "Pictures",
+            SearchPathDirectory::sharedPublicDirectory => "Public",
+            SearchPathDirectory::itemReplacementDirectory => "Temp",
+            SearchPathDirectory::trashDirectory => "Trash"
         };
         switch ($directory) {
             case SearchPathDirectory::applicationsDirectory:
@@ -315,7 +315,7 @@ final class FileManager extends ObjectClass
         $filename = (function (string $name, string $extension, URL $directoryUrl): string {
             $index = 1;
             while ($this->fileExists($directoryUrl->appendingPathComponent("$name")->appendingPathExtension($extension)->path)) {
-                $name = preg_replace('/\d+/u', '', $name) . $index;
+                $name = preg_replace("/\d+/u", '', $name) . $index;
                 $index++;
             }
             return "$name.$extension";

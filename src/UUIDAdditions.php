@@ -2,7 +2,7 @@
 
 namespace Sabatier\Foundation;
 
-const UUID_NULL = '00000000-0000-0000-0000-000000000000';
+const UUID_NULL = "00000000-0000-0000-0000-000000000000";
 
 /** @internal */
 function nanotime(): float
@@ -25,7 +25,7 @@ function uuid_compare(string $uu1, string $uu2): int
 
 function uuid_validate(string $uuid): bool
 {
-    return preg_match('/^[a-f\d]{8}(-[a-f\d]{4}){4}[a-f\d]{8}$/i', $uuid) === 1;
+    return preg_match("/^[a-f\d]{8}(-[a-f\d]{4}){4}[a-f\d]{8}$/i", $uuid) === 1;
 }
 
 function uuid_generate_random(): string
@@ -34,7 +34,7 @@ function uuid_generate_random(): string
     $out = random_bytes(16);
     $out[6] = chr(ord($out[6]) & 0x0f | 0x40);
     $out[8] = chr(ord($out[8]) & 0x3f | 0x80);
-    return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($out), 4));
+    return vsprintf("%s%s-%s-%s-%s-%s%s%s", str_split(bin2hex($out), 4));
 }
 
 function uuid_generate_time(): string
@@ -52,7 +52,7 @@ function uuid_generate_time(): string
     $out[7] = chr((int)$time >> 48);
     $out[6] = chr((ord($out[6]) & 0x0f) | 0x10);
     $out[8] = chr((ord($out[8]) & 0x3f) | 0x80);
-    return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($out), 4));
+    return vsprintf("%s%s-%s-%s-%s-%s%s%s", str_split(bin2hex($out), 4));
 }
 
 function uuid_generate(): string

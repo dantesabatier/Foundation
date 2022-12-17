@@ -13,9 +13,9 @@ class KeyPathExpression extends FunctionExpression
 {
     public function __construct(private readonly mixed $keyPath, Expression $operand)
     {
-        $selector = 'valueForKeyPath';
-        if ($this->keyPath instanceof KeyPathSpecifierExpression && !string_contains($this->keyPath->keyPath(), '.')) {
-            $selector = 'valueForKey';
+        $selector = "valueForKeyPath";
+        if ($this->keyPath instanceof KeyPathSpecifierExpression && !string_contains($this->keyPath->keyPath(), ".")) {
+            $selector = "valueForKey";
         }
         parent::__construct(ExpressionType::keyPath, $operand, $selector, new ArrayClass([$this->keyPath]));
     }
@@ -57,7 +57,7 @@ class KeyPathExpression extends FunctionExpression
         $format = '';
         if (($operand = $this->operand()) && ($operand->expressionType !== ExpressionType::evaluatedObject)) {
             $format .= $operand->description();
-            $format .= '.';
+            $format .= ".";
         }
         return $format . $this->keyPath;
     }

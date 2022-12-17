@@ -73,7 +73,7 @@ class PredicateScanner extends Scanner
     private function parseAnd(): ?Predicate
     {
         $left = $this->parseOr();
-        while ($this->scanKeyword('AND') || $this->scanKeyword('&&')) {
+        while ($this->scanKeyword("AND") || $this->scanKeyword("&&")) {
             $right = $this->parseOr();
             if ($right instanceof CompoundPredicate && ($right->compoundPredicateType === CompoundPredicateLogicalType::and)) {
                 if ($left instanceof CompoundPredicate && ($left->compoundPredicateType === CompoundPredicateLogicalType::and)) {
@@ -99,21 +99,21 @@ class PredicateScanner extends Scanner
      */
     private function parseNot(): ?Predicate
     {
-        if ($this->scanString('(')) {
+        if ($this->scanString("(")) {
             $predicate = $this->parsePredicate();
-            if (!$this->scanString(')')) {
-                throw new InvalidArgumentException("invalid argument: missing closing \")\" at index $this->scanLocation");
+            if (!$this->scanString(")")) {
+                throw new InvalidArgumentException("Invalid argument: missing closing \")\" at index $this->scanLocation");
             }
             return $predicate;
         }
-        if ($this->scanKeyword('NOT') || $this->scanKeyword('!')) {
+        if ($this->scanKeyword("NOT") || $this->scanKeyword("!")) {
             /** @psalm-suppress PossiblyNullArgument */
             return CompoundPredicate::notPredicateWithSubpredicate($this->parseNot());
         }
-        if ($this->scanKeyword('TRUEPREDICATE')) {
+        if ($this->scanKeyword("TRUEPREDICATE")) {
             return Predicate::value(true);
         }
-        if ($this->scanKeyword('FALSEPREDICATE')) {
+        if ($this->scanKeyword("FALSEPREDICATE")) {
             return Predicate::value(false);
         }
         return $this->parseComparison();
@@ -125,7 +125,7 @@ class PredicateScanner extends Scanner
     private function parseOr(): ?Predicate
     {
         $left = $this->parseNot();
-        while ($this->scanKeyword('OR') || $this->scanKeyword('||')) {
+        while ($this->scanKeyword("OR") || $this->scanKeyword("||")) {
             $right = $this->parseNot();
             if ($right instanceof CompoundPredicate && ($right->compoundPredicateType === CompoundPredicateLogicalType::or)) {
                 if ($left instanceof CompoundPredicate && ($left->compoundPredicateType === CompoundPredicateLogicalType::or)) {
@@ -154,69 +154,69 @@ class PredicateScanner extends Scanner
         $negate = false;
         $options = ComparisonPredicateOptions::none;
         $modifier = ComparisonPredicateModifier::direct;
-        if ($this->scanKeyword('ANY')) {
+        if ($this->scanKeyword("ANY")) {
             $modifier = ComparisonPredicateModifier::any;
-        } elseif ($this->scanKeyword('ALL')) {
+        } elseif ($this->scanKeyword("ALL")) {
             $modifier = ComparisonPredicateModifier::all;
-        } elseif ($this->scanKeyword('SOME')) {
+        } elseif ($this->scanKeyword("SOME")) {
             $modifier = ComparisonPredicateModifier::all;
             $negate = true;
-        } elseif ($this->scanKeyword('NONE')) {
+        } elseif ($this->scanKeyword("NONE")) {
             $modifier = ComparisonPredicateModifier::any;
             $negate = true;
         }
         $left = $this->parseExpression();
-        if ($this->scanString('<=') || $this->scanString('=<')) {
+        if ($this->scanString("<=") || $this->scanString("=<")) {
             $operator = PredicateOperatorType::lessThanOrEqualTo;
-        } elseif ($this->scanString('>=') || $this->scanString('=>')) {
+        } elseif ($this->scanString(">=") || $this->scanString("=>")) {
             $operator = PredicateOperatorType::greaterThanOrEqualTo;
-        } elseif ($this->scanString('<')) {
+        } elseif ($this->scanString("<")) {
             $operator = PredicateOperatorType::lessThan;
-        } elseif ($this->scanString('>')) {
+        } elseif ($this->scanString(">")) {
             $operator = PredicateOperatorType::greaterThan;
-        } elseif ($this->scanString('!=') || $this->scanString('<>')) {
+        } elseif ($this->scanString("!=") || $this->scanString("<>")) {
             $operator = PredicateOperatorType::notEqualTo;
-        } elseif ($this->scanString('==') || $this->scanString('=')) {
+        } elseif ($this->scanString("==") || $this->scanString("=")) {
             $operator = PredicateOperatorType::equalTo;
-        } elseif ($this->scanKeyword('LIKE')) {
+        } elseif ($this->scanKeyword("LIKE")) {
             $operator = PredicateOperatorType::like;
-        } elseif ($this->scanKeyword('MATCHES')) {
+        } elseif ($this->scanKeyword("MATCHES")) {
             $operator = PredicateOperatorType::matches;
-        } elseif ($this->scanKeyword('BEGINSWITH')) {
+        } elseif ($this->scanKeyword("BEGINSWITH")) {
             $operator = PredicateOperatorType::beginsWith;
-        } elseif ($this->scanKeyword('ENDSWITH')) {
+        } elseif ($this->scanKeyword("ENDSWITH")) {
             $operator = PredicateOperatorType::endsWith;
-        } elseif ($this->scanKeyword('CONTAINS')) {
+        } elseif ($this->scanKeyword("CONTAINS")) {
             $operator = PredicateOperatorType::contains;
-        } elseif ($this->scanKeyword('IN')) {
+        } elseif ($this->scanKeyword("IN")) {
             $operator = PredicateOperatorType::in;
-        } elseif ($this->scanKeyword('BETWEEN')) {
+        } elseif ($this->scanKeyword("BETWEEN")) {
             $operator = PredicateOperatorType::between;
         } else {
-            throw new InvalidArgumentException("invalid argument: unknown predicate operator type at index $this->scanLocation");
+            throw new InvalidArgumentException("Invalid argument: unknown predicate operator type at index $this->scanLocation");
         }
-        if ($this->scanString('[cdnl]')) {
+        if ($this->scanString("[cdnl]")) {
             $options = ComparisonPredicateOptions::caseInsensitive | ComparisonPredicateOptions::diacriticInsensitive | ComparisonPredicateOptions::normalized | ComparisonPredicateOptions::localeSensitive;
-        } elseif ($this->scanString('[cdn]')) {
+        } elseif ($this->scanString("[cdn]")) {
             $options = ComparisonPredicateOptions::caseInsensitive | ComparisonPredicateOptions::diacriticInsensitive | ComparisonPredicateOptions::normalized;
-        } elseif ($this->scanString('[cdl]')) {
+        } elseif ($this->scanString("[cdl]")) {
             $options = ComparisonPredicateOptions::caseInsensitive | ComparisonPredicateOptions::diacriticInsensitive | ComparisonPredicateOptions::localeSensitive;
-        } elseif ($this->scanString('[cd]')) {
+        } elseif ($this->scanString("[cd]")) {
             $options = ComparisonPredicateOptions::caseInsensitive | ComparisonPredicateOptions::diacriticInsensitive;
-        } elseif ($this->scanString('[cl]')) {
+        } elseif ($this->scanString("[cl]")) {
             $options = ComparisonPredicateOptions::caseInsensitive | ComparisonPredicateOptions::localeSensitive;
-        } elseif ($this->scanString('[c]')) {
+        } elseif ($this->scanString("[c]")) {
             $options = ComparisonPredicateOptions::caseInsensitive;
-        } elseif ($this->scanString('[l]')) {
+        } elseif ($this->scanString("[l]")) {
             $options = ComparisonPredicateOptions::localeSensitive;
-        } elseif ($this->scanString('[d]')) {
+        } elseif ($this->scanString("[d]")) {
             throw new InvalidArgumentException(
-                "invalid argument: invalid option \"[d]\" at index $this->scanLocation",
+                "Invalid argument: invalid option \"[d]\" at index $this->scanLocation",
                 E_USER_WARNING
             );
-        } elseif ($this->scanString('[n]')) {
+        } elseif ($this->scanString("[n]")) {
             throw new InvalidArgumentException(
-                "invalid argument: invalid option \"[n]\" at index $this->scanLocation",
+                "Invalid argument: invalid option \"[n]\" at index $this->scanLocation",
                 E_USER_WARNING
             );
         }
@@ -246,94 +246,94 @@ class PredicateScanner extends Scanner
         if ($this->scanFloat($number)) {
             return Expression::expressionForConstantValue($number);
         }
-        if ($this->scanString('-')) {
+        if ($this->scanString("-")) {
             /** @psalm-suppress InvalidArgument */
-            return Expression::expressionForFunction('chs:', new ArrayClass([$this->parseExpression()]));
+            return Expression::expressionForFunction("chs:", new ArrayClass([$this->parseExpression()]));
         }
-        if ($this->scanString('(')) {
+        if ($this->scanString("(")) {
             $expression = $this->parseExpression();
-            if (!$this->scanString(')')) {
-                throw new InvalidArgumentException("invalid argument: missing closing \")\" at index $this->scanLocation");
+            if (!$this->scanString(")")) {
+                throw new InvalidArgumentException("Invalid argument: missing closing \")\" at index $this->scanLocation");
             }
             return $expression;
         }
-        if ($this->scanString('{')) {
+        if ($this->scanString("{")) {
             /** @var ArrayClass<Expression> $subexpressions */
             $subexpressions = new ArrayClass();
-            if ($this->scanString('}')) {
+            if ($this->scanString("}")) {
                 return Expression::expressionForConstantValue($subexpressions);
             }
             /** @psalm-suppress PossiblyNullArgument */
             $subexpressions[] = $this->parseExpression(); // @phpstan-ignore-line
-            while ($this->scanString(',')) {
+            while ($this->scanString(",")) {
                 /** @psalm-suppress PossiblyNullArgument */
                 $subexpressions[] = $this->parseExpression(); // @phpstan-ignore-line
             }
-            if (/** @phpstan-ignore-line */ !$this->scanString('}')) {
-                throw new InvalidArgumentException("invalid argument: missing closing \"}\" at index $this->scanLocation");
+            if (/** @phpstan-ignore-line */ !$this->scanString("}")) {
+                throw new InvalidArgumentException("Invalid argument: missing closing \"}\" at index $this->scanLocation");
             }
             return Expression::expressionForAggregate($subexpressions); // @phpstan-ignore-line
         }
-        if ($this->scanKeyword('TRUE') || $this->scanKeyword('YES')) {
+        if ($this->scanKeyword("TRUE") || $this->scanKeyword("YES")) {
             return Expression::expressionForConstantValue(true);
-        } elseif ($this->scanKeyword('FALSE') || $this->scanKeyword('NO')) {
+        } elseif ($this->scanKeyword("FALSE") || $this->scanKeyword("NO")) {
             return Expression::expressionForConstantValue(false);
-        } elseif ($this->scanKeyword('NULL') || $this->scanKeyword('NIL')) {
+        } elseif ($this->scanKeyword("NULL") || $this->scanKeyword("NIL")) {
             return Expression::expressionForConstantValue(null);
-        } elseif ($this->scanKeyword('SELF')) {
+        } elseif ($this->scanKeyword("SELF")) {
             return Expression::expressionForEvaluatedObject();
         }
         if ($this->scanString("\$")) {
             if (!($keyPath = $this->parseSimpleExpression()?->keyPath())) {
-                throw new InvalidArgumentException("invalid argument: expecting key path");
+                throw new InvalidArgumentException("Invalid argument: expecting key path");
             }
             return Expression::expressionForVariable("\$$keyPath");
         }
         $scanLocation = $this->scanLocation;
-        if ($this->scanString('%')) {
+        if ($this->scanString("%")) {
             if (!$this->isAtEnd) {
                 $c = $this->string[$this->scanLocation];
                 switch ($c) {
-                    case '%':
+                    case "%":
                         $scanLocation = $this->scanLocation;
                         break;
-                    case 'K':
+                    case "K":
                         $this->scanLocation += 1;
                         return Expression::expressionForKeyPath($this->arguments->popFirst());
-                    case '@':
-                    case 's':
-                    case 'c':
-                    case 'C':
-                    case 'd':
-                    case 'D':
-                    case 'i':
-                    case 'o':
-                    case 'O':
-                    case 'u':
-                    case 'U':
-                    case 'x':
-                    case 'X':
-                    case 'e':
-                    case 'E':
-                    case 'f':
-                    case 'g':
-                    case 'G':
+                    case "@":
+                    case "s":
+                    case "c":
+                    case "C":
+                    case "d":
+                    case "D":
+                    case "i":
+                    case "o":
+                    case "O":
+                    case "u":
+                    case "U":
+                    case "x":
+                    case "X":
+                    case "e":
+                    case "E":
+                    case "f":
+                    case "g":
+                    case "G":
                         $this->scanLocation += 1;
                         return Expression::expressionForConstantValue($this->arguments->popFirst());
-                    case 'h':
-                        $this->scanString('h');
+                    case "h":
+                        $this->scanString("h");
                         $c = $this->string[$this->scanLocation];
-                        if ($c === 'i' || $c === 'u') {
+                        if ($c === "i" || $c === "u") {
                             $this->scanLocation += 1;
                             return Expression::expressionForConstantValue($this->arguments->popFirst());
                         }
                         break;
-                    case 'q':
-                        $this->scanString('q');
+                    case "q":
+                        $this->scanString("q");
                         /** @psalm-suppress RedundantCondition */
                         if (/** @phpstan-ignore-line */ !$this->isAtEnd) {
                             $c = $this->string[$this->scanLocation];
-                            if ($c === 'i' || $c === 'u' || $c === 'x' || $c === 'X') {
+                            if ($c === "i" || $c === "u" || $c === "x" || $c === "X") {
                                 $this->scanLocation += 1;
                                 return Expression::expressionForConstantValue($this->arguments->popFirst());
                             }
@@ -351,94 +351,94 @@ class PredicateScanner extends Scanner
             $this->charactersToBeSkipped = '';
             $this->scanUpString("\"", $value);
             if (!$this->scanString("\"")) {
-                throw new InvalidArgumentException("invalid argument: missing closing \"\"\" at index $this->scanLocation");
+                throw new InvalidArgumentException("Invalid argument: missing closing \"\"\" at index $this->scanLocation");
             }
             $this->charactersToBeSkipped = $characters;
             return Expression::expressionForConstantValue($value);
         }
         if ($this->scanString("'")) {
-            $value = '';
+            $value = "";
             $characters = $this->charactersToBeSkipped;
-            $this->charactersToBeSkipped = '';
+            $this->charactersToBeSkipped = "";
             $this->scanUpString("'", $value);
             if (!$this->scanString("'")) {
-                throw new InvalidArgumentException("invalid argument: missing closing \"'\" at index $this->scanLocation");
+                throw new InvalidArgumentException("Invalid argument: missing closing \"'\" at index $this->scanLocation");
             }
             $this->charactersToBeSkipped = $characters;
             return Expression::expressionForConstantValue($value);
         }
         if ($this->scanString("@")) {
             if (!($keyPath = $this->parseSimpleExpression()?->keyPath())) {
-                throw new InvalidArgumentException("invalid argument: expecting expression at index $this->scanLocation");
+                throw new InvalidArgumentException("Invalid argument: expecting expression at index $this->scanLocation");
             }
             return Expression::expressionForKeyPath("@$keyPath");
         }
         if ($this->scanString("SUBQUERY")) {
-            if (!$this->scanString('(')) {
-                throw new InvalidArgumentException("invalid argument: expecting \"(\" at index $this->scanLocation");
+            if (!$this->scanString("(")) {
+                throw new InvalidArgumentException("Invalid argument: expecting \"(\" at index $this->scanLocation");
             }
-            $expression = $this->parseExpression() ?? throw new InvalidArgumentException("invalid argument: expecting expression at index $this->scanLocation");
-            if (!$this->scanString(',')) {
-                throw new InvalidArgumentException("invalid argument: expecting \",\" at index $this->scanLocation");
+            $expression = $this->parseExpression() ?? throw new InvalidArgumentException("Invalid argument: expecting expression at index $this->scanLocation");
+            if (!$this->scanString(",")) {
+                throw new InvalidArgumentException("Invalid argument: expecting \",\" at index $this->scanLocation");
             }
-            $variable = $this->parseExpression() ?? throw new InvalidArgumentException("invalid argument: expecting expression at index $this->scanLocation");
-            if (!$this->scanString(',')) { // @phpstan-ignore-line
-                throw new InvalidArgumentException("invalid argument: expecting \",\" at index $this->scanLocation");
+            $variable = $this->parseExpression() ?? throw new InvalidArgumentException("Invalid argument: expecting expression at index $this->scanLocation");
+            if (!$this->scanString(",")) { // @phpstan-ignore-line
+                throw new InvalidArgumentException("Invalid argument: expecting \",\" at index $this->scanLocation");
             }
-            $predicate = $this->parsePredicate() ?? throw new InvalidArgumentException("invalid argument: expecting predicate at index $this->scanLocation");
-            if (!$this->scanString(')')) {
-                throw new InvalidArgumentException("invalid argument: expecting \")\" at index $this->scanLocation");
+            $predicate = $this->parsePredicate() ?? throw new InvalidArgumentException("Invalid argument: expecting predicate at index $this->scanLocation");
+            if (!$this->scanString(")")) {
+                throw new InvalidArgumentException("Invalid argument: expecting \")\" at index $this->scanLocation");
             }
             return Expression::expressionForSubquery($expression, $variable, $predicate);
         }
         if ($this->scanString("TERNARY")) {
-            if (!$this->scanString('(')) {
-                throw new InvalidArgumentException("invalid argument: expecting \"(\" at index $this->scanLocation");
+            if (!$this->scanString("(")) {
+                throw new InvalidArgumentException("Invalid argument: expecting \"(\" at index $this->scanLocation");
             }
-            $predicate = $this->parsePredicate() ?? throw new InvalidArgumentException("invalid argument: expecting predicate at index $this->scanLocation");
-            if (!$this->scanString(',')) {
-                throw new InvalidArgumentException("invalid argument: expecting \",\" at index $this->scanLocation");
+            $predicate = $this->parsePredicate() ?? throw new InvalidArgumentException("Invalid argument: expecting predicate at index $this->scanLocation");
+            if (!$this->scanString(",")) {
+                throw new InvalidArgumentException("Invalid argument: expecting \",\" at index $this->scanLocation");
             }
-            $trueExpression = $this->parseExpression() ?? throw new InvalidArgumentException("invalid argument: expecting expression at index $this->scanLocation");
-            if (!$this->scanString(',')) { // @phpstan-ignore-line
-                throw new InvalidArgumentException("invalid argument: expecting \",\" at index $this->scanLocation");
+            $trueExpression = $this->parseExpression() ?? throw new InvalidArgumentException("Invalid argument: expecting expression at index $this->scanLocation");
+            if (!$this->scanString(",")) { // @phpstan-ignore-line
+                throw new InvalidArgumentException("Invalid argument: expecting \",\" at index $this->scanLocation");
             }
-            $falseExpression = $this->parseExpression() ?? throw new InvalidArgumentException("invalid argument: expecting expression at index $this->scanLocation");
-            if (!$this->scanString(')')) {
-                throw new InvalidArgumentException("invalid argument: expecting \")\" at index $this->scanLocation");
+            $falseExpression = $this->parseExpression() ?? throw new InvalidArgumentException("Invalid argument: expecting expression at index $this->scanLocation");
+            if (!$this->scanString(")")) {
+                throw new InvalidArgumentException("Invalid argument: expecting \")\" at index $this->scanLocation");
             }
             return Expression::expressionForConditional($predicate, $trueExpression, $falseExpression);
         }
         if ($this->scanString("FUNCTION")) {
-            if (!$this->scanString('(')) {
-                throw new InvalidArgumentException("invalid argument: expecting \"(\" at index $this->scanLocation");
+            if (!$this->scanString("(")) {
+                throw new InvalidArgumentException("Invalid argument: expecting \"(\" at index $this->scanLocation");
             }
             /** @var ArrayClass<Expression> $arguments */
             $arguments = new ArrayClass();
-            $argument = $this->parseExpression() ?? throw new InvalidArgumentException("invalid argument: expecting expression at index $this->scanLocation");
+            $argument = $this->parseExpression() ?? throw new InvalidArgumentException("Invalid argument: expecting expression at index $this->scanLocation");
             $arguments->append($argument);
-            while ($this->scanString(',')) {
-                $argument = $this->parseExpression() ?? throw new InvalidArgumentException("invalid argument: expecting expression at index $this->scanLocation");
+            while ($this->scanString(",")) {
+                $argument = $this->parseExpression() ?? throw new InvalidArgumentException("Invalid argument: expecting expression at index $this->scanLocation");
                 $arguments->append($argument);
             }
             if (!$this->scanString(")")) {
-                throw new InvalidArgumentException("invalid argument: missing closing \")\" at index $this->scanLocation");
+                throw new InvalidArgumentException("Invalid argument: missing closing \")\" at index $this->scanLocation");
             }
             $operand = $arguments[0];
             $expression = $arguments[1];
             if ($expression->expressionType !== ExpressionType::constantValue && $expression->expressionType !== ExpressionType::keyPath) {
-                throw new InvalidArgumentException(sprintf("invalid argument: expecting constant expression, %s expression given at index %s", $expression->expressionType->name, $this->scanLocation));
+                throw new InvalidArgumentException(sprintf("Invalid argument: expecting constant expression, %s expression given at index %s", $expression->expressionType->name, $this->scanLocation));
             }
             return Expression::expressionForSelector($operand, $expression->constantValue(), new ArrayClass($arguments->dropFirst(2)));
         }
-        $this->scanString('#');
+        $this->scanString("#");
         $value = '';
         $identifier = "_\$abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
         if (!$this->scanCharacters($identifier, $value)) {
-            throw new InvalidArgumentException("invalid argument: parsing error at index $this->scanLocation");
+            throw new InvalidArgumentException("Invalid argument: parsing error at index $this->scanLocation");
         }
         if ($value === null) {
-            throw new InvalidArgumentException("invalid argument: expecting value at index $this->scanLocation");
+            throw new InvalidArgumentException("Invalid argument: expecting value at index $this->scanLocation");
         }
         return Expression::expressionForKeyPath($value);
     }
@@ -450,7 +450,7 @@ class PredicateScanner extends Scanner
     {
         $left = $this->parseSimpleExpression();
         while (true) {
-            if ($this->scanString('.')) {
+            if ($this->scanString(".")) {
                 /** @var Expression $right */
                 $right = $this->parseSimpleExpression();
                 $expressionType = $right->expressionType;
@@ -459,61 +459,61 @@ class PredicateScanner extends Scanner
                     $left = new KeyPathExpression($right, $left);
                 } elseif ($expressionType === ExpressionType::variable || $expressionType === ExpressionType::constantValue) {
                     /** @psalm-suppress PossiblyNullArgument */
-                    $left = Expression::expressionForSelector($left, 'valueForKey', new ArrayClass([$right]));
+                    $left = Expression::expressionForSelector($left, "valueForKey", new ArrayClass([$right]));
                 } else {
                     throw new InternalInconsistencyException(sprintf("%s %s() unhandled expression type \"%s\"", $this->debugDescription(), __FUNCTION__, $expressionType->name));
                 }
-            } elseif ($this->scanString('[')) {
-                if ($this->scanKeyword('FIRST')) {
+            } elseif ($this->scanString("[")) {
+                if ($this->scanKeyword("FIRST")) {
                     /** @psalm-suppress InvalidArgument */
-                    $left = Expression::expressionForFunction('first:', new ArrayClass([$left]));
-                } elseif ($this->scanKeyword('LAST')) {
+                    $left = Expression::expressionForFunction("first:", new ArrayClass([$left]));
+                } elseif ($this->scanKeyword("LAST")) {
                     /** @psalm-suppress InvalidArgument */
-                    $left = Expression::expressionForFunction('last:', new ArrayClass([$left]));
-                } elseif ($this->scanKeyword('SIZE')) {
+                    $left = Expression::expressionForFunction("last:", new ArrayClass([$left]));
+                } elseif ($this->scanKeyword("SIZE")) {
                     /** @psalm-suppress InvalidArgument */
-                    $left = Expression::expressionForFunction('size:', new ArrayClass([$left]));
+                    $left = Expression::expressionForFunction("size:", new ArrayClass([$left]));
                 } else {
                     /** @psalm-suppress InvalidArgument */
-                    $left = Expression::expressionForFunction('index:', new ArrayClass([$left, $this->parseExpression()]));
+                    $left = Expression::expressionForFunction("index:", new ArrayClass([$left, $this->parseExpression()]));
                 }
-                if (!$this->scanString(']', $string)) {
-                    throw new InvalidArgumentException("invalid argument: missing closing \"]\" at index $this->scanLocation");
+                if (!$this->scanString("]", $string)) {
+                    throw new InvalidArgumentException("Invalid argument: missing closing \"]\" at index $this->scanLocation");
                 }
-            } elseif ($left instanceof KeyPathExpression && $this->scanString(':')) {
+            } elseif ($left instanceof KeyPathExpression && $this->scanString(":")) {
                 if (!($keyPath = $left->keyPath())) {
-                    throw new InvalidArgumentException("invalid argument: expecting key path at index $this->scanLocation");
+                    throw new InvalidArgumentException("Invalid argument: expecting key path at index $this->scanLocation");
                 }
                 $function = "$keyPath:";
-                if (!$this->scanString('(')) {
+                if (!$this->scanString("(")) {
                     $string = '';
-                    $this->scanCharacters('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', $string);
-                    if (!$this->scanString(':(')) {
-                        throw new InvalidArgumentException("invalid argument: expecting expression at index $this->scanLocation");
+                    $this->scanCharacters("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ", $string);
+                    if (!$this->scanString(":(")) {
+                        throw new InvalidArgumentException("Invalid argument: expecting expression at index $this->scanLocation");
                     }
                     $function .= "$string:";
                 }
                 /** @var ArrayClass<Expression> $subexpressions */
                 $subexpressions = new ArrayClass();
-                if (!$this->scanString(')')) {
+                if (!$this->scanString(")")) {
                     /** @psalm-suppress PossiblyNullArgument */
                     $subexpressions[] = $this->parseExpression(); // @phpstan-ignore-line
-                    while ($this->scanString(',')) {
+                    while ($this->scanString(",")) {
                         /** @psalm-suppress PossiblyNullArgument */
                         $subexpressions[] = $this->parseExpression(); // @phpstan-ignore-line
                     }
-                    if (/** @phpstan-ignore-line */ !$this->scanString(')')) {
-                        throw new InvalidArgumentException("invalid argument: missing closing \")\" at index $this->scanLocation");
+                    if (/** @phpstan-ignore-line */ !$this->scanString(")")) {
+                        throw new InvalidArgumentException("Invalid argument: missing closing \")\" at index $this->scanLocation");
                     }
                 }
                 $left = Expression::expressionForFunction($function, $subexpressions);
-            } elseif ($this->scanString('UNION')) {
+            } elseif ($this->scanString("UNION")) {
                 /** @psalm-suppress PossiblyNullArgument */
                 $left = Expression::expressionForUnionSet($left, $this->parseExpression());
-            } elseif ($this->scanString('INTERSECT')) {
+            } elseif ($this->scanString("INTERSECT")) {
                 /** @psalm-suppress PossiblyNullArgument */
                 $left = Expression::expressionForIntersectSet($left, $this->parseExpression());
-            } elseif ($this->scanString('MINUS')) {
+            } elseif ($this->scanString("MINUS")) {
                 /** @psalm-suppress PossiblyNullArgument */
                 $left = Expression::expressionForMinusSet($left, $this->parseExpression());
             } else {
@@ -529,10 +529,10 @@ class PredicateScanner extends Scanner
     {
         $left = $this->parseFunctionalExpression();
         while (true) {
-            if ($this->scanString('%')) {
+            if ($this->scanString("%")) {
                 $right = $this->parseFunctionalExpression();
                 /** @psalm-suppress InvalidArgument */
-                $left = Expression::expressionForFunction('modulus:by:', new ArrayClass([$left, $right]));
+                $left = Expression::expressionForFunction("modulus:by:", new ArrayClass([$left, $right]));
             } else {
                 return $left;
             }
@@ -546,10 +546,10 @@ class PredicateScanner extends Scanner
     {
         $left = $this->parseModulusExpression();
         while (true) {
-            if ($this->scanString('**')) {
+            if ($this->scanString("**")) {
                 $right = $this->parseModulusExpression();
                 /** @psalm-suppress InvalidArgument */
-                $left = Expression::expressionForFunction('raise:toPower:', new ArrayClass([$left, $right]));
+                $left = Expression::expressionForFunction("raise:toPower:", new ArrayClass([$left, $right]));
             } else {
                 return $left;
             }
@@ -563,14 +563,14 @@ class PredicateScanner extends Scanner
     {
         $left = $this->parsePowerExpression();
         while (true) {
-            if ($this->scanString('*')) {
+            if ($this->scanString("*")) {
                 $right = $this->parsePowerExpression();
                 /** @psalm-suppress InvalidArgument */
-                $left = Expression::expressionForFunction('multiply:by:', new ArrayClass([$left, $right]));
-            } elseif ($this->scanString('/')) {
+                $left = Expression::expressionForFunction("multiply:by:", new ArrayClass([$left, $right]));
+            } elseif ($this->scanString("/")) {
                 $right = $this->parsePowerExpression();
                 /** @psalm-suppress InvalidArgument */
-                $left = Expression::expressionForFunction('divide:by:', new ArrayClass([$left, $right]));
+                $left = Expression::expressionForFunction("divide:by:", new ArrayClass([$left, $right]));
             } else {
                 return $left;
             }
@@ -584,14 +584,14 @@ class PredicateScanner extends Scanner
     {
         $left = $this->parseMultiplicationExpression();
         while (true) {
-            if ($this->scanString('+')) {
+            if ($this->scanString("+")) {
                 $right = $this->parseMultiplicationExpression();
                 /** @psalm-suppress InvalidArgument */
-                $left = Expression::expressionForFunction('add:to:', new ArrayClass([$left, $right]));
-            } elseif ($this->scanString('-')) {
+                $left = Expression::expressionForFunction("add:to:", new ArrayClass([$left, $right]));
+            } elseif ($this->scanString("-")) {
                 $right = $this->parseMultiplicationExpression();
                 /** @psalm-suppress InvalidArgument */
-                $left = Expression::expressionForFunction('from:subtract:', new ArrayClass([$left, $right]));
+                $left = Expression::expressionForFunction("from:subtract:", new ArrayClass([$left, $right]));
             } else {
                 return $left;
             }
@@ -605,11 +605,11 @@ class PredicateScanner extends Scanner
     {
         $left = $this->parseAdditionExpression();
         while (true) {
-            if ($this->scanString(':=')) {
+            if ($this->scanString(":=")) {
                 if (!($right = $this->parseAdditionExpression())) {
-                    throw new InvalidArgumentException("invalid argument: expecting expression after :=");
+                    throw new InvalidArgumentException("Invalid argument: expecting expression after :=");
                 }
-                assert($left instanceof VariableExpression, sprintf("invalid argument: expecting \"%s\", \"%s\" given", VariableExpression::class, typeof($left)));
+                assert($left instanceof VariableExpression, sprintf("Invalid argument: expecting \"%s\", \"%s\" given", VariableExpression::class, typeof($left)));
                 $left = new VariableAssignmentExpression($left, $right);
             } else {
                 return $left;
