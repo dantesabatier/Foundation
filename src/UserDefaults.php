@@ -207,10 +207,9 @@ class UserDefaults
      */
     public function setObject(mixed $value, string $key): void
     {
-        if ($this->dictionaryRepresentation()->updateValue($value, $key) === $value) {
-            return;
+        if ($value !== $this->dictionaryRepresentation()->updateValue($value, $key)) {
+            NotificationCenter::default()->postNotificationName(self::didChangeNotification, $this);
         }
-        NotificationCenter::default()->postNotificationName(self::didChangeNotification, $this);
     }
 
     /**
