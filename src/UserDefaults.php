@@ -207,7 +207,9 @@ class UserDefaults
      */
     public function setObject(mixed $value, string $key): void
     {
-        $this->dictionaryRepresentation()[$key] = $value;
+        if ($this->dictionaryRepresentation()->updateValue($value, $key) === $value) {
+            return;
+        }
         NotificationCenter::default()->postNotificationName(self::didChangeNotification, $this);
     }
 
@@ -281,7 +283,7 @@ class UserDefaults
      */
     public function register(Dictionary $defaults): void
     {
-        $this->dictionaryRepresentation()->merge($defaults);
+        $this->dictionaryRepresentation()->merge($defaults, fn(mixed $old, mixed $new): mixed => $old ?? $new);
     }
 
     /**
