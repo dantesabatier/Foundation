@@ -14,7 +14,6 @@ use GdImage;
 use InvalidArgumentException;
 use Locale;
 use ReflectionClass;
-use Throwable;
 
 /**
  * A representation of the code and resources stored in a bundle directory on disk.
@@ -269,28 +268,23 @@ final class Bundle extends ObjectClass
      */
     private static function findBundleResources(URL $baseURL, ?string $name = null, ?ArrayClass $extensions = null, ?ArrayClass $languages = null, int $limit = NotFound): ?ArrayClass
     {
-        try {
-            $extensions ??= new ArrayClass();
-            if ($extensions->isEmpty() && $name && ($extension = pathinfo($name, PATHINFO_EXTENSION))) {
-                /** @psalm-suppress InvalidScalarArgument */
-                $extensions->append($extension);
-            }
-            $languages ??= new ArrayClass([""]);
-            $resources = $languages->flatMap(fn(string $language): iterable => FileManager::default()->contentsOfDirectory($language ? $baseURL->appendingPathComponent($language) : $baseURL, null, DirectoryEnumerationOptions::skipsHiddenFiles))->filter(function (URL $url, int $idx, bool &$stop) use ($name, $extensions, $limit): bool {
-                $pathExtension = $url->pathExtension;
-                /** @psalm-suppress InvalidScalarArgument */
-                $ok = $name ? (string_is_equal($url->deletingPathExtension()->lastPathComponent, pathinfo($name, PATHINFO_FILENAME)) && (empty($pathExtension) || $extensions->containsElement($pathExtension))) : (empty($pathExtension) || $extensions->containsElement($pathExtension));
-                $stop = $ok && $limit > 0 && $limit >= $idx;
-                return $ok;
-            });
-            if ($resources->isEmpty()) {
-                return null;
-            }
-            return $resources;
-        } catch (Throwable $throwable) {
-            $throwableClass = $throwable::class;
-            throw new $throwableClass($throwable->getMessage(), $throwable->getCode());
+        $extensions ??= new ArrayClass();
+        if ($extensions->isEmpty() && $name && ($extension = pathinfo($name, PATHINFO_EXTENSION))) {
+            /** @psalm-suppress InvalidScalarArgument */
+            $extensions->append($extension);
         }
+        $languages ??= new ArrayClass([""]);
+        $resources = $languages->flatMap(fn(string $language): iterable => FileManager::default()->contentsOfDirectory($language ? $baseURL->appendingPathComponent($language) : $baseURL, null, DirectoryEnumerationOptions::skipsHiddenFiles))->filter(function (URL $url, int $idx, bool &$stop) use ($name, $extensions, $limit): bool {
+            $pathExtension = $url->pathExtension;
+            /** @psalm-suppress InvalidScalarArgument */
+            $ok = $name ? (string_is_equal($url->deletingPathExtension()->lastPathComponent, pathinfo($name, PATHINFO_FILENAME)) && (empty($pathExtension) || $extensions->containsElement($pathExtension))) : (empty($pathExtension) || $extensions->containsElement($pathExtension));
+            $stop = $ok && $limit > 0 && $limit >= $idx;
+            return $ok;
+        });
+        if ($resources->isEmpty()) {
+            return null;
+        }
+        return $resources;
     }
 
     /**
