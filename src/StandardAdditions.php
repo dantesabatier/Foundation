@@ -292,6 +292,7 @@ function document_root_directory(): string
 {
     /** @psalm-suppress PossiblyUndefinedArrayOffset */
     $path = $_SERVER["DOCUMENT_ROOT"];
+    /** @psalm-suppress RedundantCondition */
     if (RUNNING_FROM_CLI) {
         if (isset($_SERVER["PWD"])) {
             $path = $_SERVER["PWD"];
