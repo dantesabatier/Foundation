@@ -14,6 +14,7 @@ class KeyedArchiver
      */
     public static function archivedData(/** @noinspection PhpUnusedParameterInspection */ mixed $object, bool $requiresSecureCoding = true): string
     {
-        return unsafe_value(fn(): string => ($decoded = base64_decode($object)) && !is_serialized($decoded) ? base64_encode(serialize($object)) : $object);
+        $decoded = base64_decode($object, true);
+        return unsafe_value(fn(): string => !$decoded || ($decoded && !is_serialized($decoded)) ? base64_encode(serialize($object)) : $object);
     }
 }
