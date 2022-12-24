@@ -11,7 +11,7 @@ use Sabatier\Foundation\URLResourceKey;
 
 final class URLTest extends TestCase
 {
-    public const URLString = 'http://localhost';
+    public const URLString = "http://localhost";
 
     public function testCanBeCreatedFromValidUrl(): URL
     {
@@ -26,7 +26,7 @@ final class URLTest extends TestCase
     public function testCannotBeCreatedFromInvalidUrl(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        new URL('invalid');
+        new URL("invalid");
     }
 
     /**
@@ -54,7 +54,7 @@ final class URLTest extends TestCase
     public function testCannotBeCreatedFromInvalidFileUrl(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        URL::fileURL('http://localhost');
+        URL::fileURL("http://localhost");
     }
 
     /**

@@ -9,7 +9,7 @@ use function Sabatier\Foundation\uuid_generate_time;
 
 final class UUIDTest extends TestCase
 {
-    public const UUIDString = 'e621e1f8-c36c-495a-93fc-0c247a3e6e5f';
+    public const UUIDString = "e621e1f8-c36c-495a-93fc-0c247a3e6e5f";
 
     public function testCanBeCreatedFromUuid4(): UUID
     {

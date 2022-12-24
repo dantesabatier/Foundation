@@ -219,7 +219,7 @@ final class ArrayClassTest extends TestCase
     public function testCanBeUsedAsString(): void
     {
         self::assertEquals(
-            '[1]',
+            "[1]",
             new ArrayClass([1])
         );
     }

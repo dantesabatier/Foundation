@@ -40,7 +40,7 @@ final class BundleTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
         /** @psalm-suppress UndefinedClass, ArgumentTypeCoercion */
-        Bundle::bundleForClass('Invalid');
+        Bundle::bundleForClass("Invalid");
     }
 
     /**
@@ -50,7 +50,7 @@ final class BundleTest extends TestCase
     public function testCanLoadInfoDictionary(Bundle $bundle): void
     {
         self::assertEquals(
-            'Foundation',
+            "Foundation",
             $bundle->object(kCFBundleNameKey)
         );
     }
@@ -76,7 +76,7 @@ final class BundleTest extends TestCase
      */
     public function testCanLoadLocalizedString(Bundle $bundle): void
     {
-        self::assertIsString($bundle->localizedString('An unexpected error has occurred'));
+        self::assertIsString($bundle->localizedString("An unexpected error has occurred"));
     }
 
     /**
@@ -87,7 +87,7 @@ final class BundleTest extends TestCase
     {
         self::assertInstanceOf(
             URL::class,
-            $bundle->url('mime.types')
+            $bundle->url("mime.types")
         );
     }
 

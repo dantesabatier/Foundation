@@ -17,7 +17,7 @@ final class URLSessionTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->url = new URL('https://api.ipify.org/?format=json');
+        $this->url = new URL("https://api.ipify.org/?format=json");
     }
 
     /**

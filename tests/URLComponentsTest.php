@@ -9,9 +9,7 @@ use Sabatier\Foundation\URLComponents;
 
 final class URLComponentsTest extends TestCase
 {
-    public const URLString = 'https://admin:admin@host.com:1234/path/data?key=value2#fragment';
-
-    public URLComponents $components;
+    public const URLString = "https://admin:admin@host.com:1234/path/data?key=value2#fragment";public URLComponents $components;
 
     protected function setUp(): void
     {

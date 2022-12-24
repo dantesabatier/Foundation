@@ -66,7 +66,7 @@ final class FileManagerTest extends TestCase
      */
     public function testCanCreateDirectory(): URL
     {
-        $directoryURL = FileManager::default()->temporaryDirectory->appendingPathComponent('Test');
+        $directoryURL = FileManager::default()->temporaryDirectory->appendingPathComponent("Test");
         $path = $directoryURL->path;
         if (!FileManager::default()->fileExists($path)) {
             FileManager::default()->createDirectory($directoryURL);
@@ -83,10 +83,10 @@ final class FileManagerTest extends TestCase
      */
     public function testCanCreateFile(URL $directoryURL): URL
     {
-        $url = $directoryURL->appendingPathComponent('Test')->appendingPathExtension('txt');
+        $url = $directoryURL->appendingPathComponent("Test")->appendingPathExtension("txt");
         $path = $url->path;
         if (!FileManager::default()->fileExists($path)) {
-            FileManager::default()->createFile($path, 'Hello!');
+            FileManager::default()->createFile($path, "Hello!");
         }
         self::assertFileExists($path);
         return $url;
