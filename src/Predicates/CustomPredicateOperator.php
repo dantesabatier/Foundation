@@ -10,7 +10,6 @@
 namespace Sabatier\Foundation\Predicates;
 
 use InvalidArgumentException;
-
 use function Sabatier\Foundation\human_readable_value;
 use function Sabatier\Foundation\typeof;
 
