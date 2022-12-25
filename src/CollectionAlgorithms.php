@@ -22,7 +22,7 @@ trait CollectionAlgorithms
 
     public function offsetGet(mixed $offset): mixed
     {
-        if (is_int($offset)) {
+        if (!is_int($offset)) {
             throw new InvalidArgumentException(sprintf("Invalid argument: expecting int, \"%s\" given", typeof($offset)));
         }
         if (!$this->offsetExists($offset)) {
