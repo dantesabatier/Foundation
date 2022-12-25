@@ -8,6 +8,9 @@ use RangeException;
 use Sabatier\Foundation\Predicates\Predicate;
 use Sabatier\Foundation\Predicates\PredicateUtilities;
 
+/**
+ * @psalm-require-implements Collection
+ */
 trait CollectionAlgorithms
 {
     use SequenceAlgorithms;
