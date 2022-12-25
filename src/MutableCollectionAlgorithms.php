@@ -23,7 +23,7 @@ trait MutableCollectionAlgorithms
     
     public function insert(mixed $newElement): array
     {
-        $oldElement = $this->first(fn(mixed $e): bool => $e instanceof Equatable ? $e->isEqual($newElement) : $e === $newElement);
+        $oldElement = $this->first(fn(mixed $e): bool => equivalent($e, $newElement));
         if ($oldElement === null) {
             $this->append($newElement);
             return ["inserted" => true, "elementAfterInsert" => $newElement];

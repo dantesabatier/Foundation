@@ -524,7 +524,7 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
      */
     public function member(mixed $element)
     {
-        return $this->first(fn(mixed $e): bool => $e instanceof Equatable ? $e->isEqual($element) : $e === $element);
+        return $this->first(fn(mixed $e): bool => equivalent($e, $element));
     }
 
     /**
