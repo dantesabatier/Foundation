@@ -22,7 +22,7 @@ trait CollectionAlgorithms
         if (is_int($offset)) {
             throw new InvalidArgumentException(sprintf("Invalid argument: expecting int, \"%s\" given", typeof($offset)));
         }
-        if (!in_range($offset, $this->startIndex(), $this->endIndex())) {
+        if (!$this->offsetExists($offset)) {
             throw new RangeException(sprintf("%s %s(%s) index \"%s\" out of bounds [%s...<%s]", $this->debugDescription(), __FUNCTION__, $offset, $offset, $this->startIndex(), $this->endIndex()));
         }
         return $this->reserved[$offset];
