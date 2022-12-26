@@ -110,7 +110,7 @@ trait CollectionAlgorithms
                 $instance[] = $e;
             }
             /** @psalm-suppress TypeDoesNotContainType */
-            if (/** @phpstan-ingore-line */ $stop) {
+            if (/** @phpstan-ignore-line */ $stop) {
                 break;
             }
         }
