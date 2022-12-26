@@ -46,9 +46,9 @@ return static function (RectorConfig $rectorConfig): void {
             __DIR__ . "/src/SystemRandomNumberGenerator.php",
         ],
         ReadOnlyPropertyRector::class => [
-            __DIR__ . "src/ArrayConverter.php",
-            __DIR__ . "src/Networking/MultiHandle.php",
-            __DIR__ . "src/PropertyListSerializer.php",
+            __DIR__ . "/src/ArrayConverter.php",
+            __DIR__ . "/src/Networking/MultiHandle.php",
+            __DIR__ . "/src/PropertyListSerializer.php",
         ],
         ReturnNeverTypeRector::class,
         NullToStrictStringFuncCallArgRector::class,
