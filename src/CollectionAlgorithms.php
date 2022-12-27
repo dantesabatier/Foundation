@@ -29,17 +29,16 @@ trait CollectionAlgorithms
     {
         if ($offset === null) {
             $this->reserved[] = $value;
-            return;
+        } else {
+            $this->reserved[$offset] = $value;
         }
-        $this->reserved[$offset] = $value;
     }
 
     public function offsetUnset(mixed $offset): void
     {
-        if (!$this->offsetExists($offset)) {
-            return;
+        if ($this->offsetExists($offset)) {
+            unset($this->reserved[$offset]);
         }
-        unset($this->reserved[$offset]);
     }
 
     public function startIndex(): int
