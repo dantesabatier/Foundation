@@ -58,3 +58,19 @@ const BundleDidLoadNotification = "BundleDidLoadNotification";
 /** @var string A constant used as a key for the userInfo dictionary of a {@see BundleDidLoadNotification} notification that corresponds to an array of names of each class that was loaded. */
 const LoadedClasses = "LoadedClasses";
 const EscapeSequenceBackgroundColorAddition = 10;
+/** @var string Posted whenever an UndoManager object opens or closes an undo group (except when it opens a top-level group) and when checking the redo stack in {@see UndoManager::canRedo}. */
+const UndoManagerCheckpointNotification = "UndoManagerCheckpointNotification";
+/** @var string Posted just before an UndoManager object performs an undo operation. */
+const UndoManagerWillUndoChangeNotification = "UndoManagerWillUndoChangeNotification";
+/** @var string Posted just after an UndoManager object performs an undo operation. */
+const UndoManagerDidUndoChangeNotification = "UndoManagerDidUndoChangeNotification";
+/** @var string Posted just before an UndoManager object performs a redo operation ({@see UndoManager::redo()}). */
+const UndoManagerWillRedoChangeNotification = "UndoManagerWillRedoChangeNotification";
+/** @var string Posted just after an UndoManager object performs a redo operation ({@see UndoManager::redo()}). */
+const UndoManagerDidRedoChangeNotification = "UndoManagerDidRedoChangeNotification";
+/** @var string Posted whenever an UndoManager object opens an undo group, which occurs in the implementation of the {@see UndoManager::beginUndoGrouping()} method. */
+const UndoManagerDidOpenUndoGroupNotification = "UndoManagerDidOpenUndoGroupNotification";
+/** @var string Posted before an UndoManager object closes an undo group, which occurs in the implementation of the {@see UndoManager::endUndoGrouping()} method. */
+const UndoManagerWillCloseUndoGroupNotification = "UndoManagerWillCloseUndoGroupNotification";
+/** @var string Posted after an UndoManager object closes an undo group, which occurs in the implementation of the {@see UndoManager::endUndoGrouping()} method. */
+const UndoManagerDidCloseUndoGroupNotification = "UndoManagerDidCloseUndoGroupNotification";
