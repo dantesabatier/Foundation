@@ -127,7 +127,7 @@ class URLCredentialStorage
      * Returns a dictionary containing the credentials for the specified protection space.
      *
      * @param URLProtectionSpace $space The protection space whose credentials you want to retrieve.
-     * @return Dictionary<URLCredential>|null A dictionary containing the credentials for the specified protection space. The dictionary’s keys are username strings, and each value is the corresponding {@see URLCredential}.
+     * @return Dictionary<URLCredential>|null A dictionary containing the credentials for the specified protection space. The dictionary's keys are username strings, and each value is the corresponding {@see URLCredential}.
      */
     public function credentials(URLProtectionSpace $space): ?Dictionary
     {
@@ -139,7 +139,7 @@ class URLCredentialStorage
      *
      * @param URLProtectionSpace $space The protection space whose credentials you want to retrieve.
      * @param URLSessionTask|null $task The task accessing the specified protection space.
-     * @param Closure(Dictionary<URLCredential>|null): void $completionHandler A completion handler that receives a single argument with the credentials for the specified protection space and task. The dictionary’s keys are username strings, and the corresponding value is a URLCredential. If no credential has been set for this space, the argument to the completion handler is nil.
+     * @param Closure(Dictionary<URLCredential>|null): void $completionHandler A completion handler that receives a single argument with the credentials for the specified protection space and task. The dictionary's keys are username strings, and the corresponding value is a URLCredential. If no credential has been set for this space, the argument to the completion handler is nil.
      */
     public function getCredentials(/** @noinspection PhpUnusedParameterInspection */ URLProtectionSpace $space, ?URLSessionTask $task, Closure $completionHandler): void
     {

@@ -26,7 +26,7 @@ const URLErrorBadURL = -1000;
 const URLErrorNetworkConnectionLost = -1005;
 /** @var int The URL Loading System received bad data from the server. */
 const URLErrorBadServerResponse = -1011;
-/** @var int The URL Loading System encountered an error that it can’t interpret. */
+/** @var int The URL Loading System encountered an error that it can't interpret. */
 const URLErrorUnknown = -1;
 /** @var int An asynchronous operation timed out. */
 const URLErrorTimedOut = -1001;

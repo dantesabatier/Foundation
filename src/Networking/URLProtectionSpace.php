@@ -23,7 +23,7 @@ class URLProtectionSpace extends ObjectClass
     ];
     /** @var bool A Boolean value that indicates whether the credentials for the protection space can be sent securely. This value is true if the credentials for the protection space represented by the receiver can be sent securely, false otherwise. */
     public bool $receivesCredentialSecurely = false;
-    /** @var mixed A representation of the server’s SSL transaction state. This value is nil if the authentication method of the protection space is not server trust. */
+    /** @var mixed A representation of the server's SSL transaction state. This value is nil if the authentication method of the protection space is not server trust. */
     public mixed $serverTrust = null;
     private readonly bool $isProxy;
 

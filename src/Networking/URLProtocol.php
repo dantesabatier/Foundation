@@ -15,13 +15,13 @@ abstract class URLProtocol extends ObjectClass
 {
     /** @var ArrayClass<class-string<URLProtocol>>|null */
     private static ?ArrayClass $registeredProtocolClasses = null;
-    /** @var CachedURLResponse|null The protocol’s cached response. If not overridden in a subclass, this method returns the cached response stored at initialization time. */
+    /** @var CachedURLResponse|null The protocol's cached response. If not overridden in a subclass, this method returns the cached response stored at initialization time. */
     public readonly ?CachedURLResponse $cachedResponse;
     /** @var URLProtocolClient|null The object the protocol uses to communicate with the URL loading system. */
     public readonly ?URLProtocolClient $client;
-    /** @var URLSessionTask The protocol’s task. */
+    /** @var URLSessionTask The protocol's task. */
     public readonly URLSessionTask $task;
-    /** @var URLRequest The protocol’s request. */
+    /** @var URLRequest The protocol's request. */
     public readonly URLRequest $request;
 
     /**

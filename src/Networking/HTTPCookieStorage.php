@@ -179,7 +179,7 @@ class HTTPCookieStorage extends ObjectClass
     /**
      * Stores a specified cookie in the cookie storage if the cookie accept policy permits.
      *
-     * The cookie replaces an existing cookie with the same name, domain, and path, if one exists in the cookie storage. This method accepts the cookie only if the storage’s cookie accept policy is HTTPCookieAcceptPolicy::always or HTTPCookieAcceptPolicy::onlyFromMainDocumentDomain. The cookie is ignored if the storage’s cookie accept policy is HTTPCookieAcceptPolicy::never.
+     * The cookie replaces an existing cookie with the same name, domain, and path, if one exists in the cookie storage. This method accepts the cookie only if the storage's cookie accept policy is HTTPCookieAcceptPolicy::always or HTTPCookieAcceptPolicy::onlyFromMainDocumentDomain. The cookie is ignored if the storage's cookie accept policy is HTTPCookieAcceptPolicy::never.
      *
      * @param HTTPCookie $cookie The cookie to store.
      */
@@ -199,10 +199,10 @@ class HTTPCookieStorage extends ObjectClass
     }
 
     /**
-     * Adds an array of cookies to the cookie storage if the storage’s cookie acceptance policy permits.
+     * Adds an array of cookies to the cookie storage if the storage's cookie acceptance policy permits.
      *
      * Cookies in the array will replace existing cookies with the same name, domain, and path in the cookie storage. If the storage has an accept policy of HTTPCookie.AcceptPolicy.never, the cookies are ignored.
-     * To store cookies from a set of response headers, an application can use cookies({@see HTTPCookie::cookies()}) passing a header field dictionary and then use this method to store the resulting cookies in accordance with the cookie storage’s cookie acceptance policy.
+     * To store cookies from a set of response headers, an application can use cookies({@see HTTPCookie::cookies()}) passing a header field dictionary and then use this method to store the resulting cookies in accordance with the cookie storage's cookie acceptance policy.
      * If you override this method, also override {@see HTTPCookieStorage::storeCookies()}.
      *
      * @param ArrayClass<HTTPCookie> $cookies The cookies to add.
@@ -237,7 +237,7 @@ class HTTPCookieStorage extends ObjectClass
     /**
      * Fetches cookies relevant to the specified task and passes them to the completion handler.
      *
-     * @param URLSessionTask $task The task performing a request. The cookie storage can use the URL and other properties of this task’s request to determine which cookies to fetch.
+     * @param URLSessionTask $task The task performing a request. The cookie storage can use the URL and other properties of this task's request to determine which cookies to fetch.
      * @param Closure(ArrayClass<HTTPCookie>|null): void $completionHandler A completion handler that receives an array of cookies as its argument.
      */
     public function getCookiesFor(URLSessionTask $task, Closure $completionHandler): void
@@ -250,7 +250,7 @@ class HTTPCookieStorage extends ObjectClass
     }
 
     /**
-     * Returns all the cookie storage’s cookies that are sent to a specified URL.
+     * Returns all the cookie storage's cookies that are sent to a specified URL.
      *
      * You can use the requestHeaderFields(with:) method of HTTPCookie to turn the array returned by this method into a set of header fields to add to a URLRequest object.
      * If you override this method, also override {@see HTTPCookieStorage::getCookiesFor()}.
@@ -270,7 +270,7 @@ class HTTPCookieStorage extends ObjectClass
      * Returns all the cookie storage's cookies, sorted according to a given set of sort descriptors.
      *
      * @param ArrayClass<SortDescriptor> $sortOrder The sort descriptors to use for sorting, as an array of {@see SortDescriptor} objects.
-     * @return ArrayClass<HTTPCookie> The cookie storage’s cookies, sorted according to sortOrder, as an array of {@see HTTPCookie} objects.
+     * @return ArrayClass<HTTPCookie> The cookie storage's cookies, sorted according to sortOrder, as an array of {@see HTTPCookie} objects.
      */
     public function sortedCookies(ArrayClass $sortOrder): ArrayClass
     {

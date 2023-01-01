@@ -11,7 +11,7 @@ enum FormatterContext: int
 {
     /** An unknown formatting context. This is the default formatting context. */
     case unknown = 0;
-    /** A formatting context determined automatically at runtime. A FormatterContext::dynamic context is automatically determined to be one of the following: FormatterContext::standalone, FormatterContext.beginningOfSentence, or FormatterContext::middleOfSentence. When used in combination with stringWithFormat:, the formatter returns a string proxy, formats the string using FormatterContext::unknown, determines context based on the proxy string’s location, and then reformats the string accordingly. */
+    /** A formatting context determined automatically at runtime. A FormatterContext::dynamic context is automatically determined to be one of the following: FormatterContext::standalone, FormatterContext.beginningOfSentence, or FormatterContext::middleOfSentence. When used in combination with stringWithFormat:, the formatter returns a string proxy, formats the string using FormatterContext::unknown, determines context based on the proxy string's location, and then reformats the string accordingly. */
     case dynamic = 1;
     /** The formatting context for stand-alone usage. */
     case standalone = 2;

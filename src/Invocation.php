@@ -1,0 +1,47 @@
+<?php
+
+namespace Sabatier\Foundation;
+
+/**
+ * A message rendered as an object.
+ */
+class Invocation
+{
+    /** @var string The receiver's selector, or 0 if it hasn't been set. */
+    public string $selector;
+    /** @var object The receiver's target, or nil if the receiver has no target. The target is the receiver of the message sent by {@see invoke()}. */
+    public object $target;
+    /** @var ArrayClass<mixed> */
+    public ArrayClass $arguments;
+    public mixed $value;
+
+    public function __construct()
+    {
+        $this->arguments = new ArrayClass();
+    }
+
+    /**
+     * Sends the receiver's message (with arguments) to its target and sets the return value.
+     *
+     * You must set the receiver's target, selector, and argument values before calling this method.
+     */
+    public function invoke(): void
+    {
+        $target = $this->target;
+        $selector = $this->selector;
+        assert(method_exists($target, $selector), sprintf("<%s %s> %s() unrecognized selector sent to instance", class_name($target::class), spl_object_id($target), $selector));
+        $this->value = $target->$selector(...$this->arguments->toArray());
+    }
+
+    /**
+     * Sets the receiver's target, sends the receiver's message (with arguments) to that target, and sets the return value.
+     *
+     * You must set the receiver's selector and argument values before calling this method.
+     * @param object $target The object to set as the receiver's target.
+     */
+    public function invokeWithTarget(object $target): void
+    {
+        $this->target = $target;
+        $this->invoke();
+    }
+}
