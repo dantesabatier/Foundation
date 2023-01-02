@@ -509,8 +509,7 @@ class IndexPath extends ObjectClass implements MutableCollection, Iterator
      */
     public function getIndexes(?array &$indexes, Range $range): void
     {
-        /** @var int[] $indexes */
-        $indexes = $this->filter(fn(int $e): bool => $range->contains($e))->reserved;
+        $indexes = $this->filter(fn(int $e): bool => $range->contains($e))->toArray();
     }
 
     /**
