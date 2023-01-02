@@ -78,16 +78,10 @@ trait CollectionAlgorithms
         }
         return null;
     }
-
-    /** @noinspection PhpMixedReturnTypeCanBeReducedInspection */
-    public function indexOf(mixed $element): mixed
+    
+    public function indexOf(mixed $element)
     {
         return $this->firstIndex(fn(mixed $e): bool => equivalent($e, $element));
-    }
-
-    public function elementAt(mixed $index)
-    {
-        return $this->reserved[$index] ?? null;
     }
 
     public function distance(int $start, int $end): int

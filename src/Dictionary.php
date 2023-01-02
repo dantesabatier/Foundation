@@ -274,15 +274,6 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
     }
 
     /**
-     * @param string $index
-     * @return Element|null
-     */
-    public function elementAt(mixed $index)
-    {
-        return $this->valueForKey($index);
-    }
-
-    /**
      * Returns the first element of the collection that satisfies the given predicate.
      * @param Closure(Element, string=): bool|null $where A closure that takes an element of the collection as its argument and returns a Boolean value indicating whether the element is a match.
      * @return Element|null The first element of the collection that satisfies predicate, or nil if there is no element that satisfies predicate.

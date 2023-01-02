@@ -66,12 +66,6 @@ interface Collection extends Sequence, ArrayAccess
     public function indexOf(mixed $element);
 
     /**
-     * @param Index $index
-     * @return Element|null
-     */
-    public function elementAt(mixed $index);
-
-    /**
      * Returns the distance between two indices.
      *
      * @param int $start A valid index of the collection.

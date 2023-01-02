@@ -44,7 +44,6 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
         firstIndex as private collectionFirstIndex;
         lastIndex as private collectionLastIndex;
         indexOf as private collectionIndexOf;
-        elementAt as private collectionElementAt;
         filter as private collectionFilter;
         filtered as private collectionFiltered;
         sort as private collectionSort;
@@ -223,15 +222,6 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
     public function indexOf(mixed $element): ?int
     {
         return $this->collectionIndexOf($element);
-    }
-
-    /**
-     * @param int $index
-     * @return Element|null
-     */
-    public function elementAt(mixed $index)
-    {
-        return $this->collectionElementAt($index);
     }
 
     /**

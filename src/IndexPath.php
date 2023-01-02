@@ -36,7 +36,6 @@ class IndexPath extends ObjectClass implements MutableCollection, Iterator
         firstIndex as private collectionFirstIndex;
         lastIndex as private collectionLastIndex;
         indexOf as private collectionIndexOf;
-        elementAt as private collectionElementAt;
         filter as private collectionFilter;
         filtered as private collectionFiltered;
         sort as private collectionSort;
@@ -221,15 +220,6 @@ class IndexPath extends ObjectClass implements MutableCollection, Iterator
     public function indexOf(mixed $element): ?int
     {
         return $this->collectionIndexOf($element);
-    }
-
-    /**
-     * @param int $index
-     * @return int|null
-     */
-    public function elementAt(mixed $index): ?int
-    {
-        return $this->collectionElementAt($index);
     }
 
     /**
@@ -498,7 +488,7 @@ class IndexPath extends ObjectClass implements MutableCollection, Iterator
      */
     public function index(int $position): int
     {
-        return $this->elementAt($position) ?? NotFound;
+        return $this->reserved[$position] ?? NotFound;
     }
 
     /**
