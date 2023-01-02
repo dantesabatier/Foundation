@@ -13,7 +13,7 @@ class Invocation
     public object $target;
     /** @var ArrayClass<mixed> */
     public ArrayClass $arguments;
-    public mixed $value;
+    public mixed $returnValue;
 
     public function __construct()
     {
@@ -30,7 +30,7 @@ class Invocation
         $target = $this->target;
         $selector = $this->selector;
         assert(method_exists($target, $selector), sprintf("<%s %s> %s() unrecognized selector sent to instance", class_name($target::class), spl_object_id($target), $selector));
-        $this->value = $target->$selector(...$this->arguments->toArray());
+        $this->returnValue = $target->$selector(...$this->arguments->toArray());
     }
 
     /**

@@ -6,7 +6,7 @@ namespace Sabatier\Foundation;
  * A general-purpose recorder of operations that enables undo and redo.
  * @property-read int $levelsOfUndo The maximum number of top-level undo groups the receiver holds. An integer specifying the number of undo groups. A limit of 0 indicates no limit, so old undo groups are never dropped. When ending an undo group results in the number of groups exceeding this limit, the oldest groups are dropped from the stack. The default is 0. If you change the limit to a level below the prior limit, old undo groups are immediately dropped.
  * @property-read bool $canUndo A Boolean value that indicates whether the receiver has any actions to undo.
- * @property-read bool $canRedo A Boolean value that indicates whether the receiver has any actions to redo.
+ * @property-read bool $canRedo A Boolean value that indicates whether the receiver has any actions to redo. true if the receiver has any actions to redo, otherwise false. Because any undo operation registered clears the redo stack, this method posts an {@see UndoManagerCheckpointNotification} to allow clients to apply their pending operations before testing the redo stack.
  * @property-read int $groupingLevel The number of nested undo groups (or redo groups, if Redo was invoked last) in the current event loop. An integer indicating the number of nested groups. If 0 is returned, there is no open undo or redo group.
  * @property-read bool $isUndoRegistrationEnabled A Boolean value that indicates whether the recording of undo operations is enabled.
  * @property-read bool $isUndoing Returns a Boolean value that indicates whether the receiver is in the process of performing its {@see undo()} or {@see undoNestedGroup()} method.
@@ -45,10 +45,13 @@ class UndoManager extends ObjectClass
     public function __get(string $name)
     {
         return match ($name) {
-            "canUndo" => !$this->undoStack->isEmpty(),
-            "canRedo" => !$this->redoStack->isEmpty(),
-            "redoActionName" => $this->canRedo ? $this->redoStack->last()?->actionName : null,
-            "undoActionName" => $this->canUndo ? $this->undoStack->last()?->actionName : null,
+            "canUndo" => !$this->undoStack->isEmpty() || $this->group?->actions->isEmpty() === false,
+            "canRedo" => (function (): bool {
+                NotificationCenter::default()->postNotificationName(UndoManagerCheckpointNotification, $this);
+                return !$this->redoStack->isEmpty();
+            })(),
+            "redoActionName" => $this->redoStack->last()?->actionName ?? "",
+            "undoActionName" => $this->group?->actionName ?? $this->undoStack->last()?->actionName ?? "",
             "redoMenuItemTitle" => $this->redoMenuTitle($this->redoActionName),
             "undoMenuItemTitle" => $this->undoMenuTitle($this->undoActionName),
             "levelsOfUndo", "groupingLevel", "isUndoRegistrationEnabled", "isUndoing", "isRedoing", "undoActionIsDiscardable", "redoActionIsDiscardable" => $this->$name,
@@ -97,13 +100,13 @@ class UndoManager extends ObjectClass
             }
             $this->begin();
         }
-        /** @var UndoGroup $g */
-        $g = $this->group;
+        /** @var UndoGroup $group */
+        $group = $this->group;
         $invocation = new Invocation();
         $invocation->target = $target;
         $invocation->selector = $selector;
         $invocation->arguments->append($object);
-        $g->addInvocation($invocation);
+        $group->addInvocation($invocation);
         if (!$this->isUndoing && !$this->isRedoing) {
             $this->redoStack->removeAll();
         }
@@ -260,6 +263,31 @@ class UndoManager extends ObjectClass
         }
     }
 
+    public function forwardInvocation(Invocation $invocation): void
+    {
+        if (!$this->isUndoRegistrationEnabled) {
+            return;
+        }
+        $nextTarget = $this->nextTarget;
+        if ($nextTarget === null) {
+            throw new InternalInconsistencyException("forwardInvocation() without preparation");
+        }
+        if ($this->group === null) {
+            if (!$this->groupsByEvent) {
+                throw new InternalInconsistencyException("forwardInvocation() without beginUndoGrouping()");
+            }
+            $this->begin();
+        }
+        /** @var UndoGroup $group */
+        $group = $this->group;
+        $invocation->target = $nextTarget;
+        $group->addInvocation($invocation);
+        if (!$this->isUndoing && !$this->isRedoing && !$group->actions->isEmpty()) {
+            $this->redoStack->removeAll();
+        }
+        $this->nextTarget = null;
+    }
+
     /**
      * Disables the recording of undo operations, whether by {@see registerUndo()} or by invocation-based undo.
      *
@@ -342,7 +370,7 @@ class UndoManager extends ObjectClass
     public function undoMenuTitle(string $actionName): string
     {
         $name = localized_string("Redo");
-        if ($actionName === "") {
+        if ($actionName == "") {
             return $name;
         }
         return sprintf("%s %s", $name, $actionName);
@@ -358,7 +386,7 @@ class UndoManager extends ObjectClass
     public function redoMenuTitle(string $actionName): string
     {
         $name = localized_string("Undo");
-        if ($actionName === "") {
+        if ($actionName == "") {
             return $name;
         }
         return sprintf("%s %s", $name, $actionName);

@@ -100,6 +100,15 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
         throw new InvalidArgumentException(sprintf("%s %s() unrecognized selector sent to instance", $this->debugDescription(), $selector));
     }
 
+    /**
+     * Overridden by subclasses to forward messages to other objects.
+     * @param Invocation $invocation The invocation to forward.
+     */
+    public function forwardInvocation(Invocation $invocation): void
+    {
+        $this->doesNotRecognizeSelector($invocation->selector);
+    }
+
     public function compare(mixed $other): ComparisonResult
     {
         request_concrete_implementation($this, __FUNCTION__);
