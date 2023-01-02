@@ -33,7 +33,7 @@ class UndoManager extends ObjectClass
     private readonly ArrayClass $undoStack;
     /** @var ArrayClass<UndoGroup> */
     private readonly ArrayClass $redoStack;
-    private mixed $nextTarget = null;
+    private ?object $nextTarget = null;
     private ?UndoGroup $group = null;
 
     public function __construct()
@@ -82,11 +82,11 @@ class UndoManager extends ObjectClass
 
     /**
      * Registers the selector of the specified target to implement a single undo operation that the target receives.
-     * @param mixed $target The target of the undo operation.
+     * @param object $target The target of the undo operation.
      * @param string $selector The selector for the undo operation.
      * @param mixed $object The argument sent with the selector.
      */
-    public function registerUndo(mixed $target, string $selector, mixed $object): void
+    public function registerUndo(object $target, string $selector, mixed $object): void
     {
         if (!$this->isUndoRegistrationEnabled) {
             return;
@@ -111,10 +111,10 @@ class UndoManager extends ObjectClass
 
     /**
      * Prepares the undo manager for invocation-based undo with the given target as the subject of the next undo operation.
-     * @param mixed $target The target of the undo operation.
+     * @param object $target The target of the undo operation.
      * @return UndoManager A proxy object that forwards messages to the undo manager for recording as undo actions.
      */
-    public function prepare(mixed $target): UndoManager
+    public function prepare(object $target): UndoManager
     {
         $this->nextTarget = $target;
         return $this;
