@@ -39,7 +39,7 @@ trait SequenceAlgorithms
 
     public function compare(mixed $other): ComparisonResult
     {
-        if ($other instanceof self) {
+        if ($other instanceof Sequence) {
             return ComparisonResult::from($this->count() <=> $other->count());
         }
         return ComparisonResult::orderedDescending;
