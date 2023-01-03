@@ -61,6 +61,7 @@ class IndexPath extends ObjectClass implements MutableCollection, Iterator
         popFirst as private mutableCollectionPopFirst;
         popLast as private mutableCollectionPopLast;
     }
+
     use IteratorAlgorithms {
         current as private iteratorCurrent;
     }
