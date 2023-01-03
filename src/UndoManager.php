@@ -61,7 +61,7 @@ class UndoManager extends ObjectClass
 
     public function __set(string $name, mixed $value): void
     {
-        if ($name === "levelsOfUndo") {
+        if ($name == "levelsOfUndo") {
             $this->$name = $value;
             while ($this->undoStack->count() > $value) {
                 $this->undoStack->removeAt(0);
@@ -131,7 +131,7 @@ class UndoManager extends ObjectClass
      */
     public function undo(): void
     {
-        if ($this->groupingLevel === 1) {
+        if ($this->groupingLevel == 1) {
             $this->endUndoGrouping();
         }
         if ($this->group !== null) {
