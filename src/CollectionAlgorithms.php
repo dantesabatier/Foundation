@@ -84,8 +84,9 @@ trait CollectionAlgorithms
         }
         return null;
     }
-    
-    public function indexOf(mixed $element)
+
+    /** @noinspection PhpMixedReturnTypeCanBeReducedInspection */
+    public function indexOf(mixed $element): mixed
     {
         return $this->firstIndex(fn(mixed $e): bool => equivalent($e, $element));
     }
