@@ -19,8 +19,8 @@ readonly class AuthParameter
     {
         /** @var ArrayClass<AuthParameter> */
         return (new ArrayClass(explode(",", $parametersView)))->compactMap(function (string $e): ?AuthParameter {
-            /** @psalm-suppress TypeDoesNotContainType */
-            if (/** @phpstan-ignore-line */!($components = array_map(fn(string $e): string => trim($e), explode("=", $e))) || count($components) !== 2) {
+            $components = array_map(fn(string $e): string => trim($e), explode("=", $e));
+            if (count($components) !== 2) {
                 return null;
             }
             [$name, $value] = $components;
