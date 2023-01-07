@@ -43,7 +43,7 @@ class URLCredentialStorage
      */
     public function defaultCredential(URLProtectionSpace $space): ?URLCredential
     {
-        return $this->defaultCredentials[(string)$space->hash()];
+        return $this->defaultCredentials[(string)$space];
     }
 
     /**
@@ -70,7 +70,7 @@ class URLCredentialStorage
             return;
         }
         $this->set($credential, $space, $task);
-        $key = (string)$space->hash();
+        $key = (string)$space;
         if (!isset($this->defaultCredentials[$key])) {
             $this->defaultCredentials[$key] = $credential;
         }
@@ -115,7 +115,7 @@ class URLCredentialStorage
             return;
         }
         if ($user = $credential->user) {
-            $key = (string)$space->hash();
+            $key = (string)$space;
             /** @var Dictionary<URLCredential> $current */
             $current = $this->allCredentials[$key] ?? new Dictionary();
             $current[$user] = $credential;
@@ -131,7 +131,7 @@ class URLCredentialStorage
      */
     public function credentials(URLProtectionSpace $space): ?Dictionary
     {
-        return $this->allCredentials[(string)$space->hash()];
+        return $this->allCredentials[(string)$space];
     }
 
     /**
