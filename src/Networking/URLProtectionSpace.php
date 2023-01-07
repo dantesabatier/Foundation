@@ -63,8 +63,7 @@ class URLProtectionSpace extends ObjectClass
         if (!($host = $response->url->host) || !($protocol = $response->url->scheme) || ($protocol !== "http" && $protocol !== "https") || !($challenge = Challenge::challenges($response)->first())) {
             return null;
         }
-        $port = $response->url->port ?? ($protocol === "http" ? 80 : 443);
-        return new URLProtectionSpace($host, $port, protocol: $protocol, realm: $challenge->parameter("realm")?->value, authenticationMethod: $challenge->authenticationMethod() ?? URLAuthenticationMethodDefault);
+        return new URLProtectionSpace($host, $response->url->port ?? ($protocol === "http" ? 80 : 443), protocol: $protocol, realm: $challenge->parameter("realm")?->value, authenticationMethod: $challenge->authenticationMethod() ?? URLAuthenticationMethodDefault);
     }
 
     public function description(): string
