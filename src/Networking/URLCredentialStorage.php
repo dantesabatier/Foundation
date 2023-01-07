@@ -87,18 +87,16 @@ class URLCredentialStorage
      */
     public function remove(/** @noinspection PhpUnusedParameterInspection */ URLCredential $credential, URLProtectionSpace|string $space, ?Dictionary $options = null, ?URLSessionTask $task = null): void
     {
-        if (($credential->persistence === URLCredentialPersistence::synchronizable) && (!($removeSynchronizable = $options?->valueForKey(URLCredentialStorageRemoveSynchronizableCredentials)) || !$removeSynchronizable instanceof Number || !$removeSynchronizable->boolValue)) {
+        if (($credential->persistence === URLCredentialPersistence::synchronizable) && (!($removeSynchronizable = $options?->valueForKey(URLCredentialStorageRemoveSynchronizableCredentials)) || !$removeSynchronizable instanceof Number || !$removeSynchronizable->boolValue) || !($user = $credential->user)) {
             return;
         }
-        if ($user = $credential->user) {
-            $key = (string)$space;
-            if (($current = $this->allCredentials[$key]) && $current[$user] === $credential) {
-                $current[$user] = null;
-                $this->allCredentials->setValueForKey($current, $key);
-            }
-            if (($defaultCredential = $this->defaultCredentials[$key]) && $defaultCredential === $credential) {
-                $this->defaultCredentials->removeValueForKey($key);
-            }
+        $key = (string)$space;
+        if (($current = $this->allCredentials[$key]) && $current[$user] === $credential) {
+            $current[$user] = null;
+            $this->allCredentials->setValueForKey($current, $key);
+        }
+        if (($defaultCredential = $this->defaultCredentials[$key]) && $defaultCredential === $credential) {
+            $this->defaultCredentials->removeValueForKey($key);
         }
     }
 
@@ -111,16 +109,14 @@ class URLCredentialStorage
      */
     public function set(/** @noinspection PhpUnusedParameterInspection */ URLCredential $credential, URLProtectionSpace $space, ?URLSessionTask $task): void
     {
-        if ($credential->persistence === URLCredentialPersistence::synchronizable || $credential->persistence === URLCredentialPersistence::none) {
+        if ($credential->persistence === URLCredentialPersistence::synchronizable || $credential->persistence === URLCredentialPersistence::none || !($user = $credential->user)) {
             return;
         }
-        if ($user = $credential->user) {
-            $key = (string)$space;
-            /** @var Dictionary<URLCredential> $current */
-            $current = $this->allCredentials[$key] ?? new Dictionary();
-            $current[$user] = $credential;
-            $this->allCredentials->setValueForKey($current, $key);
-        }
+        $key = (string)$space;
+        /** @var Dictionary<URLCredential> $current */
+        $current = $this->allCredentials[$key] ?? new Dictionary();
+        $current[$user] = $credential;
+        $this->allCredentials->setValueForKey($current, $key);
     }
 
     /**
