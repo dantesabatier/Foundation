@@ -306,7 +306,7 @@ final class URLSession implements URLSessionProtocol
         }
         $this->delegateQueue->addOperationWithBlock(function () use ($sessionDelegate) {
             $sessionDelegate->urlSessionDidBecomeInvalidWithError($this);
-            $this->delegate = null;
+            //$this->delegate = null;
         });
     }
 }
