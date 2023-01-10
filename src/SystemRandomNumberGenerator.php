@@ -10,9 +10,15 @@ use Random\Randomizer;
  */
 class SystemRandomNumberGenerator implements RandomNumberGenerator
 {
+    private readonly Randomizer $randomizer;
+
+    public function __construct()
+    {
+        $this->randomizer = new Randomizer(new Secure());
+    }
+    
     public function next(int $upperBound = NotFound): int
     {
-        $randomizer = new Randomizer(new Secure());
-        return $randomizer->getInt(0, $upperBound !== NotFound ? $upperBound : PHP_INT_MAX);
+        return $this->randomizer->getInt(0, $upperBound !== NotFound ? $upperBound : PHP_INT_MAX);
     }
 }
