@@ -14,7 +14,7 @@ trait SetAlgebraAlgorithms
         return $this->first(fn(mixed $e): bool => equivalent($e, $element));
     }
 
-    public function union(SetAlgebra $other): Set
+    public function union(SetAlgebra $other): self
     {
         $copy = clone $this;
         $copy->formUnion($other);
@@ -26,7 +26,7 @@ trait SetAlgebraAlgorithms
         $this->appendContentsOf($other);
     }
 
-    public function intersection(SetAlgebra $other): Set
+    public function intersection(SetAlgebra $other): self
     {
         $copy = clone $this;
         $copy->formIntersection($other);
