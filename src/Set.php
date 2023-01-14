@@ -21,7 +21,7 @@ use Sabatier\Foundation\Predicates\Predicate;
  */
 class Set extends ObjectClass implements SetAlgebra, Iterator
 {
-    use MutableCollectionAlgorithms {
+    use SetAlgebraAlgorithms {
         toArray as private sequenceToArray;
         contains as private sequenceContains;
         containsElement as private sequenceContainsElement;
@@ -68,8 +68,20 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
         dropLast as private mutableCollectionDropLast;
         popFirst as private mutableCollectionPopFirst;
         popLast as private mutableCollectionPopLast;
+        member as private setAlgebraMember;
+        union as private setAlgebraUnion;
+        formUnion as private setAlgebraFormUnion;
+        intersection as private setAlgebraIntersection;
+        formIntersection as private setAlgebraFormIntersection;
+        symmetricDifference as private setAlgebraSymmetricDifference;
+        formSymmetricDifference as private setAlgebraFormSymmetricDifference;
+        subtract as private setAlgebraSubtract;
+        subtracting as private setAlgebraSubtracting;
+        isSubset as private setAlgebraIsSubset;
+        isSuperset as private setAlgebraIsSuperset;
+        isDisjoint as private setAlgebraIsDisjoint;
     }
-    
+
     use IteratorAlgorithms {
         current as private iteratorCurrent;
     }
@@ -514,7 +526,7 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
      */
     public function member(mixed $element)
     {
-        return $this->first(fn(mixed $e): bool => equivalent($e, $element));
+        return $this->setAlgebraMember($element);
     }
 
     /**
@@ -524,9 +536,7 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
      */
     public function union(SetAlgebra $other): Set
     {
-        $copy = clone $this;
-        $copy->formUnion($other);
-        return $copy;
+        return $this->setAlgebraUnion($other);
     }
 
     /**
@@ -537,7 +547,7 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
      */
     public function formUnion(SetAlgebra $other): void
     {
-        $this->appendContentsOf($other);
+        $this->setAlgebraFormUnion($other);
     }
 
     /**
@@ -547,9 +557,7 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
      */
     public function intersection(SetAlgebra $other): Set
     {
-        $copy = clone $this;
-        $copy->formIntersection($other);
-        return $copy;
+        return $this->setAlgebraIntersection($other);
     }
 
     /**
@@ -558,11 +566,7 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
      */
     public function formIntersection(SetAlgebra $other): void
     {
-        foreach ($this as $member) {
-            if (!$other->containsElement($member)) {
-                $this->remove($member);
-            }
-        }
+        $this->setAlgebraFormIntersection($other);
     }
 
     /**
@@ -572,9 +576,7 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
      */
     public function symmetricDifference(SetAlgebra $other): Set
     {
-        $copy = clone $this;
-        $copy->formSymmetricDifference($other);
-        return $copy;
+        return $this->setAlgebraSymmetricDifference($other);
     }
 
     /**
@@ -583,13 +585,7 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
      */
     public function formSymmetricDifference(SetAlgebra $other): void
     {
-        foreach ($other as $member) {
-            if ($this->containsElement($member)) {
-                $this->remove($member);
-            } else {
-                $this->append($member);
-            }
-        }
+        $this->setAlgebraFormSymmetricDifference($other);
     }
 
     /**
@@ -598,9 +594,7 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
      */
     public function subtract(SetAlgebra $other): void
     {
-        foreach ($other as $member) {
-            $this->remove($member);
-        }
+        $this->setAlgebraSubtract($other);
     }
 
     /**
@@ -610,9 +604,7 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
      */
     public function subtracting(SetAlgebra $other): Set
     {
-        $copy = clone $this;
-        $copy->subtract($other);
-        return $copy;
+        return $this->setAlgebraSubtracting($other);
     }
 
     /**
@@ -623,15 +615,7 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
      */
     public function isSubset(SetAlgebra $other): bool
     {
-        if ($this->compare($other) !== ComparisonResult::orderedAscending) {
-            return false;
-        }
-        foreach ($this as $element) {
-            if (!$other->containsElement($element)) {
-                return false;
-            }
-        }
-        return true;
+        return $this->setAlgebraIsSubset($other);
     }
 
     /**
@@ -642,15 +626,7 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
      */
     public function isSuperset(SetAlgebra $other): bool
     {
-        if ($this->compare($other) !== ComparisonResult::orderedDescending) {
-            return false;
-        }
-        foreach ($this as $element) {
-            if (!$other->containsElement($element)) {
-                return false;
-            }
-        }
-        return true;
+        return $this->setAlgebraIsSuperset($other);
     }
 
     /**
@@ -660,7 +636,7 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
      */
     public function isDisjoint(SetAlgebra $other): bool
     {
-        return !$this->contains(fn(mixed $member): bool => $other->containsElement($member));
+        return $this->setAlgebraIsDisjoint($other);
     }
 
     /**
@@ -700,7 +676,7 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
     {
         return $this->collectionOffsetExists($offset);
     }
-    
+
     /**
      * @param int $offset
      * @return Element
@@ -709,7 +685,7 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
     {
         return $this->collectionOffsetGet($offset);
     }
-    
+
     /**
      * @param int|null $offset
      * @param Element $value
@@ -718,7 +694,7 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
     {
         $this->collectionOffsetSet($offset, $value);
     }
-    
+
     /**
      * @param int $offset
      */

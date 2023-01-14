@@ -381,8 +381,10 @@ class PredicateScanner extends Scanner
             if (!$this->scanString(",")) {
                 throw new InvalidArgumentException("Invalid argument: expecting \",\" at index $this->scanLocation");
             }
+            /** @phpstan-ignore-next-line */
             $variable = $this->parseExpression() ?? throw new InvalidArgumentException("Invalid argument: expecting expression at index $this->scanLocation");
-            if (!$this->scanString(",")) { // @phpstan-ignore-line
+            /** @phpstan-ignore-next-line */
+            if (!$this->scanString(",")) {
                 throw new InvalidArgumentException("Invalid argument: expecting \",\" at index $this->scanLocation");
             }
             $predicate = $this->parsePredicate() ?? throw new InvalidArgumentException("Invalid argument: expecting predicate at index $this->scanLocation");
@@ -400,9 +402,11 @@ class PredicateScanner extends Scanner
                 throw new InvalidArgumentException("Invalid argument: expecting \",\" at index $this->scanLocation");
             }
             $trueExpression = $this->parseExpression() ?? throw new InvalidArgumentException("Invalid argument: expecting expression at index $this->scanLocation");
-            if (!$this->scanString(",")) { // @phpstan-ignore-line
+            /** @phpstan-ignore-next-line */
+            if (!$this->scanString(",")) {
                 throw new InvalidArgumentException("Invalid argument: expecting \",\" at index $this->scanLocation");
             }
+            /** @phpstan-ignore-next-line */
             $falseExpression = $this->parseExpression() ?? throw new InvalidArgumentException("Invalid argument: expecting expression at index $this->scanLocation");
             if (!$this->scanString(")")) {
                 throw new InvalidArgumentException("Invalid argument: expecting \")\" at index $this->scanLocation");
@@ -418,6 +422,7 @@ class PredicateScanner extends Scanner
             $argument = $this->parseExpression() ?? throw new InvalidArgumentException("Invalid argument: expecting expression at index $this->scanLocation");
             $arguments->append($argument);
             while ($this->scanString(",")) {
+                /** @phpstan-ignore-next-line */
                 $argument = $this->parseExpression() ?? throw new InvalidArgumentException("Invalid argument: expecting expression at index $this->scanLocation");
                 $arguments->append($argument);
             }

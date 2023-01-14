@@ -8,9 +8,9 @@ use Random\Randomizer;
 /**
  * The system's default source of random data.
  */
-class SystemRandomNumberGenerator implements RandomNumberGenerator
+readonly class SystemRandomNumberGenerator implements RandomNumberGenerator
 {
-    private readonly Randomizer $randomizer;
+    private Randomizer $randomizer;
 
     public function __construct()
     {
