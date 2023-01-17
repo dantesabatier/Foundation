@@ -63,7 +63,7 @@ trait SequenceAlgorithms
         /**
          * @var array-key $i
          */
-        foreach ($this as $i => $e) {
+        foreach (clone $this as $i => $e) {
             if ($predicate($e, $i)) {
                 return true;
             }
@@ -82,7 +82,7 @@ trait SequenceAlgorithms
             return false;
         }
         $areEquivalent ??= fn(mixed $e0, mixed $e1): bool => equivalent($e0, $e1);
-        foreach ($this as $i => $e) {
+        foreach (clone $this as $i => $e) {
             if (!$areEquivalent($e, $sequence->first(fn(mixed $v, string|int $k): bool => $k === $i))) {
                 return false;
             }
@@ -92,7 +92,7 @@ trait SequenceAlgorithms
 
     public function first(Closure $where = null): mixed
     {
-        foreach ($this as $i => $e) {
+        foreach (clone $this as $i => $e) {
             if ($where === null) {
                 return $e;
             } elseif ($where($e, $i)) {
@@ -105,7 +105,7 @@ trait SequenceAlgorithms
     public function min(): mixed
     {
         $min = null;
-        foreach ($this as $e) {
+        foreach (clone $this as $e) {
             if ($min === null || (($e instanceof Comparable) ? ($e->compare($min) === ComparisonResult::orderedAscending) : ($e < $min))) {
                 $min = $e;
             }
@@ -116,7 +116,7 @@ trait SequenceAlgorithms
     public function max(): mixed
     {
         $max = null;
-        foreach ($this as $e) {
+        foreach (clone $this as $e) {
             if ($max === null || (($e instanceof Comparable) ? ($e->compare($max) === ComparisonResult::orderedDescending) : ($e > $max))) {
                 $max = $e;
             }
@@ -126,7 +126,7 @@ trait SequenceAlgorithms
     
     public function reduce(mixed $initialResult, Closure $updateAccumulatingResult): mixed
     {
-        foreach ($this as $i => $e) {
+        foreach (clone $this as $i => $e) {
             $updateAccumulatingResult($initialResult, $e, $i);
         }
         return $initialResult;
@@ -140,7 +140,7 @@ trait SequenceAlgorithms
     public function map(Closure $transform): self
     {
         $instance = new self();
-        foreach ($this as $i => $e) {
+        foreach (clone $this as $i => $e) {
             $instance->append($transform($e, $i));
         }
         return $instance;
@@ -149,7 +149,7 @@ trait SequenceAlgorithms
     public function compactMap(Closure $transform): self
     {
         $instance = new self();
-        foreach ($this as $i => $e) {
+        foreach (clone $this as $i => $e) {
             $r = $transform($e, $i);
             if ($r !== null) {
                 $instance->append($r);
@@ -161,7 +161,7 @@ trait SequenceAlgorithms
     public function flatMap(Closure $transform): self
     {
         $instance = new self();
-        foreach ($this as $i => $e) {
+        foreach (clone $this as $i => $e) {
             $instance->appendContentsOf($transform($e, $i));
         }
         return $instance;

@@ -104,7 +104,7 @@ trait CollectionAlgorithms
     public function filter(Closure $isIncluded): self
     {
         $instance = new self();
-        foreach ($this as $i => $e) {
+        foreach (clone $this as $i => $e) {
             $stop = false;
             if ($isIncluded($e, $i, $stop)) {
                 $instance[] = $e;
@@ -170,7 +170,7 @@ trait CollectionAlgorithms
 
     public function setValueForKey(mixed $value, string $key): void
     {
-        foreach ($this as $e) {
+        foreach (clone $this as $e) {
             assert($e instanceof KeyValueCoding, sprintf("Invalid argument: expecting %s, \"%s\" given", KeyValueCoding::class, typeof($e)));
             $e->setValueForKey($value, $key);
         }

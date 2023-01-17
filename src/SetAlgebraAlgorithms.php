@@ -16,9 +16,9 @@ trait SetAlgebraAlgorithms
 
     public function union(SetAlgebra $other): self
     {
-        $copy = clone $this;
-        $copy->formUnion($other);
-        return $copy;
+        $instance = clone $this;
+        $instance->formUnion($other);
+        return $instance;
     }
 
     public function formUnion(SetAlgebra $other): void
@@ -28,9 +28,9 @@ trait SetAlgebraAlgorithms
 
     public function intersection(SetAlgebra $other): self
     {
-        $copy = clone $this;
-        $copy->formIntersection($other);
-        return $copy;
+        $instance = clone $this;
+        $instance->formIntersection($other);
+        return $instance;
     }
 
     public function formIntersection(SetAlgebra $other): void
@@ -44,9 +44,9 @@ trait SetAlgebraAlgorithms
 
     public function symmetricDifference(SetAlgebra $other): self
     {
-        $copy = clone $this;
-        $copy->formSymmetricDifference($other);
-        return $copy;
+        $instance = clone $this;
+        $instance->formSymmetricDifference($other);
+        return $instance;
     }
 
     public function formSymmetricDifference(SetAlgebra $other): void
@@ -69,9 +69,9 @@ trait SetAlgebraAlgorithms
 
     public function subtracting(SetAlgebra $other): self
     {
-        $copy = clone $this;
-        $copy->subtract($other);
-        return $copy;
+        $instance = clone $this;
+        $instance->subtract($other);
+        return $instance;
     }
 
     public function isSubset(SetAlgebra $other): bool
