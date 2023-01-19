@@ -8,7 +8,6 @@ use Sabatier\Foundation\Dictionary;
 use Sabatier\Foundation\Number;
 use Sabatier\Foundation\URL;
 use function Sabatier\Foundation\human_readable_value;
-use function Sabatier\Foundation\string_contains;
 use function Sabatier\Foundation\string_has_prefix;
 use function Sabatier\Foundation\string_is_equal;
 
@@ -73,7 +72,7 @@ class HTTPURLResponse extends URLResponse
 
     private function suggestedFilename(?Dictionary $headerFields): string
     {
-        if (($value = $headerFields?->valueForCaseInsensitiveKey("Content-Disposition")) && string_contains($value, ";")) {
+        if (($value = $headerFields?->valueForCaseInsensitiveKey("Content-Disposition")) && str_contains($value, ";")) {
             [, $part] = explode(";", $value);
             [, $filename] = explode("=", $part);
             return $filename;
@@ -86,7 +85,7 @@ class HTTPURLResponse extends URLResponse
         if ($value = $headerFields?->valueForCaseInsensitiveKey("Content-Type")) {
             /** @var string $mimeType */
             $mimeType = $value;
-            if (string_contains($value, ";")) {
+            if (str_contains($value, ";")) {
                 [$mimeType, $part] = explode(";", $value);
                 [, $textEncoding] = explode("=", $part);
                 return ['mimeType' => $mimeType, 'textEncoding' => $textEncoding];

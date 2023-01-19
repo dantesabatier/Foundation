@@ -27,11 +27,7 @@ class Value extends ObjectClass
             } elseif (string_is_equal($value, "TRUE", CompareOptions::caseInsensitive) || string_is_equal($value, "FALSE", CompareOptions::caseInsensitive) || string_is_equal($value, "YES", CompareOptions::caseInsensitive) || string_is_equal($value, "NO", CompareOptions::caseInsensitive)) {
                 $value = filter_var($value, FILTER_VALIDATE_BOOLEAN);
             } elseif (is_numeric($value)) {
-                if (string_contains($value, ".")) {
-                    $value = filter_var($value, FILTER_VALIDATE_FLOAT);
-                } else {
-                    $value = filter_var($value, FILTER_VALIDATE_INT);
-                }
+                $value = str_contains($value, ".") ? filter_var($value, FILTER_VALIDATE_FLOAT) : filter_var($value, FILTER_VALIDATE_INT);
             }
         } elseif ($value instanceof Value) {
             $value = $value->value;

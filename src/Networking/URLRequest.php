@@ -7,7 +7,6 @@ use Sabatier\Foundation\CompareOptions;
 use Sabatier\Foundation\Dictionary;
 use Sabatier\Foundation\ObjectClass;
 use Sabatier\Foundation\URL;
-use function Sabatier\Foundation\string_contains;
 use function Sabatier\Foundation\string_has_prefix;
 use function Sabatier\Foundation\string_is_equal;
 
@@ -55,7 +54,7 @@ class URLRequest extends ObjectClass
             if ($this->httpMethod !== HTTPRequestMethod::get && $this->httpMethod !== HTTPRequestMethod::head && $this->httpMethod !== HTTPRequestMethod::options) {
                 $contentType = $this->valueForHttpHeaderField("Content-Type") ?? "text/plain";
                 $mediaType = $contentType;
-                if (string_contains($contentType, ";")) {
+                if (str_contains($contentType, ";")) {
                     [$mediaType,] = explode(";", $contentType);
                 }
                 if (string_is_equal($mediaType, "application/x-www-form-urlencoded", CompareOptions::caseInsensitive)) {

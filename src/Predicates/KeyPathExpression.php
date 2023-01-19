@@ -5,7 +5,6 @@ namespace Sabatier\Foundation\Predicates;
 use Sabatier\Foundation\ArrayClass;
 use Sabatier\Foundation\Dictionary;
 use function Sabatier\Foundation\human_readable_value;
-use function Sabatier\Foundation\string_contains;
 use function Sabatier\Foundation\typeof;
 
 /** @internal */
@@ -14,7 +13,7 @@ class KeyPathExpression extends FunctionExpression
     public function __construct(private readonly mixed $keyPath, Expression $operand)
     {
         $selector = "valueForKeyPath";
-        if ($this->keyPath instanceof KeyPathSpecifierExpression && !string_contains($this->keyPath->keyPath(), ".")) {
+        if ($this->keyPath instanceof KeyPathSpecifierExpression && !str_contains($this->keyPath->keyPath(), ".")) {
             $selector = "valueForKey";
         }
         parent::__construct(ExpressionType::keyPath, $operand, $selector, new ArrayClass([$this->keyPath]));

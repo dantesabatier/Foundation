@@ -152,7 +152,7 @@ function unsafe_value(Closure $block): mixed
  */
 function class_name(string $class): string
 {
-    if (in_string($class, "\\")) {
+    if (str_contains($class, "\\")) {
         $class = array_last(explode("\\", $class));
         assert($class !== null);
     }
