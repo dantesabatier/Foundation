@@ -19,6 +19,10 @@ if (!defined("RUNNING_FROM_CLI")) {
     define("RUNNING_FROM_CLI", ((PHP_SAPI === "cli") || (stristr(PHP_SAPI, "cgi") && getenv("TERM"))));
 }
 
+if (!defined("HAS_ESCAPE_SEQUENCES")) {
+    define("HAS_ESCAPE_SEQUENCES", function_exists("posix_isatty") ? posix_isatty(STDOUT) : (getenv("ANSICON") !== false || getenv("ConEmuANSI") === "ON"));
+}
+
 function debuglog(string $string): void
 {
     print $string . PHP_EOL;
@@ -34,14 +38,6 @@ function cli_log(string $string): void
 function escape_sequence(string $string, EscapeSequenceTextAttribute $textAttribute = EscapeSequenceTextAttribute::normal, EscapeSequenceColor $foregroundColor = EscapeSequenceColor::white, EscapeSequenceColor $backgroundColor = EscapeSequenceColor::black): string
 {
     return sprintf("\e[%s;%s;%sm%s\e[0m", $textAttribute->value, $foregroundColor->value, $backgroundColor->value + EscapeSequenceBackgroundColorAddition, $string);
-}
-
-function has_escape_sequences(): bool
-{
-    if (function_exists("posix_isatty")) {
-        return posix_isatty(STDOUT);
-    }
-    return getenv("ANSICON") !== false || getenv("ConEmuANSI") === "ON";
 }
 
 function typeof(mixed $value): string
