@@ -4,18 +4,20 @@ namespace Sabatier\Foundation\Networking;
 
 use Closure;
 use Sabatier\Foundation\Dictionary;
+use Sabatier\Foundation\NotificationCenter;
 use Sabatier\Foundation\Number;
+use Sabatier\Foundation\ObjectClass;
 
 /**
  * The manager of a shared credentials cache.
  */
-class URLCredentialStorage
+class URLCredentialStorage extends ObjectClass
 {
     private static ?URLCredentialStorage $shared = null;
     /** @var Dictionary<Dictionary<URLCredential>> The dictionary has keys corresponding to the {@see URLProtectionSpace} instances. The values are dictionaries where the keys are username strings, and each value is the corresponding {@see URLCredential} instances. */
     public readonly Dictionary $allCredentials;
     /** @var Dictionary<URLCredential> */
-    private Dictionary $defaultCredentials;
+    private readonly Dictionary $defaultCredentials;
 
     public function __construct(public readonly bool $isEphemeral = false)
     {
@@ -64,16 +66,12 @@ class URLCredentialStorage
      * @param URLProtectionSpace $space The protection space whose default credential is being set.
      * @param URLSessionTask|null $task The task accessing the specified protection space. Subclasses of URLCredentialStorage may use the request URL or other properties of this task to affect how the default credential is stored.
      */
-    public function setDefaultCredential(URLCredential $credential, URLProtectionSpace $space, ?URLSessionTask $task): void
+    public function setDefaultCredential(/** @noinspection PhpUnusedParameterInspection */ URLCredential $credential, URLProtectionSpace $space, ?URLSessionTask $task): void
     {
-        if ($credential->persistence === URLCredentialPersistence::synchronizable || $credential->persistence === URLCredentialPersistence::none) {
+        if ($credential->persistence === URLCredentialPersistence::synchronizable || $credential->persistence === URLCredentialPersistence::none || !$this->setWhileLocked($credential, $space, true)) {
             return;
         }
-        $this->set($credential, $space, $task);
-        $key = (string)$space;
-        if (!isset($this->defaultCredentials[$key])) {
-            $this->defaultCredentials[$key] = $credential;
-        }
+        NotificationCenter::default()->postNotificationName(URLCredentialStorageChangedNotification, $this);
     }
 
     /**
@@ -109,14 +107,10 @@ class URLCredentialStorage
      */
     public function set(/** @noinspection PhpUnusedParameterInspection */ URLCredential $credential, URLProtectionSpace $space, ?URLSessionTask $task): void
     {
-        if ($credential->persistence === URLCredentialPersistence::synchronizable || $credential->persistence === URLCredentialPersistence::none || !($user = $credential->user)) {
+        if ($credential->persistence === URLCredentialPersistence::synchronizable || $credential->persistence === URLCredentialPersistence::none || !$this->setWhileLocked($credential, $space)) {
             return;
         }
-        $key = (string)$space;
-        /** @var Dictionary<URLCredential> $current */
-        $current = $this->allCredentials[$key] ?? new Dictionary();
-        $current[$user] = $credential;
-        $this->allCredentials->setValueForKey($current, $key);
+        NotificationCenter::default()->postNotificationName(URLCredentialStorageChangedNotification, $this);
     }
 
     /**
@@ -140,5 +134,23 @@ class URLCredentialStorage
     public function getCredentials(/** @noinspection PhpUnusedParameterInspection */ URLProtectionSpace $space, ?URLSessionTask $task, Closure $completionHandler): void
     {
         $completionHandler($this->credentials($space));
+    }
+
+    private function setWhileLocked(URLCredential $credential, URLProtectionSpace $space, bool $isDefault = false): bool
+    {
+        $modified = false;
+        $key = (string)$space;
+        if ($user = $credential->user) {
+            /** @var Dictionary<URLCredential> $current */
+            $current = $this->allCredentials[$key] ?? new Dictionary();
+            $modified = $current[$user] !== $credential;
+            $current[$user] = $credential;
+            $this->allCredentials->setValueForKey($current, $key);
+        }
+        if ($isDefault || $this->defaultCredentials[$key] === null) {
+            $modified = $modified || $this->defaultCredentials[$key] !== $credential;
+            $this->defaultCredentials->setValueForKey($credential, $key);
+        }
+        return $modified;
     }
 }
