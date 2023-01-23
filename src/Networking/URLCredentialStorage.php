@@ -85,16 +85,22 @@ class URLCredentialStorage extends ObjectClass
      */
     public function remove(/** @noinspection PhpUnusedParameterInspection */ URLCredential $credential, URLProtectionSpace|string $space, ?Dictionary $options = null, ?URLSessionTask $task = null): void
     {
-        if (($credential->persistence === URLCredentialPersistence::synchronizable) && (!($removeSynchronizable = $options?->valueForKey(URLCredentialStorageRemoveSynchronizableCredentials)) || !$removeSynchronizable instanceof Number || !$removeSynchronizable->boolValue) || !($user = $credential->user)) {
+        if (($credential->persistence === URLCredentialPersistence::synchronizable) && (!($removeSynchronizable = $options?->valueForKey(URLCredentialStorageRemoveSynchronizableCredentials)) || !$removeSynchronizable instanceof Number || !$removeSynchronizable->boolValue)) {
             return;
         }
         $key = (string)$space;
-        if (($current = $this->allCredentials[$key]) && $current[$user] === $credential) {
-            $current[$user] = null;
-            $this->allCredentials->setValueForKey($current, $key);
+        if ($user = $credential->user) {
+            if (($current = $this->allCredentials[$key]) && $current[$user] === $credential) {
+                $current[$user] = null;
+                if ($current->isEmpty()) {
+                    $current = null;
+                }
+                $this->allCredentials->setValueForKey($current, $key);NotificationCenter::default()->postNotificationName(URLCredentialStorageChangedNotification, $this);
+            }
         }
         if (($defaultCredential = $this->defaultCredentials[$key]) && $defaultCredential === $credential) {
             $this->defaultCredentials->removeValueForKey($key);
+            NotificationCenter::default()->postNotificationName(URLCredentialStorageChangedNotification, $this);
         }
     }
 
