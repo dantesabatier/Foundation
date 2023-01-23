@@ -7,4 +7,5 @@ parameters:
 	ignoreErrors:
 		- '/uninitialized readonly property/'
 		- '/is assigned outside of the constructor/'
+		- '/is already assigned/'
 		- '#^Unsafe access to private property#'
