@@ -71,7 +71,7 @@ class URLCredentialStorage extends ObjectClass
         if ($credential->persistence === URLCredentialPersistence::synchronizable || $credential->persistence === URLCredentialPersistence::none || !$this->setWhileLocked($credential, $space, true)) {
             return;
         }
-        NotificationCenter::default()->postNotificationName(URLCredentialStorageChangedNotification, $this);
+        $this->sendNotificationWhileUnlocked();
     }
 
     /**
@@ -88,19 +88,24 @@ class URLCredentialStorage extends ObjectClass
         if (($credential->persistence === URLCredentialPersistence::synchronizable) && (!($removeSynchronizable = $options?->valueForKey(URLCredentialStorageRemoveSynchronizableCredentials)) || !$removeSynchronizable instanceof Number || !$removeSynchronizable->boolValue)) {
             return;
         }
+        $needsNotification = false;
         $key = (string)$space;
         if ($user = $credential->user) {
             if (($current = $this->allCredentials[$key]) && $current[$user] === $credential) {
                 $current[$user] = null;
+                $needsNotification = true;
                 if ($current->isEmpty()) {
                     $current = null;
                 }
-                $this->allCredentials->setValueForKey($current, $key);NotificationCenter::default()->postNotificationName(URLCredentialStorageChangedNotification, $this);
+                $this->allCredentials->setValueForKey($current, $key);
             }
         }
         if (($defaultCredential = $this->defaultCredentials[$key]) && $defaultCredential === $credential) {
             $this->defaultCredentials->removeValueForKey($key);
-            NotificationCenter::default()->postNotificationName(URLCredentialStorageChangedNotification, $this);
+            $needsNotification = true;
+        }
+        if ($needsNotification) {
+            $this->sendNotificationWhileUnlocked();
         }
     }
 
@@ -116,7 +121,7 @@ class URLCredentialStorage extends ObjectClass
         if ($credential->persistence === URLCredentialPersistence::synchronizable || $credential->persistence === URLCredentialPersistence::none || !$this->setWhileLocked($credential, $space)) {
             return;
         }
-        NotificationCenter::default()->postNotificationName(URLCredentialStorageChangedNotification, $this);
+        $this->sendNotificationWhileUnlocked();
     }
 
     /**
@@ -158,5 +163,10 @@ class URLCredentialStorage extends ObjectClass
             $this->defaultCredentials->setValueForKey($credential, $key);
         }
         return $modified;
+    }
+
+    private function sendNotificationWhileUnlocked(): void
+    {
+        NotificationCenter::default()->postNotificationName(URLCredentialStorageChangedNotification, $this);
     }
 }
