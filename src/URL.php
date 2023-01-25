@@ -12,7 +12,6 @@ namespace Sabatier\Foundation;
 use Closure;
 use Exception;
 use InvalidArgumentException;
-use JetBrains\PhpStorm\ArrayShape;
 use JetBrains\PhpStorm\ExpectedValues;
 use SplFileInfo;
 
@@ -67,20 +66,15 @@ final class URL extends ObjectClass
         $this->string = $string;
     }
 
-    #[ArrayShape(["string" => "string", "baseURL" => "\\" . URL::class])]
     public function __serialize(): array
     {
-        $serialization = ["string" => $this->string];
-        if ($baseURL = $this->baseURL) {
-            $serialization["baseURL"] = $baseURL;
-        }
-        return $serialization;
+        return ["string" => $this->string, "baseURL" => $this->baseURL];
     }
 
     public function __unserialize(array $data): void
     {
         $this->string = $data["string"];
-        $this->baseURL = $data["baseURL"] ?? null;
+        $this->baseURL = $data["baseURL"];
     }
 
     public function __get(string $name)

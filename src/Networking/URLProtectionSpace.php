@@ -42,6 +42,21 @@ class URLProtectionSpace extends ObjectClass
         unset($this->isProxy);
     }
 
+    public function __serialize(): array
+    {
+        return ["host" => $this->host, "port" => $this->port, "proxyType" => $this->proxyType, "protocol" => $this->protocol, "realm" => $this->realm, "authenticationMethod" => $this->authenticationMethod];
+    }
+
+    public function __unserialize(array $data): void
+    {
+        $this->host = $data["host"];
+        $this->port = $data["port"];
+        $this->proxyType = $data["proxyType"];
+        $this->protocol = $data["protocol"];
+        $this->realm = $data["realm"];
+        $this->authenticationMethod = $data["authenticationMethod"];
+    }
+
     public function __get(string $name)
     {
         return $this->$name = match ($name) {
