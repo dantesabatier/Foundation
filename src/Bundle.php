@@ -125,6 +125,7 @@ final class Bundle extends ObjectClass
             $this->$name = $this->infoDictionary;
             return $this->$name;
         } elseif ($name == "principalClass") {
+            /** @var class-string|null $principalClass */
             $principalClass = $this->object(kCFBundlePrincipalClassKey);
             $this->$name = empty($principalClass) ? null : $this->classNamed($principalClass);
             return $this->$name;
