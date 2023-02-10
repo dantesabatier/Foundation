@@ -408,7 +408,7 @@ final class Bundle extends ObjectClass
     public function localizedString(string $key, string $value = null, string $table = null): string
     {
         $string = localized_string($key, $table ?? "Localizable", $this->resourceURL?->path ?? "");
-        if (string_is_equal($key, $string) && $value) {
+        if ($key === $string && $value !== null) {
             return $value;
         }
         return $string;
