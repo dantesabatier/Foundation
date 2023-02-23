@@ -4,7 +4,6 @@ namespace Sabatier\Foundation\Networking;
 
 use Closure;
 use Sabatier\Foundation\ArrayClass;
-use function Sabatier\Foundation\string_has_prefix;
 
 /** @internal */
 class CacheControlDirectives
@@ -17,7 +16,7 @@ class CacheControlDirectives
     public function __construct(public readonly string $headerValue)
     {
         $isWithArgument = function (string $part, string $named, Closure $converter): mixed {
-            if (string_has_prefix($part, "$named=")) {
+            if (str_starts_with($part, "$named=")) {
                 $split = explode("=", $part);
                 if (count($split) === 2) {
                     $argument = $split[1];

@@ -151,7 +151,7 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
     {
         foreach ($this->observances as $observance) {
             $keyPath = $observance->keyPath;
-            if (string_is_equal($keyPath, $key)) {
+            if ($keyPath === $key) {
                 $change = new KeyValueObservedChange();
                 $change->kind = $changeKind;
                 if ($observance->options & KeyValueObservingOptions::new) {
@@ -180,7 +180,7 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
         foreach ($this->observances as $observance) {
             $options = $observance->options;
             $keyPath = $observance->keyPath;
-            if (string_is_equal($keyPath, $key)) {
+            if ($keyPath === $key) {
                 $change = new KeyValueObservedChange();
                 $change->kind = $changeKind;
                 if ($options & KeyValueObservingOptions::new) {

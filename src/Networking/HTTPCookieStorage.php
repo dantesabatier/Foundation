@@ -217,7 +217,7 @@ class HTTPCookieStorage extends ObjectClass
         if ($this->cookieAcceptPolicy === HTTPCookieAcceptPolicy::onlyFromMainDocumentDomain && (!($documentHost = $mainDocumentURL?->host) || !string_has_suffix($documentHost, $host, CompareOptions::caseInsensitive))) {
             return;
         }
-        $cookies = $cookies->filter(fn(HTTPCookie $cookie): bool => string_has_prefix($cookie->domain, ".") ? string_has_suffix($host, $cookie->domain, CompareOptions::caseInsensitive) : string_is_equal($cookie->domain, $host, CompareOptions::caseInsensitive));
+        $cookies = $cookies->filter(fn(HTTPCookie $cookie): bool => str_starts_with($cookie->domain, ".") ? string_has_suffix($host, $cookie->domain, CompareOptions::caseInsensitive) : string_is_equal($cookie->domain, $host, CompareOptions::caseInsensitive));
         foreach ($cookies as $cookie) {
             $this->setCookie($cookie);
         }
@@ -263,7 +263,7 @@ class HTTPCookieStorage extends ObjectClass
         if (!($host = $url->host)) {
             return null;
         }
-        return $this->allCookies->values->filter(fn(HTTPCookie $cookie): bool => string_has_prefix($cookie->domain, ".") ? string_has_suffix($host, $cookie->domain, CompareOptions::caseInsensitive) : string_is_equal($cookie->domain, $host, CompareOptions::caseInsensitive));
+        return $this->allCookies->values->filter(fn(HTTPCookie $cookie): bool => str_starts_with($cookie->domain, ".") ? string_has_suffix($host, $cookie->domain, CompareOptions::caseInsensitive) : string_is_equal($cookie->domain, $host, CompareOptions::caseInsensitive));
     }
 
     /**

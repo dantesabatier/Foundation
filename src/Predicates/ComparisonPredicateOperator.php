@@ -7,9 +7,7 @@ use JetBrains\PhpStorm\ExpectedValues;
 use Sabatier\Foundation\CompareOptions;
 use Sabatier\Foundation\ComparisonResult;
 use Sabatier\Foundation\ObjectClass;
-use function Sabatier\Foundation\human_readable_value;
 use function Sabatier\Foundation\string_compare;
-use function Sabatier\Foundation\typeof;
 
 /** @internal */
 class ComparisonPredicateOperator extends PredicateOperator
@@ -21,9 +19,6 @@ class ComparisonPredicateOperator extends PredicateOperator
 
     public function performPrimitiveOperation(mixed $left, mixed $right): bool
     {
-        if (Predicate::$debugDefault) {
-            error_log(sprintf("Foundation: predicate operator %s: (%s)%s %s (%s)%s", $this->operatorType->name, typeof($left), human_readable_value($left), $this->symbol(), typeof($right), human_readable_value($right)));
-        }
         $variant = $this->variant;
         if ($left === null && $right === null) {
             return match ($variant) {

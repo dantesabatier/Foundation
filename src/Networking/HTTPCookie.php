@@ -11,7 +11,6 @@ use Sabatier\Foundation\ObjectClass;
 use Sabatier\Foundation\Scanner;
 use Sabatier\Foundation\URL;
 use function Sabatier\Foundation\human_readable_value;
-use function Sabatier\Foundation\string_has_prefix;
 
 /**
  * A representation of an HTTP cookie.
@@ -208,17 +207,17 @@ class HTTPCookie extends ObjectClass
                 $scanner->scanLocation += 1;
             }
             if ($domain = $properties[HTTPCookiePropertyKey::domain]) {
-                if (!string_has_prefix($domain, ".") && !filter_var($domain, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+                if (!str_starts_with($domain, ".") && !filter_var($domain, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
                     $properties[HTTPCookiePropertyKey::domain] = ".$domain";
                 }
             } else {
                 $properties[HTTPCookiePropertyKey::domain] = $url->host;
             }
             $domain = $properties[HTTPCookiePropertyKey::domain];
-            if (!string_has_prefix($domain, ".")) {
+            if (!str_starts_with($domain, ".")) {
                 $properties[HTTPCookiePropertyKey::domain] = strtolower($domain);
             }
-            if (!($path = $properties[HTTPCookiePropertyKey::path]) || !string_has_prefix($path, "/")) {
+            if (!($path = $properties[HTTPCookiePropertyKey::path]) || !str_starts_with($path, "/")) {
                 $properties[HTTPCookiePropertyKey::path] = "/";
             }
             $httpCookies->append(new HTTPCookie($properties));

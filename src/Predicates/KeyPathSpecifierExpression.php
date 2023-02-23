@@ -3,7 +3,6 @@
 namespace Sabatier\Foundation\Predicates;
 
 use Sabatier\Foundation\Dictionary;
-use function Sabatier\Foundation\string_is_equal;
 
 /** @internal */
 class KeyPathSpecifierExpression extends Expression
@@ -49,7 +48,7 @@ class KeyPathSpecifierExpression extends Expression
     public function isEqual(mixed $other): bool
     {
         if ($other instanceof KeyPathSpecifierExpression) {
-            return string_is_equal($this->keyPath(), $other->keyPath());
+            return $this->keyPath() === $other->keyPath();
         }
         return false;
     }

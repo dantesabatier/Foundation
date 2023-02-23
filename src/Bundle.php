@@ -444,7 +444,7 @@ final class Bundle extends ObjectClass
                 $path = $url->path;
                 if (string_is_equal($url->pathExtension, "php", CompareOptions::caseInsensitive) && string_is_equal(pathinfo($path, PATHINFO_FILENAME), $name, CompareOptions::caseInsensitive)) {
                     require_once $path;
-                    if (($class = array_last(get_declared_classes(), fn(string $class): bool => string_has_suffix($class, $className))) && class_exists($class)) {
+                    if (($class = array_last(get_declared_classes(), fn(string $class): bool => str_ends_with($class, $className))) && class_exists($class)) {
                         NotificationCenter::default()->postNotificationName(self::didLoadNotification, $this, new Dictionary([LoadedClasses => new ArrayClass([$class])]));
                         return $class;
                     }

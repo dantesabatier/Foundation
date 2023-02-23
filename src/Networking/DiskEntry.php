@@ -4,7 +4,6 @@ namespace Sabatier\Foundation\Networking;
 
 use Sabatier\Foundation\Date;
 use Sabatier\Foundation\URL;
-use function Sabatier\Foundation\string_is_equal;
 
 /** @internal */
 class DiskEntry
@@ -19,7 +18,7 @@ class DiskEntry
 
     public static function entry(URL $url): ?DiskEntry
     {
-        if (string_is_equal($url->pathExtension, self::pathExtension)) {
+        if ($url->pathExtension === self::pathExtension) {
             return null;
         }
         $parts = preg_split(sprintf("/%s/", preg_quote(".", "/")), $url->deletingPathExtension()->lastPathComponent, -1, PREG_SPLIT_NO_EMPTY);

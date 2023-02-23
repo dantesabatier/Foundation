@@ -11,9 +11,11 @@ namespace Sabatier\Foundation\Predicates;
 
 use InvalidArgumentException;
 use JetBrains\PhpStorm\ExpectedValues;
+use Sabatier\Foundation\ArrayClass;
 use Sabatier\Foundation\CompareOptions;
-use Sabatier\Foundation\ExpressibleByArrayLiteral;
 use Sabatier\Foundation\ObjectClass;
+use Sabatier\Foundation\Set;
+use function Sabatier\Foundation\human_readable_value;
 use function Sabatier\Foundation\request_concrete_implementation;
 use function Sabatier\Foundation\typeof;
 
@@ -43,43 +45,34 @@ class PredicateOperator extends ObjectClass
 
     public function performOperation(mixed $left, mixed $right): bool
     {
-        if ($this->modifier === ComparisonPredicateModifier::direct) {
-            return $this->performPrimitiveOperation($left, $right);
-        }
-        if ($left === null) {
-            return match ($this->modifier) {
-                ComparisonPredicateModifier::all => true,
-                ComparisonPredicateModifier::any => false,
-                default => throw new InvalidArgumentException("Invalid argument: {$this->modifier->name}"),
-            };
-        }
-        if ($left instanceof ExpressibleByArrayLiteral) {
-            $left = $left->toArray();
-        }
-        if (!is_array($left)) {
-            throw new InvalidArgumentException(sprintf("Invalid argument: the left hand side for an ALL or ANY modifier must be an Array or a Set, \"%s\" given", typeof($left)));
-        }
-        if (empty($left)) {
-            return false;
-        }
-        switch ($this->modifier) {
-            case ComparisonPredicateModifier::all:
-                foreach ($left as $obj) {
-                    if (!$this->performPrimitiveOperation($obj, $right)) {
-                        return false;
-                    }
-                }
-                return true;
-            case ComparisonPredicateModifier::any:
-                foreach ($left as $obj) {
-                    if ($this->performPrimitiveOperation($obj, $right)) {
-                        return true;
-                    }
-                }
+        $value = (function () use ($left, $right): bool {
+            if ($this->modifier === ComparisonPredicateModifier::direct) {
+                return $this->performPrimitiveOperation($left, $right);
+            }
+            if ($left === null) {
+                return match ($this->modifier) {
+                    ComparisonPredicateModifier::all => true,
+                    ComparisonPredicateModifier::any => false,
+                    default => throw new InvalidArgumentException("Invalid argument: {$this->modifier->name}"),
+                };
+            }
+            if (!$left instanceof ArrayClass && !$left instanceof Set) {
+                throw new InvalidArgumentException(sprintf("Invalid argument: the left hand side for an ALL or ANY modifier must be an %s or a %s, \"%s\" given", ArrayClass::class, Set::class, typeof($left)));
+            }
+            if ($left->isEmpty()) {
                 return false;
-            default:
-                throw new InvalidArgumentException("Bad predicate operator modifier: {$this->modifier->name}");
+            }
+            $predicate = fn (mixed $e): bool => $this->performPrimitiveOperation($e, $right);
+            return match ($this->modifier) {
+                ComparisonPredicateModifier::all => $left->allSatisfy($predicate),
+                ComparisonPredicateModifier::any => $left->contains($predicate),
+                default => throw new InvalidArgumentException("Bad predicate operator modifier: {$this->modifier->name}"),
+            };
+        })();
+        if (Predicate::$debugDefault) {
+            error_log(sprintf("Foundation: predicate operator %s (%s): (%s)%s %s (%s)%s => %s", $this->operatorType->name, $this->modifier->name, typeof($left), human_readable_value($left), $this->symbol(), typeof($right), human_readable_value($right), human_readable_value($value)));
         }
+        return $value;
     }
 
     public function performPrimitiveOperation(mixed $left, mixed $right): bool

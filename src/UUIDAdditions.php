@@ -62,5 +62,5 @@ function uuid_generate(): string
 
 function uuid_is_null(string $uuid): bool
 {
-    return string_is_equal($uuid, UUID_NULL);
+    return $uuid === UUID_NULL;
 }

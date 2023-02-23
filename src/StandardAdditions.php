@@ -351,12 +351,11 @@ function is_hidden(string $filename): bool
         $attributes = trim(unsafe_value(fn(): string|bool|null => shell_exec("FOR %A IN (" . "\"" . $filename . "\"" . ") DO @ECHO %~aA")));
         return $attributes[3] === "h" || $attributes[4] === "s";
     }
-    return string_has_prefix($filename, ".");
+    return str_starts_with($filename, ".");
 }
 
 function is_serialized(mixed $value, bool $strict = true): bool
 {
-    // If it isn't a string, it isn't serialized.
     if (!is_string($value)) {
         return false;
     }
@@ -378,11 +377,9 @@ function is_serialized(mixed $value, bool $strict = true): bool
     } else {
         $semicolon = strpos($value, ";");
         $brace = strpos($value, "}");
-        // Either ; or } must exist.
         if (false === $semicolon && false === $brace) {
             return false;
         }
-        // But neither must be in the first X characters.
         if (false !== $semicolon && $semicolon < 3) {
             return false;
         }
@@ -401,7 +398,6 @@ function is_serialized(mixed $value, bool $strict = true): bool
                 return false;
             }
             break;
-        // Or else fall through.
         case "a":
         case "O":
             return (bool)preg_match("/^$token:\d+:/s", $value);

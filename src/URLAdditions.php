@@ -9,7 +9,7 @@ function url_validate(string $url): bool
 
 function url_encode(string $url, string $endpoint, array $parameters = []): string
 {
-    if (!string_has_suffix($url, "/")) {
+    if (!str_ends_with($url, "/")) {
         $url .= "/";
     }
     $url .= $endpoint;
@@ -42,7 +42,7 @@ function getallheaders(): array
         "CONTENT_MD5" => "Content-Md5",
     ];
     foreach ($_SERVER as $key => $value) {
-        if (string_has_prefix($key, "HTTP_")) {
+        if (str_starts_with($key, "HTTP_")) {
             $key = substring_from_index($key, 5);
             if (!isset($copy_server[$key]) || !isset($_SERVER[$key])) {
                 $key = str_replace(" ", "-", ucwords(strtolower(str_replace("_", " ", $key))));

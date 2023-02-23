@@ -88,11 +88,11 @@ final class URL extends ObjectClass
                 $baseURL = $baseURL->deletingLastPathComponent();
             }
             $relative = $this->string;
-            if (string_has_prefix($relative, "/")) {
+            if (str_starts_with($relative, "/")) {
                 $relative = substring_from_index($relative, 1);
-            } elseif (string_has_prefix($relative, "./")) {
+            } elseif (str_starts_with($relative, "./")) {
                 $relative = substring_from_index($relative, 2);
-            } elseif (string_has_prefix($relative, "../")) {
+            } elseif (str_starts_with($relative, "../")) {
                 $steps = substr_count($relative, "../");
                 $numberOfComponents = $baseURL->pathComponents->count();
                 if ($steps >= $numberOfComponents) {
@@ -150,11 +150,11 @@ final class URL extends ObjectClass
             $path = $this->path;
             /** @var ArrayClass<string> $components */
             $components = new ArrayClass();
-            if (string_has_prefix($path, "/")) {
+            if (str_starts_with($path, "/")) {
                 $components->append("/");
             }
             $components->appendContentsOf((new ArrayClass(explode("/", $path)))->filter(fn(string $component): bool => !empty($component)));
-            if ($components->count() > 1 && string_has_suffix($path, "/")) {
+            if ($components->count() > 1 && str_ends_with($path, "/")) {
                 $components->append("/");
             }
             return $components;
@@ -241,7 +241,7 @@ final class URL extends ObjectClass
     public function appendPathComponent(string $component): URL
     {
         $path = $this->path;
-        if (!string_has_suffix($path, "/")) {
+        if (!str_ends_with($path, "/")) {
             if ($this->isFileURL && FileManager::default()->fileExists($path, $isDirectory) && !$isDirectory) {
                 throw new InternalInconsistencyException("Cannot append components to a file");
             }
@@ -271,7 +271,7 @@ final class URL extends ObjectClass
     {
         if (strlen($extension)) {
             $path = $this->path;
-            if (!string_has_suffix($path, ".") && !string_has_prefix($extension, ".")) {
+            if (!str_ends_with($path, ".") && !str_starts_with($extension, ".")) {
                 $path .= ".";
             }
             $path .= $extension;
