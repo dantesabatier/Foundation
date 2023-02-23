@@ -636,7 +636,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
      */
     public function starts(Sequence $possiblePrefix, ?Closure $areEquivalent = null): bool
     {
-        $areEquivalent ??= fn(mixed $e0, mixed $e1): bool => equivalent($e0, $e1);
+        $areEquivalent ??= fn(mixed $e0, mixed $e1): bool => is_equal($e0, $e1);
         foreach ($this as $e0) {
             if ($possiblePrefix->valid()) {
                 if (!$areEquivalent($e0, $possiblePrefix->current())) {

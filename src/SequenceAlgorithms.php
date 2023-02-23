@@ -73,7 +73,7 @@ trait SequenceAlgorithms
     
     public function containsElement(mixed $element): bool
     {
-        return $this->contains(fn(mixed $e): bool => equivalent($e, $element));
+        return $this->contains(fn(mixed $e): bool => is_equal($e, $element));
     }
     
     public function elementsEqual(Sequence $sequence, ?Closure $areEquivalent = null): bool
@@ -81,7 +81,7 @@ trait SequenceAlgorithms
         if ($this->compare($sequence) != ComparisonResult::orderedSame) {
             return false;
         }
-        $areEquivalent ??= fn(mixed $e0, mixed $e1): bool => equivalent($e0, $e1);
+        $areEquivalent ??= fn(mixed $e0, mixed $e1): bool => is_equal($e0, $e1);
         foreach (clone $this as $i => $e) {
             if (!$areEquivalent($e, $sequence->first(fn(mixed $v, string|int $k): bool => $k === $i))) {
                 return false;

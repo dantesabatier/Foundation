@@ -88,7 +88,7 @@ trait CollectionAlgorithms
     /** @noinspection PhpMixedReturnTypeCanBeReducedInspection */
     public function indexOf(mixed $element): mixed
     {
-        return $this->firstIndex(fn(mixed $e): bool => equivalent($e, $element));
+        return $this->firstIndex(fn(mixed $e): bool => is_equal($e, $element));
     }
 
     public function distance(int $start, int $end): int

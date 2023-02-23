@@ -23,8 +23,8 @@ use Sabatier\Foundation\SystemRandomNumberGenerator;
 use Sabatier\Foundation\UUID;
 use Stringable;
 use function Sabatier\Foundation\canonical;
-use function Sabatier\Foundation\equivalent;
 use function Sabatier\Foundation\human_readable_value;
+use function Sabatier\Foundation\is_equal;
 use function Sabatier\Foundation\pn;
 use function Sabatier\Foundation\string_is_equal;
 use const Sabatier\Foundation\NotFound;
@@ -338,7 +338,7 @@ class PredicateUtilities
 
     public static function nullIf(mixed $a, mixed $b): mixed
     {
-        return equivalent($a, $b) ? null : $a;
+        return is_equal($a, $b) ? null : $a;
     }
 
     public static function bitwiseAndWith(int $n1, int $n2): Number

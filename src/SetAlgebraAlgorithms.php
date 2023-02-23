@@ -11,7 +11,7 @@ trait SetAlgebraAlgorithms
 
     public function member(mixed $element): mixed
     {
-        return $this->first(fn(mixed $e): bool => equivalent($e, $element));
+        return $this->first(fn(mixed $e): bool => is_equal($e, $element));
     }
 
     public function union(SetAlgebra $other): self

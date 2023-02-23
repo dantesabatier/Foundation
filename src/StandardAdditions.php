@@ -410,7 +410,7 @@ function is_serialized(mixed $value, bool $strict = true): bool
     return false;
 }
 
-function equivalent(mixed $a, mixed $b): bool
+function is_equal(mixed $a, mixed $b): bool
 {
     return $a instanceof Equatable ? $a->isEqual($b) : $a === $b;
 }
