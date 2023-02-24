@@ -17,7 +17,6 @@ use Sabatier\Foundation\PropertyListSerialization;
 use Sabatier\Foundation\SearchPathDirectory;
 use Sabatier\Foundation\SortDescriptor;
 use Sabatier\Foundation\URL;
-use function Sabatier\Foundation\string_has_prefix;
 use function Sabatier\Foundation\string_has_suffix;
 use function Sabatier\Foundation\string_is_equal;
 use const Sabatier\Foundation\kCFBundleNameKey;

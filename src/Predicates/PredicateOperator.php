@@ -45,15 +45,14 @@ class PredicateOperator extends ObjectClass
 
     public function performOperation(mixed $left, mixed $right): bool
     {
-        $value = (function () use ($left, $right): bool {
+        $f = function () use ($left, $right): bool {
             if ($this->modifier === ComparisonPredicateModifier::direct) {
                 return $this->performPrimitiveOperation($left, $right);
             }
             if ($left === null) {
                 return match ($this->modifier) {
                     ComparisonPredicateModifier::all => true,
-                    ComparisonPredicateModifier::any => false,
-                    default => throw new InvalidArgumentException("Invalid argument: {$this->modifier->name}"),
+                    default => false,
                 };
             }
             if (!$left instanceof ArrayClass && !$left instanceof Set) {
@@ -62,17 +61,17 @@ class PredicateOperator extends ObjectClass
             if ($left->isEmpty()) {
                 return false;
             }
-            $predicate = fn (mixed $e): bool => $this->performPrimitiveOperation($e, $right);
+            $predicate = fn(mixed $e): bool => $this->performPrimitiveOperation($e, $right);
             return match ($this->modifier) {
                 ComparisonPredicateModifier::all => $left->allSatisfy($predicate),
-                ComparisonPredicateModifier::any => $left->contains($predicate),
-                default => throw new InvalidArgumentException("Bad predicate operator modifier: {$this->modifier->name}"),
+                default => $left->contains($predicate),
             };
-        })();
+        };
+        $v = $f();
         if (Predicate::$debugDefault) {
-            error_log(sprintf("Foundation: predicate operator %s (%s): (%s)%s %s (%s)%s => %s", $this->operatorType->name, $this->modifier->name, typeof($left), human_readable_value($left), $this->symbol(), typeof($right), human_readable_value($right), human_readable_value($value)));
+            error_log(sprintf("Foundation: predicate operator %s (%s): (%s)%s %s (%s)%s => %s", $this->operatorType->name, $this->modifier->name, typeof($left), human_readable_value($left), $this->symbol(), typeof($right), human_readable_value($right), human_readable_value($v)));
         }
-        return $value;
+        return $v;
     }
 
     public function performPrimitiveOperation(mixed $left, mixed $right): bool
@@ -86,7 +85,7 @@ class PredicateOperator extends ObjectClass
             $visitor->visitPredicateOperator($this);
         }
     }
-    
+
     #[ExpectedValues(flagsFromClass: CompareOptions::class)]
     public function compareOptions(): int
     {
