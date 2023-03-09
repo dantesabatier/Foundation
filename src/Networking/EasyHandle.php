@@ -102,22 +102,20 @@ final class EasyHandle
 
     public function setAllowedProtocolsToHTTPAndHTTPS(): void
     {
-        $protocols = [CURLPROTO_HTTP, CURLPROTO_HTTPS];
+        $protocols = CURLPROTO_HTTP | CURLPROTO_HTTPS;
         $this->set($protocols, CURLOPT_PROTOCOLS);
         $this->set($protocols, CURLOPT_REDIR_PROTOCOLS);
-        if ($caInfo = ProcessInfo::processInfo()->environment["URLSessionCertificateAuthorityInfoFile"]) {
-            if ($caInfo === "INSECURE_SSL_NO_VERIFY") {
-                $this->set(0, CURLOPT_SSL_VERIFYPEER);
-            } else {
-                $this->set($caInfo, CURLOPT_CAINFO);
-            }
+        if (($caInfo = ProcessInfo::processInfo()->environment["URLSessionCertificateAuthorityInfoFile"]) && $caInfo !== "INSECURE_SSL_NO_VERIFY") {
+            $this->set($caInfo, CURLOPT_CAINFO);
+        } else {
+            $this->set(0, CURLOPT_SSL_VERIFYPEER);
         }
     }
 
     public function setAllowedProtocolsToAll(): void
     {
-        $this->set([CURLPROTO_ALL], CURLOPT_PROTOCOLS);
-        $this->set([CURLPROTO_HTTP, CURLPROTO_HTTPS], CURLOPT_REDIR_PROTOCOLS);
+        $this->set(CURLPROTO_ALL, CURLOPT_PROTOCOLS);
+        $this->set(CURLPROTO_HTTP | CURLPROTO_HTTPS, CURLOPT_REDIR_PROTOCOLS);
     }
 
     public function setPreferredReceiveBufferSize(int $size): void

@@ -84,7 +84,7 @@ final readonly class MultiHandle
             curl_multi_exec($this->rawHandle, $running);
             curl_multi_select($this->rawHandle);
             $info = curl_multi_info_read($this->rawHandle);
-            if (!$handle = $info["handle"]) {
+            if (!($handle = $info["handle"])) {
                 break;
             }
             $code = $info["result"];
