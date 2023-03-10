@@ -2,6 +2,9 @@
 
 namespace Sabatier\Foundation;
 
+/**
+ * A type that presents a mathematical set interface to a bit set.
+ */
 class OptionSet
 {
     public function __construct(public int $rawValue = 0)
