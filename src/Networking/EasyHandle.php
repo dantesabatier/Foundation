@@ -26,6 +26,7 @@ final class EasyHandle
     public readonly CurlHandle $rawHandle;
     private ?URL $url = null;
     private ?URLSessionConfiguration $configuration = null;
+    private int $pauseState = 0;
 
     public function __construct(public readonly EasyHandleDelegate $delegate)
     {
@@ -169,24 +170,45 @@ final class EasyHandle
         return $this->get(CURLINFO_TOTAL_TIME);
     }
 
-    public function setState(EasyHandle $handle): void
+    private function setState(): void
     {
+        curl_pause($this->rawHandle, 0 | ($this->pauseState & EasyHandlePauseState::sendPaused ? CURLPAUSE_SEND : CURLPAUSE_SEND_CONT) | ($this->pauseState & EasyHandlePauseState::receivePaused ? CURLPAUSE_RECV : CURLPAUSE_RECV_CONT));
     }
-
+    
     public function pauseReceive(): void
     {
+        if ($this->pauseState & EasyHandlePauseState::receivePaused) {
+            return;
+        }
+        $this->pauseState |= EasyHandlePauseState::receivePaused;
+        $this->setState();
     }
 
     public function unpauseReceive(): void
     {
+        if (!($this->pauseState & EasyHandlePauseState::receivePaused)) {
+            return;
+        }
+        $this->pauseState &= ~EasyHandlePauseState::receivePaused;
+        $this->setState();
     }
 
     public function pauseSend(): void
     {
+        if ($this->pauseState & EasyHandlePauseState::sendPaused) {
+            return;
+        }
+        $this->pauseState |= EasyHandlePauseState::sendPaused;
+        $this->setState();
     }
 
     public function unpauseSend(): void
     {
+        if (!($this->pauseState & EasyHandlePauseState::sendPaused)) {
+            return;
+        }
+        $this->pauseState &= ~EasyHandlePauseState::sendPaused;
+        $this->setState();
     }
 
     private function setupCallbacks(): void

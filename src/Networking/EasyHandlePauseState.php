@@ -3,8 +3,8 @@
 namespace Sabatier\Foundation\Networking;
 
 /** @internal */
-enum EasyHandlePauseState: int
+class EasyHandlePauseState
 {
-    case receivePaused = 1 << 0;
-    case sendPaused = 1 << 1;
+    const receivePaused = 1 << 0;
+    const sendPaused = 1 << 1;
 }
