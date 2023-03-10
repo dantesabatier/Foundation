@@ -34,7 +34,7 @@ interface Sequence extends Traversable, Countable, Comparable, ExpressibleByArra
     public function contains(Closure $predicate): bool;
 
     /**
-     * Returns a bool value indicating whether the sequence contains an element that satisfies the given predicate.
+     * Returns a Boolean value indicating whether the sequence contains the given element.
      *
      * Available when Element conforms to {@see Equatable}.
      * @param Element $element The element to find in the sequence.
