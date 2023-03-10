@@ -26,12 +26,13 @@ final class EasyHandle
     public readonly CurlHandle $rawHandle;
     private ?URL $url = null;
     private ?URLSessionConfiguration $configuration = null;
-    private int $pauseState = 0;
+    private EasyHandlePauseState $pauseState;
 
     public function __construct(public readonly EasyHandleDelegate $delegate)
     {
         $this->rawHandle = curl_init();
         $this->setupCallbacks();
+        $this->pauseState = new EasyHandlePauseState();
     }
 
     public function __destruct()
@@ -169,46 +170,45 @@ final class EasyHandle
     {
         return $this->get(CURLINFO_TOTAL_TIME);
     }
-
-    private function setState(): void
-    {
-        curl_pause($this->rawHandle, 0 | ($this->pauseState & EasyHandlePauseState::sendPaused ? CURLPAUSE_SEND : CURLPAUSE_SEND_CONT) | ($this->pauseState & EasyHandlePauseState::receivePaused ? CURLPAUSE_RECV : CURLPAUSE_RECV_CONT));
-    }
     
     public function pauseReceive(): void
     {
-        if ($this->pauseState & EasyHandlePauseState::receivePaused) {
+        $pauseState = $this->pauseState;
+        if ($pauseState->contains(EasyHandlePauseState::receivePaused)) {
             return;
         }
-        $this->pauseState |= EasyHandlePauseState::receivePaused;
-        $this->setState();
+        $pauseState->insert(EasyHandlePauseState::receivePaused);
+        $pauseState->setState($this);
     }
 
     public function unpauseReceive(): void
     {
-        if (!($this->pauseState & EasyHandlePauseState::receivePaused)) {
+        $pauseState = $this->pauseState;
+        if (!$pauseState->contains(EasyHandlePauseState::receivePaused)) {
             return;
         }
-        $this->pauseState &= ~EasyHandlePauseState::receivePaused;
-        $this->setState();
+        $pauseState->remove(EasyHandlePauseState::receivePaused);
+        $pauseState->setState($this);
     }
 
     public function pauseSend(): void
     {
-        if ($this->pauseState & EasyHandlePauseState::sendPaused) {
+        $pauseState = $this->pauseState;
+        if ($pauseState->contains(EasyHandlePauseState::sendPaused)) {
             return;
         }
-        $this->pauseState |= EasyHandlePauseState::sendPaused;
-        $this->setState();
+        $pauseState->insert(EasyHandlePauseState::sendPaused);
+        $pauseState->setState($this);
     }
 
     public function unpauseSend(): void
     {
-        if (!($this->pauseState & EasyHandlePauseState::sendPaused)) {
+        $pauseState = $this->pauseState;
+        if (!$pauseState->contains(EasyHandlePauseState::sendPaused)) {
             return;
         }
-        $this->pauseState &= ~EasyHandlePauseState::sendPaused;
-        $this->setState();
+        $pauseState->remove(EasyHandlePauseState::sendPaused);
+        $pauseState->setState($this);
     }
 
     private function setupCallbacks(): void
