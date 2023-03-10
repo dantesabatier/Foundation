@@ -85,11 +85,7 @@ class FTPURLProtocol extends NativeProtocol
         if ($this->internalState->rawValue !== InternalStateRawValue::transferInProgress) {
             fatal_error("Received header data, but no transfer in progress.");
         }
-        /** @var TransferState $ts */
-        $ts = $this->internalState->transferState;
-        /** @var HTTPURLResponse|null $response */
-        $response = $ts->response;
-        if (!$response instanceof HTTPURLResponse) {
+        if (!($response = $this->internalState->transferState?->response)) {
             fatal_error("Header complete, but not URL response.");
         }
         $session = $this->task->session;
