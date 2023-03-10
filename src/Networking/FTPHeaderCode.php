@@ -2,6 +2,7 @@
 
 namespace Sabatier\Foundation\Networking;
 
+/** @internal */
 enum FTPHeaderCode: int
 {
     case transferCompleted = 226;

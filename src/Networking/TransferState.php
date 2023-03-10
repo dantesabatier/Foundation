@@ -37,23 +37,6 @@ class TransferState
         }
     }
 
-    public function byAppendingBodyData(string $data): TransferState
-    {
-        return match ($this->bodyDataDrain->rawValue) {
-            DataDrainRawValue::inMemory => (function () use ($data): TransferState {
-                $this->bodyDataDrain->bodyData .= $data;
-                return new TransferState($this->url, $this->parsedResponseHeader, $this->response, DataDrain::inMemory($this->bodyDataDrain->bodyData));
-            })(),
-            DataDrainRawValue::toFile => new TransferState($this->url, $this->parsedResponseHeader, $this->response, $this->bodyDataDrain),
-            DataDrainRawValue::ignore => $this
-        };
-    }
-
-    public function isHeaderComplete(): bool
-    {
-        return $this->response !== null;
-    }
-
     public function byAppendingFTP(string $data, int $contentLength): TransferState
     {
         if (str_starts_with($data, (string)FTPHeaderCode::transferCompleted->value)) {
@@ -70,5 +53,22 @@ class TransferState
         } else {
             return new TransferState($this->url, $h, $this->response, $this->bodyDataDrain);
         }
+    }
+
+    public function byAppendingBodyData(string $data): TransferState
+    {
+        return match ($this->bodyDataDrain->rawValue) {
+            DataDrainRawValue::inMemory => (function () use ($data): TransferState {
+                $this->bodyDataDrain->bodyData .= $data;
+                return new TransferState($this->url, $this->parsedResponseHeader, $this->response, DataDrain::inMemory($this->bodyDataDrain->bodyData));
+            })(),
+            DataDrainRawValue::toFile => new TransferState($this->url, $this->parsedResponseHeader, $this->response, $this->bodyDataDrain),
+            DataDrainRawValue::ignore => $this
+        };
+    }
+
+    public function isHeaderComplete(): bool
+    {
+        return $this->response !== null;
     }
 }
