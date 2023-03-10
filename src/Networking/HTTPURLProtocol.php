@@ -288,7 +288,7 @@ class HTTPURLProtocol extends NativeProtocol
                 if (($contentEncoding = $response->allHeaderFields["Content-Encoding"]) && $contentEncoding !== "identity") {
                     $this->task->countOfBytesExpectedToReceive = URLSessionTransferSizeUnknown;
                 } else {
-                    $this->task->countOfBytesExpectedToReceive = $contentLength > 0 ? $contentLength : URLSessionTransferSizeUnknown;
+                    $this->task->countOfBytesExpectedToReceive = $contentLength ?: URLSessionTransferSizeUnknown;
                 }
                 $this->didReceiveResponse();
             }
