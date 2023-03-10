@@ -306,19 +306,12 @@ class HTTPURLProtocol extends NativeProtocol
         if ($this->internalState->rawValue !== InternalStateRawValue::transferInProgress) {
             fatal_error("Transfer not in progress.");
         }
-        $task = $this->task;
-        if (!$task instanceof URLSessionDataTask) {
-            return;
-        }
-        /** @var TransferState $ts */
-        $ts = $this->internalState->transferState;
-        /** @var HTTPURLResponse|null $response */
-        $response = $ts->response;
+        $response = $this->internalState->transferState?->response;
         if (!$response instanceof HTTPURLResponse) {
             fatal_error("Header complete, but not URL response.");
         }
-        $session = $task->session;
-        $behaviour = $session->behaviour($task);
+        $session = $this->task->session;
+        $behaviour = $session->behaviour($this->task);
         switch ($behaviour->rawValue) {
             case TaskBehaviourRawValue::taskDelegate:
                 switch ($response->statusCode) {
