@@ -11,18 +11,33 @@ class OptionSet
     {
     }
 
-    public function contains(int $v): bool
+    /**
+     * Returns a Boolean value that indicates whether the given element exists in the set.
+     * 
+     * @param int $element The element to find in the sequence.
+     * @return bool {@see true} if the element was found in the sequence; otherwise, {@see false}.
+     */
+    public function contains(int $element): bool
     {
-        return ($this->rawValue & $v) === $v;
+        return ($this->rawValue & $element) === $element;
     }
 
-    public function insert(int $v): void
+    /**
+     * Inserts the given element in the set if it is not already present.
+     * 
+     * @param int $newElement An element to insert into the set.
+     */
+    public function insert(int $newElement): void
     {
-        $this->rawValue |= $v;
+        $this->rawValue |= $newElement;
     }
-
-    public function remove(int $v): void
+    
+    /**
+     * Removes the given element and any elements subsumed by the given element.
+     * @param int $element
+     */
+    public function remove(int $element): void
     {
-        $this->rawValue &= ~$v;
+        $this->rawValue &= ~$element;
     }
 }
