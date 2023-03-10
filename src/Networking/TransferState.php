@@ -53,4 +53,22 @@ class TransferState
     {
         return $this->response !== null;
     }
+
+    public function byAppendingFTP(string $data, int $contentLength): TransferState
+    {
+        if (str_starts_with($data, (string)FTPHeaderCode::transferCompleted->value)) {
+            return $this;
+        }
+        if (!($h = $this->parsedResponseHeader->byAppending($data, fn(): bool => str_starts_with($data, (string)FTPHeaderCode::openDataConnection->value)))) {
+            throw new RuntimeException();
+        }
+        if ($h->rawVale === ParsedResponseHeaderRawVale::complete) {
+            if (!($response = $h->header->createURLResponse($this->url, $contentLength))) {
+                throw new RuntimeException();
+            }
+            return new TransferState($this->url, $this->parsedResponseHeader, $response, $this->bodyDataDrain);
+        } else {
+            return new TransferState($this->url, $h, $this->response, $this->bodyDataDrain);
+        }
+    }
 }

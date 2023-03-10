@@ -13,6 +13,11 @@ readonly class ResponseHeaderLines
     {
     }
 
+    public function createURLResponse(URL $url, int $contentLength): ?URLResponse
+    {
+        return new URLResponse($url, expectedContentLength: $contentLength);
+    }
+
     public function createHTTPURLResponse(URL $url): ?HTTPURLResponse
     {
         if (!($components = $this->decompose())) {

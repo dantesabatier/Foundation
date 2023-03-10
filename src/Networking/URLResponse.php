@@ -18,7 +18,7 @@ class URLResponse extends ObjectClass
      * @param string|null $textEncodingName The name of the text encoding provided by the response's originating source.
      * @param string|null $suggestedFilename A suggested filename for the response data.
      */
-    public function __construct(public readonly URL $url, public readonly ?string $mimeType, public readonly int $expectedContentLength, public readonly ?string $textEncodingName, public readonly ?string $suggestedFilename)
+    public function __construct(public readonly URL $url, public readonly ?string $mimeType = null, public readonly int $expectedContentLength = 0, public readonly ?string $textEncodingName = null, public readonly ?string $suggestedFilename = null)
     {
     }
 }
