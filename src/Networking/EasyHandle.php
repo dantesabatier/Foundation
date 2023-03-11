@@ -44,7 +44,7 @@ final class EasyHandle
     {
         return match ($name) {
             "connectFailureErrno" => $this->get(CURLINFO_OS_ERRNO),
-            "redirectURL" => new URL($this->get(CURLINFO_REDIRECT_URL)),
+            "redirectURL" => ($s = $this->get(CURLINFO_REDIRECT_URL)) ? new URL($s) : null,
             default => throw new UndefinedKeyException()
         };
     }
