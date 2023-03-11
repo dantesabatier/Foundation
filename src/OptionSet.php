@@ -13,7 +13,7 @@ class OptionSet
 
     /**
      * Returns a Boolean value that indicates whether the given element exists in the set.
-     * 
+     *
      * @param int $element The element to find in the sequence.
      * @return bool {@see true} if the element was found in the sequence; otherwise, {@see false}.
      */
@@ -24,14 +24,14 @@ class OptionSet
 
     /**
      * Inserts the given element in the set if it is not already present.
-     * 
+     *
      * @param int $newElement An element to insert into the set.
      */
     public function insert(int $newElement): void
     {
         $this->rawValue |= $newElement;
     }
-    
+
     /**
      * Removes the given element and any elements subsumed by the given element.
      * @param int $element

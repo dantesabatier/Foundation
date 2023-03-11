@@ -90,15 +90,13 @@ class URLCredentialStorage extends ObjectClass
         }
         $needsNotification = false;
         $key = (string)$space;
-        if ($user = $credential->user) {
-            if (($current = $this->allCredentials[$key]) && $current[$user] === $credential) {
-                $current[$user] = null;
-                $needsNotification = true;
-                if ($current->isEmpty()) {
-                    $current = null;
-                }
-                $this->allCredentials->setValueForKey($current, $key);
+        if (($user = $credential->user) && ($current = $this->allCredentials[$key]) && $current[$user] === $credential) {
+            $current[$user] = null;
+            $needsNotification = true;
+            if ($current->isEmpty()) {
+                $current = null;
             }
+            $this->allCredentials->setValueForKey($current, $key);
         }
         if (($defaultCredential = $this->defaultCredentials[$key]) && $defaultCredential === $credential) {
             $this->defaultCredentials->removeValueForKey($key);

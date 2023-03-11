@@ -4,6 +4,8 @@ namespace Sabatier\Foundation\Networking;
 
 use Closure;
 use Sabatier\Foundation\Error;
+use const Sabatier\Foundation\URLErrorDomain;
+use const Sabatier\Foundation\URLErrorNetworkConnectionLost;
 
 /**
  * A URL session task that communicates over the WebSockets protocol standard.
@@ -11,15 +13,16 @@ use Sabatier\Foundation\Error;
 class URLSessionWebSocketTask extends URLSessionTask
 {
     /** @var int The maximum number of bytes to buffer before the receive call fails with an error. This value includes the sum of all bytes from continuation frames. Receive calls will fail once the task reaches this limit. */
-    public int $maximumMessageSize = 0;
+    public int $maximumMessageSize = 1024 * 1024;
     /** @var URLSessionWebSocketTaskCloseCode A code that indicates the reason a connection closed. */
-    public readonly URLSessionWebSocketTaskCloseCode $closeCode;
+    public URLSessionWebSocketTaskCloseCode $closeCode = URLSessionWebSocketTaskCloseCode::invalid;
     /** @var string|null A block of data that provides further information about why a connection closed. */
-    public readonly ?string $closeReason;
+    public ?string $closeReason = null;
     /** @internal */
     public ?string $protocolPicked = null;
     /** @internal */
     public bool $handshakeCompleted = false;
+    private ?Error $taskError = null;
 
     /**
      * Sends a WebSocket message, receiving the result in a completion handler.
@@ -52,6 +55,11 @@ class URLSessionWebSocketTask extends URLSessionTask
     {
     }
 
+    public function cancel(): void
+    {
+        $this->cancelWithReason(URLSessionWebSocketTaskCloseCode::invalid, null);
+    }
+
     /**
      * Sends a close frame with the given close code and optional close reason.
      *
@@ -61,5 +69,19 @@ class URLSessionWebSocketTask extends URLSessionTask
      */
     public function cancelWithReason(URLSessionWebSocketTaskCloseCode $closeCode, ?string $reason): void
     {
+        $this->close($closeCode, $reason);
+    }
+
+    /**
+     * @internal
+     */
+    public function close(URLSessionWebSocketTaskCloseCode $code, ?string $reason = null): void
+    {
+        if ($this->taskError !== null) {
+            return;
+        }
+        $this->closeCode = $code;
+        $this->closeReason = $reason;
+        $this->taskError = new Error(URLErrorDomain, URLErrorNetworkConnectionLost);
     }
 }

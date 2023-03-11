@@ -26,13 +26,13 @@ final class EasyHandle
     public readonly CurlHandle $rawHandle;
     private ?URL $url = null;
     private ?URLSessionConfiguration $configuration = null;
-    private EasyHandlePauseState $pauseState;
+    private readonly EasyHandlePauseState $pauseState;
 
     public function __construct(public readonly EasyHandleDelegate $delegate)
     {
         $this->rawHandle = curl_init();
-        $this->setupCallbacks();
         $this->pauseState = new EasyHandlePauseState();
+        $this->setupCallbacks();
     }
 
     public function __destruct()
@@ -170,7 +170,7 @@ final class EasyHandle
     {
         return $this->get(CURLINFO_TOTAL_TIME);
     }
-    
+
     public function pauseReceive(): void
     {
         $pauseState = $this->pauseState;
@@ -215,13 +215,13 @@ final class EasyHandle
     {
         $obj = $this;
         $this->set(true, CURLOPT_RETURNTRANSFER);
-        $this->set(fn(mixed $handle, string $data): int => $obj->didReceiveData($data), CURLOPT_WRITEFUNCTION);
-        $this->set(fn(mixed $handle, mixed $data, int $size): string => $obj->fill($data), CURLOPT_READFUNCTION);
-        $this->set(function (mixed $handle, float $totalBytesExpectedToReceive, float $totalBytesReceived, float $totalBytesExpectedToSend, float $totalBytesSent) use ($obj): int {
+        $this->set(fn(CurlHandle $handle, string $data): int => $obj->didReceiveData($data), CURLOPT_WRITEFUNCTION);
+        $this->set(fn(CurlHandle $handle, mixed $data, int $size): string => $obj->fill($data), CURLOPT_READFUNCTION);
+        $this->set(function (CurlHandle $handle, float $totalBytesExpectedToReceive, float $totalBytesReceived, float $totalBytesExpectedToSend, float $totalBytesSent) use ($obj): int {
             $obj->updateProgressMeter(new EasyHandleProgress($totalBytesSent, $totalBytesExpectedToSend, $totalBytesReceived, $totalBytesExpectedToReceive));
             return CURLE_OK;
         }, CURLOPT_PROGRESSFUNCTION);
-        $this->set(fn(mixed $handle, string $data): int => $obj->didReceiveHeaderData($data, curl_getinfo($handle, CURLINFO_CONTENT_LENGTH_DOWNLOAD)), CURLOPT_HEADERFUNCTION);
+        $this->set(fn(CurlHandle $handle, string $data): int => $obj->didReceiveHeaderData($data, curl_getinfo($handle, CURLINFO_CONTENT_LENGTH_DOWNLOAD)), CURLOPT_HEADERFUNCTION);
     }
 
     public function urlErrorCode(int $easyCode): ?int
@@ -279,7 +279,7 @@ final class EasyHandle
 
     private function setCookies(string $data): void
     {
-        if (!($configuration = $this->configuration) || !($url = $this->url) || !($storage = $configuration->httpCookieStorage)) {
+        if (!($url = $this->url) || !($storage = $this->configuration?->httpCookieStorage)) {
             return;
         }
         $headerComponents = explode(":", $data, 1);
