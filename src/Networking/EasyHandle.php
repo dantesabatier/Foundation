@@ -213,15 +213,14 @@ final class EasyHandle
 
     private function setupCallbacks(): void
     {
-        $obj = $this;
         $this->set(true, CURLOPT_RETURNTRANSFER);
-        $this->set(fn(CurlHandle $handle, string $data): int => $obj->didReceiveData($data), CURLOPT_WRITEFUNCTION);
-        $this->set(fn(CurlHandle $handle, mixed $data, int $size): string => $obj->fill($data), CURLOPT_READFUNCTION);
-        $this->set(function (CurlHandle $handle, float $totalBytesExpectedToReceive, float $totalBytesReceived, float $totalBytesExpectedToSend, float $totalBytesSent) use ($obj): int {
-            $obj->updateProgressMeter(new EasyHandleProgress($totalBytesSent, $totalBytesExpectedToSend, $totalBytesReceived, $totalBytesExpectedToReceive));
+        $this->set(fn(CurlHandle $handle, string $data): int => $this->didReceiveData($data), CURLOPT_WRITEFUNCTION);
+        $this->set(fn(CurlHandle $handle, mixed $data, int $size): string => $this->fill($data), CURLOPT_READFUNCTION);
+        $this->set(function (CurlHandle $handle, float $totalBytesExpectedToReceive, float $totalBytesReceived, float $totalBytesExpectedToSend, float $totalBytesSent): int {
+            $this->updateProgressMeter(new EasyHandleProgress($totalBytesSent, $totalBytesExpectedToSend, $totalBytesReceived, $totalBytesExpectedToReceive));
             return CURLE_OK;
         }, CURLOPT_PROGRESSFUNCTION);
-        $this->set(fn(CurlHandle $handle, string $data): int => $obj->didReceiveHeaderData($data, curl_getinfo($handle, CURLINFO_CONTENT_LENGTH_DOWNLOAD)), CURLOPT_HEADERFUNCTION);
+        $this->set(fn(CurlHandle $handle, string $data): int => $this->didReceiveHeaderData($data, curl_getinfo($handle, CURLINFO_CONTENT_LENGTH_DOWNLOAD)), CURLOPT_HEADERFUNCTION);
     }
 
     public function urlErrorCode(int $easyCode): ?int
