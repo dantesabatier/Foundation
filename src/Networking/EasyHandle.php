@@ -16,22 +16,22 @@ use const Sabatier\Foundation\URLErrorTimedOut;
 use const Sabatier\Foundation\URLErrorUnknown;
 use const Sabatier\Foundation\URLErrorUnsupportedURL;
 
-/**
- * @internal
- * @property-read int $connectFailureErrno
- * @property-read URL|null $redirectURL
- */
+/** @internal */
 final class EasyHandle
 {
     public readonly CurlHandle $rawHandle;
+    public readonly int $connectFailureErrno;
+    public readonly ?URL $redirectURL;
     private ?URL $url = null;
     private ?URLSessionConfiguration $configuration = null;
     private readonly EasyHandlePauseState $pauseState;
 
     public function __construct(public readonly EasyHandleDelegate $delegate)
     {
+        unset($this->connectFailureErrno);
+        unset($this->redirectURL);
+        unset($this->pauseState);
         $this->rawHandle = curl_init();
-        $this->pauseState = new EasyHandlePauseState();
         $this->setupCallbacks();
     }
 
@@ -42,7 +42,7 @@ final class EasyHandle
 
     public function __get(string $name)
     {
-        return match ($name) {
+        return $this->$name = match ($name) {
             "connectFailureErrno" => $this->get(CURLINFO_OS_ERRNO),
             "redirectURL" => ($s = $this->get(CURLINFO_REDIRECT_URL)) ? new URL($s) : null,
             default => throw new UndefinedKeyException()
