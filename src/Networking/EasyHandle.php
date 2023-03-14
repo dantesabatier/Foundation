@@ -8,7 +8,6 @@ use Sabatier\Foundation\Error;
 use Sabatier\Foundation\ProcessInfo;
 use Sabatier\Foundation\UndefinedKeyException;
 use Sabatier\Foundation\URL;
-use function Sabatier\Foundation\fatal_error;
 use const Sabatier\Foundation\URLErrorBadServerResponse;
 use const Sabatier\Foundation\URLErrorBadURL;
 use const Sabatier\Foundation\URLErrorCannotFindHost;
