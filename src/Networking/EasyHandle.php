@@ -8,6 +8,7 @@ use Sabatier\Foundation\Error;
 use Sabatier\Foundation\ProcessInfo;
 use Sabatier\Foundation\UndefinedKeyException;
 use Sabatier\Foundation\URL;
+use function Sabatier\Foundation\fatal_error;
 use const Sabatier\Foundation\URLErrorBadServerResponse;
 use const Sabatier\Foundation\URLErrorBadURL;
 use const Sabatier\Foundation\URLErrorCannotFindHost;
@@ -51,44 +52,42 @@ final class EasyHandle
 
     public function get(int $option): mixed
     {
-        /** @psalm-suppress MissingParamType */
         return curl_getinfo($this->rawHandle, $option);
     }
 
     public function set(mixed $value, int $option): void
     {
-        /** @psalm-suppress MissingParamType */
-        curl_setopt($this->rawHandle, $option, $value);
+        curl_setopt($this->rawHandle, $option, $value) ?: fatal_error();
     }
 
     public function setVerboseModeOn(bool $flag): void
     {
-        $this->set((int)$flag, CURLOPT_VERBOSE);
+        $this->set($flag, CURLOPT_VERBOSE);
     }
 
     public function setPassHeadersToDataStream(bool $flag): void
     {
-        $this->set((int)$flag, CURLOPT_HEADER);
+        $this->set($flag, CURLOPT_HEADER);
     }
 
     public function setFollowLocation(bool $flag): void
     {
-        $this->set((int)$flag, CURLOPT_FOLLOWLOCATION);
+        $this->set($flag, CURLOPT_FOLLOWLOCATION);
     }
 
     public function setProgressMeterOff(bool $flag): void
     {
-        $this->set((int)$flag, CURLOPT_NOPROGRESS);
+        $this->set($flag, CURLOPT_NOPROGRESS);
     }
 
     public function setSkipAllSignalHandling(bool $flag): void
     {
-        $this->set((int)$flag, CURLOPT_NOSIGNAL);
+        $this->set($flag, CURLOPT_NOSIGNAL);
     }
 
     public function setFailOnHTTPErrorCode(bool $flag): void
     {
-        $this->set((int)$flag, CURLOPT_FAILONERROR);
+        $this->set($flag, CURLOPT_FAILONERROR);
     }
 
     public function setURL(URL $url): void
@@ -110,7 +109,7 @@ final class EasyHandle
         if (($caInfo = ProcessInfo::processInfo()->environment["URLSessionCertificateAuthorityInfoFile"]) && $caInfo !== "INSECURE_SSL_NO_VERIFY") {
             $this->set($caInfo, CURLOPT_CAINFO);
         } else {
-            $this->set(0, CURLOPT_SSL_VERIFYPEER);
+            $this->set(false, CURLOPT_SSL_VERIFYPEER);
         }
     }
 
@@ -134,10 +133,10 @@ final class EasyHandle
     {
         if ($flag) {
             $this->set("", CURLOPT_ACCEPT_ENCODING);
-            $this->set(1, CURLOPT_HTTP_CONTENT_DECODING);
+            $this->set(true, CURLOPT_HTTP_CONTENT_DECODING);
         } else {
             $this->set(null, CURLOPT_ACCEPT_ENCODING);
-            $this->set(0, CURLOPT_HTTP_CONTENT_DECODING);
+            $this->set(false, CURLOPT_HTTP_CONTENT_DECODING);
         }
     }
 
@@ -148,12 +147,12 @@ final class EasyHandle
 
     public function setNoBody(bool $flag): void
     {
-        $this->set((int)$flag, CURLOPT_NOBODY);
+        $this->set($flag, CURLOPT_NOBODY);
     }
 
     public function setUpload(bool $flag): void
     {
-        $this->set((int)$flag, CURLOPT_UPLOAD);
+        $this->set($flag, CURLOPT_UPLOAD);
     }
 
     public function setRequestBodyLength(int $length): void
@@ -268,12 +267,11 @@ final class EasyHandle
 
     private function didReceiveHeaderData(string $data, int $contentLength): int
     {
-        $action = match ($this->delegate->didReceiveHeaderData($data, $contentLength)) {
+        $this->setCookies($data);
+        return match ($this->delegate->didReceiveHeaderData($data, $contentLength)) {
             EasyHandleAction::proceed => strlen($data),
             default => CURLE_OK
         };
-        $this->setCookies($data);
-        return $action;
     }
 
     private function setCookies(string $data): void
