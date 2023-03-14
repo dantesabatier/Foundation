@@ -57,7 +57,7 @@ final class EasyHandle
 
     public function set(mixed $value, int $option): void
     {
-        curl_setopt($this->rawHandle, $option, $value) ?: fatal_error();
+        curl_setopt($this->rawHandle, $option, $value);
     }
 
     public function setVerboseModeOn(bool $flag): void
