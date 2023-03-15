@@ -6,6 +6,7 @@ use Exception;
 use Sabatier\Foundation\Error;
 use Sabatier\Foundation\Scanner;
 use function Sabatier\Foundation\fatal_error;
+use function Sabatier\Foundation\is_ascii;
 use function Sabatier\Foundation\substring_from_index;
 use const Sabatier\Foundation\URLErrorBadURL;
 use const Sabatier\Foundation\URLErrorDomain;
@@ -32,11 +33,7 @@ class DataURLProtocol extends URLProtocol
             $client->urlProtocolDidLoad($this, $data);
             $client->urlProtocolDidFinishLoading($this);
         } else {
-            $session = $this->task->session;
-            $delegate = $session->delegate;
-            if ($delegate instanceof URLSessionTaskDelegate) {
-                $delegate->urlSessionTaskDidComplete($session, $this->task, new Error(URLErrorDomain, URLErrorBadURL));
-            }
+            $client->urlProtocolDidFailWithError($this, new Error(URLErrorDomain, URLErrorBadURL));
         }
     }
 
@@ -50,10 +47,10 @@ class DataURLProtocol extends URLProtocol
         if (!str_starts_with($dataBody, "data:")) {
             return null;
         }
-        $scanner = new Scanner(substring_from_index(urldecode($dataBody), 5));
         $mimeType = null;
         $charSet = null;
         $base64 = false;
+        $scanner = new Scanner(substring_from_index(urldecode($dataBody), 5));
         $validate = function (string $mimeType): bool {
             if (str_starts_with($mimeType, "/")) {
                 return false;
@@ -79,8 +76,8 @@ class DataURLProtocol extends URLProtocol
             $part = "";
             $foundCharsetKey = false;
             while (!$scanner->isAtEnd) {
-                $ch = $scanner->string[$scanner->scanLocation];
-                switch ($ch) {
+                $c = $scanner->string[$scanner->scanLocation];
+                switch ($c) {
                     case ",":
                         if ($foundCharsetKey) {
                             $charSet = $part;
@@ -115,18 +112,43 @@ class DataURLProtocol extends URLProtocol
                         }
                         break;
                     default:
-                        $part .= $ch;
+                        $part .= $c;
                         break;
                 }
                 $scanner->scanLocation += 1;
             }
             return false;
         };
+        $decodeBase64Body = function () use ($scanner): ?string {
+            $base64encoded = "";
+            while (!$scanner->isAtEnd) {
+                $c = $scanner->string[$scanner->scanLocation];
+                if (!is_ascii($c)) {
+                    return null;
+                }
+                $base64encoded .= $c;
+                $scanner->scanLocation += 1;
+            }
+            return base64_decode($base64encoded);
+        };
+        $decodeStringBody = function () use ($scanner): ?string {
+            $data = "";
+            while (!$scanner->isAtEnd) {
+                $c = $scanner->string[$scanner->scanLocation];
+                if (!is_ascii($c)) {
+                    return null;
+                }
+                $data .= $c;
+                $scanner->scanLocation += 1;
+            }
+            return $data;
+        };
         if (!$decodeHeader()) {
             return null;
         }
-        $data = substring_from_index($scanner->string, $scanner->scanLocation);
-        $data = $base64 ? base64_decode($data) : $data;
+        if (!($data = $base64 ? $decodeBase64Body() : $decodeStringBody())) {
+            return null;
+        }
         return [new URLResponse($url, $mimeType, strlen($data), $charSet), $data];
     }
 

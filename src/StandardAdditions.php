@@ -260,6 +260,11 @@ function string_contains(string $string, string $substring, #[ExpectedValues(fla
     return string_search($string, $substring, SearchMethod::contains, $options) > 0;
 }
 
+function is_ascii(string $string): bool
+{
+    return mb_check_encoding($string, "ASCII");
+}
+
 /**
  * Returns a localized version of the string designated by the specified key and residing in the specified table.
  * @param string $string The key for a string in the specified table.
