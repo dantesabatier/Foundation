@@ -21,7 +21,7 @@ readonly class TaskRegistryBehaviour
     {
     }
 
-    public static function callDelegate(?URLSessionDelegate $delegate): TaskRegistryBehaviour
+    public static function callDelegate(?URLSessionDelegate $delegate = null): TaskRegistryBehaviour
     {
         return new TaskRegistryBehaviour(TaskRegistryBehaviourRawValue::callDelegate, taskDelegate: $delegate);
     }

@@ -114,63 +114,63 @@ final class URLSession implements URLSessionProtocol
      * Creates a task that retrieves the contents of the specified URL, then calls a handler upon completion.
      *
      * @param URL $url The URL to be retrieved.
-     * @param DataCompletionHandler $completionHandler The completion handler to call when the load request is complete. This handler is executed on the delegate queue. If you pass nil, only the session delegate methods are called when the task completes, making this method equivalent to the dataTask(with:) method.
+     * @param DataCompletionHandler|null $completionHandler The completion handler to call when the load request is complete. This handler is executed on the delegate queue. If you pass nil, only the session delegate methods are called when the task completes, making this method equivalent to the dataTask(with:) method.
      * @return URLSessionDataTask The new session data task.
      * @throws Exception
      */
-    public function dataTaskWithURL(URL $url, Closure $completionHandler): URLSessionDataTask
+    public function dataTaskWithURL(URL $url, ?Closure $completionHandler = null): URLSessionDataTask
     {
-        return $this->dataTask(new URLRequest($url), TaskRegistryBehaviour::dataCompletionHandler($completionHandler));
+        return $this->dataTask(new URLRequest($url), $completionHandler ? TaskRegistryBehaviour::dataCompletionHandler($completionHandler) : TaskRegistryBehaviour::callDelegate());
     }
 
     /**
      * Creates a task that retrieves the contents of a URL based on the specified URL request object.
      *
      * @param URLRequest $request A URL request object that provides request-specific information such as the URL, cache policy, request type, and body data or body stream.
-     * @param DataCompletionHandler $completionHandler The completion handler to call when the load request is complete.
+     * @param DataCompletionHandler|null $completionHandler The completion handler to call when the load request is complete.
      * @return URLSessionDataTask The new session data task.
      * @throws Exception
      */
-    public function dataTaskWithRequest(URLRequest $request, Closure $completionHandler): URLSessionDataTask
+    public function dataTaskWithRequest(URLRequest $request, ?Closure $completionHandler = null): URLSessionDataTask
     {
-        return $this->dataTask($request, TaskRegistryBehaviour::dataCompletionHandler($completionHandler));
+        return $this->dataTask($request, $completionHandler ? TaskRegistryBehaviour::dataCompletionHandler($completionHandler) : TaskRegistryBehaviour::callDelegate());
     }
 
     /**
      * Creates a download task that retrieves the contents of the specified URL, saves the results to a file, and calls a handler upon completion.
      *
      * @param URL $url The URL to download.
-     * @param DownloadCompletionHandler $completionHandler The completion handler to call when the load request is complete. This handler is executed on the delegate queue.
+     * @param DownloadCompletionHandler|null $completionHandler The completion handler to call when the load request is complete. This handler is executed on the delegate queue.
      * @return URLSessionDownloadTask The new session download task.
      * @throws Exception
      */
-    public function downloadTaskWithURL(URL $url, Closure $completionHandler): URLSessionDownloadTask
+    public function downloadTaskWithURL(URL $url, ?Closure $completionHandler = null): URLSessionDownloadTask
     {
-        return $this->downloadTask(new URLRequest($url), TaskRegistryBehaviour::downloadCompletionHandler($completionHandler));
+        return $this->downloadTask(new URLRequest($url), $completionHandler ? TaskRegistryBehaviour::downloadCompletionHandler($completionHandler) : TaskRegistryBehaviour::callDelegate());
     }
 
     /**
      * Creates a download task that retrieves the contents of a URL based on the specified URL request object and saves the results to a file.
      * @param URLRequest $request A URL request object that provides the URL, cache policy, request type, body data or body stream, and so on.
-     * @param DownloadCompletionHandler $completionHandler The completion handler to call when the load request is complete.
+     * @param DownloadCompletionHandler|null $completionHandler The completion handler to call when the load request is complete.
      * @return URLSessionDownloadTask The new session download task.
      * @throws Exception
      */
-    public function downloadTaskWithRequest(URLRequest $request, Closure $completionHandler): URLSessionDownloadTask
+    public function downloadTaskWithRequest(URLRequest $request, ?Closure $completionHandler = null): URLSessionDownloadTask
     {
-        return $this->downloadTask($request, TaskRegistryBehaviour::downloadCompletionHandler($completionHandler));
+        return $this->downloadTask($request, $completionHandler ? TaskRegistryBehaviour::downloadCompletionHandler($completionHandler) : TaskRegistryBehaviour::callDelegate());
     }
 
     /**
      * Creates a task that performs an HTTP request for uploading the specified file, then calls a handler upon completion.
      * @param URLRequest $request A URL request object that provides the URL, cache policy, request type, and so on. The body stream and body data in this request object are ignored.
      * @param URL $fileURL The URL of the file to upload.
-     * @param DataCompletionHandler $completionHandler The completion handler to call when the load request is complete.
+     * @param DataCompletionHandler|null $completionHandler The completion handler to call when the load request is complete.
      * @throws Exception
      */
-    public function uploadTaskWithRequest(URLRequest $request, URL $fileURL, Closure $completionHandler): URLSessionUploadTask
+    public function uploadTaskWithRequest(URLRequest $request, URL $fileURL, ?Closure $completionHandler = null): URLSessionUploadTask
     {
-        return $this->uploadTask($request, TaskBody::file($fileURL), TaskRegistryBehaviour::dataCompletionHandler($completionHandler));
+        return $this->uploadTask($request, TaskBody::file($fileURL), $completionHandler ? TaskRegistryBehaviour::dataCompletionHandler($completionHandler) : TaskRegistryBehaviour::callDelegate());
     }
 
     /**
@@ -194,7 +194,7 @@ final class URLSession implements URLSessionProtocol
         $behaviour = $this->taskRegistry->behaviour($task);
         /** @psalm-suppress InvalidArgument */
         return match ($behaviour->rawValue) {
-            TaskRegistryBehaviourRawValue::callDelegate => $behaviour->taskDelegate instanceof URLSessionDelegate ? TaskBehaviour::taskDelegate($behaviour->taskDelegate) : TaskBehaviour::noDelegate(),
+            TaskRegistryBehaviourRawValue::callDelegate => $this->delegate instanceof URLSessionDelegate ? TaskBehaviour::taskDelegate($this->delegate) : TaskBehaviour::noDelegate(),
             TaskRegistryBehaviourRawValue::dataCompletionHandler => TaskBehaviour::dataCompletionHandler($behaviour->dataCompletionHandler),
             TaskRegistryBehaviourRawValue::downloadCompletionHandler => TaskBehaviour::downloadCompletionHandler($behaviour->downloadCompletionHandler),
         };

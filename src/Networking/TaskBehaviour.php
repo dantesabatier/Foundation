@@ -26,7 +26,7 @@ readonly class TaskBehaviour
         return new TaskBehaviour(TaskBehaviourRawValue::noDelegate);
     }
 
-    public static function taskDelegate(?URLSessionDelegate $delegate): TaskBehaviour
+    public static function taskDelegate(URLSessionDelegate $delegate): TaskBehaviour
     {
         return new TaskBehaviour(TaskBehaviourRawValue::taskDelegate, taskDelegate: $delegate);
     }
