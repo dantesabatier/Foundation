@@ -57,14 +57,16 @@ class DataURLProtocol extends URLProtocol
             }
             $count = 0;
             $lastChar = "";
-            foreach (str_split($mimeType) as $ch) {
-                if ($ch === "/") {
+            $max = strlen($mimeType);
+            for ($i = 0; $i < $max; $i++) {
+                $c = $mimeType[$i];
+                if ($c === "/") {
                     $count += 1;
                 }
                 if ($count > 1) {
                     return false;
                 }
-                $lastChar = $ch;
+                $lastChar = $c;
             }
             if ($count !== 1) {
                 return false;
