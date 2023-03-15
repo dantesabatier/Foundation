@@ -42,6 +42,9 @@ final class URLSession implements URLSessionProtocol
     private static function registerProtocols(): void
     {
         URLProtocol::registerClass(HTTPURLProtocol::class);
+        URLProtocol::registerClass(FTPURLProtocol::class);
+        URLProtocol::registerClass(DataURLProtocol::class);
+        URLProtocol::registerClass(WebSocketURLProtocol::class);
     }
 
     private function createNextTaskIdentifier(): int

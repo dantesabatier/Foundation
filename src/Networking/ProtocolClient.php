@@ -47,7 +47,7 @@ class ProtocolClient implements URLProtocolClient
                 $delegate = $behaviour->taskDelegate;
                 if ($delegate instanceof URLSessionDataDelegate && $task instanceof URLSessionDataTask) {
                     $delegate->urlSessionDataTaskDidReceiveResponse($session, $task, $response, function (/** @noinspection PhpUnusedParameterInspection */ URLSessionResponseDisposition $disposition): void {
-                        trigger_error("warning: Ignoring disposition from completion handler.");
+                        trigger_error("Warning: Ignoring disposition from completion handler.");
                     });
                 }
                 break;
