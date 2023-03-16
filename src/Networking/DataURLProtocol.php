@@ -75,11 +75,11 @@ class DataURLProtocol extends URLProtocol
             $defaultMimeType = "text/plain";
             $part = "";
             $foundCharsetKey = false;
-            foreach ($iterator as $e) {
-                switch ($e->rawValue) {
+            foreach ($iterator as $element) {
+                switch ($element->rawValue) {
                     case PercentDecoderElementRawValue::asciiCharacter:
-                        $c = (string)$e->character;
-                        switch ($c) {
+                        $ch = (string)$element->character;
+                        switch ($ch) {
                             case ",":
                                 if ($foundCharsetKey) {
                                     $charSet = $part;
@@ -113,11 +113,12 @@ class DataURLProtocol extends URLProtocol
                                 }
                                 break;
                             default:
-                                $part .= $c;
+                                $part .= $ch;
                                 break;
-                        };
+                        }
                         break;
-                    default:
+                    case PercentDecoderElementRawValue::decodedByte:
+                    case PercentDecoderElementRawValue::invalid:
                         return false;
                 }
             }
@@ -126,12 +127,14 @@ class DataURLProtocol extends URLProtocol
         $decodeBase64Body = function () use ($iterator): ?string {
             $base64encoded = "";
             while ($iterator->valid()) {
-                $e = $iterator->current();
-                switch ($e->rawValue) {
+                $element = $iterator->current();
+                switch ($element->rawValue) {
                     case PercentDecoderElementRawValue::asciiCharacter:
-                        $base64encoded .= (string)$e->character;
+                        /** @psalm-suppress PossiblyNullOperand */
+                        $base64encoded .= $element->character;
                         break;
-                    default:
+                    case PercentDecoderElementRawValue::decodedByte:
+                    case PercentDecoderElementRawValue::invalid:
                         return null;
                 }
                 $iterator->next();
@@ -141,12 +144,16 @@ class DataURLProtocol extends URLProtocol
         $decodeStringBody = function () use ($iterator): ?string {
             $data = "";
             while ($iterator->valid()) {
-                $e = $iterator->current();
-                switch ($e->rawValue) {
+                $element = $iterator->current();
+                switch ($element->rawValue) {
                     case PercentDecoderElementRawValue::asciiCharacter:
-                        $data .= (string)$e->character;
+                        /** @psalm-suppress PossiblyNullOperand */
+                        $data .= $element->character;
                         break;
-                    default:
+                    case PercentDecoderElementRawValue::decodedByte:
+                        $data .= urldecode((string)$element->byte);
+                        break;
+                    case PercentDecoderElementRawValue::invalid:
                         return null;
                 }
                 $iterator->next();
