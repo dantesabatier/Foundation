@@ -58,14 +58,14 @@ class URLComponents extends ObjectClass
             $host = $this->host;
             $port = $this->port;
             if ($port && $host) {
-                $host = "$host:";
+                $host .= ":";
             }
             $path = $this->path;
             if ($path) {
                 $tu = "";
                 $tok = strtok($path, "\\/");
                 while (strlen($tok)) {
-                    $tu .= rawurlencode($tok) . "/";
+                    $tu .= $scheme !== "data://" ? rawurlencode($tok) . "/" : "$tok/";
                     $tok = strtok("\\/");
                 }
                 $path = "/" . trim($tu, "/");

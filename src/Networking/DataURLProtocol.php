@@ -4,9 +4,7 @@ namespace Sabatier\Foundation\Networking;
 
 use Exception;
 use Sabatier\Foundation\Error;
-use Sabatier\Foundation\Scanner;
 use function Sabatier\Foundation\fatal_error;
-use function Sabatier\Foundation\is_ascii;
 use function Sabatier\Foundation\substring_from_index;
 use const Sabatier\Foundation\URLErrorBadURL;
 use const Sabatier\Foundation\URLErrorDomain;
@@ -50,7 +48,7 @@ class DataURLProtocol extends URLProtocol
         $mimeType = null;
         $charSet = null;
         $base64 = false;
-        $scanner = new Scanner(substring_from_index(urldecode($dataBody), 5));
+        $iterator = new PercentDecoder(substring_from_index($dataBody, 5));
         $validate = function (string $mimeType): bool {
             if (str_starts_with($mimeType, "/")) {
                 return false;
@@ -73,75 +71,85 @@ class DataURLProtocol extends URLProtocol
             }
             return $lastChar !== "/";
         };
-        $decodeHeader = function () use ($scanner, $validate, &$mimeType, &$charSet, &$base64): bool {
+        $decodeHeader = function () use ($iterator, $validate, &$mimeType, &$charSet, &$base64): bool {
             $defaultMimeType = "text/plain";
             $part = "";
             $foundCharsetKey = false;
-            while (!$scanner->isAtEnd) {
-                $c = $scanner->string[$scanner->scanLocation];
-                switch ($c) {
-                    case ",":
-                        if ($foundCharsetKey) {
-                            $charSet = $part;
-                        } else {
-                            $base64 = $part === ";base64";
-                        }
-                        if ($mimeType === null || !$validate($mimeType)) {
-                            $mimeType = $defaultMimeType;
-                        }
-                        $scanner->scanLocation += 1;
-                        return true;
-                    case ";":
-                        if ($mimeType === null) {
-                            if (str_contains($part, "/")) {
-                                $mimeType = $part;
-                            } else {
-                                $mimeType = $defaultMimeType;
-                            }
-                        }
-                        if ($foundCharsetKey) {
-                            $charSet = $part;
-                            $foundCharsetKey = false;
-                        }
-                        $part = ";";
-                        break;
-                    case "=":
-                        if ($mimeType === null) {
-                            $mimeType = $defaultMimeType;
-                        } elseif ($part === ";charset" && $charSet === null) {
-                            $foundCharsetKey = true;
-                            $part = "";
-                        }
+            foreach ($iterator as $e) {
+                switch ($e->rawValue) {
+                    case PercentDecoderElementRawValue::asciiCharacter:
+                        $c = (string)$e->character;
+                        switch ($c) {
+                            case ",":
+                                if ($foundCharsetKey) {
+                                    $charSet = $part;
+                                } else {
+                                    $base64 = $part === ";base64";
+                                }
+                                if ($mimeType === null || !$validate($mimeType)) {
+                                    $mimeType = $defaultMimeType;
+                                }
+                                return true;
+                            case ";":
+                                if ($mimeType === null) {
+                                    if (str_contains($part, "/")) {
+                                        $mimeType = $part;
+                                    } else {
+                                        $mimeType = $defaultMimeType;
+                                    }
+                                }
+                                if ($foundCharsetKey) {
+                                    $charSet = $part;
+                                    $foundCharsetKey = false;
+                                }
+                                $part = ";";
+                                break;
+                            case "=":
+                                if ($mimeType === null) {
+                                    $mimeType = $defaultMimeType;
+                                } elseif ($part === ";charset" && $charSet === null) {
+                                    $foundCharsetKey = true;
+                                    $part = "";
+                                }
+                                break;
+                            default:
+                                $part .= $c;
+                                break;
+                        };
                         break;
                     default:
-                        $part .= $c;
-                        break;
+                        return false;
                 }
-                $scanner->scanLocation += 1;
             }
             return false;
         };
-        $decodeBase64Body = function () use ($scanner): ?string {
+        $decodeBase64Body = function () use ($iterator): ?string {
             $base64encoded = "";
-            while (!$scanner->isAtEnd) {
-                $c = $scanner->string[$scanner->scanLocation];
-                if (!is_ascii($c)) {
-                    return null;
+            while ($iterator->valid()) {
+                $e = $iterator->current();
+                switch ($e->rawValue) {
+                    case PercentDecoderElementRawValue::asciiCharacter:
+                        $base64encoded .= (string)$e->character;
+                        break;
+                    default:
+                        return null;
                 }
-                $base64encoded .= $c;
-                $scanner->scanLocation += 1;
+                $iterator->next();
             }
             return base64_decode($base64encoded);
         };
-        $decodeStringBody = function () use ($scanner): ?string {
+        $decodeStringBody = function () use ($iterator): ?string {
             $data = "";
-            while (!$scanner->isAtEnd) {
-                $c = $scanner->string[$scanner->scanLocation];
-                if (!is_ascii($c)) {
-                    return null;
+            while ($iterator->valid()) {
+                $e = $iterator->current();
+                switch ($e->rawValue) {
+                    case PercentDecoderElementRawValue::asciiCharacter:
+                        $data .= (string)$e->character;
+                        break;
+                    default:
+                        return null;
                 }
-                $data .= $c;
-                $scanner->scanLocation += 1;
+                $iterator->next();
             }
             return $data;
         };
