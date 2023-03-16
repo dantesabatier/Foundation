@@ -59,8 +59,9 @@ class TransferState
     {
         return match ($this->bodyDataDrain->rawValue) {
             DataDrainRawValue::inMemory => (function () use ($data): TransferState {
-                $this->bodyDataDrain->bodyData .= $data;
-                return new TransferState($this->url, $this->parsedResponseHeader, $this->response, DataDrain::inMemory($this->bodyDataDrain->bodyData));
+                $bodyData = $this->bodyDataDrain->bodyData;
+                $bodyData .= $data;
+                return new TransferState($this->url, $this->parsedResponseHeader, $this->response, DataDrain::inMemory($bodyData));
             })(),
             DataDrainRawValue::toFile => new TransferState($this->url, $this->parsedResponseHeader, $this->response, $this->bodyDataDrain),
             DataDrainRawValue::ignore => $this
