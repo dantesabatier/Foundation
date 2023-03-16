@@ -5,9 +5,9 @@ namespace Sabatier\Foundation\Networking;
 use Closure;
 
 /** @internal */
-class ParsedResponseHeader
+readonly class ParsedResponseHeader
 {
-    private function __construct(public readonly ParsedResponseHeaderRawVale $rawVale, public ResponseHeaderLines $header)
+    private function __construct(public ParsedResponseHeaderRawVale $rawVale, public ResponseHeaderLines $header)
     {
     }
 
