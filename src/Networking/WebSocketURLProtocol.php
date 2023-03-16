@@ -19,7 +19,7 @@ class WebSocketURLProtocol extends HTTPURLProtocol
     {
         return match ($request->url->scheme) {
             "ws", "wss" => true,
-            default => false,
+            default => false
         };
     }
 
