@@ -8,9 +8,9 @@ use Sabatier\Foundation\FileManager;
 use Sabatier\Foundation\URL;
 
 /** @internal */
-class TaskBody
+readonly class TaskBody
 {
-    private function __construct(public readonly TaskBodyRawValue $rawValue, public ?string $data = null, public ?URL $fileURL = null)
+    private function __construct(public TaskBodyRawValue $rawValue, public ?string $data = null, public ?URL $fileURL = null)
     {
     }
 
