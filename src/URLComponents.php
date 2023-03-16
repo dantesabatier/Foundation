@@ -65,7 +65,10 @@ class URLComponents extends ObjectClass
                 $tu = "";
                 $tok = strtok($path, "\\/");
                 while (strlen($tok)) {
-                    $tu .= $scheme !== "data://" ? rawurlencode($tok) . "/" : "$tok/";
+                    $tu .= match ($this->scheme) {
+                        "http", "https", "ftp", "ftps", "file" => rawurlencode($tok) . "/",
+                        default => "$tok/"
+                    };
                     $tok = strtok("\\/");
                 }
                 $path = "/" . trim($tu, "/");
