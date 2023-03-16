@@ -7,13 +7,13 @@ use Closure;
 /** @internal */
 class ParsedResponseHeader
 {
-    private function __construct(public readonly ParsedResponseHeaderRawVale $rawVale = ParsedResponseHeaderRawVale::partial, public ResponseHeaderLines $header = new ResponseHeaderLines())
+    private function __construct(public readonly ParsedResponseHeaderRawVale $rawVale, public ResponseHeaderLines $header)
     {
     }
 
     public static function partial(ResponseHeaderLines $header = new ResponseHeaderLines()): ParsedResponseHeader
     {
-        return new ParsedResponseHeader(header: $header);
+        return new ParsedResponseHeader(ParsedResponseHeaderRawVale::partial, $header);
     }
 
     public static function complete(ResponseHeaderLines $header): ParsedResponseHeader
@@ -43,7 +43,7 @@ class ParsedResponseHeader
                 ParsedResponseHeaderRawVale::partial => $this->header,
                 ParsedResponseHeaderRawVale::complete => new ResponseHeaderLines()
             };
-            return ParsedResponseHeader::partial(header: $header->byAppending($line));
+            return ParsedResponseHeader::partial($header->byAppending($line));
         }
     }
 }
