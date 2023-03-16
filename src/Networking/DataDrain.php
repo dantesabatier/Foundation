@@ -5,9 +5,9 @@ namespace Sabatier\Foundation\Networking;
 use Sabatier\Foundation\URL;
 
 /** @internal */
-class DataDrain
+readonly class DataDrain
 {
-    private function __construct(public readonly DataDrainRawValue $rawValue = DataDrainRawValue::inMemory, public string $bodyData = "", public ?URL $fileURL = null, public mixed $fileHandle = null)
+    private function __construct(public DataDrainRawValue $rawValue = DataDrainRawValue::inMemory, public string $bodyData = "", public ?URL $fileURL = null, public mixed $fileHandle = null)
     {
     }
 
