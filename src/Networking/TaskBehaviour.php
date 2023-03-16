@@ -17,7 +17,7 @@ readonly class TaskBehaviour
      * @param DownloadCompletionHandler|null $downloadCompletionHandler 
      * @param URLSessionDelegate|null $taskDelegate 
      */
-    public function __construct(public TaskBehaviourRawValue $rawValue, public ?Closure $dataCompletionHandler = null, public ?Closure $downloadCompletionHandler = null, public ?URLSessionDelegate $taskDelegate = null)
+    private function __construct(public TaskBehaviourRawValue $rawValue, public ?Closure $dataCompletionHandler = null, public ?Closure $downloadCompletionHandler = null, public ?URLSessionDelegate $taskDelegate = null)
     {
     }
 
