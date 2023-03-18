@@ -18,7 +18,7 @@ final class NotificationCenter
 {
     private static ?NotificationCenter $default = null;
     /** @var ArrayClass<NotificationObserver> $observers */
-    private ArrayClass $observers;
+    private readonly ArrayClass $observers;
 
     public function __construct()
     {
