@@ -150,10 +150,12 @@ function canonical(string $string): string
  */
 function in_string(string $string, string $substring, #[ExpectedValues(flagsFromClass: CompareOptions::class)] int $options = CompareOptions::none): bool
 {
-    $string = string_with_options($string, $options);
-    $substring = string_with_options($substring, $options);
-    if ($options & CompareOptions::caseInsensitive) {
-        return stripos($string, $substring) !== false;
+    if ($options !== CompareOptions::none) {
+        $string = string_with_options($string, $options);
+        $substring = string_with_options($substring, $options);
+        if ($options & CompareOptions::caseInsensitive) {
+            return stripos($string, $substring) !== false;
+        }
     }
     return str_contains($string, $substring);
 }
@@ -167,23 +169,25 @@ function in_string(string $string, string $substring, #[ExpectedValues(flagsFrom
  */
 function string_compare(string $string, string $other, #[ExpectedValues(flagsFromClass: CompareOptions::class)] int $options = CompareOptions::none): int
 {
-    if (($options !== CompareOptions::none) && ($collator = Collator::create("root"))) {
-        $collator->setAttribute(Collator::STRENGTH, Collator::PRIMARY);
-        if (!($options & CompareOptions::diacriticInsensitive)) {
-            $collator->setAttribute(Collator::STRENGTH, Collator::SECONDARY);
+    if ($options !== CompareOptions::none) {
+        if ($collator = Collator::create("root")) {
+            $collator->setAttribute(Collator::STRENGTH, Collator::PRIMARY);
+            if (!($options & CompareOptions::diacriticInsensitive)) {
+                $collator->setAttribute(Collator::STRENGTH, Collator::SECONDARY);
+            }
+            if (!($options & CompareOptions::caseInsensitive)) {
+                $collator->setAttribute(Collator::STRENGTH, Collator::TERTIARY);
+            }
+            if (($options & CompareOptions::caseInsensitive) && ($options & CompareOptions::diacriticInsensitive) && !($options & CompareOptions::normalized)) {
+                $collator->setAttribute(Collator::NORMALIZATION_MODE, Collator::ON);
+            }
+            return $collator->compare($string, $other);
         }
-        if (!($options & CompareOptions::caseInsensitive)) {
-            $collator->setAttribute(Collator::STRENGTH, Collator::TERTIARY);
+        $string = string_with_options($string, $options);
+        $other = string_with_options($other, $options);
+        if ($options & CompareOptions::caseInsensitive) {
+            return max(min(strcasecmp($string, $other), ComparisonResult::orderedDescending->value), ComparisonResult::orderedAscending->value);
         }
-        if (($options & CompareOptions::caseInsensitive) && ($options & CompareOptions::diacriticInsensitive) && !($options & CompareOptions::normalized)) {
-            $collator->setAttribute(Collator::NORMALIZATION_MODE, Collator::ON);
-        }
-        return $collator->compare($string, $other);
-    }
-    $string = string_with_options($string, $options);
-    $other = string_with_options($other, $options);
-    if ($options & CompareOptions::caseInsensitive) {
-        return max(min(strcasecmp($string, $other), ComparisonResult::orderedDescending->value), ComparisonResult::orderedAscending->value);
     }
     return max(min(strcmp($string, $other), ComparisonResult::orderedDescending->value), ComparisonResult::orderedAscending->value);
 }
