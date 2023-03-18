@@ -213,12 +213,12 @@ function string_is_equal(string $string, string $other, #[ExpectedValues(flagsFr
  */
 function string_has_prefix(string $string, string $prefix, #[ExpectedValues(flagsFromClass: CompareOptions::class)] int $options = CompareOptions::none): bool
 {
-    return string_is_equal(substring_to_index($string, strlen($prefix)), $prefix, $options);
+    return $options === CompareOptions::none ? str_starts_with($string, $prefix): string_is_equal(substring_to_index($string, strlen($prefix)), $prefix, $options);
 }
 
 function string_has_suffix(string $string, string $suffix, #[ExpectedValues(flagsFromClass: CompareOptions::class)] int $options = CompareOptions::none): bool
 {
-    return string_is_equal(substring_from_index($string, strlen($string) - strlen($suffix)), $suffix, $options);
+    return $options === CompareOptions::none ? string_ends_with($string, $suffix) : string_is_equal(substring_from_index($string, strlen($string) - strlen($suffix)), $suffix, $options);
 }
 
 function string_search(string $string, string $needle, SearchMethod $method = SearchMethod::matches, #[ExpectedValues(flagsFromClass: CompareOptions::class)] int $options = CompareOptions::none, array &$matches = null): int
