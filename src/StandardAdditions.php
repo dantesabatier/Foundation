@@ -201,7 +201,7 @@ function string_compare(string $string, string $other, #[ExpectedValues(flagsFro
  */
 function string_is_equal(string $string, string $other, #[ExpectedValues(flagsFromClass: CompareOptions::class)] int $options = CompareOptions::none): bool
 {
-    return string_compare($string, $other, $options) === ComparisonResult::orderedSame->value;
+    return $options === CompareOptions::none ? $string === $other : string_compare($string, $other, $options) === ComparisonResult::orderedSame->value;
 }
 
 /**
