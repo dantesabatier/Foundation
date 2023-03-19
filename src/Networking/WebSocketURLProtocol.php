@@ -55,7 +55,7 @@ class WebSocketURLProtocol extends HTTPURLProtocol
 
     public function configureEasyHandle(URLRequest $request, TaskBody $body): void
     {
-        if ($request->httpMethod === HTTPRequestMethod::get) {
+        if ($request->httpMethod !== HTTPRequestMethod::get) {
             trigger_error("WebSocket tasks must use GET");
             $this->internalState = InternalState::transferFailed();
             $error = new Error(URLErrorDomain, URLErrorUnsupportedURL, new Dictionary([LocalizedDescriptionKey => "WebSocket task must use GET httpMethod", URLErrorFailingURLErrorKey => $request->url]));
