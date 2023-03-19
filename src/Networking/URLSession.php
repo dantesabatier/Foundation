@@ -111,6 +111,19 @@ final class URLSession implements URLSessionProtocol
     }
 
     /**
+     * @throws Exception
+     */
+    private function webSocketTask(URLRequest $request, TaskRegistryBehaviour $behaviour): URLSessionWebSocketTask
+    {
+        if ($this->invalidated) {
+            fatal_error("Session invalidated");
+        }
+        $task = new URLSessionWebSocketTask($this, $this->createConfiguredRequest($request), $this->createNextTaskIdentifier());
+        $this->taskRegistry->add($task, $behaviour);
+        return $task;
+    }
+
+    /**
      * Creates a task that retrieves the contents of the specified URL, then calls a handler upon completion.
      *
      * @param URL $url The URL to be retrieved.
@@ -171,6 +184,38 @@ final class URLSession implements URLSessionProtocol
     public function uploadTaskWithRequest(URLRequest $request, URL $fileURL, ?Closure $completionHandler = null): URLSessionUploadTask
     {
         return $this->uploadTask($request, TaskBody::file($fileURL), $completionHandler ? TaskRegistryBehaviour::dataCompletionHandler($completionHandler) : TaskRegistryBehaviour::callDelegate());
+    }
+
+    /**
+     * Creates a WebSocket task for the provided URL request.
+     *
+     * You can modify the request's properties prior to calling resume on the task. The task uses these properties during the HTTP handshake phase.
+     * To add custom protocols, add a header with the key Sec-WebSocket-Protocol, and a comma-separated list of protocols you want to negotiate with the server. The custom HTTP headers provided by the client remain unchanged for the handshake with the server.
+     * @param URLRequest $request A URL request that indicates a WebSockets endpoint with which to connect.
+     * @return URLSessionWebSocketTask
+     * @throws Exception
+     */
+    public function webSocketTaskWithRequest(URLRequest $request): URLSessionWebSocketTask
+    {
+        return $this->webSocketTask($request, TaskRegistryBehaviour::callDelegate());
+    }
+
+    /**
+     * Creates a WebSocket task given a URL and an array of protocols.
+     *
+     * During the WebSocket handshake, the task uses the provided protocols to negotiate a preferred protocol with the server.
+     * @param URL $url The WebSocket URL with which to connect.
+     * @param ArrayClass $protocols An array of protocols to negotiate with the server.
+     * @return URLSessionWebSocketTask
+     * @throws Exception
+     */
+    public function webSocketTaskWithURL(URL $url, ArrayClass $protocols = new ArrayClass()): URLSessionWebSocketTask
+    {
+        $request = new URLRequest($url);
+        if (!$protocols->isEmpty()) {
+            $request->setValueForHttpHeaderField($protocols->join(", "), "Sec-WebSocket-Protocol");
+        }
+        return $this->webSocketTaskWithRequest($request);
     }
 
     /**
