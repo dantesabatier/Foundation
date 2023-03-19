@@ -205,7 +205,7 @@ final class URLSession implements URLSessionProtocol
      *
      * During the WebSocket handshake, the task uses the provided protocols to negotiate a preferred protocol with the server.
      * @param URL $url The WebSocket URL with which to connect.
-     * @param ArrayClass $protocols An array of protocols to negotiate with the server.
+     * @param ArrayClass<string> $protocols An array of protocols to negotiate with the server.
      * @return URLSessionWebSocketTask
      * @throws Exception
      */
