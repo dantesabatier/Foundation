@@ -256,7 +256,9 @@ function string_search(string $string, string $needle, SearchMethod $method = Se
         $pattern .= "i";
     }
     $value = preg_match_all($pattern, $string, $matches);
-    $matches = array_map(fn($match): string => trim($match), $matches[0]);
+    if (func_num_args() === 5) {
+        $matches = array_map(fn($match): string => trim($match), $matches[0]);
+    }
     return $value;
 }
 
