@@ -197,11 +197,11 @@ function string_compare(string $string, string $other, #[ExpectedValues(flagsFro
  * @param string $string The receiver string.
  * @param string $other The string with which to compare.
  * @param int $options The options for the comparison.
- * @return bool True if the strings are lexically equals.
+ * @return bool {@see true} if the strings are lexically equals.
  */
 function string_is_equal(string $string, string $other, #[ExpectedValues(flagsFromClass: CompareOptions::class)] int $options = CompareOptions::none): bool
 {
-    return $options === CompareOptions::none ? $string === $other : string_compare($string, $other, $options) === ComparisonResult::orderedSame->value;
+    return string_compare($string, $other, $options) === ComparisonResult::orderedSame->value;
 }
 
 /**
@@ -209,18 +209,34 @@ function string_is_equal(string $string, string $other, #[ExpectedValues(flagsFr
  * @param string $string The receiver string.
  * @param string $prefix The string with which to compare.
  * @param int $options The options for the comparison.
- * @return bool true if the initial characters of the string are the same as the characters of prefix; otherwise, false.
+ * @return bool {@see true} if the initial characters of the string are the same as the characters of prefix; otherwise, {@see false}.
  */
 function string_has_prefix(string $string, string $prefix, #[ExpectedValues(flagsFromClass: CompareOptions::class)] int $options = CompareOptions::none): bool
 {
-    return $options === CompareOptions::none ? str_starts_with($string, $prefix): string_is_equal(substring_to_index($string, strlen($prefix)), $prefix, $options);
+    return string_is_equal(substring_to_index($string, strlen($prefix)), $prefix, $options);
 }
 
+/**
+ * Returns a Boolean value indicating whether the final characters of the string are the same as the characters in suffix.
+ * @param string $string The receiver string.
+ * @param string $suffix The string with which to compare.
+ * @param int $options The options for the comparison.
+ * @return bool {@see true} if the final characters of the string are the same as the characters of suffix; otherwise, {@see false}.
+ */
 function string_has_suffix(string $string, string $suffix, #[ExpectedValues(flagsFromClass: CompareOptions::class)] int $options = CompareOptions::none): bool
 {
-    return $options === CompareOptions::none ? str_ends_with($string, $suffix) : string_is_equal(substring_from_index($string, strlen($string) - strlen($suffix)), $suffix, $options);
+    return string_is_equal(substring_from_index($string, strlen($string) - strlen($suffix)), $suffix, $options);
 }
 
+/**
+ * Searches for a given string using a regex-style comparison according to {@link http://userguide.icu-project.org/strings/regexp ICU v3}.
+ * @param string $string The input string.
+ * @param string $needle The string to search for.
+ * @param SearchMethod $method The search method
+ * @param int $options The options for the comparison.
+ * @param array|null $matches Array of all matches
+ * @return int Returns the number of matches.
+ */
 function string_search(string $string, string $needle, SearchMethod $method = SearchMethod::matches, #[ExpectedValues(flagsFromClass: CompareOptions::class)] int $options = CompareOptions::none, array &$matches = null): int
 {
     $string = string_with_options($string, $options);
