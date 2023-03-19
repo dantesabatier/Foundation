@@ -2,11 +2,13 @@
 
 namespace Sabatier\Foundation\Networking;
 
+use Exception;
 use Sabatier\Foundation\Dictionary;
 use Sabatier\Foundation\Error;
 use function Sabatier\Foundation\fatal_error;
 use function Sabatier\Foundation\in_range;
 use const Sabatier\Foundation\LocalizedDescriptionKey;
+use const Sabatier\Foundation\URLErrorBadServerResponse;
 use const Sabatier\Foundation\URLErrorDomain;
 use const Sabatier\Foundation\URLErrorFailingURLErrorKey;
 use const Sabatier\Foundation\URLErrorUnsupportedURL;
@@ -110,7 +112,18 @@ class WebSocketURLProtocol extends HTTPURLProtocol
         return EasyHandleAction::proceed;
     }
 
+    /**
+     * @throws Exception
+     */
     private function notifyTaskAboutReceivedData(string $data): void
     {
+        $task = $this->task;
+        if ($task->session->behaviour($task)->rawValue !== TaskBehaviourRawValue::taskDelegate || !$task instanceof URLSessionWebSocketTask) {
+            fatal_error("WebSocket internal invariant violated");
+        }
+        trigger_error("Unexpected message received from server $data");
+        $this->internalState = InternalState::transferFailed();
+        $error = new Error(URLErrorDomain, URLErrorBadServerResponse, new Dictionary([LocalizedDescriptionKey => "Unexpected message received from server", URLErrorFailingURLErrorKey, $this->request->url]));
+        $this->transferCompleted($error);
     }
 }
