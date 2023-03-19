@@ -257,7 +257,7 @@ function string_search(string $string, string $needle, SearchMethod $method = Se
     }
     $value = preg_match_all($pattern, $string, $matches);
     if (func_num_args() === 5) {
-        $matches = array_map(fn($match): string => trim($match), $matches[0]);
+        $matches = array_map(fn(string $match): string => trim($match), $matches[0]);
     }
     return $value;
 }
