@@ -124,9 +124,25 @@ function fatal_error(string $message = "", string $file = "", int $line = 0): ne
     throw new ErrorException($message, 0, 0, $file, $line);
 }
 
-function request_concrete_implementation(object|string $objectOrClass, string $cmd): never
+/**
+ * @throws Exception
+ */
+function unimplemented(object|string $objectOrClass, string $fn): never
 {
-    throw new InvalidArgumentException(sprintf("%s %s() requires a subclass implementation", is_object($objectOrClass) ? $objectOrClass::class : $objectOrClass, $cmd));
+    throw new InvalidArgumentException(sprintf("%s %s() is not yet implemented", is_object($objectOrClass) ? $objectOrClass::class : $objectOrClass, $fn));
+}
+
+/**
+ * @throws Exception
+ */
+function unsupported(object|string $objectOrClass, string $fn): never
+{
+    throw new InvalidArgumentException(sprintf("%s %s() is not supported", is_object($objectOrClass) ? $objectOrClass::class : $objectOrClass, $fn));
+}
+
+function request_concrete_implementation(object|string $objectOrClass, string $fn): never
+{
+    throw new InvalidArgumentException(sprintf("%s %s() requires a subclass implementation", is_object($objectOrClass) ? $objectOrClass::class : $objectOrClass, $fn));
 }
 
 function invalid_mutation(): never
