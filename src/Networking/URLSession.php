@@ -9,6 +9,7 @@ use Sabatier\Foundation\Error;
 use Sabatier\Foundation\OperationQueue;
 use Sabatier\Foundation\URL;
 use function Sabatier\Foundation\fatal_error;
+use function Sabatier\Foundation\unsupported;
 
 /**
  * An object that coordinates a group of related, network data-transfer tasks.
@@ -187,6 +188,20 @@ final class URLSession implements URLSessionProtocol
     }
 
     /**
+     * Creates a task that establishes a bidirectional TCP/IP connection to a specified hostname and port.
+     *
+     * After you create the task, you must start it by calling its {@see URLSessionTask::resume()} method.
+     * @param string $hostname The hostname of the connection endpoint.
+     * @param int $port The port of the connection endpoint.
+     * @return URLSessionStreamTask The new session stream task.
+     * @throws Exception
+     */
+    public function streamTaskWithHostName(/** @noinspection PhpUnusedParameterInspection */ string $hostname, int $port): URLSessionStreamTask
+    {
+        unsupported($this, __FUNCTION__);
+    }
+
+    /**
      * Creates a WebSocket task for the provided URL request.
      *
      * You can modify the request's properties prior to calling resume on the task. The task uses these properties during the HTTP handshake phase.
@@ -354,7 +369,6 @@ final class URLSession implements URLSessionProtocol
         }
         $this->delegateQueue->addOperationWithBlock(function () use ($sessionDelegate) {
             $sessionDelegate->urlSessionDidBecomeInvalidWithError($this);
-            //$this->delegate = null;
         });
     }
 }
