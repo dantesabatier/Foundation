@@ -218,7 +218,7 @@ function string_has_prefix(string $string, string $prefix, #[ExpectedValues(flag
 
 function string_has_suffix(string $string, string $suffix, #[ExpectedValues(flagsFromClass: CompareOptions::class)] int $options = CompareOptions::none): bool
 {
-    return $options === CompareOptions::none ? string_ends_with($string, $suffix) : string_is_equal(substring_from_index($string, strlen($string) - strlen($suffix)), $suffix, $options);
+    return $options === CompareOptions::none ? str_ends_with($string, $suffix) : string_is_equal(substring_from_index($string, strlen($string) - strlen($suffix)), $suffix, $options);
 }
 
 function string_search(string $string, string $needle, SearchMethod $method = SearchMethod::matches, #[ExpectedValues(flagsFromClass: CompareOptions::class)] int $options = CompareOptions::none, array &$matches = null): int
