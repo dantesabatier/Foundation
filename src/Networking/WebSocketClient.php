@@ -12,12 +12,13 @@ class WebSocketClient
     private URL $url;
     private Dictionary $additionalHeaders;
     private mixed $socket;
+    public URLSessionWebSocketOperationCode $operationCode = URLSessionWebSocketOperationCode::cont;
 
     public function __construct(public readonly EasyHandleDelegate $delegate)
     {
         $this->additionalHeaders = new Dictionary();
     }
-    
+
     public function setURL(URL $url): void
     {
         $authority = (string)$url->host;
@@ -27,6 +28,7 @@ class WebSocketClient
         if ($port = $url->port) {
             $authority .= ':' . $port;
         }
+        /** @noinspection PhpUnhandledExceptionInspection */
         $key = base64_encode(random_bytes(16));
         $this->additionalHeaders = new Dictionary([
             "Host" => $authority,
@@ -83,9 +85,9 @@ class WebSocketClient
 
     public function receive(): string
     {
-        $fn = function(int $length): string {
+        $fn = function (int $length): string {
             $data = "";
-            while(strlen($data) < $length && ($result = fread($this->socket, $length))) {
+            while (strlen($data) < $length && ($result = fread($this->socket, $length))) {
                 $data .= $result;
             }
             return $data;
@@ -126,8 +128,6 @@ class WebSocketClient
             $code = URLSessionWebSocketOperationCode::from($byte1 & 0b00001111);
             switch ($code) {
                 case URLSessionWebSocketOperationCode::ping:
-                    //TODO: implement this
-                    break;
                 case URLSessionWebSocketOperationCode::close:
                     //TODO: implement this
                     break;
@@ -138,7 +138,7 @@ class WebSocketClient
                     break;
             }
             error_log($data);
-        } while(!$final);
+        } while (!$final);
         return "";
     }
 
