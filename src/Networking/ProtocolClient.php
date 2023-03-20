@@ -160,7 +160,7 @@ class ProtocolClient implements URLProtocolClient
                 /** @var URLSessionDelegate $delegate */
                 $delegate = $behaviour->taskDelegate;
                 if ($delegate instanceof URLSessionTaskDelegate) {
-                    $delegate->urlSessionTaskDidComplete($session, $task);
+                    $delegate->urlSessionTaskDidComplete($session, $task, $error);
                 }
                 $task->state = URLSessionTaskState::completed;
                 $session->taskRegistry->remove($task);
