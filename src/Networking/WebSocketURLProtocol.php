@@ -13,6 +13,7 @@ use const Sabatier\Foundation\LocalizedDescriptionKey;
 use const Sabatier\Foundation\URLErrorBadServerResponse;
 use const Sabatier\Foundation\URLErrorDomain;
 use const Sabatier\Foundation\URLErrorFailingURLErrorKey;
+use const Sabatier\Foundation\URLErrorUnsupportedURL;
 
 /** @internal */
 class WebSocketURLProtocol extends HTTPURLProtocol
@@ -63,6 +64,13 @@ class WebSocketURLProtocol extends HTTPURLProtocol
 
     public function configureEasyHandle(URLRequest $request, TaskBody $body): void
     {
+        if ($request->httpMethod !== HTTPRequestMethod::get) {
+            trigger_error("WebSocket tasks must use GET");
+            $this->internalState = InternalState::transferFailed();
+            $error = new Error(URLErrorDomain, URLErrorUnsupportedURL, new Dictionary([LocalizedDescriptionKey => "WebSocket task must use GET httpMethod", URLErrorFailingURLErrorKey => $request->url]));
+            $this->transferCompleted($error);
+            return;
+        }
         $absoluteURL = $request->url->absoluteURL;
         $components = new URLComponents($absoluteURL->absoluteString);
         $components->scheme = $absoluteURL->scheme === "wss" ? "ssl" : "tcp";
