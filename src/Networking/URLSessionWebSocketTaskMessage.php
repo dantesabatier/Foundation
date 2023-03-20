@@ -7,7 +7,7 @@ namespace Sabatier\Foundation\Networking;
  */
 readonly class URLSessionWebSocketTaskMessage
 {
-    private function __construct(public URLSessionWebSocketTaskMessageRawValue $rawValue, public ?string $data = null, public ?string $string = null)
+    private function __construct(public URLSessionWebSocketTaskMessageRawValue $rawValue, public string $data = "", public string $string = "")
     {
     }
 
@@ -23,6 +23,8 @@ readonly class URLSessionWebSocketTaskMessage
 
     /**
      * A WebSocket message that contains a string.
+     *
+     * The {@see URLSessionWebSocketTask} uses UTF-8 encoding to send the message's string.
      * @param string $string
      * @return URLSessionWebSocketTaskMessage
      */
