@@ -4,18 +4,28 @@ namespace Sabatier\Foundation\Networking;
 
 use Exception;
 use Sabatier\Foundation\Dictionary;
-use Sabatier\Foundation\Error;
+use Sabatier\Foundation\URL;
+use Sabatier\Foundation\URLComponents;
 use function Sabatier\Foundation\fatal_error;
-use function Sabatier\Foundation\in_range;
-use const Sabatier\Foundation\LocalizedDescriptionKey;
-use const Sabatier\Foundation\URLErrorBadServerResponse;
-use const Sabatier\Foundation\URLErrorDomain;
-use const Sabatier\Foundation\URLErrorFailingURLErrorKey;
-use const Sabatier\Foundation\URLErrorUnsupportedURL;
 
 /** @internal */
-class WebSocketURLProtocol extends HTTPURLProtocol
+class WebSocketURLProtocol extends URLProtocol
 {
+    private readonly mixed $stream;
+    private readonly URL $url;
+
+    public function __construct(URLSessionTask $task, ?CachedURLResponse $cachedResponse = null, ?URLProtocolClient $client = null)
+    {
+        parent::__construct($task, $cachedResponse, $client);
+        $url = $this->request->url->absoluteURL;
+        $components = new URLComponents($url->absoluteString);
+        $components->scheme = $url->scheme === "wss" ? "ssl" : "tcp";
+        $components->port = $url->port ?? $url->scheme === "wss" ? 443 : 80;
+        /** @var URL $url */
+        $url = $components->url;
+        $this->stream = stream_socket_client($url->absoluteString, $code, $message, $this->request->timeoutInterval);
+        $this->url = $url;
+    }
 
     public static function canInit(URLRequest $request): bool
     {
@@ -25,105 +35,59 @@ class WebSocketURLProtocol extends HTTPURLProtocol
         };
     }
 
-    public function canCache(CachedURLResponse $cacheable): bool
-    {
-        return false;
-    }
-
-    public function canRespondFromCache(CachedURLResponse $cachedResponse): bool
-    {
-        return false;
-    }
-
-    public function didReceiveResponse(): void
-    {
-        if ($this->internalState->rawValue !== InternalStateRawValue::transferInProgress) {
-            fatal_error("Transfer not in progress.");
-        }
-        $response = $this->internalState->transferState?->response;
-        if (!$response instanceof HTTPURLResponse) {
-            fatal_error("Header complete, but not URL response.");
-        }
-        $task = $this->task;
-        if (!$task instanceof URLSessionWebSocketTask) {
-            return;
-        }
-        $task->protocolPicked = $response->valueForHttpHeaderField("Sec-WebSocket-Protocol");
-        $task->handshakeCompleted = true;
-        $this->client?->urlProtocolDidReceiveCacheStoragePolicy($this, $response, URLCacheStoragePolicy::notAllowed);
-    }
-
-    public function configureEasyHandle(URLRequest $request, TaskBody $body): void
-    {
-        if ($request->httpMethod !== HTTPRequestMethod::get) {
-            trigger_error("WebSocket tasks must use GET");
-            $this->internalState = InternalState::transferFailed();
-            $error = new Error(URLErrorDomain, URLErrorUnsupportedURL, new Dictionary([LocalizedDescriptionKey => "WebSocket task must use GET httpMethod", URLErrorFailingURLErrorKey => $request->url]));
-            $this->transferCompleted($error);
-            return;
-        }
-        parent::configureEasyHandle($request, $body);
-        $easyHandle = $this->easyHandle;
-        $easyHandle->setAllowedProtocolsToAll();
-        $task = $this->task;
-        if (!$task instanceof URLSessionWebSocketTask) {
-            return;
-        }
-        $easyHandle->setPreferredReceiveBufferSize($task->maximumMessageSize);
-    }
-
-    public function completionAction(URLRequest $request, URLResponse $response): CompletionAction
-    {
-        $httpURLResponse = $response;
-        if (!$httpURLResponse instanceof HTTPURLResponse) {
-            fatal_error("Response was not HTTPURLResponse");
-        }
-        if ($request = $this->redirectRequest($request, $httpURLResponse)) {
-            return CompletionAction::redirectWithRequest($request);
-        }
-        return CompletionAction::completeTask();
-    }
-
-    public function completeTask(): void
-    {
-        $task = $this->task;
-        if ($task instanceof URLSessionWebSocketTask) {
-            $task->close(URLSessionWebSocketTaskCloseCode::normalClosure);
-        }
-        parent::completeTask();
-    }
-
-    public function didReceiveData(string $data): EasyHandleAction
-    {
-        if ($this->internalState->rawValue !== InternalStateRawValue::transferInProgress) {
-            fatal_error("Received web socket data, but no transfer in progress.");
-        }
-        /** @var TransferState $ts */
-        $ts = $this->internalState->transferState;
-        if ($response = $this->validateHeaderComplete($ts)) {
-            $ts->response = $response;
-        }
-        if (($httpResponse = $ts->response) && $httpResponse instanceof HTTPURLResponse && in_range($httpResponse->statusCode, 301, 308)) {
-            /** @psalm-suppress PossiblyNullOperand */
-            $this->lastRedirectBody .= $data;
-        }
-        $this->notifyTaskAboutReceivedData($data);
-        $this->internalState = InternalState::transferInProgress($ts->byAppendingBodyData($data));
-        return EasyHandleAction::proceed;
-    }
-
     /**
      * @throws Exception
      */
-    private function notifyTaskAboutReceivedData(string $data): void
+    public function startLoading(): void
     {
-        $task = $this->task;
-        if ($task->session->behaviour($task)->rawValue !== TaskBehaviourRawValue::taskDelegate || !$task instanceof URLSessionWebSocketTask) {
-            fatal_error("WebSocket internal invariant violated");
+        $url = $this->url;
+        $key = base64_encode(random_bytes(16));
+        $authority = (string)$url->host;
+        if (($user = $url->user) && ($password = $url->password)) {
+            $authority = "$user:$password@$authority";
         }
-        trigger_error("Unexpected message received from server $data");
-        $this->internalState = InternalState::transferFailed();
-        $error = new Error(URLErrorDomain, URLErrorBadServerResponse, new Dictionary([LocalizedDescriptionKey => "Unexpected message received from server", URLErrorFailingURLErrorKey, $this->request->url]));
-        $this->transferCompleted($error);
+        if ($port = $url->port) {
+            $authority .= ':' . $port;
+        }
+        $path = $url->path;
+        if ($query = $url->query) {
+            $path .= "?$query";
+        }
+        $headers = new Dictionary([
+            "Host" => $authority,
+            "Upgrade" => "WebSocket",
+            "Connection" => "Upgrade",
+            "Sec-WebSocket-Key" => $key,
+            "Sec-WebSocket-Version" => "13",
+        ]);
+        $header = "GET $path HTTP/1.1\r\n";
+        $header .= $headers->mapValues(fn(string $value, string $key): string => "$key: $value")->values->join("\r\n");
+        $header .= "\r\n\r\n";
+        fwrite($this->stream, $header);
+        $response = "";
+        do {
+            $response .= fgets($this->stream, 1024);
+        } while (substr_count($response, "\r\n\r\n") === 0);
+        if (!preg_match("#Sec-WebSocket-Accept:\\s(.*)\$#mUi", $response, $matches)) {
+            fatal_error();
+        }
+        $value = trim($matches[1]);
+        $expected = base64_encode(pack('H*', sha1($key . "258EAFA5-E914-47DA-95CA-C5AB0DC85B11")));
+        if ($value !== $expected) {
+            fatal_error();
+        }
+        /** @var URLSessionWebSocketTask $task */
+        $task = $this->task;
+        $task->handshakeCompleted = true;
+    }
+
+    public function stopLoading(): void
+    {
+        fclose($this->stream);
+    }
+
+    public function sendWebSocketData(string $string, URLSessionWebSocketOperationCode $code): void
+    {
+        error_log(sprintf("%s(%s, %s)", __METHOD__, $string, $code->name));
     }
 }
