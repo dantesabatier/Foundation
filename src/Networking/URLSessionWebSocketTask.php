@@ -102,7 +102,7 @@ class URLSessionWebSocketTask extends URLSessionTask
         $this->getProtocol(function (?URLProtocol $protocol) use ($pongReceiveHandler): void {
             if ($protocol instanceof WebSocketURLProtocol) {
                 try {
-                    $protocol->sendWebSocketData("", URLSessionWebSocketOperationCode::ping);
+                    $protocol->send("", URLSessionWebSocketOperationCode::ping);
                     $this->pongCompletionHandlers->append($pongReceiveHandler);
                 } catch (Exception) {
                     $pongReceiveHandler(new Error(URLErrorDomain, URLErrorBadServerResponse));
@@ -163,7 +163,7 @@ class URLSessionWebSocketTask extends URLSessionTask
                     if ($closeMessage = $this->closeMessage) {
                         $this->closeMessage = null;
                         try {
-                            $protocol->sendWebSocketData($closeMessage, URLSessionWebSocketOperationCode::close);
+                            $protocol->send($closeMessage, URLSessionWebSocketOperationCode::close);
                         } catch (Exception) {
                         }
                     }
@@ -180,10 +180,10 @@ class URLSessionWebSocketTask extends URLSessionTask
                         try {
                             switch ($message->rawValue) {
                                 case URLSessionWebSocketTaskMessageRawValue::data:
-                                    $protocol->sendWebSocketData($message->data, URLSessionWebSocketOperationCode::binary);
+                                    $protocol->send($message->data, URLSessionWebSocketOperationCode::binary);
                                     break;
                                 case URLSessionWebSocketTaskMessageRawValue::string:
-                                    $protocol->sendWebSocketData($message->string, URLSessionWebSocketOperationCode::text);
+                                    $protocol->send($message->string, URLSessionWebSocketOperationCode::text);
                                     break;
                             }
                             $completionHandler(null);
@@ -193,7 +193,7 @@ class URLSessionWebSocketTask extends URLSessionTask
                     if ($closeMessage = $this->closeMessage) {
                         $this->closeMessage = null;
                         try {
-                            $protocol->sendWebSocketData($closeMessage, URLSessionWebSocketOperationCode::close);
+                            $protocol->send($closeMessage, URLSessionWebSocketOperationCode::close);
                         } catch (Exception) {
                         }
                     }
