@@ -73,24 +73,6 @@ class URLSessionWebSocketTask extends URLSessionTask
     }
 
     /**
-     * @throws Exception
-     */
-    public function appendReceivedMessage(URLSessionWebSocketTaskMessage $message): void
-    {
-        $this->receiveBuffer->append($message);
-        $this->doPendingWork();
-    }
-
-    public function noteReceivedPong(): void
-    {
-        if (!($completionHandler = $this->pongCompletionHandlers->popFirst())) {
-            $this->close(URLSessionWebSocketTaskCloseCode::protocolError);
-            return;
-        }
-        $completionHandler(null);
-    }
-
-    /**
      * Sends a ping frame from the client side, with a closure to receive the pong from the server endpoint.
      *
      * When sending multiple pings, the task always calls pongReceiveHandler in the order it sent the pings.
