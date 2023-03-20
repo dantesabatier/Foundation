@@ -4,7 +4,7 @@ namespace Sabatier\Foundation;
 
 function url_validate(string $url): bool
 {
-    return preg_match("/^(https?|file|data|sql|ftps?|wss?|x-coredata):\/\//", $url) === 1;
+    return preg_match("/^(https?|file|data|sql|ssl|tcp|ftps?|wss?|x-coredata):\/\//", $url) === 1;
 }
 
 function url_encode(string $url, string $endpoint, array $parameters = []): string
