@@ -109,18 +109,10 @@ class URLSessionWebSocketTask extends URLSessionTask
      */
     public function cancelWithReason(URLSessionWebSocketTaskCloseCode $closeCode, ?string $reason): void
     {
-        $this->close($closeCode, $reason);
-    }
-
-    /**
-     * @internal
-     */
-    public function close(URLSessionWebSocketTaskCloseCode $code, ?string $reason = null): void
-    {
         if ($this->taskError !== null) {
             return;
         }
-        $this->closeCode = $code;
+        $this->closeCode = $closeCode;
         $this->closeReason = $reason;
         $this->taskError = new Error(URLErrorDomain, URLErrorNetworkConnectionLost);
     }
