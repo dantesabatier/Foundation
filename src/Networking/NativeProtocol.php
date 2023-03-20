@@ -129,7 +129,6 @@ abstract class NativeProtocol extends URLProtocol implements EasyHandleDelegate
      */
     public function startNewTransfer(URLRequest $request): void
     {
-        /** @var URLSessionTask $task */
         $task = $this->task;
         $task->currentRequest = $request;
         $url = $request->url;
