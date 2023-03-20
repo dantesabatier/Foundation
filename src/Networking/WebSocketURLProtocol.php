@@ -25,7 +25,7 @@ class WebSocketURLProtocol extends HTTPURLProtocol
         parent::__construct($task, $cachedResponse, $client);
         $this->webSocketClient = new WebSocketClient($this);
     }
-    
+
     public static function canInit(URLRequest $request): bool
     {
         return match ($request->url->scheme) {
@@ -43,7 +43,7 @@ class WebSocketURLProtocol extends HTTPURLProtocol
     {
         return false;
     }
-    
+
     /**
      * @throws Exception
      */
@@ -79,42 +79,12 @@ class WebSocketURLProtocol extends HTTPURLProtocol
         $url = $components->url;
         $webSocketClient = $this->webSocketClient;
         $webSocketClient->setURL($url);
-        $webSocketClient->setTimeout((int) $request->timeoutInterval);
+        $webSocketClient->setTimeout((int)$request->timeoutInterval);
     }
 
     public function send(string $data, URLSessionWebSocketOperationCode $code): void
     {
         $this->webSocketClient->send($data, $code);
-    }
-
-    /**
-     * @throws Exception
-     */
-    public function didReceiveHeaderData(string $data, int $contentLength): EasyHandleAction
-    {
-        if ($this->internalState->rawValue !== InternalStateRawValue::transferInProgress) {
-            fatal_error("Received header data, but no transfer in progress.");
-        }
-        try {
-            /** @var TransferState $ts */
-            $ts = $this->internalState->transferState;
-            $newTS = $ts->byAppendingHTTP($data);
-            $this->internalState = InternalState::transferInProgress($newTS);
-            $didCompleteHeader = !$ts->isHeaderComplete() && $newTS->isHeaderComplete();
-            if ($didCompleteHeader) {
-                /** @var HTTPURLResponse $response */
-                $response = $newTS->response;
-                if (($contentEncoding = $response->allHeaderFields["Content-Encoding"]) && $contentEncoding !== "identity") {
-                    $this->task->countOfBytesExpectedToReceive = URLSessionTransferSizeUnknown;
-                } else {
-                    $this->task->countOfBytesExpectedToReceive = $contentLength ?: URLSessionTransferSizeUnknown;
-                }
-                $this->didReceiveResponse();
-            }
-            return EasyHandleAction::proceed;
-        } catch (Exception) {
-            return EasyHandleAction::abort;
-        }
     }
 
     public function didReceiveResponse(): void
@@ -132,7 +102,7 @@ class WebSocketURLProtocol extends HTTPURLProtocol
         $task->handshakeCompleted = true;
         $this->client?->urlProtocolDidReceiveCacheStoragePolicy($this, $response, URLCacheStoragePolicy::notAllowed);
     }
-    
+
     public function completionAction(URLRequest $request, URLResponse $response): CompletionAction
     {
         $httpURLResponse = $response;
@@ -168,7 +138,7 @@ class WebSocketURLProtocol extends HTTPURLProtocol
             /** @psalm-suppress PossiblyNullOperand */
             $this->lastRedirectBody .= $data;
         }
-        $this->notifyTaskAboutReceivedData($data, URLSessionWebSocketOperationCode::binary);
+        $this->notifyTaskAboutReceivedData($data, $this->webSocketClient->operationCode);
         $this->internalState = InternalState::transferInProgress($ts->byAppendingBodyData($data));
         return EasyHandleAction::proceed;
     }
@@ -189,7 +159,7 @@ class WebSocketURLProtocol extends HTTPURLProtocol
                 if (strlen($data) > 2) {
                     //TODO: implement this
                 }
-                $task->close($closeCode, $reasonData);       
+                $task->close($closeCode, $reasonData);
                 break;
             case URLSessionWebSocketOperationCode::pong:
                 $task->noteReceivedPong();
