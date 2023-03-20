@@ -80,8 +80,8 @@ class WebSocketURLProtocol extends URLProtocol
         fclose($this->stream);
     }
 
-    public function sendWebSocketData(string $string, URLSessionWebSocketOperationCode $code): void
+    public function sendWebSocketData(string $data, URLSessionWebSocketOperationCode $code): void
     {
-        error_log(sprintf("%s(%s, %s)", __METHOD__, $string, $code->name));
+        error_log(sprintf("%s(%s, %s)", __METHOD__, $data, $code->name));
     }
 }
