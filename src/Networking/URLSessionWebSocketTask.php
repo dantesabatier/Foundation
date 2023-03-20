@@ -52,6 +52,7 @@ class URLSessionWebSocketTask extends URLSessionTask
      * If an error occurs while sending the message, any outstanding work also fails.
      * @param URLSessionWebSocketTaskMessage $message The WebSocket message to send to the other endpoint.
      * @param Closure(Error|null): void $completionHandler A closure that receives an Error that indicates an error encountered while sending, or nil if no error occurred.
+     * @throws Exception
      */
     public function send(URLSessionWebSocketTaskMessage $message, Closure $completionHandler): void
     {
@@ -64,6 +65,7 @@ class URLSessionWebSocketTask extends URLSessionTask
      *
      * If the task reaches the {@see maximumMessageSize} while buffering the frames, this call fails with an error.
      * @param Closure(URLSessionWebSocketTaskMessage|null, Error|null): void $completionHandler A closure that receives two parameters: the WebSocket message, and an Error that indicates an error encountered while receiving the message. The error is nil if no error occurred.
+     * @throws Exception
      */
     public function receive(Closure $completionHandler): void
     {
@@ -76,6 +78,7 @@ class URLSessionWebSocketTask extends URLSessionTask
      *
      * When sending multiple pings, the task always calls pongReceiveHandler in the order it sent the pings.
      * @param Closure(Error|null): void $pongReceiveHandler A closure called by the task when it receives the pong from the server. The closure receives an Error that indicates a lost connection or other problem, or nil if no error occurred.
+     * @throws Exception
      */
     public function sendPing(Closure $pongReceiveHandler): void
     {
@@ -93,6 +96,9 @@ class URLSessionWebSocketTask extends URLSessionTask
         });
     }
 
+    /**
+     * @throws Exception
+     */
     public function cancel(): void
     {
         $this->cancelWithReason(URLSessionWebSocketTaskCloseCode::invalid, null);
@@ -104,13 +110,15 @@ class URLSessionWebSocketTask extends URLSessionTask
      * If you call {@see cancel()} on the task instead of this method, it sends a cancellation frame with no close code or reason.
      * @param URLSessionWebSocketTaskCloseCode $closeCode A {@see URLSessionWebSocketTaskCloseCode} that indicates the reason for closing the connection.
      * @param string|null $reason Optional further information to explain the closing. The value of this parameter is defined by the endpoints, not by the standard.
+     * @throws Exception
      */
     public function cancelWithReason(URLSessionWebSocketTaskCloseCode $closeCode, ?string $reason): void
     {
         $this->close($closeCode, $reason);
     }
 
-    /** 
+    /**
+     * @throws Exception
      * @internal
      */
     public function appendReceivedMessage(URLSessionWebSocketTaskMessage $message): void
@@ -119,7 +127,8 @@ class URLSessionWebSocketTask extends URLSessionTask
         $this->doPendingWork();
     }
 
-    /** 
+    /**
+     * @throws Exception
      * @internal
      */
     public function noteReceivedPong(): void
@@ -131,7 +140,8 @@ class URLSessionWebSocketTask extends URLSessionTask
         $completionHandler(null);
     }
 
-    /** 
+    /**
+     * @throws Exception
      * @internal
      */
     public function close(URLSessionWebSocketTaskCloseCode $code, ?string $reason = null): void
@@ -146,6 +156,9 @@ class URLSessionWebSocketTask extends URLSessionTask
         $this->doPendingWork();
     }
 
+    /**
+     * @throws Exception
+     */
     private function doPendingWork(): void
     {
         if ($taskError = $this->taskError ?? $this->error) {
@@ -158,21 +171,12 @@ class URLSessionWebSocketTask extends URLSessionTask
                 $receiveCompletionHandler(null, $taskError);
             }
             $this->receiveCompletionHandlers->removeAll();
-            /** @noinspection PhpUnhandledExceptionInspection */
             $this->getProtocol(function (?URLProtocol $protocol): void {
-                if ($this->handshakeCompleted && $protocol instanceof WebSocketURLProtocol && ($closeMessage = $this->closeMessage)) {
-                    $this->closeMessage = null;
-                    try {
-                        [$code, $reason] = $closeMessage;
-                        $data = (new ArrayClass(str_split(sprintf('%016b', $code->value), 8)))->map(fn(string $string): string => chr((int)bindec($string)))->join("");
-                        $data .= $reason;
-                        $protocol->send($data, URLSessionWebSocketOperationCode::close);
-                    } catch (Exception) {
-                    }
+                if ($this->handshakeCompleted && $protocol instanceof WebSocketURLProtocol) {
+                    $this->e($protocol);
                 }
             });
         } else {
-            /** @noinspection PhpUnhandledExceptionInspection */
             $this->getProtocol(function (?URLProtocol $protocol): void {
                 if ($this->handshakeCompleted && $protocol instanceof WebSocketURLProtocol) {
                     while (!$this->sendBuffer->isEmpty()) {
@@ -192,16 +196,7 @@ class URLSessionWebSocketTask extends URLSessionTask
                         } catch (Exception) {
                         }
                     }
-                    if ($closeMessage = $this->closeMessage) {
-                        $this->closeMessage = null;
-                        try {
-                            [$code, $reason] = $closeMessage;
-                            $data = (new ArrayClass(str_split(sprintf('%016b', $code->value), 8)))->map(fn(string $string): string => chr((int)bindec($string)))->join("");
-                            $data .= $reason;
-                            $protocol->send($data, URLSessionWebSocketOperationCode::close);
-                        } catch (Exception) {
-                        }
-                    }
+                    $this->e($protocol);
                 }
                 while (!$this->receiveBuffer->isEmpty() && !$this->receiveCompletionHandlers->isEmpty()) {
                     /** @var URLSessionWebSocketTaskMessage $message */
@@ -211,6 +206,21 @@ class URLSessionWebSocketTask extends URLSessionTask
                     $handler($message, null);
                 }
             });
+        }
+    }
+
+    private function e(WebSocketURLProtocol $protocol): void
+    {
+        if (!($closeMessage = $this->closeMessage)) {
+            return;
+        }
+        $this->closeMessage = null;
+        try {
+            [$code, $reason] = $closeMessage;
+            $data = (new ArrayClass(str_split(sprintf('%016b', $code->value), 8)))->map(fn(string $string): string => chr((int)bindec($string)))->join("");
+            $data .= $reason;
+            $protocol->send($data, URLSessionWebSocketOperationCode::close);
+        } catch (Exception) {
         }
     }
 }
