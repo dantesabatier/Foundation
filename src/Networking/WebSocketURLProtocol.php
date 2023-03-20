@@ -41,7 +41,6 @@ class WebSocketURLProtocol extends URLProtocol
     public function startLoading(): void
     {
         $url = $this->url;
-        $key = base64_encode(random_bytes(16));
         $authority = (string)$url->host;
         if (($user = $url->user) && ($password = $url->password)) {
             $authority = "$user:$password@$authority";
@@ -53,6 +52,7 @@ class WebSocketURLProtocol extends URLProtocol
         if ($query = $url->query) {
             $path .= "?$query";
         }
+        $key = base64_encode(random_bytes(16));
         $headers = new Dictionary([
             "Host" => $authority,
             "Upgrade" => "WebSocket",
