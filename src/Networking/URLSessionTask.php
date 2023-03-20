@@ -132,7 +132,7 @@ abstract class URLSessionTask extends ObjectClass
      * @param Closure(URLProtocol|null): void $callback
      * @throws Exception
      */
-    private function getProtocol(Closure $callback): void
+    protected function getProtocol(Closure $callback): void
     {
         $ps = $this->protocolStorage;
         switch ($ps->rawValue) {
@@ -269,11 +269,10 @@ abstract class URLSessionTask extends ObjectClass
             $this->getProtocol(function (?URLProtocol $protocol): void {
                 if ($protocol) {
                     $protocol->startLoading();
-                } elseif ($error = $this->error) {
-                    $urlError = new Error(URLErrorDomain, URLErrorUnsupportedURL, new Dictionary([LocalizedDescriptionKey => "Unsupported URL", URLErrorFailingURLErrorKey => $this->originalRequest?->url]));
-                    $this->error = $urlError;
+                } elseif ($this->error === null) {
+                    $this->error = new Error(URLErrorDomain, URLErrorUnsupportedURL, new Dictionary([LocalizedDescriptionKey => "Unsupported URL", URLErrorFailingURLErrorKey => $this->originalRequest?->url]));
                     /** @noinspection PhpUnhandledExceptionInspection */
-                    (new ProtocolClient())->urlProtocolTaskDidFailWithError($this, $error);
+                    (new ProtocolClient())->urlProtocolTaskDidFailWithError($this, $this->error);
                 }
             });
         }
