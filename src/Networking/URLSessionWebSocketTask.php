@@ -34,7 +34,8 @@ class URLSessionWebSocketTask extends URLSessionTask
     private readonly ArrayClass $receiveCompletionHandlers;
     /** @var ArrayClass<Closure(Error|null): void> */
     private readonly ArrayClass $pongCompletionHandlers;
-    private ?string $closeMessage = null;
+    /** @var array{URLSessionWebSocketTaskCloseCode, string}|null */
+    private ?array $closeMessage = null;
 
     public function __construct(URLSession $session, URLRequest $request, int $taskIdentifier, ?TaskBody $body = null)
     {
@@ -51,7 +52,6 @@ class URLSessionWebSocketTask extends URLSessionTask
      * If an error occurs while sending the message, any outstanding work also fails.
      * @param URLSessionWebSocketTaskMessage $message The WebSocket message to send to the other endpoint.
      * @param Closure(Error|null): void $completionHandler A closure that receives an Error that indicates an error encountered while sending, or nil if no error occurred.
-     * @throws Exception
      */
     public function send(URLSessionWebSocketTaskMessage $message, Closure $completionHandler): void
     {
@@ -64,7 +64,6 @@ class URLSessionWebSocketTask extends URLSessionTask
      *
      * If the task reaches the {@see maximumMessageSize} while buffering the frames, this call fails with an error.
      * @param Closure(URLSessionWebSocketTaskMessage|null, Error|null): void $completionHandler A closure that receives two parameters: the WebSocket message, and an Error that indicates an error encountered while receiving the message. The error is nil if no error occurred.
-     * @throws Exception
      */
     public function receive(Closure $completionHandler): void
     {
@@ -77,7 +76,6 @@ class URLSessionWebSocketTask extends URLSessionTask
      *
      * When sending multiple pings, the task always calls pongReceiveHandler in the order it sent the pings.
      * @param Closure(Error|null): void $pongReceiveHandler A closure called by the task when it receives the pong from the server. The closure receives an Error that indicates a lost connection or other problem, or nil if no error occurred.
-     * @throws Exception
      */
     public function sendPing(Closure $pongReceiveHandler): void
     {
@@ -109,47 +107,77 @@ class URLSessionWebSocketTask extends URLSessionTask
      */
     public function cancelWithReason(URLSessionWebSocketTaskCloseCode $closeCode, ?string $reason): void
     {
+        $this->close($closeCode, $reason);
+    }
+
+    /** 
+     * @internal
+     */
+    public function appendReceivedMessage(URLSessionWebSocketTaskMessage $message): void
+    {
+        $this->receiveBuffer->append($message);
+        $this->doPendingWork();
+    }
+
+    /** 
+     * @internal
+     */
+    public function noteReceivedPong(): void
+    {
+        if (!($completionHandler = $this->pongCompletionHandlers->popFirst())) {
+            $this->close(URLSessionWebSocketTaskCloseCode::protocolError);
+            return;
+        }
+        $completionHandler(null);
+    }
+
+    /** 
+     * @internal
+     */
+    public function close(URLSessionWebSocketTaskCloseCode $code, ?string $reason = null): void
+    {
         if ($this->taskError !== null) {
             return;
         }
-        $this->closeCode = $closeCode;
+        $this->closeCode = $code;
         $this->closeReason = $reason;
         $this->taskError = new Error(URLErrorDomain, URLErrorNetworkConnectionLost);
+        $this->closeMessage = [$code, $reason ?? ""];
+        $this->doPendingWork();
     }
 
-    /**
-     * @throws Exception
-     */
     private function doPendingWork(): void
     {
-        if ($taskError = $this->taskError) {
+        if ($taskError = $this->taskError ?? $this->error) {
             foreach ($this->sendBuffer as $element) {
                 [, $handler] = $element;
-                $handler(null, $taskError);
+                $handler($taskError);
             }
             $this->sendBuffer->removeAll();
             foreach ($this->receiveCompletionHandlers as $receiveCompletionHandler) {
                 $receiveCompletionHandler(null, $taskError);
             }
             $this->receiveCompletionHandlers->removeAll();
+            /** @noinspection PhpUnhandledExceptionInspection */
             $this->getProtocol(function (?URLProtocol $protocol): void {
-                if ($protocol instanceof WebSocketURLProtocol) {
-                    if ($closeMessage = $this->closeMessage) {
-                        $this->closeMessage = null;
-                        try {
-                            $protocol->send($closeMessage, URLSessionWebSocketOperationCode::close);
-                        } catch (Exception) {
-                        }
+                if ($this->handshakeCompleted && $protocol instanceof WebSocketURLProtocol && ($closeMessage = $this->closeMessage)) {
+                    $this->closeMessage = null;
+                    try {
+                        [$code, $reason] = $closeMessage;
+                        $data = (new ArrayClass(str_split(sprintf('%016b', $code->value), 8)))->map(fn(string $string): string => chr((int)bindec($string)))->join("");
+                        $data .= $reason;
+                        $protocol->send($data, URLSessionWebSocketOperationCode::close);
+                    } catch (Exception) {
                     }
                 }
             });
         } else {
+            /** @noinspection PhpUnhandledExceptionInspection */
             $this->getProtocol(function (?URLProtocol $protocol): void {
                 if ($this->handshakeCompleted && $protocol instanceof WebSocketURLProtocol) {
-                    while (true) {
-                        if (!($element = $this->sendBuffer->popFirst())) {
-                            break;
-                        }
+                    while (!$this->sendBuffer->isEmpty()) {
+                        /** @var array{URLSessionWebSocketTaskMessage, Closure(Error|null): void} $element */
+                        $element = $this->sendBuffer->popFirst();
                         [$message, $completionHandler] = $element;
                         try {
                             switch ($message->rawValue) {
@@ -167,16 +195,20 @@ class URLSessionWebSocketTask extends URLSessionTask
                     if ($closeMessage = $this->closeMessage) {
                         $this->closeMessage = null;
                         try {
-                            $protocol->send($closeMessage, URLSessionWebSocketOperationCode::close);
+                            [$code, $reason] = $closeMessage;
+                            $data = (new ArrayClass(str_split(sprintf('%016b', $code->value), 8)))->map(fn(string $string): string => chr((int)bindec($string)))->join("");
+                            $data .= $reason;
+                            $protocol->send($data, URLSessionWebSocketOperationCode::close);
                         } catch (Exception) {
                         }
                     }
                 }
-                while (true) {
-                    if (!($message = $this->receiveBuffer->popFirst()) || !($handler = $this->receiveCompletionHandlers->popFirst())) {
-                        break;
-                    }
-                    $handler($message);
+                while (!$this->receiveBuffer->isEmpty() && !$this->receiveCompletionHandlers->isEmpty()) {
+                    /** @var URLSessionWebSocketTaskMessage $message */
+                    $message = $this->receiveBuffer->popFirst();
+                    /** @var Closure(URLSessionWebSocketTaskMessage|null, Error|null): void $handler */
+                    $handler = $this->receiveCompletionHandlers->popFirst();
+                    $handler($message, null);
                 }
             });
         }

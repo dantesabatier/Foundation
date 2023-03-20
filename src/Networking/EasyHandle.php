@@ -244,11 +244,11 @@ final class EasyHandle
         };
     }
 
-    private function fill(mixed $data): string
+    private function fill(mixed $buffer): string
     {
-        $result = $this->delegate->fill($data);
+        $result = $this->delegate->fill($buffer);
         return match ($result->rawValue) {
-            EasyHandleWriteBufferResultRawValue::bytes => (string)$result->bytes,
+            EasyHandleWriteBufferResultRawValue::bytes => $result->bytes,
             EasyHandleWriteBufferResultRawValue::pause => (string)CURL_READFUNC_PAUSE,
             EasyHandleWriteBufferResultRawValue::abort => "",
         };

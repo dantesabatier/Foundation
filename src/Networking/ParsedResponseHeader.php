@@ -7,18 +7,18 @@ use Closure;
 /** @internal */
 readonly class ParsedResponseHeader
 {
-    private function __construct(public ParsedResponseHeaderRawVale $rawVale, public ResponseHeaderLines $header)
+    private function __construct(public ParsedResponseHeaderRawVale $rawVale, public ResponseHeaderLines $lines)
     {
     }
 
-    public static function partial(ResponseHeaderLines $header = new ResponseHeaderLines()): ParsedResponseHeader
+    public static function partial(ResponseHeaderLines $lines = new ResponseHeaderLines()): ParsedResponseHeader
     {
-        return new ParsedResponseHeader(ParsedResponseHeaderRawVale::partial, $header);
+        return new ParsedResponseHeader(ParsedResponseHeaderRawVale::partial, $lines);
     }
 
-    public static function complete(ResponseHeaderLines $header): ParsedResponseHeader
+    public static function complete(ResponseHeaderLines $lines): ParsedResponseHeader
     {
-        return new ParsedResponseHeader(ParsedResponseHeaderRawVale::complete, $header);
+        return new ParsedResponseHeader(ParsedResponseHeaderRawVale::complete, $lines);
     }
 
     public function byAppending(string $data, Closure $onHeaderCompleted): ?ParsedResponseHeader
@@ -35,15 +35,15 @@ readonly class ParsedResponseHeader
     {
         if ($onHeaderCompleted($line)) {
             return match ($this->rawVale) {
-                ParsedResponseHeaderRawVale::partial => ParsedResponseHeader::complete($this->header),
+                ParsedResponseHeaderRawVale::partial => ParsedResponseHeader::complete($this->lines),
                 ParsedResponseHeaderRawVale::complete => ParsedResponseHeader::partial()
             };
         } else {
-            $header = match ($this->rawVale) {
-                ParsedResponseHeaderRawVale::partial => $this->header,
+            $lines = match ($this->rawVale) {
+                ParsedResponseHeaderRawVale::partial => $this->lines,
                 ParsedResponseHeaderRawVale::complete => new ResponseHeaderLines()
             };
-            return ParsedResponseHeader::partial($header->byAppending($line));
+            return ParsedResponseHeader::partial($lines->byAppending($line));
         }
     }
 }

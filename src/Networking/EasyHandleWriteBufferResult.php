@@ -5,7 +5,7 @@ namespace Sabatier\Foundation\Networking;
 /** @internal */
 readonly class EasyHandleWriteBufferResult
 {
-    private function __construct(public EasyHandleWriteBufferResultRawValue $rawValue, public ?string $bytes = null)
+    private function __construct(public EasyHandleWriteBufferResultRawValue $rawValue, public string $bytes = "")
     {
     }
 
@@ -19,7 +19,7 @@ readonly class EasyHandleWriteBufferResult
         return new EasyHandleWriteBufferResult(EasyHandleWriteBufferResultRawValue::pause);
     }
 
-    public static function bytes(?string $bytes): EasyHandleWriteBufferResult
+    public static function bytes(string $bytes): EasyHandleWriteBufferResult
     {
         return new EasyHandleWriteBufferResult(EasyHandleWriteBufferResultRawValue::bytes, $bytes);
     }

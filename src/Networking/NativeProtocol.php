@@ -162,9 +162,9 @@ abstract class NativeProtocol extends URLProtocol implements EasyHandleDelegate
                 $this->startNewTransfer($request);
             }
         }
-        /** @var TransferState $ts */
-        $ts = $this->internalState->transferState;
         if ($this->internalState->rawValue === InternalStateRawValue::transferReady) {
+            /** @var TransferState $ts */
+            $ts = $this->internalState->transferState;
             $this->internalState = InternalState::transferInProgress($ts);
             $this->task->session->add($this->easyHandle);
         }
@@ -179,7 +179,9 @@ abstract class NativeProtocol extends URLProtocol implements EasyHandleDelegate
         }
     }
 
-    abstract public function configureEasyHandle(URLRequest $request, TaskBody $body): void;
+    public function configureEasyHandle(URLRequest $request, TaskBody $body): void
+    {
+    }
 
     /**
      * @throws Exception
