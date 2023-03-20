@@ -17,10 +17,10 @@ class WebSocketURLProtocol extends URLProtocol
     public function __construct(URLSessionTask $task, ?CachedURLResponse $cachedResponse = null, ?URLProtocolClient $client = null)
     {
         parent::__construct($task, $cachedResponse, $client);
-        $url = $this->request->url->absoluteURL;
-        $components = new URLComponents($url->absoluteString);
-        $components->scheme = $url->scheme === "wss" ? "ssl" : "tcp";
-        $components->port = $url->port ?? $url->scheme === "wss" ? 443 : 80;
+        $absoluteURL = $this->request->url->absoluteURL;
+        $components = new URLComponents($absoluteURL->absoluteString);
+        $components->scheme = $absoluteURL->scheme === "wss" ? "ssl" : "tcp";
+        $components->port = $absoluteURL->port ?? $absoluteURL->scheme === "wss" ? 443 : 80;
         /** @var URL $url */
         $url = $components->url;
         $this->stream = stream_socket_client($url->absoluteString, $code, $message, $this->request->timeoutInterval);
