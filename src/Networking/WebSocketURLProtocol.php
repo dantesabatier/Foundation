@@ -11,22 +11,8 @@ use function Sabatier\Foundation\fatal_error;
 /** @internal */
 class WebSocketURLProtocol extends URLProtocol
 {
-    private readonly mixed $stream;
-    private readonly URL $url;
-
-    public function __construct(URLSessionTask $task, ?CachedURLResponse $cachedResponse = null, ?URLProtocolClient $client = null)
-    {
-        parent::__construct($task, $cachedResponse, $client);
-        $absoluteURL = $this->request->url->absoluteURL;
-        $components = new URLComponents($absoluteURL->absoluteString);
-        $components->scheme = $absoluteURL->scheme === "wss" ? "ssl" : "tcp";
-        $components->port = $absoluteURL->port ?? $absoluteURL->scheme === "wss" ? 443 : 80;
-        /** @var URL $url */
-        $url = $components->url;
-        $this->stream = stream_socket_client($url->absoluteString, $code, $message, $this->request->timeoutInterval);
-        $this->url = $url;
-    }
-
+    private mixed $stream;
+    
     public static function canInit(URLRequest $request): bool
     {
         return match ($request->url->scheme) {
@@ -40,7 +26,12 @@ class WebSocketURLProtocol extends URLProtocol
      */
     public function startLoading(): void
     {
-        $url = $this->url;
+        $absoluteURL = $this->request->url->absoluteURL;
+        $components = new URLComponents($absoluteURL->absoluteString);
+        $components->scheme = $absoluteURL->scheme === "wss" ? "ssl" : "tcp";
+        $components->port = $absoluteURL->port ?? $absoluteURL->scheme === "wss" ? 443 : 80;
+        /** @var URL $url */
+        $url = $components->url;
         $authority = (string)$url->host;
         if (($user = $url->user) && ($password = $url->password)) {
             $authority = "$user:$password@$authority";
@@ -63,6 +54,9 @@ class WebSocketURLProtocol extends URLProtocol
         $header = "GET $path HTTP/1.1\r\n";
         $header .= $headers->mapValues(fn(string $value, string $key): string => "$key: $value")->values->join("\r\n");
         $header .= "\r\n\r\n";
+        if (!($this->stream = stream_socket_client($url->absoluteString, $code, $message, $this->request->timeoutInterval))) {
+            fatal_error("$code $message");
+        }
         fwrite($this->stream, $header);
         $response = "";
         do {
