@@ -196,7 +196,7 @@ class WebSocketURLProtocol extends HTTPURLProtocol
             case URLSessionWebSocketOperationCode::ping:
                 trigger_error("Unexpected message received from server $data");
                 $this->internalState = InternalState::transferFailed();
-                $error = new Error(URLErrorDomain, URLErrorBadServerResponse, new Dictionary([LocalizedDescriptionKey => "Unexpected message received from server", URLErrorFailingURLErrorKey, $this->request->url]));
+                $error = new Error(URLErrorDomain, URLErrorBadServerResponse, new Dictionary([LocalizedDescriptionKey => "Unexpected message received from server", URLErrorFailingURLErrorKey => $this->request->url]));
                 $this->transferCompleted($error);
                 break;
         }
