@@ -160,7 +160,7 @@ class WebSocketURLProtocol extends HTTPURLProtocol
                 if (strlen($data) >= 2) {
                     $reasonData = substring_from_index($data, 2);
                     [$byte1,] = array_values(unpack('C*', $data[0]));
-                    $closeCode = URLSessionWebSocketOperationCode::tryFrom($byte1 & 0b00001111) ?? URLSessionWebSocketTaskCloseCode::unsupportedData;
+                    $closeCode = URLSessionWebSocketTaskCloseCode::tryFrom($byte1 & 0b00001111) ?? URLSessionWebSocketTaskCloseCode::unsupportedData;
                 }
                 $task->close($closeCode, $reasonData);
                 break;
