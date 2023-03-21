@@ -30,7 +30,9 @@ final readonly class MultiHandle
     public function __destruct()
     {
         foreach ($this->easyHandles as $easyHandle) {
-            curl_multi_remove_handle($this->rawHandle, $easyHandle->rawHandle);
+            if (!$easyHandle->isWebSocketClient) {
+                curl_multi_remove_handle($this->rawHandle, $easyHandle->rawHandle);
+            }
         }
         curl_multi_close($this->rawHandle);
     }
@@ -50,6 +52,10 @@ final readonly class MultiHandle
      */
     public function add(EasyHandle $handle): void
     {
+        if ($handle->isWebSocketClient) {
+            $handle->connect();
+            return;
+        }
         $needsTimeout = $this->easyHandles->isEmpty();
         $this->easyHandles->append($handle);
         curl_multi_add_handle($this->rawHandle, $handle->rawHandle);
@@ -60,6 +66,10 @@ final readonly class MultiHandle
 
     public function remove(EasyHandle $handle): void
     {
+        if ($handle->isWebSocketClient) {
+            $handle->disconnect();
+            return;
+        }
         $this->easyHandles->remove($handle);
         curl_multi_remove_handle($this->rawHandle, $handle->rawHandle);
     }

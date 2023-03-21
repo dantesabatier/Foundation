@@ -3,6 +3,7 @@
 namespace Sabatier\Foundation\Networking;
 
 use CurlHandle;
+use Sabatier\Foundation\ArrayClass;
 use Sabatier\Foundation\Dictionary;
 use Sabatier\Foundation\Error;
 use Sabatier\Foundation\ProcessInfo;
@@ -23,28 +24,35 @@ final class EasyHandle
     public readonly int $connectFailureErrno;
     public readonly ?URL $redirectURL;
     private ?URL $url = null;
+    /** @var Dictionary<string> */
+    public readonly Dictionary $allHeaderFields;
     private ?URLSessionConfiguration $configuration = null;
-    private readonly EasyHandlePauseState $pauseState;
+    private EasyHandlePauseState $pauseState;
+    private URLSessionWebSocketOperationCode $code = URLSessionWebSocketOperationCode::binary;
+    public bool $isWebSocketClient = false;
+    public mixed $socket;
 
     public function __construct(public readonly EasyHandleDelegate $delegate)
     {
+        unset($this->rawHandle);
         unset($this->connectFailureErrno);
         unset($this->redirectURL);
         unset($this->pauseState);
-        $this->rawHandle = curl_init();
-        $this->setupCallbacks();
+        unset($this->allHeaderFields);
     }
 
     public function __destruct()
     {
-        curl_close($this->rawHandle);
+        $this->disconnect();
     }
 
     public function __get(string $name)
     {
         return $this->$name = match ($name) {
+            "rawHandle" => curl_init(),
             "connectFailureErrno" => $this->get(CURLINFO_OS_ERRNO),
             "redirectURL" => ($s = $this->get(CURLINFO_REDIRECT_URL)) ? new URL($s) : null,
+            "allHeaderFields" => new Dictionary(),
             default => throw new UndefinedKeyException()
         };
     }
@@ -92,6 +100,26 @@ final class EasyHandle
     public function setURL(URL $url): void
     {
         $this->url = $url;
+        if ($this->isWebSocketClient) {
+            $authority = (string)$url->host;
+            if (($user = $url->user) && ($password = $url->password)) {
+                $authority = "$user:$password@$authority";
+            }
+            if ($port = $url->port) {
+                $authority .= ':' . $port;
+            }
+            /** @noinspection PhpUnhandledExceptionInspection */
+            $key = base64_encode(random_bytes(16));
+            $this->allHeaderFields->merge(new Dictionary([
+                "Host" => $authority,
+                "Upgrade" => "WebSocket",
+                "Connection" => "Upgrade",
+                "Sec-WebSocket-Key" => $key,
+                "Sec-WebSocket-Version" => "13"
+            ]));
+            $this->socket = stream_socket_client($url->absoluteString);
+            return;
+        }
         $this->set($url->absoluteString, CURLOPT_URL);
     }
 
@@ -123,9 +151,15 @@ final class EasyHandle
         $this->set(min($size, CURL_MAX_READ_SIZE), CURLOPT_BUFFERSIZE);
     }
 
+    /**
+     * @param Dictionary<string> $headerFields
+     */
     public function setCustomHeaders(Dictionary $headerFields): void
     {
-        $this->set($headerFields->mapValues(fn(string $value, string $key): string => $value === "" ? $key : "$key: $value")->values->toArray(), CURLOPT_HTTPHEADER);
+        $this->allHeaderFields->merge($headerFields);
+        if (!$this->isWebSocketClient) {
+            $this->set($headerFields->mapValues(fn(string $value, string $key): string => $value === "" ? $key : "$key: $value")->values->toArray(), CURLOPT_HTTPHEADER);
+        }
     }
 
     public function setAutomaticBodyDecompression(bool $flag): void
@@ -161,7 +195,11 @@ final class EasyHandle
 
     public function setTimeout(int $timeout): void
     {
-        $this->set($timeout, CURLOPT_TIMEOUT);
+        if ($this->isWebSocketClient) {
+            stream_set_timeout($this->socket, $timeout);
+        } else {
+            $this->set($timeout, CURLOPT_TIMEOUT);
+        }
     }
 
     public function getTimeoutIntervalSpent(): float
@@ -209,7 +247,7 @@ final class EasyHandle
         $pauseState->setState($this);
     }
 
-    private function setupCallbacks(): void
+    public function setupCallbacks(): void
     {
         $this->set(true, CURLOPT_RETURNTRANSFER);
         $this->set(fn(CurlHandle $handle, string $data): int => $this->didReceiveData($data), CURLOPT_WRITEFUNCTION);
@@ -289,5 +327,143 @@ final class EasyHandle
             return;
         }
         $storage->setCookies($cookies, $url);
+    }
+
+    public function connect(): void
+    {
+        $header = "GET {$this->url->absoluteString} HTTP/1.1\r\n";
+        $header .= $this->allHeaderFields->mapValues(fn(string $value, string $key): string => "$key: $value")->values->join("\r\n");
+        $header .= "\r\n\r\n";
+        fwrite($this->socket, $header);
+        while (!feof($this->socket)) {
+            if (!($data = $this->fill($this->socket))) {
+                break;
+            }
+            $this->didReceiveHeaderData($data, strlen($data));
+        }
+    }
+
+    public function disconnect(): void
+    {
+        if ($this->isWebSocketClient) {
+            fclose($this->socket);
+        } else {
+            curl_close($this->rawHandle);
+        }
+    }
+
+    public function getWebSocketFlags(): URLSessionWebSocketOperationCode
+    {
+        return $this->code;
+    }
+
+    /**
+     * @return array{string, URLSessionWebSocketOperationCode}
+     */
+    public function receiveWebSocketsData(): array
+    {
+        $fn = function (int $length): string {
+            $data = "";
+            while (strlen($data) < $length && ($result = fread($this->socket, $length))) {
+                $data .= $result;
+            }
+            return $data;
+        };
+        $payload = "";
+        $code = URLSessionWebSocketOperationCode::binary;
+        do {
+            $data = $fn(2);
+            $components = array_values(unpack('C*', $data));
+            if (empty($components)) {
+                break;
+            }
+            [$byte1, $byte2] = $components;
+            $final = (bool)($byte1 & 0b10000000);
+            $isMasked = (bool)($byte2 & 0b10000000);
+            $length = $byte2 & 0b01111111;
+            if ($length > 125) {
+                if ($length === 126) {
+                    $data = $fn(2);
+                    $length = current(unpack('n', $data));
+                } else {
+                    $data = $fn(8);
+                    $length = current(unpack('J', $data));
+                }
+            }
+            $mask = "";
+            if ($isMasked) {
+                $mask = $fn(4);
+            }
+            if ($length > 0) {
+                $data = $fn($length);
+                if ($isMasked) {
+                    for ($i = 0; $i < $length; $i++) {
+                        $length .= ($data[$i] ^ $mask[$i % 4]);
+                    }
+                } else {
+                    $payload = $data;
+                }
+            }
+            $code = URLSessionWebSocketOperationCode::from($byte1 & 0b00001111);
+            switch ($code) {
+                case URLSessionWebSocketOperationCode::ping:
+                    $this->sendWebSocketsData($payload, URLSessionWebSocketOperationCode::pong);
+                    break;
+                case URLSessionWebSocketOperationCode::close:
+                    $this->sendWebSocketsData("", URLSessionWebSocketOperationCode::close);
+                    break;
+                case URLSessionWebSocketOperationCode::pong:
+                case URLSessionWebSocketOperationCode::cont:
+                case URLSessionWebSocketOperationCode::text:
+                case URLSessionWebSocketOperationCode::binary:
+                    break;
+            }
+            $this->code = $code;
+        } while (!$final);
+        return [$payload, $code];
+    }
+
+    public function sendWebSocketsData(string $data, URLSessionWebSocketOperationCode $code): void
+    {
+        $parts = new ArrayClass(str_split($data, 4096));
+        $max = $parts->indexBefore($parts->endIndex());
+        /** @var ArrayClass<array{string, URLSessionWebSocketOperationCode, bool, bool}> $frames */
+        $frames = $parts->map(fn(string $e, int $i): array => [$e, $i === 0 ? $code : URLSessionWebSocketOperationCode::cont, $i === $max, true]);
+        foreach ($frames as $frame) {
+            $data = "";
+            [$payload, $code, $isFinal, $isMasked] = $frame;
+            $byte1 = $isFinal ? 0b10000000 : 0b00000000;
+            $byte1 |= $code->value;
+            $byte2 = $isMasked ? 0b10000000 : 0b00000000;
+            $data .= pack('C', $byte1);
+            $length = strlen($payload);
+            if ($length > 65535) {
+                $data .= pack('C', $byte2 | 0b01111111);
+                $data .= pack('J', $length);
+            } elseif ($length > 125) {
+                $data .= pack('C', $byte2 | 0b01111110);
+                $data .= pack('n', $length);
+            } else {
+                $data .= pack('C', $byte2 | $length);
+            }
+            if ($isMasked) {
+                $isMasked = "";
+                for ($i = 0; $i < 4; $i++) {
+                    $isMasked .= chr(rand(0, 255));
+                }
+                $data .= $isMasked;
+                for ($i = 0; $i < $length; $i++) {
+                    $data .= $payload[$i] ^ $isMasked[$i % 4];
+                }
+            } else {
+                $data .= $payload;
+            }
+            fwrite($this->socket, $data);
+        }
+    }
+
+    public static function supportsWebSockets(): bool
+    {
+        return (new ArrayClass(stream_get_transports()))->contains(fn(string $e): bool => $e === "tpc" || $e === "ssl");
     }
 }

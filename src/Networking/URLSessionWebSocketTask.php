@@ -5,10 +5,14 @@ namespace Sabatier\Foundation\Networking;
 use Closure;
 use Exception;
 use Sabatier\Foundation\ArrayClass;
+use Sabatier\Foundation\Dictionary;
 use Sabatier\Foundation\Error;
+use const Sabatier\Foundation\LocalizedDescriptionKey;
 use const Sabatier\Foundation\URLErrorBadServerResponse;
 use const Sabatier\Foundation\URLErrorDomain;
+use const Sabatier\Foundation\URLErrorFailingURLErrorKey;
 use const Sabatier\Foundation\URLErrorNetworkConnectionLost;
+use const Sabatier\Foundation\URLErrorUnsupportedURL;
 
 /**
  * A URL session task that communicates over the WebSockets protocol standard.
@@ -222,5 +226,30 @@ class URLSessionWebSocketTask extends URLSessionTask
             $protocol->sendWebSocketData($data, URLSessionWebSocketOperationCode::close);
         } catch (Exception) {
         }
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function resume(): void
+    {
+        if (!EasyHandle::supportsWebSockets()) {
+            $userInfo = new Dictionary([LocalizedDescriptionKey => ""]);
+            if ($url = $this->originalRequest?->url) {
+                $userInfo[URLErrorFailingURLErrorKey] = $url;
+            }
+            $this->error = new Error(URLErrorDomain, URLErrorUnsupportedURL, $userInfo);
+            (new ProtocolClient())->urlProtocolTaskDidFailWithError($this, $this->error);
+            return;
+        }
+        parent::resume();
+    }
+
+    /**
+     * @internal
+     */
+    public static function supportsWebSockets(): bool
+    {
+        return EasyHandle::supportsWebSockets();
     }
 }

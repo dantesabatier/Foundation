@@ -19,14 +19,6 @@ use const Sabatier\Foundation\URLErrorUnsupportedURL;
 /** @internal */
 class WebSocketURLProtocol extends HTTPURLProtocol
 {
-    private readonly WebSocketClient $webSocketClient;
-
-    public function __construct(URLSessionTask $task, ?CachedURLResponse $cachedResponse = null, ?URLProtocolClient $client = null)
-    {
-        parent::__construct($task, $cachedResponse, $client);
-        $this->webSocketClient = new WebSocketClient($this);
-    }
-
     public static function canInit(URLRequest $request): bool
     {
         return match ($request->url->scheme) {
@@ -45,24 +37,6 @@ class WebSocketURLProtocol extends HTTPURLProtocol
         return false;
     }
 
-    /**
-     * @throws Exception
-     */
-    public function resume(): void
-    {
-        if ($this->internalState->rawValue === InternalStateRawValue::initial) {
-            /** @var URLRequest $request */
-            $request = $this->task->originalRequest;
-            $this->startNewTransfer($request);
-        }
-        if ($this->internalState->rawValue === InternalStateRawValue::transferReady) {
-            /** @var TransferState $ts */
-            $ts = $this->internalState->transferState;
-            $this->internalState = InternalState::transferInProgress($ts);
-            $this->webSocketClient->start();
-        }
-    }
-
     public function configureEasyHandle(URLRequest $request, TaskBody $body): void
     {
         if ($request->httpMethod !== HTTPRequestMethod::get) {
@@ -78,14 +52,15 @@ class WebSocketURLProtocol extends HTTPURLProtocol
         $components->port = $absoluteURL->port ?? $absoluteURL->scheme === "wss" ? 443 : 80;
         /** @var URL $url */
         $url = $components->url;
-        $webSocketClient = $this->webSocketClient;
-        $webSocketClient->setURL($url);
-        $webSocketClient->setTimeout((int)$request->timeoutInterval);
+        $easyHandle = $this->easyHandle;
+        $easyHandle->isWebSocketClient = true;
+        $easyHandle->setURL($url);
+        $easyHandle->setTimeout((int)$request->timeoutInterval);
     }
 
     public function sendWebSocketData(string $data, URLSessionWebSocketOperationCode $code): void
     {
-        $this->webSocketClient->send($data, $code);
+        $this->easyHandle->sendWebSocketsData($data, $code);
     }
 
     public function didReceiveResponse(): void
@@ -139,7 +114,7 @@ class WebSocketURLProtocol extends HTTPURLProtocol
             /** @psalm-suppress PossiblyNullOperand */
             $this->lastRedirectBody .= $data;
         }
-        $this->notifyTaskAboutReceivedData($data, $this->webSocketClient->code);
+        $this->notifyTaskAboutReceivedData($data, $this->easyHandle->getWebSocketFlags());
         $this->internalState = InternalState::transferInProgress($ts->byAppendingBodyData($data));
         return EasyHandleAction::proceed;
     }

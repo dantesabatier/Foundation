@@ -124,6 +124,7 @@ class HTTPURLProtocol extends NativeProtocol
      */
     public function configureEasyHandle(URLRequest $request, TaskBody $body): void
     {
+        parent::configureEasyHandle($request, $body);
         if ($request->httpMethod === HTTPRequestMethod::get && $body->rawValue !== TaskBodyRawValue::none) {
             trigger_error("GET method must not have a body");
             $this->internalState = InternalState::transferFailed();
