@@ -27,7 +27,7 @@ abstract class NativeProtocol extends URLProtocol implements EasyHandleDelegate
 {
     public ?string $lastRedirectBody = null;
     public InternalState $internalState;
-    public EasyHandle $easyHandle;
+    public readonly EasyHandle $easyHandle;
     public readonly URL $tempFileURL;
 
     public function __construct(URLSessionTask $task, ?CachedURLResponse $cachedResponse = null, ?URLProtocolClient $client = null)
