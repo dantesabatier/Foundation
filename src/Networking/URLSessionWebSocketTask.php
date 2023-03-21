@@ -89,7 +89,7 @@ class URLSessionWebSocketTask extends URLSessionTask
         $this->getProtocol(function (?URLProtocol $protocol) use ($pongReceiveHandler): void {
             if ($protocol instanceof WebSocketURLProtocol) {
                 try {
-                    $protocol->sendWebSocketData("", URLSessionWebSocketOperationCode::ping);
+                    $protocol->sendWebSocketData("", URLSessionWebSocketOperation::ping);
                     $this->pongCompletionHandlers->append($pongReceiveHandler);
                 } catch (Exception) {
                     $pongReceiveHandler(new Error(URLErrorDomain, URLErrorBadServerResponse));
@@ -190,10 +190,10 @@ class URLSessionWebSocketTask extends URLSessionTask
                         try {
                             switch ($message->rawValue) {
                                 case URLSessionWebSocketTaskMessageRawValue::data:
-                                    $protocol->sendWebSocketData($message->data, URLSessionWebSocketOperationCode::binary);
+                                    $protocol->sendWebSocketData($message->data, URLSessionWebSocketOperation::binary);
                                     break;
                                 case URLSessionWebSocketTaskMessageRawValue::string:
-                                    $protocol->sendWebSocketData($message->string, URLSessionWebSocketOperationCode::text);
+                                    $protocol->sendWebSocketData($message->string, URLSessionWebSocketOperation::text);
                                     break;
                             }
                             $completionHandler(null);
@@ -223,7 +223,7 @@ class URLSessionWebSocketTask extends URLSessionTask
             [$code, $reason] = $closeMessage;
             $data = (new ArrayClass(str_split(sprintf('%016b', $code->value), 8)))->map(fn(string $string): string => chr((int)bindec($string)))->join("");
             $data .= $reason;
-            $protocol->sendWebSocketData($data, URLSessionWebSocketOperationCode::close);
+            $protocol->sendWebSocketData($data, URLSessionWebSocketOperation::close);
         } catch (Exception) {
         }
     }

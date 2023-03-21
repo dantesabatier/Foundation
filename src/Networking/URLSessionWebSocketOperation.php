@@ -3,7 +3,7 @@
 namespace Sabatier\Foundation\Networking;
 
 /** @internal */
-enum URLSessionWebSocketOperationCode: int
+enum URLSessionWebSocketOperation: int
 {
     case cont = 0;
     case text = 1;

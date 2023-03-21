@@ -53,14 +53,13 @@ class WebSocketURLProtocol extends HTTPURLProtocol
         /** @var URL $url */
         $url = $components->url;
         $easyHandle = $this->easyHandle;
-        $easyHandle->isWebSocketClient = true;
         $easyHandle->setURL($url);
         $easyHandle->setTimeout((int)$request->timeoutInterval);
     }
 
-    public function sendWebSocketData(string $data, URLSessionWebSocketOperationCode $code): void
+    public function sendWebSocketData(string $data, URLSessionWebSocketOperation $operation): void
     {
-        $this->easyHandle->sendWebSocketsData($data, $code);
+        $this->easyHandle->sendWebSocketsData($data, $operation);
     }
 
     public function didReceiveResponse(): void
@@ -122,34 +121,34 @@ class WebSocketURLProtocol extends HTTPURLProtocol
     /**
      * @throws Exception
      */
-    private function notifyTaskAboutReceivedData(string $data, URLSessionWebSocketOperationCode $code): void
+    private function notifyTaskAboutReceivedData(string $data, URLSessionWebSocketOperation $operation): void
     {
         $task = $this->task;
         if ($task->session->behaviour($task)->rawValue !== TaskBehaviourRawValue::taskDelegate || !$task instanceof URLSessionWebSocketTask) {
             fatal_error("WebSocket internal invariant violated");
         }
-        switch ($code) {
-            case URLSessionWebSocketOperationCode::close:
+        switch ($operation) {
+            case URLSessionWebSocketOperation::close:
                 $reasonData = "";
                 $closeCode = URLSessionWebSocketTaskCloseCode::normalClosure;
                 if (strlen($data) >= 2) {
                     $reasonData = substring_from_index($data, 2);
-                    [$byte1,] = array_values(unpack('C*', $data[0]));
+                    [$byte1,] = array_values(unpack("C*", $data[0]));
                     $closeCode = URLSessionWebSocketTaskCloseCode::tryFrom($byte1 & 0b00001111) ?? URLSessionWebSocketTaskCloseCode::unsupportedData;
                 }
                 $task->close($closeCode, $reasonData);
                 break;
-            case URLSessionWebSocketOperationCode::pong:
+            case URLSessionWebSocketOperation::pong:
                 $task->noteReceivedPong();
                 break;
-            case URLSessionWebSocketOperationCode::binary:
+            case URLSessionWebSocketOperation::binary:
                 $task->appendReceivedMessage(URLSessionWebSocketTaskMessage::data($data));
                 break;
-            case URLSessionWebSocketOperationCode::text:
+            case URLSessionWebSocketOperation::text:
                 $task->appendReceivedMessage(URLSessionWebSocketTaskMessage::string($data));
                 break;
-            case URLSessionWebSocketOperationCode::cont:
-            case URLSessionWebSocketOperationCode::ping:
+            case URLSessionWebSocketOperation::cont:
+            case URLSessionWebSocketOperation::ping:
                 trigger_error("Unexpected message received from server $data");
                 $this->internalState = InternalState::transferFailed();
                 $error = new Error(URLErrorDomain, URLErrorBadServerResponse, new Dictionary([LocalizedDescriptionKey => "Unexpected message received from server", URLErrorFailingURLErrorKey => $this->request->url]));

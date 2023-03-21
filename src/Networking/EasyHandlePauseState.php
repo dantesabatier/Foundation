@@ -12,7 +12,7 @@ class EasyHandlePauseState extends OptionSet
 
     public function setState(EasyHandle $handle): void
     {
-        if (!$handle->isWebSocketClient) {
+        if (!$handle->isWebSocketHandle) {
             curl_pause($handle->rawHandle, 0 | ($this->contains(EasyHandlePauseState::sendPaused) ? CURLPAUSE_SEND : CURLPAUSE_SEND_CONT) | ($this->contains(EasyHandlePauseState::receivePaused) ? CURLPAUSE_RECV : CURLPAUSE_RECV_CONT));
         }
     }
