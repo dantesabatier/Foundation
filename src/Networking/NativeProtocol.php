@@ -181,10 +181,7 @@ abstract class NativeProtocol extends URLProtocol implements EasyHandleDelegate
         }
     }
 
-    public function configureEasyHandle(URLRequest $request, TaskBody $body): void
-    {
-        $this->easyHandle->setupCallbacks();
-    }
+    abstract public function configureEasyHandle(URLRequest $request, TaskBody $body): void;
 
     /**
      * @throws Exception
