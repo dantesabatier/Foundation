@@ -10,6 +10,7 @@ use Sabatier\Foundation\URLComponents;
 use function Sabatier\Foundation\fatal_error;
 use function Sabatier\Foundation\in_range;
 use function Sabatier\Foundation\substring_from_index;
+use function Sabatier\Foundation\substring_to_index;
 use const Sabatier\Foundation\LocalizedDescriptionKey;
 use const Sabatier\Foundation\URLErrorBadServerResponse;
 use const Sabatier\Foundation\URLErrorDomain;
@@ -159,7 +160,7 @@ class WebSocketURLProtocol extends HTTPURLProtocol
                 $closeCode = URLSessionWebSocketTaskCloseCode::normalClosure;
                 if (strlen($data) >= 2) {
                     $reasonData = substring_from_index($data, 2);
-                    [$byte1,] = array_values(unpack('C*', $data));
+                    [$byte1,] = array_values(unpack('C*', $data[0]));
                     $closeCode = URLSessionWebSocketOperationCode::tryFrom($byte1 & 0b00001111) ?? URLSessionWebSocketTaskCloseCode::unsupportedData;
                 }
                 $task->close($closeCode, $reasonData);
