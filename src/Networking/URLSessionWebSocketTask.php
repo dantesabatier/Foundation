@@ -173,7 +173,7 @@ class URLSessionWebSocketTask extends URLSessionTask
             $this->receiveCompletionHandlers->removeAll();
             $this->getProtocol(function (?URLProtocol $protocol): void {
                 if ($this->handshakeCompleted && $protocol instanceof WebSocketURLProtocol) {
-                    $this->stop($protocol);
+                    $this->sendCloseMessage($protocol);
                 }
             });
         } else {
@@ -196,7 +196,7 @@ class URLSessionWebSocketTask extends URLSessionTask
                         } catch (Exception) {
                         }
                     }
-                    $this->stop($protocol);
+                    $this->sendCloseMessage($protocol);
                 }
                 while (!$this->receiveBuffer->isEmpty() && !$this->receiveCompletionHandlers->isEmpty()) {
                     /** @var URLSessionWebSocketTaskMessage $message */
@@ -209,7 +209,7 @@ class URLSessionWebSocketTask extends URLSessionTask
         }
     }
 
-    private function stop(WebSocketURLProtocol $protocol): void
+    private function sendCloseMessage(WebSocketURLProtocol $protocol): void
     {
         if (!($closeMessage = $this->closeMessage)) {
             return;
