@@ -59,12 +59,14 @@ final class EasyHandle
 
     public function get(int $option): mixed
     {
-        return curl_getinfo($this->rawHandle, $option);
+        return $this->isWebSocketClient ? null : curl_getinfo($this->rawHandle, $option);
     }
 
     public function set(mixed $value, int $option): void
     {
-        curl_setopt($this->rawHandle, $option, $value);
+        if (!$this->isWebSocketClient) {
+            curl_setopt($this->rawHandle, $option, $value);
+        }
     }
 
     public function setVerboseModeOn(bool $flag): void
