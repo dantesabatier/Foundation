@@ -143,7 +143,7 @@ class WebSocketURLProtocol extends HTTPURLProtocol
             /** @psalm-suppress PossiblyNullOperand */
             $this->lastRedirectBody .= $data;
         }
-        $this->notifyTaskAboutReceivedData($data, $this->webSocketClient->operationCode);
+        $this->notifyTaskAboutReceivedData($data, $this->webSocketClient->code);
         $this->internalState = InternalState::transferInProgress($ts->byAppendingBodyData($data));
         return EasyHandleAction::proceed;
     }

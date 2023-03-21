@@ -12,7 +12,7 @@ class WebSocketClient
     private URL $url;
     private Dictionary $additionalHeaders;
     private mixed $socket;
-    public URLSessionWebSocketOperationCode $operationCode = URLSessionWebSocketOperationCode::cont;
+    public URLSessionWebSocketOperationCode $code = URLSessionWebSocketOperationCode::cont;
 
     public function __construct(public readonly EasyHandleDelegate $delegate)
     {
@@ -137,7 +137,7 @@ class WebSocketClient
                 case URLSessionWebSocketOperationCode::binary:
                     break;
             }
-            $this->operationCode = $code;
+            $this->code = $code;
             error_log($data);
         } while (!$final);
         return "";
