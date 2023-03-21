@@ -10,7 +10,6 @@ use Sabatier\Foundation\URLComponents;
 use function Sabatier\Foundation\fatal_error;
 use function Sabatier\Foundation\in_range;
 use function Sabatier\Foundation\substring_from_index;
-use function Sabatier\Foundation\substring_to_index;
 use const Sabatier\Foundation\LocalizedDescriptionKey;
 use const Sabatier\Foundation\URLErrorBadServerResponse;
 use const Sabatier\Foundation\URLErrorDomain;
