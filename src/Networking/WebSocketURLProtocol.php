@@ -9,6 +9,7 @@ use Sabatier\Foundation\URL;
 use Sabatier\Foundation\URLComponents;
 use function Sabatier\Foundation\fatal_error;
 use function Sabatier\Foundation\in_range;
+use function Sabatier\Foundation\substring_from_index;
 use const Sabatier\Foundation\LocalizedDescriptionKey;
 use const Sabatier\Foundation\URLErrorBadServerResponse;
 use const Sabatier\Foundation\URLErrorDomain;
@@ -18,7 +19,7 @@ use const Sabatier\Foundation\URLErrorUnsupportedURL;
 /** @internal */
 class WebSocketURLProtocol extends HTTPURLProtocol
 {
-    public readonly WebSocketClient $webSocketClient;
+    private readonly WebSocketClient $webSocketClient;
 
     public function __construct(URLSessionTask $task, ?CachedURLResponse $cachedResponse = null, ?URLProtocolClient $client = null)
     {
@@ -80,11 +81,6 @@ class WebSocketURLProtocol extends HTTPURLProtocol
         $webSocketClient = $this->webSocketClient;
         $webSocketClient->setURL($url);
         $webSocketClient->setTimeout((int)$request->timeoutInterval);
-        $task = $this->task;
-        if (!$task instanceof URLSessionWebSocketTask) {
-            return;
-        }
-        $webSocketClient->setPreferredReceiveBufferSize($task->maximumMessageSize);
     }
 
     public function sendWebSocketData(string $data, URLSessionWebSocketOperationCode $code): void
@@ -159,10 +155,12 @@ class WebSocketURLProtocol extends HTTPURLProtocol
         }
         switch ($code) {
             case URLSessionWebSocketOperationCode::close:
-                $closeCode = URLSessionWebSocketTaskCloseCode::normalClosure;
                 $reasonData = "";
-                if (strlen($data) > 2) {
-                    //TODO: implement this
+                $closeCode = URLSessionWebSocketTaskCloseCode::normalClosure;
+                if (strlen($data) >= 2) {
+                    $reasonData = substring_from_index($data, 2);
+                    [$byte1,] = array_values(unpack('C*', $data));
+                    $closeCode = URLSessionWebSocketOperationCode::tryFrom($byte1 & 0b00001111) ?? URLSessionWebSocketTaskCloseCode::unsupportedData;
                 }
                 $task->close($closeCode, $reasonData);
                 break;

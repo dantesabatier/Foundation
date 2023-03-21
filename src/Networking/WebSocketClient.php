@@ -41,18 +41,9 @@ class WebSocketClient
         $this->socket = stream_socket_client($url->absoluteString);
     }
 
-    public function setPreferredReceiveBufferSize(int $size): void
-    {
-        stream_set_chunk_size($this->socket, $size);
-    }
-
     public function setCustomHeaders(Dictionary $headerFields): void
     {
         $this->additionalHeaders->merge($headerFields);
-    }
-
-    public function setRequestBodyLength(int $length): void
-    {
     }
 
     public function setTimeout(int $timeout): void
