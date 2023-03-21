@@ -25,7 +25,7 @@ final class EasyHandle
     public readonly ?URL $redirectURL;
     private ?URL $url = null;
     /** @var Dictionary<string> */
-    public readonly Dictionary $allHeaderFields;
+    private Dictionary $allHeaderFields;
     private ?URLSessionConfiguration $configuration = null;
     private EasyHandlePauseState $pauseState;
     private URLSessionWebSocketOperationCode $code = URLSessionWebSocketOperationCode::binary;
@@ -115,13 +115,13 @@ final class EasyHandle
             }
             /** @noinspection PhpUnhandledExceptionInspection */
             $key = base64_encode(random_bytes(16));
-            $this->allHeaderFields->merge(new Dictionary([
+            $this->allHeaderFields = new Dictionary([
                 "Host" => $authority,
                 "Upgrade" => "WebSocket",
                 "Connection" => "Upgrade",
                 "Sec-WebSocket-Key" => $key,
                 "Sec-WebSocket-Version" => "13"
-            ]));
+            ]);
             $this->socket = stream_socket_client($url->absoluteString);
             return;
         }
