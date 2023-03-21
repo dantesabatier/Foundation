@@ -137,6 +137,7 @@ class WebSocketClient
                 case URLSessionWebSocketOperationCode::binary:
                     break;
             }
+            $this->operationCode = $code;
             error_log($data);
         } while (!$final);
         return "";
