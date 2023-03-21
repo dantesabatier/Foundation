@@ -10,13 +10,13 @@ use Sabatier\Foundation\URL;
 class WebSocketClient
 {
     private URL $url;
-    private Dictionary $additionalHeaders;
+    private Dictionary $allHeaderFields;
     private mixed $socket;
     public URLSessionWebSocketOperationCode $code = URLSessionWebSocketOperationCode::cont;
 
     public function __construct(public readonly EasyHandleDelegate $delegate)
     {
-        $this->additionalHeaders = new Dictionary();
+        $this->allHeaderFields = new Dictionary();
     }
 
     public function setURL(URL $url): void
@@ -30,7 +30,7 @@ class WebSocketClient
         }
         /** @noinspection PhpUnhandledExceptionInspection */
         $key = base64_encode(random_bytes(16));
-        $this->additionalHeaders = new Dictionary([
+        $this->allHeaderFields = new Dictionary([
             "Host" => $authority,
             "Upgrade" => "WebSocket",
             "Connection" => "Upgrade",
@@ -43,7 +43,7 @@ class WebSocketClient
 
     public function setCustomHeaders(Dictionary $headerFields): void
     {
-        $this->additionalHeaders->merge($headerFields);
+        $this->allHeaderFields->merge($headerFields);
     }
 
     public function setTimeout(int $timeout): void
@@ -54,7 +54,7 @@ class WebSocketClient
     public function start(): void
     {
         $header = "GET {$this->url->absoluteString} HTTP/1.1\r\n";
-        $header .= $this->additionalHeaders->mapValues(fn(string $value, string $key): string => "$key: $value")->values->join("\r\n");
+        $header .= $this->allHeaderFields->mapValues(fn(string $value, string $key): string => "$key: $value")->values->join("\r\n");
         $header .= "\r\n\r\n";
         fwrite($this->socket, $header);
         while (!feof($this->socket)) {
