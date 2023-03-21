@@ -28,7 +28,7 @@ final class EasyHandle
     private Dictionary $allHeaderFields;
     private ?URLSessionConfiguration $configuration = null;
     private EasyHandlePauseState $pauseState;
-    private URLSessionWebSocketOperationCode $code = URLSessionWebSocketOperationCode::binary;
+    private URLSessionWebSocketOperationCode $code = URLSessionWebSocketOperationCode::cont;
     public bool $isWebSocketClient = false;
     private mixed $socket;
 
