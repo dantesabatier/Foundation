@@ -32,10 +32,10 @@ abstract class NativeProtocol extends URLProtocol implements EasyHandleDelegate
 
     public function __construct(URLSessionTask $task, ?CachedURLResponse $cachedResponse = null, ?URLProtocolClient $client = null)
     {
-        unset($this->tempFileURL);
         parent::__construct($task, $cachedResponse, $client);
-        $this->internalState = InternalState::initial();
-        $this->easyHandle = new EasyHandle($this);
+        unset($this->internalState);
+        unset($this->easyHandle);
+        unset($this->tempFileURL);
     }
 
     /**
@@ -43,14 +43,16 @@ abstract class NativeProtocol extends URLProtocol implements EasyHandleDelegate
      */
     public function __get(string $name)
     {
-        if ($name == "tempFileURL") {
-            $tempFileURL = FileManager::default()->url(SearchPathDirectory::cachesDirectory, SearchPathDomainMask::local, null, true)->appendingPathComponent(uniqid((string)(new SystemRandomNumberGenerator())->next(), true))->appendPathExtension($this->task->originalRequest?->url?->pathExtension ?? "");
-            FileManager::default()->createFile($tempFileURL->path, null);
-            $this->$name = $tempFileURL;
-            return $this->$name;
-        } else {
-            return $this->valueForUndefinedKey($name);
-        }
+        return $this->$name = match ($name) {
+            "internalState" => InternalState::initial(),
+            "easyHandle" => new EasyHandle($this),
+            "tempFileURL" => (function (): URL {
+                $tempFileURL = FileManager::default()->url(SearchPathDirectory::cachesDirectory, SearchPathDomainMask::local, null, true)->appendingPathComponent(uniqid((string)(new SystemRandomNumberGenerator())->next(), true))->appendPathExtension($this->task->originalRequest?->url?->pathExtension ?? "");
+                FileManager::default()->createFile($tempFileURL->path, null);
+                return $tempFileURL;
+            })(),
+            default => $this->valueForUndefinedKey($name)
+        };
     }
 
     public static function enableLibcurlDebugOutput(): bool
