@@ -52,7 +52,7 @@ final class NotificationCenter
     public function addObserverForName(string $name, mixed $object, Closure $block): ObjectProtocol
     {
         $observer = new NotificationObserver($name, observed: $object, callable: $block);
-        $this->observers[] = $observer;
+        $this->observers->append($observer);
         return $observer;
     }
 
@@ -65,7 +65,7 @@ final class NotificationCenter
      */
     public function addObserver(mixed $observer, string $selector, string $name, mixed $object = null): void
     {
-        $this->observers[] = new NotificationObserver($name, $observer, $object, $selector);
+        $this->observers->append(new NotificationObserver($name, $observer, $object, $selector));
     }
 
     /**
