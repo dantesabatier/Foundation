@@ -30,7 +30,7 @@ final class EasyHandle
     private EasyHandlePauseState $pauseState;
     private URLSessionWebSocketOperationCode $code = URLSessionWebSocketOperationCode::binary;
     public bool $isWebSocketClient = false;
-    public mixed $socket;
+    private mixed $webSocketClient;
 
     public function __construct(public readonly EasyHandleDelegate $delegate)
     {
@@ -122,7 +122,7 @@ final class EasyHandle
                 "Sec-WebSocket-Key" => $key,
                 "Sec-WebSocket-Version" => "13"
             ]));
-            $this->socket = stream_socket_client($url->absoluteString);
+            $this->webSocketClient = stream_socket_client($url->absoluteString);
             return;
         }
         $this->set($url->absoluteString, CURLOPT_URL);
@@ -201,7 +201,7 @@ final class EasyHandle
     public function setTimeout(int $timeout): void
     {
         if ($this->isWebSocketClient) {
-            stream_set_timeout($this->socket, $timeout);
+            stream_set_timeout($this->webSocketClient, $timeout);
         } else {
             $this->set($timeout, CURLOPT_TIMEOUT);
         }
@@ -339,9 +339,9 @@ final class EasyHandle
         $header = "GET {$this->url->absoluteString} HTTP/1.1\r\n";
         $header .= $this->allHeaderFields->mapValues(fn(string $value, string $key): string => "$key: $value")->values->join("\r\n");
         $header .= "\r\n\r\n";
-        fwrite($this->socket, $header);
-        while (!feof($this->socket)) {
-            if (!($data = $this->fill($this->socket))) {
+        fwrite($this->webSocketClient, $header);
+        while (!feof($this->webSocketClient)) {
+            if (!($data = $this->fill($this->webSocketClient))) {
                 break;
             }
             $this->didReceiveHeaderData($data, strlen($data));
@@ -351,7 +351,7 @@ final class EasyHandle
     public function disconnect(): void
     {
         if ($this->isWebSocketClient) {
-            fclose($this->socket);
+            fclose($this->webSocketClient);
         } else {
             curl_close($this->rawHandle);
         }
@@ -369,7 +369,7 @@ final class EasyHandle
     {
         $fn = function (int $length): string {
             $data = "";
-            while (strlen($data) < $length && ($result = fread($this->socket, $length))) {
+            while (strlen($data) < $length && ($result = fread($this->webSocketClient, $length))) {
                 $data .= $result;
             }
             return $data;
@@ -463,7 +463,7 @@ final class EasyHandle
             } else {
                 $data .= $payload;
             }
-            fwrite($this->socket, $data);
+            fwrite($this->webSocketClient, $data);
         }
     }
 
