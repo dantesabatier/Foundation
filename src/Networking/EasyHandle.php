@@ -370,7 +370,7 @@ final class EasyHandle
             return $data;
         };
         $payload = "";
-        $code = URLSessionWebSocketOperationCode::binary;
+        $code = URLSessionWebSocketOperationCode::cont;
         do {
             $data = $fn(2);
             $components = array_values(unpack('C*', $data));
