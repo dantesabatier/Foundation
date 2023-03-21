@@ -80,9 +80,14 @@ class WebSocketURLProtocol extends HTTPURLProtocol
         $webSocketClient = $this->webSocketClient;
         $webSocketClient->setURL($url);
         $webSocketClient->setTimeout((int)$request->timeoutInterval);
+        $task = $this->task;
+        if (!$task instanceof URLSessionWebSocketTask) {
+            return;
+        }
+        $webSocketClient->setPreferredReceiveBufferSize($task->maximumMessageSize);
     }
 
-    public function send(string $data, URLSessionWebSocketOperationCode $code): void
+    public function sendWebSocketData(string $data, URLSessionWebSocketOperationCode $code): void
     {
         $this->webSocketClient->send($data, $code);
     }
