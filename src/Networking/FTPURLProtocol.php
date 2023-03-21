@@ -48,8 +48,8 @@ class FTPURLProtocol extends NativeProtocol
      */
     public function configureEasyHandle(URLRequest $request, TaskBody $body): void
     {
-        parent::configureEasyHandle($request, $body);
         $easyHandle = $this->easyHandle;
+        $easyHandle->setupCallbacks();
         $easyHandle->setVerboseModeOn(self::enableLibcurlDebugOutput());
         $easyHandle->setSkipAllSignalHandling(true);
         $easyHandle->setURL($request->url);
