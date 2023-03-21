@@ -54,7 +54,7 @@ final class EasyHandle
             "connectFailureErrno" => $this->get(CURLINFO_OS_ERRNO),
             "redirectURL" => ($s = $this->get(CURLINFO_REDIRECT_URL)) ? new URL($s) : null,
             "allHeaderFields" => new Dictionary(),
-            "isWebSocket" => $this->delegate instanceof WebSocketURLProtocol,
+            "isWebSocketHandle" => $this->delegate instanceof WebSocketURLProtocol,
             default => throw new UndefinedKeyException()
         };
     }
