@@ -59,7 +59,10 @@ final class EasyHandle
 
     public function get(int $option): mixed
     {
-        return $this->isWebSocketClient ? null : curl_getinfo($this->rawHandle, $option);
+        if ($this->isWebSocketClient) {
+            return null;
+        }
+        return curl_getinfo($this->rawHandle, $option);
     }
 
     public function set(mixed $value, int $option): void
