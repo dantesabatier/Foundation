@@ -235,10 +235,10 @@ abstract class URLSessionTask extends ObjectClass
 
     /**
      * @param string $authScheme
-     * @return callable(URLSessionTask, URLSessionAuthChallengeDisposition, URLCredential|null): void
+     * @return Closure(URLSessionTask, URLSessionAuthChallengeDisposition, URLCredential|null): void
      * @internal
      */
-    public function authHandler(string $authScheme): callable
+    public function authHandler(string $authScheme): Closure
     {
         return match ($authScheme) {
             URLAuthenticationMethodHTTPBasic => function (/** @noinspection PhpUnusedParameterInspection */ URLSessionTask $task, URLSessionAuthChallengeDisposition $disposition, ?URLCredential $credential): void {
