@@ -377,7 +377,7 @@ final class EasyHandle
             return $data;
         };
         $payload = "";
-        $operation = URLSessionWebSocketOperation::cont;
+        $operation = URLSessionWebSocketOperation::close;
         do {
             $data = $fn(2);
             $components = array_values(unpack("C*", $data));
@@ -417,7 +417,8 @@ final class EasyHandle
                     $this->sendWebSocketsData($payload, URLSessionWebSocketOperation::pong);
                     break;
                 case URLSessionWebSocketOperation::close:
-                    $this->sendWebSocketsData("", URLSessionWebSocketOperation::close);
+                    $data = (new ArrayClass(str_split(sprintf('%016b', URLSessionWebSocketTaskCloseCode::normalClosure->value), 8)))->map(fn(string $string): string => chr((int) bindec($string)))->join("");
+                    $this->sendWebSocketsData($data, URLSessionWebSocketOperation::close);
                     break;
                 case URLSessionWebSocketOperation::pong:
                 case URLSessionWebSocketOperation::cont:
@@ -425,8 +426,8 @@ final class EasyHandle
                 case URLSessionWebSocketOperation::binary:
                     break;
             }
-            $this->operation = $operation;
         } while (!$isFinal);
+        $this->operation = $operation;
         return [$payload, $operation];
     }
 
@@ -467,6 +468,8 @@ final class EasyHandle
             }
             fwrite($this->socket, $data);
         }
+        [$data, ] = $this->receiveWebSocketsData();
+        $this->didReceiveData($data);
     }
 
     public static function supportsWebSockets(): bool
