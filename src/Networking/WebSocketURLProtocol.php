@@ -57,6 +57,9 @@ class WebSocketURLProtocol extends HTTPURLProtocol
         $easyHandle->setTimeout((int)$request->timeoutInterval);
     }
 
+    /**
+     * @throws Exception
+     */
     public function sendWebSocketData(string $data, URLSessionWebSocketOperation $operation): void
     {
         $this->easyHandle->sendWebSocketsData($data, $operation);
@@ -133,8 +136,7 @@ class WebSocketURLProtocol extends HTTPURLProtocol
                 $closeCode = URLSessionWebSocketTaskCloseCode::normalClosure;
                 if (strlen($data) >= 2) {
                     $reasonData = substring_from_index($data, 2);
-                    [$byte1,] = array_values(unpack("C*", $data));
-                    $closeCode = URLSessionWebSocketTaskCloseCode::tryFrom($byte1 & 0b00001111) ?? URLSessionWebSocketTaskCloseCode::unsupportedData;
+                    $closeCode = URLSessionWebSocketTaskCloseCode::tryFrom(current(unpack('n', $data))) ?? URLSessionWebSocketTaskCloseCode::unsupportedData;
                 }
                 $task->close($closeCode, $reasonData);
                 break;
