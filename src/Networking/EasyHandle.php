@@ -338,14 +338,11 @@ final class EasyHandle
 
     public function connect(): void
     {
-        $header = "GET {$this->url->absoluteString} HTTP/1.1\r\n";
+        $header = "GET {$this->url?->absoluteString} HTTP/1.1\r\n";
         $header .= $this->allHeaderFields->mapValues(fn(string $value, string $key): string => "$key: $value")->values->join("\r\n");
         $header .= "\r\n\r\n";
         fwrite($this->socket, $header);
-        while (!feof($this->socket)) {
-            if (!($data = $this->fill($this->socket))) {
-                break;
-            }
+        while ($data = $this->fill($this->socket)) {
             $this->didReceiveHeaderData($data, strlen($data));
         }
     }
