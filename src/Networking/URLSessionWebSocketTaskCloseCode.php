@@ -11,12 +11,12 @@ enum URLSessionWebSocketTaskCloseCode: int
     case invalid = 0;
     /** A code that indicates normal connection closure. */
     case normalClosure = 1000;
+    /** A code that indicates an endpoint is going away. */
+    case goingAway = 1001;
     /** A code that indicates an endpoint terminated the connection due to a protocol error. */
     case protocolError = 1002;
     /** A code that indicates an endpoint terminated the connection after receiving a type of data it can't accept. */
     case unsupportedData = 1003;
-    /** A code that indicates an endpoint is going away. */
-    case goingAway = 1001;
     /** A reserved code that indicates an endpoint expected a status code and didn't receive one. */
     case noStatusReceived = 1005;
     /** A reserved code that indicates the connection closed without a close control frame. */
