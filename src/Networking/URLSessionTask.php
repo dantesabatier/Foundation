@@ -92,13 +92,11 @@ abstract class URLSessionTask extends ObjectClass
 
     /**
      * @return class-string<URLProtocol>|null
-     * @throws Exception
      */
     private function protocolClass(): ?string
     {
-        if (!($request = $this->currentRequest)) {
-            fatal_error("A protocol class was requested, but we do not have a current request");
-        }
+        /** @var URLRequest $request */
+        $request = $this->currentRequest;
         /** @var ArrayClass<class-string<URLProtocol>> $protocolClasses */
         $protocolClasses = $this->session->configuration->protocolClasses ?? URLProtocol::getProtocols() ?? new ArrayClass();
         if ($urlProtocolClass = URLProtocol::getProtocolClass($protocolClasses, $request)) {
@@ -130,7 +128,6 @@ abstract class URLSessionTask extends ObjectClass
 
     /**
      * @param Closure(URLProtocol|null): void $callback
-     * @throws Exception
      */
     protected function getProtocol(Closure $callback): void
     {
@@ -265,7 +262,6 @@ abstract class URLSessionTask extends ObjectClass
         $this->updateTaskState();
         if ($this->suspendCount === 0) {
             $this->hasTriggeredResume = true;
-            /** @noinspection PhpUnhandledExceptionInspection */
             $this->getProtocol(function (?URLProtocol $protocol): void {
                 if ($protocol) {
                     $protocol->startLoading();
