@@ -60,6 +60,12 @@ class WebSocketURLProtocol extends HTTPURLProtocol
     /**
      * @throws Exception
      */
+    public function receiveWebSocketData(): void
+    {
+        [$data,] = $this->easyHandle->receiveWebSocketsData();
+        $this->didReceiveData($data);
+    }
+
     public function sendWebSocketData(string $data, URLSessionWebSocketOperation $operation): void
     {
         $this->easyHandle->sendWebSocketsData($data, $operation);
