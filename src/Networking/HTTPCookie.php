@@ -145,7 +145,7 @@ class HTTPCookie extends ObjectClass
 
     private static function splitNameValue(string $pair): array
     {
-        $components = explode('=', $pair, 2);
+        $components = explode("=", $pair, 2);
         $name = ucwords(trim($components[0]));
         $value = null;
         if (count($components) > 1) {

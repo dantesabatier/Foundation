@@ -317,7 +317,7 @@ final class URLSession implements URLSessionProtocol
     {
         $tasks = [];
         $this->getTasksWithCompletionHandler(function (ArrayClass $dataTasks, ArrayClass $uploadTasks, ArrayClass $downloadTasks) use (&$tasks): void {
-            $tasks = ['dataTasks' => $dataTasks, 'uploadTasks' => $uploadTasks, 'downloadTasks' => $downloadTasks];
+            $tasks = ["dataTasks" => $dataTasks, "uploadTasks" => $uploadTasks, "downloadTasks" => $downloadTasks];
         });
         return $tasks;
     }

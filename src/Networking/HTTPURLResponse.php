@@ -29,7 +29,7 @@ class HTTPURLResponse extends URLResponse
      */
     public function __construct(URL $url, #[ExpectedValues(valuesFromClass: HTTPStatusCode::class)] public readonly int $statusCode = HTTPStatusCode::ok, ?string $httpVersion = null, ?Dictionary $headerFields = null)
     {
-        $this->httpVersion = $httpVersion ?? $_SERVER['SERVER_PROTOCOL'] ?? "HTTP/1.1";
+        $this->httpVersion = $httpVersion ?? $_SERVER["SERVER_PROTOCOL"] ?? "HTTP/1.1";
         $this->allHeaderFields = (function () use ($headerFields): Dictionary {
             if ($headerFields === null) {
                 return new Dictionary();
@@ -43,7 +43,7 @@ class HTTPURLResponse extends URLResponse
                 if (string_has_prefix($key, "X-", CompareOptions::caseInsensitive)) {
                     $canonicalizedFields[$key] = $value;
                 } elseif (string_is_equal($key, "WWW-Authenticate", CompareOptions::caseInsensitive)) {
-                    $canonicalizedFields['WWW-Authenticate'] = $value;
+                    $canonicalizedFields["WWW-Authenticate"] = $value;
                 } else {
                     $canonicalizedFields[ucwords($key)] = $value;
                 }
@@ -56,8 +56,8 @@ class HTTPURLResponse extends URLResponse
         $textEncodingName = null;
         $contentType = $this->contentType($headerFields);
         if ($contentType) {
-            $mimeType = $contentType['mimeType'];
-            $textEncodingName = $contentType['textEncoding'];
+            $mimeType = $contentType["mimeType"];
+            $textEncodingName = $contentType["textEncoding"];
         }
         parent::__construct($url, $mimeType, $expectedContentLength, $textEncodingName, $suggestedFilename);
     }
@@ -88,9 +88,9 @@ class HTTPURLResponse extends URLResponse
             if (str_contains($value, ";")) {
                 [$mimeType, $part] = explode(";", $value);
                 [, $textEncoding] = explode("=", $part);
-                return ['mimeType' => $mimeType, 'textEncoding' => $textEncoding];
+                return ["mimeType" => $mimeType, "textEncoding" => $textEncoding];
             }
-            return ['mimeType' => $mimeType, 'textEncoding' => null];
+            return ["mimeType" => $mimeType, "textEncoding" => null];
         }
         return null;
     }
@@ -116,45 +116,45 @@ class HTTPURLResponse extends URLResponse
     public static function localizedString(#[ExpectedValues(valuesFromClass: HTTPStatusCode::class)] int $statusCode): string
     {
         return match ($statusCode) {
-            HTTPStatusCode::continue => 'Continue',
-            HTTPStatusCode::switchingProtocols => 'Switching protocols',
-            HTTPStatusCode::ok => 'OK',
-            HTTPStatusCode::created => 'Created',
-            HTTPStatusCode::accepted => 'Accepted',
-            HTTPStatusCode::nonAuthoritativeInformation => 'Non authoritative information',
-            HTTPStatusCode::noContent => 'No content',
-            HTTPStatusCode::resetContent => 'Reset content',
-            HTTPStatusCode::partialContent => 'Partial content',
-            HTTPStatusCode::multipleChoices => 'Multiple choices',
-            HTTPStatusCode::movedPermanently => 'Moved permanently',
-            HTTPStatusCode::found => 'Found',
-            HTTPStatusCode::seeOther => 'See other',
-            HTTPStatusCode::notModified => 'Not modified',
-            HTTPStatusCode::temporaryRedirect => 'Temporary redirect',
-            HTTPStatusCode::badRequest => 'Bad request',
-            HTTPStatusCode::unauthorized => 'Unauthorized',
-            HTTPStatusCode::paymentRequired => 'Payment required',
-            HTTPStatusCode::forbidden => 'Forbidden',
-            HTTPStatusCode::notFound => 'Not found',
-            HTTPStatusCode::methodNotAllowed => 'Method not allowed',
-            HTTPStatusCode::unacceptable => 'Unacceptable',
-            HTTPStatusCode::proxyAuthenticationRequired => 'Proxy authentication required',
-            HTTPStatusCode::requestTimeout => 'Request time out',
-            HTTPStatusCode::conflict => 'Conflict',
-            HTTPStatusCode::lengthRequired => 'Length required',
-            HTTPStatusCode::preconditionFailed => 'Precondition failed',
-            HTTPStatusCode::requestTooLarge => 'Request too large',
-            HTTPStatusCode::requestedURLTooLong => 'Requested URL too long',
-            HTTPStatusCode::unsupportedMediaType => 'Unsupported media type',
-            HTTPStatusCode::requestedRangeNotSatisfiable => 'Requested range not satisfiable',
-            HTTPStatusCode::expectationFailed => 'Expectation failed',
-            HTTPStatusCode::internalServerError => 'Internal server error',
-            HTTPStatusCode::unimplemented => 'Not implemented',
-            HTTPStatusCode::badGateway => 'Bad gateway',
-            HTTPStatusCode::serviceUnavailable => 'Service unavailable',
-            HTTPStatusCode::gatewayTimeout => 'Gateway time out',
-            HTTPStatusCode::unsupportedVersion => 'Unsupported version',
-            default => 'Server Error'
+            HTTPStatusCode::continue => "Continue",
+            HTTPStatusCode::switchingProtocols => "Switching protocols",
+            HTTPStatusCode::ok => "OK",
+            HTTPStatusCode::created => "Created",
+            HTTPStatusCode::accepted => "Accepted",
+            HTTPStatusCode::nonAuthoritativeInformation => "Non authoritative information",
+            HTTPStatusCode::noContent => "No content",
+            HTTPStatusCode::resetContent => "Reset content",
+            HTTPStatusCode::partialContent => "Partial content",
+            HTTPStatusCode::multipleChoices => "Multiple choices",
+            HTTPStatusCode::movedPermanently => "Moved permanently",
+            HTTPStatusCode::found => "Found",
+            HTTPStatusCode::seeOther => "See other",
+            HTTPStatusCode::notModified => "Not modified",
+            HTTPStatusCode::temporaryRedirect => "Temporary redirect",
+            HTTPStatusCode::badRequest => "Bad request",
+            HTTPStatusCode::unauthorized => "Unauthorized",
+            HTTPStatusCode::paymentRequired => "Payment required",
+            HTTPStatusCode::forbidden => "Forbidden",
+            HTTPStatusCode::notFound => "Not found",
+            HTTPStatusCode::methodNotAllowed => "Method not allowed",
+            HTTPStatusCode::unacceptable => "Unacceptable",
+            HTTPStatusCode::proxyAuthenticationRequired => "Proxy authentication required",
+            HTTPStatusCode::requestTimeout => "Request time out",
+            HTTPStatusCode::conflict => "Conflict",
+            HTTPStatusCode::lengthRequired => "Length required",
+            HTTPStatusCode::preconditionFailed => "Precondition failed",
+            HTTPStatusCode::requestTooLarge => "Request too large",
+            HTTPStatusCode::requestedURLTooLong => "Requested URL too long",
+            HTTPStatusCode::unsupportedMediaType => "Unsupported media type",
+            HTTPStatusCode::requestedRangeNotSatisfiable => "Requested range not satisfiable",
+            HTTPStatusCode::expectationFailed => "Expectation failed",
+            HTTPStatusCode::internalServerError => "Internal server error",
+            HTTPStatusCode::unimplemented => "Not implemented",
+            HTTPStatusCode::badGateway => "Bad gateway",
+            HTTPStatusCode::serviceUnavailable => "Service unavailable",
+            HTTPStatusCode::gatewayTimeout => "Gateway time out",
+            HTTPStatusCode::unsupportedVersion => "Unsupported version",
+            default => "Server Error"
         };
     }
 

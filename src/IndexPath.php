@@ -513,7 +513,7 @@ class IndexPath extends ObjectClass implements MutableCollection, Iterator
 
     public function description(): string
     {
-        return "[" . $this->join(', ') . "]";
+        return "[" . $this->join(", ") . "]";
     }
 
     /**

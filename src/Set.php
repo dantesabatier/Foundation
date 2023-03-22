@@ -657,7 +657,7 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
 
     public function description(): string
     {
-        return "[" . $this->join(', ') . "]";
+        return "[" . $this->join(", ") . "]";
     }
 
     /**

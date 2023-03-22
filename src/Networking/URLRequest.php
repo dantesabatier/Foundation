@@ -49,7 +49,7 @@ class URLRequest extends ObjectClass
 
     public function __get(string $name)
     {
-        if ($name == 'httpBody') {
+        if ($name == "httpBody") {
             $httpBody = null;
             if ($this->httpMethod !== HTTPRequestMethod::get && $this->httpMethod !== HTTPRequestMethod::head && $this->httpMethod !== HTTPRequestMethod::options) {
                 $contentType = $this->valueForHttpHeaderField("Content-Type") ?? "text/plain";
@@ -65,12 +65,12 @@ class URLRequest extends ObjectClass
                 } elseif (string_has_prefix($mediaType, "multipart/form-data", CompareOptions::caseInsensitive)) {
                     $httpBody = json_encode(empty($_FILES) ? $_POST : $_FILES);
                 } else {
-                    $httpBody = file_get_contents('php://input');
+                    $httpBody = file_get_contents("php://input");
                 }
             }
             $this->$name = empty($httpBody) ? null : $httpBody;
             return $this->$name;
-        } elseif ($name == 'protocolProperties') {
+        } elseif ($name == "protocolProperties") {
             $this->$name = new Dictionary();
             return $this->$name;
         } else {

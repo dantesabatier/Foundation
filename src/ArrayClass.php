@@ -700,7 +700,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
 
     public function description(): string
     {
-        return "[" . $this->join(', ') . "]";
+        return "[" . $this->join(", ") . "]";
     }
 
     /**

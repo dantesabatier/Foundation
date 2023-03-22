@@ -113,7 +113,7 @@ final class EasyHandle
                 $authority = "$user:$password@$authority";
             }
             if ($port = $url->port) {
-                $authority .= ':' . $port;
+                $authority .= ":" . $port;
             }
             /** @noinspection PhpUnhandledExceptionInspection */
             $key = base64_encode(random_bytes(16));
@@ -417,7 +417,7 @@ final class EasyHandle
                     $this->sendWebSocketsData($payload, URLSessionWebSocketOperation::pong);
                     break;
                 case URLSessionWebSocketOperation::close:
-                    $data = (new ArrayClass(str_split(sprintf('%016b', URLSessionWebSocketTaskCloseCode::normalClosure->value), 8)))->map(fn(string $string): string => chr((int) bindec($string)))->join("");
+                    $data = (new ArrayClass(str_split(sprintf("%016b", URLSessionWebSocketTaskCloseCode::normalClosure->value), 8)))->map(fn(string $string): string => chr((int) bindec($string)))->join("");
                     $this->sendWebSocketsData($data, URLSessionWebSocketOperation::close);
                     break;
                 case URLSessionWebSocketOperation::pong:

@@ -221,7 +221,7 @@ class URLSessionWebSocketTask extends URLSessionTask
         $this->closeMessage = null;
         try {
             [$code, $reason] = $closeMessage;
-            $data = (new ArrayClass(str_split(sprintf('%016b', $code->value), 8)))->map(fn(string $string): string => chr((int)bindec($string)))->join("");
+            $data = (new ArrayClass(str_split(sprintf("%016b", $code->value), 8)))->map(fn(string $string): string => chr((int)bindec($string)))->join("");
             $data .= $reason;
             $protocol->sendWebSocketData($data, URLSessionWebSocketOperation::close);
         } catch (Exception) {

@@ -157,7 +157,7 @@ class HTTPURLProtocol extends NativeProtocol
                     if ($data = $body->data) {
                         $easyHandle->set($data, CURLOPT_POSTFIELDS);
                     } elseif ($fileURL = $body->fileURL) {
-                        $easyHandle->set(['file' => new CURLFile($fileURL->path, URLFileTypeMappings::shared()->mimeType($fileURL->pathExtension) ?? "application/octet-stream", $fileURL->lastPathComponent)], CURLOPT_POSTFIELDS);
+                        $easyHandle->set(["file" => new CURLFile($fileURL->path, URLFileTypeMappings::shared()->mimeType($fileURL->pathExtension) ?? "application/octet-stream", $fileURL->lastPathComponent)], CURLOPT_POSTFIELDS);
                     }
                     if ($length = $body->getBodyLength()) {
                         $easyHandle->setRequestBodyLength($length);
