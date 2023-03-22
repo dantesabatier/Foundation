@@ -8,7 +8,6 @@ use Sabatier\Foundation\ArrayClass;
 use Sabatier\Foundation\Dictionary;
 use Sabatier\Foundation\Error;
 use const Sabatier\Foundation\LocalizedDescriptionKey;
-use const Sabatier\Foundation\URLErrorBadServerResponse;
 use const Sabatier\Foundation\URLErrorDomain;
 use const Sabatier\Foundation\URLErrorFailingURLErrorKey;
 use const Sabatier\Foundation\URLErrorNetworkConnectionLost;
@@ -56,7 +55,6 @@ class URLSessionWebSocketTask extends URLSessionTask
      * If an error occurs while sending the message, any outstanding work also fails.
      * @param URLSessionWebSocketTaskMessage $message The WebSocket message to send to the other endpoint.
      * @param Closure(Error|null): void $completionHandler A closure that receives an Error that indicates an error encountered while sending, or nil if no error occurred.
-     * @throws Exception
      */
     public function send(URLSessionWebSocketTaskMessage $message, Closure $completionHandler): void
     {
@@ -69,7 +67,6 @@ class URLSessionWebSocketTask extends URLSessionTask
      *
      * If the task reaches the {@see maximumMessageSize} while buffering the frames, this call fails with an error.
      * @param Closure(URLSessionWebSocketTaskMessage|null, Error|null): void $completionHandler A closure that receives two parameters: the WebSocket message, and an Error that indicates an error encountered while receiving the message. The error is nil if no error occurred.
-     * @throws Exception
      */
     public function receive(Closure $completionHandler): void
     {
@@ -82,17 +79,16 @@ class URLSessionWebSocketTask extends URLSessionTask
      *
      * When sending multiple pings, the task always calls pongReceiveHandler in the order it sent the pings.
      * @param Closure(Error|null): void $pongReceiveHandler A closure called by the task when it receives the pong from the server. The closure receives an Error that indicates a lost connection or other problem, or nil if no error occurred.
-     * @throws Exception
      */
     public function sendPing(Closure $pongReceiveHandler): void
     {
         $this->getProtocol(function (?URLProtocol $protocol) use ($pongReceiveHandler): void {
             if ($protocol instanceof WebSocketURLProtocol) {
+                $this->pongCompletionHandlers->append($pongReceiveHandler);
                 try {
                     $protocol->sendWebSocketData("", URLSessionWebSocketOperation::ping);
-                    $this->pongCompletionHandlers->append($pongReceiveHandler);
-                } catch (Exception) {
-                    $pongReceiveHandler(new Error(URLErrorDomain, URLErrorBadServerResponse));
+                } catch (Exception $exception) {
+                    $pongReceiveHandler(new Error(URLErrorDomain, (int)$exception->getCode(), new Dictionary([LocalizedDescriptionKey => $exception->getMessage()])));
                 }
             } else {
                 $pongReceiveHandler(new Error(URLErrorDomain, URLErrorNetworkConnectionLost));
@@ -100,9 +96,22 @@ class URLSessionWebSocketTask extends URLSessionTask
         });
     }
 
-    /**
-     * @throws Exception
-     */
+    public function resume(): void
+    {
+        if (!EasyHandle::supportsWebSockets()) {
+            /** @var Dictionary<mixed> $userInfo */
+            $userInfo = new Dictionary([LocalizedDescriptionKey => ""]);
+            if ($url = $this->originalRequest?->url) {
+                $userInfo[URLErrorFailingURLErrorKey] = $url;
+            }
+            $this->error = new Error(URLErrorDomain, URLErrorUnsupportedURL, $userInfo);
+            /** @noinspection PhpUnhandledExceptionInspection */
+            (new ProtocolClient())->urlProtocolTaskDidFailWithError($this, $this->error);
+            return;
+        }
+        parent::resume();
+    }
+
     public function cancel(): void
     {
         $this->cancelWithReason(URLSessionWebSocketTaskCloseCode::invalid, null);
@@ -114,7 +123,6 @@ class URLSessionWebSocketTask extends URLSessionTask
      * If you call {@see cancel()} on the task instead of this method, it sends a cancellation frame with no close code or reason.
      * @param URLSessionWebSocketTaskCloseCode $closeCode A {@see URLSessionWebSocketTaskCloseCode} that indicates the reason for closing the connection.
      * @param string|null $reason Optional further information to explain the closing. The value of this parameter is defined by the endpoints, not by the standard.
-     * @throws Exception
      */
     public function cancelWithReason(URLSessionWebSocketTaskCloseCode $closeCode, ?string $reason): void
     {
@@ -122,7 +130,6 @@ class URLSessionWebSocketTask extends URLSessionTask
     }
 
     /**
-     * @throws Exception
      * @internal
      */
     public function appendReceivedMessage(URLSessionWebSocketTaskMessage $message): void
@@ -132,7 +139,6 @@ class URLSessionWebSocketTask extends URLSessionTask
     }
 
     /**
-     * @throws Exception
      * @internal
      */
     public function noteReceivedPong(): void
@@ -145,7 +151,6 @@ class URLSessionWebSocketTask extends URLSessionTask
     }
 
     /**
-     * @throws Exception
      * @internal
      */
     public function close(URLSessionWebSocketTaskCloseCode $code, ?string $reason = null): void
@@ -160,9 +165,6 @@ class URLSessionWebSocketTask extends URLSessionTask
         $this->doPendingWork();
     }
 
-    /**
-     * @throws Exception
-     */
     private function doPendingWork(): void
     {
         if ($taskError = $this->taskError ?? $this->error) {
@@ -197,7 +199,8 @@ class URLSessionWebSocketTask extends URLSessionTask
                                     break;
                             }
                             $completionHandler(null);
-                        } catch (Exception) {
+                        } catch (Exception $exception) {
+                            $completionHandler(new Error(URLErrorDomain, (int)$exception->getCode(), new Dictionary([LocalizedDescriptionKey => $exception->getMessage()])));
                         }
                     }
                     $this->sendCloseMessage($protocol);
@@ -226,24 +229,6 @@ class URLSessionWebSocketTask extends URLSessionTask
             $protocol->sendWebSocketData($data, URLSessionWebSocketOperation::close);
         } catch (Exception) {
         }
-    }
-
-    /**
-     * @throws Exception
-     */
-    public function resume(): void
-    {
-        if (!EasyHandle::supportsWebSockets()) {
-            /** @var Dictionary<mixed> $userInfo */
-            $userInfo = new Dictionary([LocalizedDescriptionKey => ""]);
-            if ($url = $this->originalRequest?->url) {
-                $userInfo[URLErrorFailingURLErrorKey] = $url;
-            }
-            $this->error = new Error(URLErrorDomain, URLErrorUnsupportedURL, $userInfo);
-            (new ProtocolClient())->urlProtocolTaskDidFailWithError($this, $this->error);
-            return;
-        }
-        parent::resume();
     }
 
     /**
