@@ -349,9 +349,10 @@ abstract class NativeProtocol extends URLProtocol implements EasyHandleDelegate
      */
     public function failWithError(Error $error, URLRequest $request): void
     {
-        $urlError = new Error(URLErrorDomain, $error->code, new Dictionary([UnderlyingErrorKey => $error, URLErrorFailingURLErrorKey => $request->url, LocalizedDescriptionKey => localized_string($error->localizedDescription)]));
-        $this->completeTaskWithError($urlError);
-        $this->client?->urlProtocolDidFailWithError($this, $urlError);
+        if ($error->domain !== URLErrorDomain) {
+            $error = new Error(URLErrorDomain, $error->code, new Dictionary([UnderlyingErrorKey => $error, URLErrorFailingURLErrorKey => $request->url, LocalizedDescriptionKey => localized_string($error->localizedDescription)]));
+        }
+        $this->client?->urlProtocolDidFailWithError($this, $error);
     }
 
     /**
