@@ -342,9 +342,12 @@ final class EasyHandle
         $header .= $this->allHeaderFields->mapValues(fn(string $value, string $key): string => "$key: $value")->values->join("\r\n");
         $header .= "\r\n\r\n";
         fwrite($this->socket, $header);
-        while ($data = $this->fill($this->socket)) {
+        $buffer = "";
+        do {
+            $data = $this->fill($this->socket);
+            $buffer .= $data;
             $this->didReceiveHeaderData($data, strlen($data));
-        }
+        } while(substr_count($buffer, "\r\n\r\n") == 0);
     }
 
     public function disconnect(): void
@@ -429,7 +432,7 @@ final class EasyHandle
 
     public function sendWebSocketsData(string $data, URLSessionWebSocketOperation $operation): void
     {
-        $parts = new ArrayClass(str_split($data, 4096));
+        $parts = new ArrayClass(str_split($data, 4096) ?: [""]);
         $max = $parts->indexBefore($parts->endIndex());
         /** @var ArrayClass<array{string, URLSessionWebSocketOperation, bool, bool}> $frames */
         $frames = $parts->map(fn(string $e, int $i): array => [$e, $i === 0 ? $operation : URLSessionWebSocketOperation::cont, $i === $max, true]);
