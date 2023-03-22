@@ -84,9 +84,9 @@ class URLSessionWebSocketTask extends URLSessionTask
     {
         $this->getProtocol(function (?URLProtocol $protocol) use ($pongReceiveHandler): void {
             if ($protocol instanceof WebSocketURLProtocol) {
-                $this->pongCompletionHandlers->append($pongReceiveHandler);
                 try {
                     $protocol->sendWebSocketData("", URLSessionWebSocketOperation::ping);
+                    $this->pongCompletionHandlers->append($pongReceiveHandler);
                 } catch (Exception $exception) {
                     $pongReceiveHandler(new Error(URLErrorDomain, (int)$exception->getCode(), new Dictionary([LocalizedDescriptionKey => $exception->getMessage()])));
                 }
