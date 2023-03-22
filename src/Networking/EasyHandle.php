@@ -3,12 +3,14 @@
 namespace Sabatier\Foundation\Networking;
 
 use CurlHandle;
+use Exception;
 use Sabatier\Foundation\ArrayClass;
 use Sabatier\Foundation\Dictionary;
 use Sabatier\Foundation\Error;
 use Sabatier\Foundation\ProcessInfo;
 use Sabatier\Foundation\UndefinedKeyException;
 use Sabatier\Foundation\URL;
+use function Sabatier\Foundation\fatal_error;
 use const Sabatier\Foundation\URLErrorBadServerResponse;
 use const Sabatier\Foundation\URLErrorBadURL;
 use const Sabatier\Foundation\URLErrorCannotFindHost;
@@ -347,7 +349,7 @@ final class EasyHandle
             $data = $this->fill($this->socket);
             $buffer .= $data;
             $this->didReceiveHeaderData($data, strlen($data));
-        } while(substr_count($buffer, "\r\n\r\n") == 0);
+        } while (substr_count($buffer, "\r\n\r\n") == 0);
     }
 
     public function disconnect(): void
@@ -366,25 +368,24 @@ final class EasyHandle
 
     /**
      * @return array{string, URLSessionWebSocketOperation}
+     * @throws Exception
      */
     public function receiveWebSocketsData(): array
     {
         $fn = function (int $length): string {
             $data = "";
-            while (strlen($data) < $length && ($result = fread($this->socket, $length))) {
-                $data .= $result;
+            while (strlen($data) < $length) {
+                if (!($buffer = fread($this->socket, $length - strlen($data)))) {
+                    fatal_error();
+                }
+                $data .= $buffer;
             }
             return $data;
         };
         $payload = "";
-        $operation = URLSessionWebSocketOperation::close;
         do {
             $data = $fn(2);
-            $components = array_values(unpack("C*", $data));
-            if (empty($components)) {
-                break;
-            }
-            [$byte1, $byte2] = $components;
+            [$byte1, $byte2] = array_values(unpack("C*", $data));
             $isFinal = (bool)($byte1 & 0b10000000);
             $isMasked = (bool)($byte2 & 0b10000000);
             $length = $byte2 & 0b01111111;
@@ -405,7 +406,7 @@ final class EasyHandle
                 $data = $fn($length);
                 if ($isMasked) {
                     for ($i = 0; $i < $length; $i++) {
-                        $length .= ($data[$i] ^ $mask[$i % 4]);
+                        $payload .= ($data[$i] ^ $mask[$i % 4]);
                     }
                 } else {
                     $payload = $data;
@@ -417,26 +418,25 @@ final class EasyHandle
                     $this->sendWebSocketsData($payload, URLSessionWebSocketOperation::pong);
                     break;
                 case URLSessionWebSocketOperation::close:
-                    $data = (new ArrayClass(str_split(sprintf("%016b", URLSessionWebSocketTaskCloseCode::normalClosure->value), 8)))->map(fn(string $string): string => chr((int) bindec($string)))->join("");
-                    $this->sendWebSocketsData($data, URLSessionWebSocketOperation::close);
-                    break;
                 case URLSessionWebSocketOperation::pong:
                 case URLSessionWebSocketOperation::cont:
                 case URLSessionWebSocketOperation::text:
                 case URLSessionWebSocketOperation::binary:
                     break;
             }
+            $this->operation = $operation;
         } while (!$isFinal);
-        $this->operation = $operation;
         return [$payload, $operation];
     }
 
+    /**
+     * @throws Exception
+     */
     public function sendWebSocketsData(string $data, URLSessionWebSocketOperation $operation): void
     {
         $parts = new ArrayClass(str_split($data, 4096) ?: [""]);
-        $max = $parts->indexBefore($parts->endIndex());
         /** @var ArrayClass<array{string, URLSessionWebSocketOperation, bool, bool}> $frames */
-        $frames = $parts->map(fn(string $e, int $i): array => [$e, $i === 0 ? $operation : URLSessionWebSocketOperation::cont, $i === $max, true]);
+        $frames = $parts->map(fn(string $e, int $i): array => [$e, $i === 0 ? $operation : URLSessionWebSocketOperation::cont, $i === $parts->indexBefore($parts->endIndex()), true]);
         foreach ($frames as $frame) {
             $data = "";
             [$payload, $operation, $isFinal, $isMasked] = $frame;
@@ -468,8 +468,6 @@ final class EasyHandle
             }
             fwrite($this->socket, $data);
         }
-        [$data, ] = $this->receiveWebSocketsData();
-        $this->didReceiveData($data);
     }
 
     public static function supportsWebSockets(): bool
