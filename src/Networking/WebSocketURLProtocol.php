@@ -127,14 +127,13 @@ class WebSocketURLProtocol extends HTTPURLProtocol
         if ($task->session->behaviour($task)->rawValue !== TaskBehaviourRawValue::taskDelegate || !$task instanceof URLSessionWebSocketTask) {
             fatal_error("WebSocket internal invariant violated");
         }
-        error_log("$operation->name: $data");
         switch ($operation) {
             case URLSessionWebSocketOperation::close:
                 $reasonData = "";
                 $closeCode = URLSessionWebSocketTaskCloseCode::normalClosure;
                 if (strlen($data) >= 2) {
                     $reasonData = substring_from_index($data, 2);
-                    [$byte1,] = current(unpack("C*", $data[0]));
+                    [$byte1,] = array_values(unpack('C*', $data));
                     $closeCode = URLSessionWebSocketTaskCloseCode::tryFrom($byte1 & 0b00001111) ?? URLSessionWebSocketTaskCloseCode::unsupportedData;
                 }
                 $task->close($closeCode, $reasonData);
