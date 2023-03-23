@@ -49,6 +49,8 @@ class ProtocolClient implements URLProtocolClient
                     $delegate->urlSessionDataTaskDidReceiveResponse($session, $task, $response, function (/** @noinspection PhpUnusedParameterInspection */ URLSessionResponseDisposition $disposition): void {
                         trigger_error("Warning: Ignoring disposition from completion handler.");
                     });
+                } elseif ($delegate instanceof URLSessionWebSocketDelegate && $task instanceof URLSessionWebSocketTask) {
+                    $delegate->urlSessionWebSocketTaskDidOpenWithProtocol($session, $task, $task->protocolPicked);
                 }
                 break;
             case TaskBehaviourRawValue::noDelegate:
@@ -295,6 +297,8 @@ class ProtocolClient implements URLProtocolClient
                 if ($delegate instanceof URLSessionTaskDelegate) {
                     if ($delegate instanceof URLSessionDownloadDelegate && $task instanceof URLSessionDownloadTask) {
                         $delegate->urlSessionDownloadTaskDidFinishDownloadingToURL($session, $task, $protocol::property("temporaryFileURL", $request));
+                    } elseif ($delegate instanceof URLSessionWebSocketDelegate && $task instanceof URLSessionWebSocketTask) {
+                        $delegate->urlSessionWebSocketTaskDidCloseWithReason($session, $task, $task->closeCode, $task->closeReason);
                     }
                     $delegate->urlSessionTaskDidComplete($session, $task);
                 }
