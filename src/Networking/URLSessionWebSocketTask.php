@@ -154,7 +154,6 @@ class URLSessionWebSocketTask extends URLSessionTask
     public function noteReceivedPong(): void
     {
         if (!($completionHandler = $this->pongCompletionHandlers->popFirst())) {
-            //$this->close(URLSessionWebSocketTaskCloseCode::protocolError);
             return;
         }
         $completionHandler(null);
