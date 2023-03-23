@@ -8,6 +8,7 @@ use Sabatier\Foundation\ArrayClass;
 use Sabatier\Foundation\Dictionary;
 use Sabatier\Foundation\Error;
 use const Sabatier\Foundation\LocalizedDescriptionKey;
+use const Sabatier\Foundation\URLErrorBadServerResponse;
 use const Sabatier\Foundation\URLErrorDomain;
 use const Sabatier\Foundation\URLErrorFailingURLErrorKey;
 use const Sabatier\Foundation\URLErrorNetworkConnectionLost;
@@ -71,7 +72,17 @@ class URLSessionWebSocketTask extends URLSessionTask
     public function receive(Closure $completionHandler): void
     {
         $this->receiveCompletionHandlers->append($completionHandler);
-        $this->doPendingWork();
+        $this->getProtocol(function (?URLProtocol $protocol) use ($completionHandler): void {
+            if ($protocol instanceof WebSocketURLProtocol) {
+                try {
+                    $protocol->receiveWebSocketData();
+                } catch (Exception) {
+                    $completionHandler(null, new Error(URLErrorDomain, URLErrorBadServerResponse));
+                }
+            } else {
+                $completionHandler(null, new Error(URLErrorDomain, URLErrorNetworkConnectionLost));
+            }
+        });
     }
 
     /**
@@ -82,14 +93,10 @@ class URLSessionWebSocketTask extends URLSessionTask
      */
     public function sendPing(Closure $pongReceiveHandler): void
     {
+        $this->pongCompletionHandlers->append($pongReceiveHandler);
         $this->getProtocol(function (?URLProtocol $protocol) use ($pongReceiveHandler): void {
             if ($protocol instanceof WebSocketURLProtocol) {
-                try {
-                    $protocol->sendWebSocketData("", URLSessionWebSocketOperation::ping);
-                    $this->pongCompletionHandlers->append($pongReceiveHandler);
-                } catch (Exception $exception) {
-                    $pongReceiveHandler(new Error(URLErrorDomain, (int)$exception->getCode(), new Dictionary([LocalizedDescriptionKey => $exception->getMessage()])));
-                }
+                $protocol->sendWebSocketData("", URLSessionWebSocketOperation::ping);
             } else {
                 $pongReceiveHandler(new Error(URLErrorDomain, URLErrorNetworkConnectionLost));
             }
@@ -189,19 +196,15 @@ class URLSessionWebSocketTask extends URLSessionTask
                         /** @var array{URLSessionWebSocketTaskMessage, Closure(Error|null): void} $element */
                         $element = $this->sendBuffer->popFirst();
                         [$message, $completionHandler] = $element;
-                        try {
-                            switch ($message->rawValue) {
-                                case URLSessionWebSocketTaskMessageRawValue::data:
-                                    $protocol->sendWebSocketData($message->data, URLSessionWebSocketOperation::binary);
-                                    break;
-                                case URLSessionWebSocketTaskMessageRawValue::string:
-                                    $protocol->sendWebSocketData($message->string, URLSessionWebSocketOperation::text);
-                                    break;
-                            }
-                            $completionHandler(null);
-                        } catch (Exception $exception) {
-                            $completionHandler(new Error(URLErrorDomain, (int)$exception->getCode(), new Dictionary([LocalizedDescriptionKey => $exception->getMessage()])));
+                        switch ($message->rawValue) {
+                            case URLSessionWebSocketTaskMessageRawValue::data:
+                                $protocol->sendWebSocketData($message->data, URLSessionWebSocketOperation::binary);
+                                break;
+                            case URLSessionWebSocketTaskMessageRawValue::string:
+                                $protocol->sendWebSocketData($message->string, URLSessionWebSocketOperation::text);
+                                break;
                         }
+                        $completionHandler(null);
                     }
                     $this->sendCloseMessage($protocol);
                 }
@@ -222,13 +225,10 @@ class URLSessionWebSocketTask extends URLSessionTask
             return;
         }
         $this->closeMessage = null;
-        try {
-            [$code, $reason] = $closeMessage;
-            $data = (new ArrayClass(str_split(sprintf("%016b", $code->value), 8)))->map(fn(string $string): string => chr((int)bindec($string)))->join("");
-            $data .= $reason;
-            $protocol->sendWebSocketData($data, URLSessionWebSocketOperation::close);
-        } catch (Exception) {
-        }
+        [$code, $reason] = $closeMessage;
+        $data = (new ArrayClass(str_split(sprintf("%016b", $code->value), 8)))->map(fn(string $string): string => chr((int)bindec($string)))->join("");
+        $data .= $reason;
+        $protocol->sendWebSocketData($data, URLSessionWebSocketOperation::close);
     }
 
     /**
