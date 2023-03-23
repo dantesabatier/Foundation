@@ -11,6 +11,7 @@ use Sabatier\Foundation\ProcessInfo;
 use Sabatier\Foundation\UndefinedKeyException;
 use Sabatier\Foundation\URL;
 use function Sabatier\Foundation\fatal_error;
+use function Sabatier\Foundation\substring_from_index;
 use const Sabatier\Foundation\URLErrorBadServerResponse;
 use const Sabatier\Foundation\URLErrorBadURL;
 use const Sabatier\Foundation\URLErrorCannotFindHost;
@@ -425,6 +426,7 @@ final class EasyHandle
                     $payload = $data;
                 }
             }
+            /** @var URLSessionWebSocketOperation $operation */
             $operation = URLSessionWebSocketOperation::from($byte1 & 0b00001111);
             switch ($operation) {
                 case URLSessionWebSocketOperation::ping:
@@ -432,6 +434,18 @@ final class EasyHandle
                     $this->sendWebSocketsData($payload, $operation);
                     break;
                 case URLSessionWebSocketOperation::close:
+                    $binary = "";
+                    $code = 0;
+                    if ($length > 0) {
+                        $binary = $payload[0] . $payload[1];
+                        $code = current(unpack('n', $payload));
+                    }
+                    if ($length >= 2) {
+                        $payload = substring_from_index($payload, 2);
+                    }
+                    $this->sendWebSocketsData("$binary $code", $operation);
+                    $this->completedTransfer(null);
+                    break;
                 case URLSessionWebSocketOperation::pong:
                 case URLSessionWebSocketOperation::cont:
                 case URLSessionWebSocketOperation::text:
