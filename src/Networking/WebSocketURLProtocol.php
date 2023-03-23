@@ -87,18 +87,6 @@ class WebSocketURLProtocol extends HTTPURLProtocol
         $this->client?->urlProtocolDidReceiveCacheStoragePolicy($this, $response, URLCacheStoragePolicy::notAllowed);
     }
 
-    public function completionAction(URLRequest $request, URLResponse $response): CompletionAction
-    {
-        $httpURLResponse = $response;
-        if (!$httpURLResponse instanceof HTTPURLResponse) {
-            fatal_error("Response was not HTTPURLResponse");
-        }
-        if ($request = $this->redirectRequest($request, $httpURLResponse)) {
-            return CompletionAction::redirectWithRequest($request);
-        }
-        return CompletionAction::completeTask();
-    }
-
     public function completeTask(): void
     {
         $task = $this->task;
