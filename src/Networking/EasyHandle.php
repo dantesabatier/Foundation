@@ -340,6 +340,11 @@ final class EasyHandle
         $storage->setCookies($cookies, $url);
     }
 
+    public function isConnected(): bool
+    {
+        return in_array(get_resource_type($this->socket), ["stream", "persistent stream"]);
+    }
+
     /**
      * @throws Exception
      */
@@ -362,11 +367,6 @@ final class EasyHandle
             $buffer .= $data;
             $this->didReceiveHeaderData($data, strlen($data));
         } while (substr_count($buffer, "\r\n\r\n") == 0);
-    }
-
-    public function isConnected(): bool
-    {
-        return in_array(get_resource_type($this->socket), ["stream", "persistent stream"]);
     }
 
     public function disconnect(): void
@@ -467,6 +467,9 @@ final class EasyHandle
         return [$payload, $operation];
     }
 
+    /**
+     * @throws Exception
+     */
     public function sendWebSocketsData(string $data, URLSessionWebSocketOperation $operation): void
     {
         $parts = new ArrayClass(str_split($data, 4096) ?: [""]);
@@ -504,10 +507,10 @@ final class EasyHandle
             fwrite($this->socket, $data);
         }
         if ($operation !== URLSessionWebSocketOperation::close) {
-           return;
+            return;
         }
         $this->isClosing = true;
-        while(true) {
+        while (true) {
             [, $operation] = $this->receiveWebSocketsData();
             if ($operation === URLSessionWebSocketOperation::close) {
                 break;
