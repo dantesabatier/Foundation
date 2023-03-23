@@ -383,7 +383,7 @@ final class EasyHandle
      */
     public function receiveWebSocketsData(): array
     {
-        $fn = function (int $length): string {
+        $read = function (int $length): string {
             $data = "";
             while (strlen($data) < $length) {
                 if (!($buffer = fread($this->socket, $length - strlen($data)))) {
@@ -398,26 +398,26 @@ final class EasyHandle
         };
         $payload = "";
         do {
-            $data = $fn(2);
+            $data = $read(2);
             [$byte1, $byte2] = array_values(unpack("C*", $data));
             $isFinal = (bool)($byte1 & 0b10000000);
             $isMasked = (bool)($byte2 & 0b10000000);
             $length = $byte2 & 0b01111111;
             if ($length > 125) {
                 if ($length === 126) {
-                    $data = $fn(2);
+                    $data = $read(2);
                     $length = current(unpack("n", $data));
                 } else {
-                    $data = $fn(8);
+                    $data = $read(8);
                     $length = current(unpack("J", $data));
                 }
             }
             $mask = "";
             if ($isMasked) {
-                $mask = $fn(4);
+                $mask = $read(4);
             }
             if ($length > 0) {
-                $data = $fn($length);
+                $data = $read($length);
                 if ($isMasked) {
                     for ($i = 0; $i < $length; $i++) {
                         $payload .= ($data[$i] ^ $mask[$i % 4]);
