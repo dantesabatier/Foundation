@@ -33,7 +33,7 @@ final class EasyHandle
     private EasyHandlePauseState $pauseState;
     private URLSessionWebSocketOperation $operation = URLSessionWebSocketOperation::cont;
     public readonly bool $isWebSocketHandle;
-    private mixed $socket;
+    private mixed $socket = null;
     private bool $isClosing = false;
 
     public function __construct(public readonly EasyHandleDelegate $delegate)
