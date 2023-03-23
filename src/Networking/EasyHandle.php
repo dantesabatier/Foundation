@@ -371,10 +371,8 @@ final class EasyHandle
 
     public function disconnect(): void
     {
-        if ($this->isWebSocketHandle) {
-            if ($this->isConnected()) {
-                fclose($this->socket);
-            }
+        if ($this->isWebSocketHandle && $this->isConnected()) {
+            fclose($this->socket);
             return;
         }
         curl_close($this->rawHandle);
