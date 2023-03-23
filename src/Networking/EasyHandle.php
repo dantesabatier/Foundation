@@ -34,6 +34,7 @@ final class EasyHandle
     private URLSessionWebSocketOperation $operation = URLSessionWebSocketOperation::cont;
     public readonly bool $isWebSocketHandle;
     private mixed $socket;
+    private bool $isClosing = false;
 
     public function __construct(public readonly EasyHandleDelegate $delegate)
     {
@@ -363,13 +364,20 @@ final class EasyHandle
         } while (substr_count($buffer, "\r\n\r\n") == 0);
     }
 
+    public function isConnected(): bool
+    {
+        return in_array(get_resource_type($this->socket), ["stream", "persistent stream"]);
+    }
+
     public function disconnect(): void
     {
         if ($this->isWebSocketHandle) {
-            fclose($this->socket);
-        } else {
-            curl_close($this->rawHandle);
+            if ($this->isConnected()) {
+                fclose($this->socket);
+            }
+            return;
         }
+        curl_close($this->rawHandle);
     }
 
     public function getWebSocketFlags(): URLSessionWebSocketOperation
@@ -443,7 +451,9 @@ final class EasyHandle
                     if ($length >= 2) {
                         $payload = substring_from_index($payload, 2);
                     }
-                    $this->sendWebSocketsData("$binary $code", $operation);
+                    if (!$this->isClosing) {
+                        $this->sendWebSocketsData("$binary $code", $operation);
+                    }
                     $this->completedTransfer(null);
                     break;
                 case URLSessionWebSocketOperation::pong:
@@ -459,6 +469,10 @@ final class EasyHandle
 
     public function sendWebSocketsData(string $data, URLSessionWebSocketOperation $operation): void
     {
+        if ($this->isClosing) {
+            error_log(sprintf("%s(%s, %s)", $data, $operation->name));
+            return;
+        }
         $parts = new ArrayClass(str_split($data, 4096) ?: [""]);
         /** @var ArrayClass<array{string, URLSessionWebSocketOperation, bool, bool}> $frames */
         $frames = $parts->map(fn(string $e, int $i): array => [$e, $i === 0 ? $operation : URLSessionWebSocketOperation::cont, $i === $parts->indexBefore($parts->endIndex()), true]);
@@ -493,6 +507,17 @@ final class EasyHandle
             }
             fwrite($this->socket, $data);
         }
+        if ($operation !== URLSessionWebSocketOperation::close) {
+           return;
+        }
+        $this->isClosing = true;
+        while(true) {
+            [, $operation] = $this->receiveWebSocketsData();
+            if ($operation === URLSessionWebSocketOperation::close) {
+                break;
+            }
+        }
+        $this->isClosing = false;
     }
 
     public static function supportsWebSockets(): bool
