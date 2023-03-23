@@ -55,6 +55,9 @@ class WebSocketURLProtocol extends HTTPURLProtocol
         $easyHandle = $this->easyHandle;
         $easyHandle->setURL($url);
         $easyHandle->setTimeout((int)$request->timeoutInterval);
+        if ($allHTTPHeaderFields = $request->allHTTPHeaderFields) {
+            $easyHandle->setCustomHeaders($allHTTPHeaderFields);
+        }
     }
 
     /**
