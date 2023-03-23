@@ -469,10 +469,6 @@ final class EasyHandle
 
     public function sendWebSocketsData(string $data, URLSessionWebSocketOperation $operation): void
     {
-        if ($this->isClosing) {
-            error_log(sprintf("%s(%s, %s)", $data, $operation->name));
-            return;
-        }
         $parts = new ArrayClass(str_split($data, 4096) ?: [""]);
         /** @var ArrayClass<array{string, URLSessionWebSocketOperation, bool, bool}> $frames */
         $frames = $parts->map(fn(string $e, int $i): array => [$e, $i === 0 ? $operation : URLSessionWebSocketOperation::cont, $i === $parts->indexBefore($parts->endIndex()), true]);
