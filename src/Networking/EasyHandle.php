@@ -340,11 +340,6 @@ final class EasyHandle
         $storage->setCookies($cookies, $url);
     }
 
-    public function isConnected(): bool
-    {
-        return in_array(get_resource_type($this->socket), ["stream", "persistent stream"]);
-    }
-
     /**
      * @throws Exception
      */
@@ -371,7 +366,7 @@ final class EasyHandle
 
     public function disconnect(): void
     {
-        if ($this->isWebSocketHandle && $this->isConnected()) {
+        if (is_resource($this->socket)) {
             fclose($this->socket);
             return;
         }
