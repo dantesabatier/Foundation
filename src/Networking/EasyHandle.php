@@ -3,13 +3,14 @@
 namespace Sabatier\Foundation\Networking;
 
 use CurlHandle;
+use Exception;
 use Sabatier\Foundation\ArrayClass;
 use Sabatier\Foundation\Dictionary;
 use Sabatier\Foundation\Error;
-use Sabatier\Foundation\InternalInconsistencyException;
 use Sabatier\Foundation\ProcessInfo;
 use Sabatier\Foundation\UndefinedKeyException;
 use Sabatier\Foundation\URL;
+use function Sabatier\Foundation\fatal_error;
 use const Sabatier\Foundation\URLErrorBadServerResponse;
 use const Sabatier\Foundation\URLErrorBadURL;
 use const Sabatier\Foundation\URLErrorCannotFindHost;
@@ -367,6 +368,7 @@ final class EasyHandle
 
     /**
      * @return array{string, URLSessionWebSocketOperation}
+     * @throws Exception
      */
     public function receiveWebSocketsData(): array
     {
@@ -375,9 +377,9 @@ final class EasyHandle
             while (strlen($data) < $length) {
                 if (!($buffer = fread($this->socket, $length - strlen($data)))) {
                     if (stream_get_meta_data($this->socket)["timed_out"]) {
-                        throw new InternalInconsistencyException("Connection timeout", URLErrorTimedOut);
+                        fatal_error("Connection timeout");
                     }
-                    throw new InternalInconsistencyException("Unexpected message received from server", URLErrorBadServerResponse);
+                    fatal_error("Unexpected message received from server");
                 }
                 $data .= $buffer;
             }
