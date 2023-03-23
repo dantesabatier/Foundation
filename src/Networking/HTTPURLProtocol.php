@@ -189,7 +189,7 @@ class HTTPURLProtocol extends NativeProtocol
     public function completionAction(URLRequest $request, URLResponse $response): CompletionAction
     {
         if (!$response instanceof HTTPURLResponse) {
-            fatal_error();
+            fatal_error("Response was not HTTPURLResponse");
         }
         /** @noinspection PhpParamsInspection */
         if ($request = $this->redirectRequest($request, $response)) {
