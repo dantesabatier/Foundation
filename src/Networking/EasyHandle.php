@@ -338,9 +338,19 @@ final class EasyHandle
         $storage->setCookies($cookies, $url);
     }
 
+    /**
+     * @throws Exception
+     */
     public function connect(): void
     {
-        $header = "GET {$this->url?->absoluteString} HTTP/1.1\r\n";
+        if (!($url = $this->url)) {
+            fatal_error("URL cannot be null");
+        }
+        $path = $url->path;
+        if ($query = $url->query) {
+            $path .= "?$query";
+        }
+        $header = "GET $path HTTP/1.1\r\n";
         $header .= $this->allHeaderFields->mapValues(fn(string $value, string $key): string => "$key: $value")->values->join("\r\n");
         $header .= "\r\n\r\n";
         fwrite($this->socket, $header);
@@ -418,7 +428,8 @@ final class EasyHandle
             $operation = URLSessionWebSocketOperation::from($byte1 & 0b00001111);
             switch ($operation) {
                 case URLSessionWebSocketOperation::ping:
-                    $this->sendWebSocketsData($payload, URLSessionWebSocketOperation::pong);
+                    $operation = URLSessionWebSocketOperation::pong;
+                    $this->sendWebSocketsData($payload, $operation);
                     break;
                 case URLSessionWebSocketOperation::close:
                 case URLSessionWebSocketOperation::pong:
