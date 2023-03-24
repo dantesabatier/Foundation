@@ -19,7 +19,7 @@ readonly class ProtocolState
         return new ProtocolState(ProtocolStateRawValue::awaitingCacheReply, $bag);
     }
 
-    public static function existing(?URLProtocol $protocol): ProtocolState
+    public static function existing(URLProtocol $protocol): ProtocolState
     {
         return new ProtocolState(ProtocolStateRawValue::existing, protocol: $protocol);
     }
