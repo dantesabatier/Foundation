@@ -235,12 +235,16 @@ final class URLSession implements URLSessionProtocol
 
     /**
      * @throws Exception
+     * @internal
      */
     public function add(EasyHandle $handle): void
     {
         $this->multiHandle->add($handle);
     }
 
+    /**
+     * @internal
+     */
     public function remove(EasyHandle $handle): void
     {
         $this->multiHandle->remove($handle);
@@ -248,6 +252,7 @@ final class URLSession implements URLSessionProtocol
 
     /**
      * @throws Exception
+     * @internal
      */
     public function behaviour(URLSessionTask $task): TaskBehaviour
     {
