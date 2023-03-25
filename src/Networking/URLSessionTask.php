@@ -128,8 +128,9 @@ abstract class URLSessionTask extends ObjectClass
 
     /**
      * @param Closure(URLProtocol|null): void $callback
+     * @internal
      */
-    protected function getProtocol(Closure $callback): void
+    public function getProtocol(Closure $callback): void
     {
         $ps = $this->protocolStorage;
         switch ($ps->rawValue) {
