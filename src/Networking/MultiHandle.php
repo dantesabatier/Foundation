@@ -30,7 +30,7 @@ final readonly class MultiHandle
     public function __destruct()
     {
         foreach ($this->easyHandles as $easyHandle) {
-            if (!$easyHandle->isWebSocketHandle) {
+            if ($easyHandle->rawHandle instanceof CurlHandle) {
                 curl_multi_remove_handle($this->rawHandle, $easyHandle->rawHandle);
             }
         }
