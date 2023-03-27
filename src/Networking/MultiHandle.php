@@ -52,7 +52,7 @@ final readonly class MultiHandle
      */
     public function add(EasyHandle $handle): void
     {
-        if ($handle->isWebSocketHandle) {
+        if (!$handle->rawHandle instanceof CurlHandle) {
             $handle->connect();
             return;
         }
@@ -66,7 +66,7 @@ final readonly class MultiHandle
 
     public function remove(EasyHandle $handle): void
     {
-        if ($handle->isWebSocketHandle) {
+        if (!$handle->rawHandle instanceof CurlHandle) {
             $handle->disconnect();
             return;
         }

@@ -58,6 +58,10 @@ class WebSocketURLProtocol extends HTTPURLProtocol
         if ($allHTTPHeaderFields = $request->allHTTPHeaderFields) {
             $easyHandle->setCustomHeaders($allHTTPHeaderFields);
         }
+        $task = $this->task;
+        if ($task instanceof URLSessionWebSocketTask) {
+            $easyHandle->setPreferredReceiveBufferSize($task->maximumMessageSize);
+        }
     }
 
     /**

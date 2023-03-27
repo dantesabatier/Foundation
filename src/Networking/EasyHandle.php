@@ -8,7 +8,6 @@ use Sabatier\Foundation\ArrayClass;
 use Sabatier\Foundation\Dictionary;
 use Sabatier\Foundation\Error;
 use Sabatier\Foundation\ProcessInfo;
-use Sabatier\Foundation\UndefinedKeyException;
 use Sabatier\Foundation\URL;
 use function Sabatier\Foundation\fatal_error;
 use function Sabatier\Foundation\substring_from_index;
@@ -23,27 +22,23 @@ use const Sabatier\Foundation\URLErrorUnsupportedURL;
 /** @internal */
 final class EasyHandle
 {
-    public readonly CurlHandle $rawHandle;
-    public readonly int $connectFailureErrno;
-    public readonly ?URL $redirectURL;
+    public mixed $rawHandle = null;
     private ?URL $url = null;
-    /** @var Dictionary<string> */
-    private Dictionary $allHeaderFields;
     private ?URLSessionConfiguration $configuration = null;
     private EasyHandlePauseState $pauseState;
     private URLSessionWebSocketOperation $operation = URLSessionWebSocketOperation::cont;
-    public readonly bool $isWebSocketHandle;
-    private mixed $socket = null;
+    /** @var Dictionary<string> */
+    private readonly Dictionary $allHeaderFields;
     private bool $isClosing = false;
 
     public function __construct(public readonly EasyHandleDelegate $delegate)
     {
-        unset($this->rawHandle);
-        unset($this->connectFailureErrno);
-        unset($this->redirectURL);
-        unset($this->pauseState);
-        unset($this->allHeaderFields);
-        unset($this->isWebSocketHandle);
+        $this->pauseState = new EasyHandlePauseState();
+        if (!$this->delegate instanceof WebSocketURLProtocol) {
+            $this->rawHandle = curl_init();
+            $this->setupCallbacks();
+        }
+        $this->allHeaderFields = new Dictionary();
     }
 
     public function __destruct()
@@ -51,29 +46,17 @@ final class EasyHandle
         $this->disconnect();
     }
 
-    public function __get(string $name)
-    {
-        return $this->$name = match ($name) {
-            "rawHandle" => curl_init(),
-            "connectFailureErrno" => $this->get(CURLINFO_OS_ERRNO),
-            "redirectURL" => ($s = $this->get(CURLINFO_REDIRECT_URL)) ? new URL($s) : null,
-            "allHeaderFields" => new Dictionary(),
-            "isWebSocketHandle" => $this->delegate instanceof WebSocketURLProtocol,
-            default => throw new UndefinedKeyException()
-        };
-    }
-
     public function get(int $option): mixed
     {
-        if ($this->isWebSocketHandle) {
-            return null;
+        if ($this->rawHandle instanceof CurlHandle) {
+            return curl_getinfo($this->rawHandle, $option);
         }
-        return curl_getinfo($this->rawHandle, $option);
+        return null;
     }
 
     public function set(mixed $value, int $option): void
     {
-        if (!$this->isWebSocketHandle) {
+        if ($this->rawHandle instanceof CurlHandle) {
             curl_setopt($this->rawHandle, $option, $value);
         }
     }
@@ -111,7 +94,7 @@ final class EasyHandle
     public function setURL(URL $url): void
     {
         $this->url = $url;
-        if ($this->isWebSocketHandle) {
+        if (!$this->rawHandle instanceof CurlHandle) {
             $authority = (string)$url->host;
             if (($user = $url->user) && ($password = $url->password)) {
                 $authority = "$user:$password@$authority";
@@ -120,15 +103,14 @@ final class EasyHandle
                 $authority .= ":" . $port;
             }
             /** @noinspection PhpUnhandledExceptionInspection */
-            $key = base64_encode(random_bytes(16));
-            $this->allHeaderFields = new Dictionary([
+            $this->allHeaderFields->merge(new Dictionary([
                 "Host" => $authority,
                 "Upgrade" => "WebSocket",
                 "Connection" => "Upgrade",
-                "Sec-WebSocket-Key" => $key,
+                "Sec-WebSocket-Key" => base64_encode(random_bytes(16)),
                 "Sec-WebSocket-Version" => "13"
-            ]);
-            $this->socket = stream_socket_client($url->absoluteString);
+            ]));
+            $this->rawHandle = stream_socket_client($url->absoluteString);
             return;
         }
         $this->set($url->absoluteString, CURLOPT_URL);
@@ -159,7 +141,12 @@ final class EasyHandle
 
     public function setPreferredReceiveBufferSize(int $size): void
     {
-        $this->set(min($size, CURL_MAX_READ_SIZE), CURLOPT_BUFFERSIZE);
+        $size = min($size, CURL_MAX_READ_SIZE);
+        if ($this->rawHandle instanceof CurlHandle) {
+            $this->set($size, CURLOPT_BUFFERSIZE);
+        } elseif (is_resource($this->rawHandle)) {
+            stream_set_read_buffer($this->rawHandle, $size);
+        }
     }
 
     /**
@@ -168,7 +155,7 @@ final class EasyHandle
     public function setCustomHeaders(Dictionary $headerFields): void
     {
         $this->allHeaderFields->merge($headerFields);
-        if (!$this->isWebSocketHandle) {
+        if ($this->rawHandle instanceof CurlHandle) {
             $this->set($headerFields->mapValues(fn(string $value, string $key): string => $value === "" ? $key : "$key: $value")->values->toArray(), CURLOPT_HTTPHEADER);
         }
     }
@@ -206,10 +193,10 @@ final class EasyHandle
 
     public function setTimeout(int $timeout): void
     {
-        if ($this->isWebSocketHandle) {
-            stream_set_timeout($this->socket, $timeout);
-        } else {
+        if ($this->rawHandle instanceof CurlHandle) {
             $this->set($timeout, CURLOPT_TIMEOUT);
+        } elseif (is_resource($this->rawHandle)) {
+            stream_set_timeout($this->rawHandle, $timeout);
         }
     }
 
@@ -258,7 +245,7 @@ final class EasyHandle
         $pauseState->setState($this);
     }
 
-    public function setupCallbacks(): void
+    private function setupCallbacks(): void
     {
         $this->set(true, CURLOPT_RETURNTRANSFER);
         $this->set(fn(CurlHandle $handle, string $data): int => $this->didReceiveData($data), CURLOPT_WRITEFUNCTION);
@@ -355,10 +342,10 @@ final class EasyHandle
         $header = "GET $path HTTP/1.1\r\n";
         $header .= $this->allHeaderFields->mapValues(fn(string $value, string $key): string => "$key: $value")->values->join("\r\n");
         $header .= "\r\n\r\n";
-        fwrite($this->socket, $header);
+        fwrite($this->rawHandle, $header);
         $buffer = "";
         do {
-            $data = $this->fill($this->socket);
+            $data = $this->fill($this->rawHandle);
             $buffer .= $data;
             $this->didReceiveHeaderData($data, strlen($data));
         } while (substr_count($buffer, "\r\n\r\n") == 0);
@@ -366,11 +353,11 @@ final class EasyHandle
 
     public function disconnect(): void
     {
-        if (is_resource($this->socket)) {
-            fclose($this->socket);
-            return;
+        if ($this->rawHandle instanceof CurlHandle) {
+            curl_close($this->rawHandle);
+        } elseif (is_resource($this->rawHandle)) {
+            fclose($this->rawHandle);
         }
-        curl_close($this->rawHandle);
     }
 
     public function getWebSocketFlags(): URLSessionWebSocketOperation
@@ -387,8 +374,8 @@ final class EasyHandle
         $read = function (int $length): string {
             $data = "";
             while (strlen($data) < $length) {
-                if (!($buffer = fread($this->socket, $length - strlen($data)))) {
-                    if (stream_get_meta_data($this->socket)["timed_out"]) {
+                if (!($buffer = fread($this->rawHandle, $length - strlen($data)))) {
+                    if (stream_get_meta_data($this->rawHandle)["timed_out"]) {
                         fatal_error("Connection timeout");
                     }
                     fatal_error("Unexpected message received from server");
@@ -497,7 +484,7 @@ final class EasyHandle
             } else {
                 $data .= $payload;
             }
-            fwrite($this->socket, $data);
+            fwrite($this->rawHandle, $data);
         }
         if ($operation !== URLSessionWebSocketOperation::close) {
             return;

@@ -132,7 +132,6 @@ class HTTPURLProtocol extends NativeProtocol
             return;
         }
         $easyHandle = $this->easyHandle;
-        $easyHandle->setupCallbacks();
         $easyHandle->setVerboseModeOn(self::enableLibcurlDebugOutput());
         $easyHandle->setPassHeadersToDataStream(false);
         $easyHandle->setProgressMeterOff(true);
