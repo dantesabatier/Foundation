@@ -187,11 +187,11 @@ class HTTPURLProtocol extends NativeProtocol
      */
     public function completionAction(URLRequest $request, URLResponse $response): CompletionAction
     {
-        if (!$response instanceof HTTPURLResponse) {
+        $httpResponse = $response;
+        if (!$httpResponse instanceof HTTPURLResponse) {
             fatal_error("Response was not HTTPURLResponse");
         }
-        /** @noinspection PhpParamsInspection */
-        if ($request = $this->redirectRequest($request, $response)) {
+        if ($request = $this->redirectRequest($request, $httpResponse)) {
             return CompletionAction::redirectWithRequest($request);
         }
         return CompletionAction::completeTask();
