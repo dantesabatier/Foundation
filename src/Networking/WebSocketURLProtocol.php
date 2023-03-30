@@ -90,8 +90,10 @@ class WebSocketURLProtocol extends HTTPURLProtocol
         if (!$response instanceof HTTPURLResponse) {
             fatal_error("Header complete, but not URL response.");
         }
-        /** @var URLSessionWebSocketTask $task */
         $task = $this->task;
+        if (!$task instanceof URLSessionWebSocketTask) {
+            return;
+        }
         $task->protocolPicked = $response->valueForHttpHeaderField("Sec-WebSocket-Protocol");
         $task->handshakeCompleted = true;
         $this->client?->urlProtocolDidReceiveCacheStoragePolicy($this, $response, URLCacheStoragePolicy::notAllowed);
