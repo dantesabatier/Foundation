@@ -414,7 +414,6 @@ final class EasyHandle
                     $payload = $data;
                 }
             }
-            /** @var URLSessionWebSocketOperation $operation */
             $operation = URLSessionWebSocketOperation::from($byte1 & 0b00001111);
             switch ($operation) {
                 case URLSessionWebSocketOperation::ping:
