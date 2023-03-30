@@ -340,7 +340,7 @@ final class EasyHandle
             $path .= "?$query";
         }
         $header = "GET $path HTTP/1.1\r\n";
-        $header .= $this->allHeaderFields->mapValues(fn(string $value, string $key): string => "$key: $value")->values->join("\r\n");
+        $header .= $this->allHeaderFields->mapValues(fn(string $value, string $key): string => $value === "" ? $key : "$key: $value")->values->join("\r\n");
         $header .= "\r\n\r\n";
         fwrite($this->rawHandle, $header);
         $buffer = "";
