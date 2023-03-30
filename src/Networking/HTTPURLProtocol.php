@@ -4,10 +4,12 @@ namespace Sabatier\Foundation\Networking;
 
 use CURLFile;
 use Exception;
+use Locale;
 use Sabatier\Foundation\ComparisonResult;
 use Sabatier\Foundation\Date;
 use Sabatier\Foundation\Dictionary;
 use Sabatier\Foundation\Error;
+use Sabatier\Foundation\ProcessInfo;
 use Sabatier\Foundation\URL;
 use Sabatier\Foundation\URLFileTypeMappings;
 use function Sabatier\Foundation\fatal_error;
@@ -177,9 +179,17 @@ class HTTPURLProtocol extends NativeProtocol
         $easyHandle->setTimeout((int)$request->timeoutInterval);
         $easyHandle->setAutomaticBodyDecompression(true);
         $easyHandle->setNoBody($request->httpMethod === HTTPRequestMethod::head);
-        if ($allHTTPHeaderFields = $request->allHTTPHeaderFields) {
-            $easyHandle->setCustomHeaders($allHTTPHeaderFields);
+        $name = ProcessInfo::processInfo()->processName;
+        $curlVersion = curl_version();
+        /** @var Dictionary<string> $customHeaders */
+        $customHeaders = $request->allHTTPHeaderFields ?? new Dictionary();
+        if ($request->httpMethod === HTTPRequestMethod::post && $request->valueForHttpHeaderField("Content-Type") === null && $request->httpBody !== null) {
+            $customHeaders["Content-Type"] = "application/x-www-form-urlencoded";
         }
+        $customHeaders["Connection"] = "keep-alive";
+        $customHeaders["User-Agent"] = "$name unknown version curl/{$curlVersion["version"]}";
+        $customHeaders["Accept-Language"] = Locale::getDefault();
+        $easyHandle->setCustomHeaders($customHeaders);
     }
 
     /**

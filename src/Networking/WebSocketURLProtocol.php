@@ -5,8 +5,6 @@ namespace Sabatier\Foundation\Networking;
 use Exception;
 use Sabatier\Foundation\Dictionary;
 use Sabatier\Foundation\Error;
-use Sabatier\Foundation\URL;
-use Sabatier\Foundation\URLComponents;
 use function Sabatier\Foundation\fatal_error;
 use function Sabatier\Foundation\in_range;
 use function Sabatier\Foundation\substring_from_index;
@@ -46,22 +44,14 @@ class WebSocketURLProtocol extends HTTPURLProtocol
             $this->transferCompleted($error);
             return;
         }
-        $absoluteURL = $request->url->absoluteURL;
-        $components = new URLComponents($absoluteURL->absoluteString);
-        $components->scheme = $absoluteURL->scheme === "wss" ? "ssl" : "tcp";
-        $components->port = $absoluteURL->port ?? $absoluteURL->scheme === "wss" ? 443 : 80;
-        /** @var URL $url */
-        $url = $components->url;
+        parent::configureEasyHandle($request, $body);
         $easyHandle = $this->easyHandle;
-        $easyHandle->setURL($url);
-        $easyHandle->setTimeout((int)$request->timeoutInterval);
-        if ($allHTTPHeaderFields = $request->allHTTPHeaderFields) {
-            $easyHandle->setCustomHeaders($allHTTPHeaderFields);
-        }
+        $easyHandle->setAllowedProtocolsToAll();
         $task = $this->task;
-        if ($task instanceof URLSessionWebSocketTask) {
-            $easyHandle->setPreferredReceiveBufferSize($task->maximumMessageSize);
+        if (!$task instanceof URLSessionWebSocketTask) {
+            return;
         }
+        $easyHandle->setPreferredReceiveBufferSize($task->maximumMessageSize);
     }
 
     /**

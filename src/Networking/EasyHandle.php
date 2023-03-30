@@ -9,6 +9,7 @@ use Sabatier\Foundation\Dictionary;
 use Sabatier\Foundation\Error;
 use Sabatier\Foundation\ProcessInfo;
 use Sabatier\Foundation\URL;
+use Sabatier\Foundation\URLComponents;
 use function Sabatier\Foundation\fatal_error;
 use function Sabatier\Foundation\substring_from_index;
 use const Sabatier\Foundation\URLErrorBadServerResponse;
@@ -28,7 +29,7 @@ final class EasyHandle
     private EasyHandlePauseState $pauseState;
     private URLSessionWebSocketOperation $operation = URLSessionWebSocketOperation::cont;
     /** @var Dictionary<string> */
-    private readonly Dictionary $allHeaderFields;
+    private Dictionary $allHeaderFields;
     private bool $isClosing = false;
 
     public function __construct(public readonly EasyHandleDelegate $delegate)
@@ -93,8 +94,13 @@ final class EasyHandle
 
     public function setURL(URL $url): void
     {
-        $this->url = $url;
         if (!$this->rawHandle instanceof CurlHandle) {
+            $absoluteURL = $url->absoluteURL;
+            $components = new URLComponents($absoluteURL->absoluteString);
+            $components->scheme = $absoluteURL->scheme === "wss" ? "ssl" : "tcp";
+            $components->port = $absoluteURL->port ?? $absoluteURL->scheme === "wss" ? 443 : 80;
+            /** @var URL $url */
+            $url = $components->url;
             $authority = (string)$url->host;
             if (($user = $url->user) && ($password = $url->password)) {
                 $authority = "$user:$password@$authority";
@@ -103,16 +109,18 @@ final class EasyHandle
                 $authority .= ":" . $port;
             }
             /** @noinspection PhpUnhandledExceptionInspection */
-            $this->allHeaderFields->merge(new Dictionary([
+            $this->allHeaderFields = new Dictionary([
                 "Host" => $authority,
                 "Upgrade" => "WebSocket",
                 "Connection" => "Upgrade",
                 "Sec-WebSocket-Key" => base64_encode(random_bytes(16)),
                 "Sec-WebSocket-Version" => "13"
-            ]));
+            ]);
+            $this->url = $url;
             $this->rawHandle = stream_socket_client($url->absoluteString);
             return;
         }
+        $this->url = $url;
         $this->set($url->absoluteString, CURLOPT_URL);
     }
 
