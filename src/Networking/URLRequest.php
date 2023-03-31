@@ -3,11 +3,9 @@
 namespace Sabatier\Foundation\Networking;
 
 use JetBrains\PhpStorm\ExpectedValues;
-use Sabatier\Foundation\CompareOptions;
 use Sabatier\Foundation\Dictionary;
 use Sabatier\Foundation\ObjectClass;
 use Sabatier\Foundation\URL;
-use function Sabatier\Foundation\string_has_prefix;
 
 /**
  * A URL load request that is independent of protocol or URL scheme.
@@ -42,35 +40,7 @@ class URLRequest extends ObjectClass
      */
     public function __construct(public URL $url, public URLRequestCachePolicy $cachePolicy = URLRequestCachePolicy::useProtocolCachePolicy, public float $timeoutInterval = 60.0)
     {
-        unset($this->httpBody);
-        unset($this->protocolProperties);
-    }
-
-    public function __get(string $name)
-    {
-        if ($name == "httpBody") {
-            $httpBody = null;
-            if ($this->httpMethod !== HTTPRequestMethod::trace) {
-                $contentType = $this->valueForHttpHeaderField("Content-Type") ?? "text/plain";
-                if (string_has_prefix($contentType, "application/x-www-form-urlencoded", CompareOptions::caseInsensitive)) {
-                    parse_str(urldecode(file_get_contents("php://input")), $body);
-                    if (!empty($body)) {
-                        $httpBody = json_encode($body);
-                    }
-                } elseif (string_has_prefix($contentType, "multipart/form-data", CompareOptions::caseInsensitive)) {
-                    $httpBody = json_encode(empty($_FILES) ? $_POST : $_FILES);
-                } else {
-                    $httpBody = file_get_contents("php://input");
-                }
-            }
-            $this->$name = empty($httpBody) ? null : $httpBody;
-            return $this->$name;
-        } elseif ($name == "protocolProperties") {
-            $this->$name = new Dictionary();
-            return $this->$name;
-        } else {
-            return $this->valueForUndefinedKey($name);
-        }
+        $this->protocolProperties = new Dictionary();
     }
 
     /**
