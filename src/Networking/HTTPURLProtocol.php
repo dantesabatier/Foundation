@@ -180,16 +180,17 @@ class HTTPURLProtocol extends NativeProtocol
         $easyHandle->setAutomaticBodyDecompression(true);
         $easyHandle->setNoBody($request->httpMethod === HTTPRequestMethod::head);
         $name = ProcessInfo::processInfo()->processName;
-        $curlVersion = curl_version();
+        $version = curl_version()["version"];
+        $osType = php_uname("s");
+        $osRelease = php_uname("r");
+        $osMachineType = php_uname("m");
         /** @var Dictionary<string> $customHeaders */
         $customHeaders = $request->allHTTPHeaderFields ?? new Dictionary();
+        $customHeaders["Connection"] = "keep-alive";
+        $customHeaders["User-Agent"] = "$name (unknown version) curl/$version $osType/$osRelease ($osMachineType)";
+        $customHeaders["Accept-Language"] = Locale::getPrimaryLanguage(Locale::getDefault());
         if ($request->httpMethod === HTTPRequestMethod::post && $request->valueForHttpHeaderField("Content-Type") === null && $request->httpBody !== null) {
             $customHeaders["Content-Type"] = "application/x-www-form-urlencoded";
-        }
-        $customHeaders["Connection"] = "keep-alive";
-        $customHeaders["User-Agent"] = "$name unknown version curl/{$curlVersion["version"]}";
-        if ($language = Locale::getPrimaryLanguage(Locale::getDefault())) {
-            $customHeaders["Accept-Language"] = $language;
         }
         $easyHandle->setCustomHeaders($customHeaders);
     }
