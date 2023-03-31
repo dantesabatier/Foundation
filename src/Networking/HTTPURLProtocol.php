@@ -188,7 +188,9 @@ class HTTPURLProtocol extends NativeProtocol
         }
         $customHeaders["Connection"] = "keep-alive";
         $customHeaders["User-Agent"] = "$name unknown version curl/{$curlVersion["version"]}";
-        $customHeaders["Accept-Language"] = Locale::getDefault();
+        if ($language = Locale::getPrimaryLanguage(Locale::getDefault())) {
+            $customHeaders["Accept-Language"] = $language;
+        }
         $easyHandle->setCustomHeaders($customHeaders);
     }
 
