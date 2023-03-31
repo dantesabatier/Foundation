@@ -122,7 +122,9 @@ readonly class PropertyListSerializer
         /** @psalm-suppress ArgumentTypeCoercion */
         $this->document->loadXML($data) ?: throw new InternalInconsistencyException();
         $value = $this->value($this->document->documentElement) ?? throw new InternalInconsistencyException();
-        $format = PropertyListSerializationFormat::xml;
+        if (func_num_args() === 3) {
+            $format = PropertyListSerializationFormat::xml;
+        }
         return $value;
     }
 

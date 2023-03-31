@@ -234,10 +234,7 @@ class HTTPCookie extends ObjectClass
      */
     public static function requestHeaderFields(ArrayClass $cookies): Dictionary
     {
-        $cookieString = $cookies->reduce("", function (string &$result, HTTPCookie $cookie): string {
-            $result .= "$cookie->name=$cookie->value; ";
-            return $result;
-        });
+        $cookieString = $cookies->reduce("", fn(string &$result, HTTPCookie $cookie): string => $result .= "$cookie->name=$cookie->value; ");
         if ($cookieString) {
             $cookieString = rtrim($cookieString, " ;");
         }

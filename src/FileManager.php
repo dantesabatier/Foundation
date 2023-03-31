@@ -150,22 +150,22 @@ final class FileManager extends ObjectClass
      */
     public function url(SearchPathDirectory $directory, #[ExpectedValues(flagsFromClass: SearchPathDomainMask::class)] int $domain = SearchPathDomainMask::local, ?URL $url = null, bool $shouldCreate = false): URL
     {
-        $fileUrl = $this->urls($directory, $domain)->first() ?? throw new InvalidArgumentException();
+        $fileURL = $this->urls($directory, $domain)->first() ?? throw new InvalidArgumentException();
         if ($directory === SearchPathDirectory::itemReplacementDirectory) {
             if ($url && ($domain & SearchPathDomainMask::user)) {
-                $components = new URLComponents($fileUrl->absoluteString);
+                $components = new URLComponents($fileURL->absoluteString);
                 $components->host = $url->host;
-                $componentsUrl = $components->url;
-                if ($componentsUrl !== null) {
-                    $fileUrl = $componentsUrl;
+                $componentsURL = $components->url;
+                if ($componentsURL !== null) {
+                    $fileURL = $componentsURL;
                 }
             }
             $shouldCreate = true;
         }
-        if ($shouldCreate && !$this->fileExists($fileUrl->path)) {
-            $this->createDirectory($fileUrl, true);
+        if ($shouldCreate && !$this->fileExists($fileURL->path)) {
+            $this->createDirectory($fileURL, true);
         }
-        return $fileUrl;
+        return $fileURL;
     }
 
     /**
@@ -274,28 +274,28 @@ final class FileManager extends ObjectClass
 
     /**
      * Removes the file or directory at the specified URL.
-     * @param URL $fileUrl A file URL specifying the file or directory to remove.
+     * @param URL $fileURL A file URL specifying the file or directory to remove.
      * If the URL specifies a directory, the contents of that directory are recursively removed.
      * @return bool true if the item was removed successfully. Returns false if an error occurred.
      * If the delegate stops the operation for a file, this method returns true.
      * However, if the delegate stops the operation for a directory, this method returns false.
      * @throws Exception
      */
-    public function removeItem(URL $fileUrl): bool
+    public function removeItem(URL $fileURL): bool
     {
-        return unsafe_value(function () use ($fileUrl): bool {
-            $process = function () use ($fileUrl): bool {
-                if (!$fileUrl->hasDirectoryPath) {
-                    return unlink($fileUrl->path);
+        return unsafe_value(function () use ($fileURL): bool {
+            $process = function () use ($fileURL): bool {
+                if (!$fileURL->hasDirectoryPath) {
+                    return unlink($fileURL->path);
                 }
-                $urls = $this->contentsOfDirectory($fileUrl);
+                $urls = $this->contentsOfDirectory($fileURL);
                 foreach ($urls as $url) {
                     $url->hasDirectoryPath ? $this->removeItem($url) : unlink($url->path);
                 }
-                return rmdir($fileUrl->path);
+                return rmdir($fileURL->path);
             };
             if ($delegate = $this->delegate) {
-                return $delegate->fileManagerShouldRemoveItemAtURL($this, $fileUrl) && $process();
+                return $delegate->fileManagerShouldRemoveItemAtURL($this, $fileURL) && $process();
             }
             return $process();
         });
@@ -312,9 +312,9 @@ final class FileManager extends ObjectClass
     public function trashItem(URL $url, ?URL &$resultingItemURL = null): bool
     {
         $directory = $this->url(SearchPathDirectory::trashDirectory, SearchPathDomainMask::local, null, true);
-        $filename = (function (string $name, string $extension, URL $directoryUrl): string {
+        $filename = (function (string $name, string $extension, URL $directoryURL): string{
             $index = 1;
-            while ($this->fileExists($directoryUrl->appendingPathComponent("$name")->appendingPathExtension($extension)->path)) {
+            while ($this->fileExists($directoryURL->appendingPathComponent("$name")->appendingPathExtension($extension)->path)) {
                 $name = preg_replace("/\d+/u", "", $name) . $index;
                 $index++;
             }
@@ -326,13 +326,13 @@ final class FileManager extends ObjectClass
 
     /**
      * Copies the file at the specified URL to a new location synchronously.
-     * @param URL $sourceUrl The file URL that identifies the file you want to copy.
+     * @param URL $sourceURL The file URL that identifies the file you want to copy.
      * The URL in this parameter must not be a file reference URL.
-     * @param URL $destinationUrl The URL at which to place the copy of srcURL.
+     * @param URL $destinationURL The URL at which to place the copy of srcURL.
      * The URL in this parameter must not be a file reference URL and must include the name of the file in its new location.
      * @return bool true if the item was copied successfully or the file manager's delegate stopped the operation deliberately.
      * Returns false if an error occurred.
-     * When copying items, the current process must have permission to read the file or directory at sourceUrl and write the parent directory of destinationUrl.
+     * When copying items, the current process must have permission to read the file or directory at sourceURL and write the parent directory of destinationURL.
      * If the item at srcURL is a directory, this method copies the directory and all of its contents, including any hidden files.
      * If a file with the same name already exists at dstURL, this method stops the copy attempt and returns an appropriate error.
      * If the last component of srcURL is a symbolic link, only the link is copied to the new path.
@@ -342,12 +342,12 @@ final class FileManager extends ObjectClass
      * the file manager proceeds to copy the file or directory
      * @throws Exception
      */
-    public function copyItem(URL $sourceUrl, URL $destinationUrl): bool
+    public function copyItem(URL $sourceURL, URL $destinationURL): bool
     {
-        return unsafe_value(function () use ($sourceUrl, $destinationUrl): bool {
-            $process = fn(): bool => copy($sourceUrl->path, $destinationUrl->path);
+        return unsafe_value(function () use ($sourceURL, $destinationURL): bool {
+            $process = fn(): bool => copy($sourceURL->path, $destinationURL->path);
             if ($delegate = $this->delegate) {
-                return $delegate->fileManagerShouldCopyItemAtURL($this, $sourceUrl, $destinationUrl) && $process();
+                return $delegate->fileManagerShouldCopyItemAtURL($this, $sourceURL, $destinationURL) && $process();
             }
             return $process();
         });
@@ -355,12 +355,12 @@ final class FileManager extends ObjectClass
 
     /**
      * Moves the file or directory at the specified URL to a new location synchronously.
-     * @param URL $sourceUrl The file URL that identifies the file or directory you want to move.
+     * @param URL $sourceURL The file URL that identifies the file or directory you want to move.
      * The URL in this parameter must not be a file reference URL.
-     * @param URL $destinationUrl The new location for the item in sourceUrl.
+     * @param URL $destinationURL The new location for the item in sourceURL.
      * The URL in this parameter must not be a file reference URL and must include the name of the file or directory in its new location.
      * @return bool true if the item was moved successfully or the file manager's delegate stopped the operation deliberately. Returns false if an error occurred.
-     * When moving items, the current process must have permission to read the item at sourceUrl and write the parent directory of destinationUrl.
+     * When moving items, the current process must have permission to read the item at sourceURL and write the parent directory of destinationURL.
      * If the item at srcURL is a directory, this method moves the directory and all of its contents, including any hidden files.
      * If an item with the same name already exists at dstURL, this method stops the move attempt and returns an appropriate error.
      * Prior to moving the item, the file manager asks its delegate if it should actually move it.
@@ -369,12 +369,12 @@ final class FileManager extends ObjectClass
      * If the delegate method returns true, or if the delegate does not implement the appropriate methods, the file manager moves the file.
      * @throws Exception
      */
-    public function moveItem(URL $sourceUrl, URL $destinationUrl): bool
+    public function moveItem(URL $sourceURL, URL $destinationURL): bool
     {
-        return unsafe_value(function () use ($sourceUrl, $destinationUrl): bool {
-            $process = fn(): bool => rename($sourceUrl->path, $destinationUrl->path);
+        return unsafe_value(function () use ($sourceURL, $destinationURL): bool {
+            $process = fn(): bool => rename($sourceURL->path, $destinationURL->path);
             if ($delegate = $this->delegate) {
-                return $delegate->fileManagerShouldMoveItemAtURL($this, $sourceUrl, $destinationUrl) && $process();
+                return $delegate->fileManagerShouldMoveItemAtURL($this, $sourceURL, $destinationURL) && $process();
             }
             return $process();
         });
@@ -382,34 +382,34 @@ final class FileManager extends ObjectClass
 
     /**
      * Creates a symbolic link at the specified URL that points to an item at the given URL.
-     * @param URL $sourceUrl The file URL at which to create the new symbolic link. The last path component of the URL issued as the name of the link.
-     * @param URL $destinationUrl The file URL that contains the item to be pointed to by the link.
+     * @param URL $sourceURL The file URL at which to create the new symbolic link. The last path component of the URL issued as the name of the link.
+     * @param URL $destinationURL The file URL that contains the item to be pointed to by the link.
      * In other words, this is the destination of the link.
      * @return bool true if the symbolic link was created or false if an error occurred.
      * This method also returns false if a file, directory, or link already exists at url.
      * @throws Exception
      */
-    public function createSymbolicLink(URL $sourceUrl, URL $destinationUrl): bool
+    public function createSymbolicLink(URL $sourceURL, URL $destinationURL): bool
     {
-        return unsafe_value(fn(): bool => symlink($sourceUrl->fileSystemRepresentation, $destinationUrl->path));
+        return unsafe_value(fn(): bool => symlink($sourceURL->fileSystemRepresentation, $destinationURL->path));
     }
 
     /**
      * Creates a hard link between the items at the specified URLs.
-     * @param URL $sourceUrl The file URL that identifies the source of the link.
+     * @param URL $sourceURL The file URL that identifies the source of the link.
      * The URL in this parameter must not be a file reference URL; it must specify the actual path to the item.
-     * @param URL $destinationUrl The file URL that specifies where you want to create the hard link.
+     * @param URL $destinationURL The file URL that specifies where you want to create the hard link.
      * The URL in this parameter must not be a file reference URL; it must specify the actual path to the item.
      * @return bool true if the hard link was created or false if an error occurred.
-     * This method also returns false if a file, directory, or link already exists at destinationUrl.
+     * This method also returns false if a file, directory, or link already exists at destinationURL.
      * @throws Exception
      */
-    public function linkItem(URL $sourceUrl, URL $destinationUrl): bool
+    public function linkItem(URL $sourceURL, URL $destinationURL): bool
     {
-        return unsafe_value(function () use ($sourceUrl, $destinationUrl): bool {
-            $process = fn(): bool => link($sourceUrl->path, $destinationUrl->path);
+        return unsafe_value(function () use ($sourceURL, $destinationURL): bool {
+            $process = fn(): bool => link($sourceURL->path, $destinationURL->path);
             if ($delegate = $this->delegate) {
-                return $delegate->fileManagerShouldLinkItemAtURL($this, $sourceUrl, $destinationUrl) && $process();
+                return $delegate->fileManagerShouldLinkItemAtURL($this, $sourceURL, $destinationURL) && $process();
             }
             return $process();
         });
@@ -431,11 +431,12 @@ final class FileManager extends ObjectClass
      * @param string $path The path of a file or directory.
      * @param bool $isDirectory Upon return, contains true if path is a directory or if the final path element is a symbolic link that points to a directory; otherwise, contains false.
      * @return bool true if a file at the specified path exists, or false if the file's does not exist or its existence could not be determined.
-     * @param-out bool $isDirectory
      */
     public function fileExists(string $path, ?bool &$isDirectory = null): bool
     {
-        $isDirectory = is_dir($path);
+        if (func_num_args() > 1) {
+            $isDirectory = is_dir($path);
+        }
         return file_exists($path);
     }
 

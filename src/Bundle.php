@@ -107,8 +107,8 @@ final class Bundle extends ObjectClass
             $this->$name = $this->object(kCFBundleIdentifierKey);
             return $this->$name;
         } elseif ($name == "infoDictionary") {
-            $infoUrl = $this->bundleURL->appendingPathComponent("Info")->appendingPathExtension("plist");
-            $this->$name = FileManager::default()->fileExists($infoUrl->path) ? PropertyListSerialization::propertyListWithURL($infoUrl) : null;
+            $infoURL = $this->bundleURL->appendingPathComponent("Info")->appendingPathExtension("plist");
+            $this->$name = FileManager::default()->fileExists($infoURL->path) ? PropertyListSerialization::propertyListWithURL($infoURL) : null;
             return $this->$name;
         } elseif ($name == "localizations") {
             $this->$name = $this->object(kCFBundleLocalizationsKey) ?? new ArrayClass();

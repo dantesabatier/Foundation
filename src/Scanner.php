@@ -112,7 +112,9 @@ class Scanner extends ObjectClass
             return false;
         }
         $this->scanLocation += strlen($substring);
-        $into = $substring;
+        if (func_num_args() > 1) {
+            $into = $substring;
+        }
         return true;
     }
 
@@ -136,7 +138,9 @@ class Scanner extends ObjectClass
         }
         $substring = substr($this->string, $this->scanLocation, $location);
         $this->scanLocation += strlen($substring);
-        $into = $substring;
+        if (func_num_args() > 1) {
+            $into = $substring;
+        }
         return true;
     }
 

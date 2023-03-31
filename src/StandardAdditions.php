@@ -302,14 +302,14 @@ function localized_string(string $string, string $domain = "Localizable", string
     if (!$fileManager->fileExists($directory, $isDirectory) || !$isDirectory) {
         $directory = $fileManager->documentRootDirectory->appendingPathComponent("Resources")->path;
     }
-    $directoryUrl = URL::fileURL($directory);
-    if ((!$fileManager->fileExists($directoryUrl->path, $isDirectory) || !$isDirectory)) {
-        $directoryUrl = Bundle::bundleForClass(FileManager::class)->bundleURL;
+    $directoryURL = URL::fileURL($directory);
+    if ((!$fileManager->fileExists($directoryURL->path, $isDirectory) || !$isDirectory)) {
+        $directoryURL = Bundle::bundleForClass(FileManager::class)->bundleURL;
     }
-    if (!string_is_equal($directoryUrl->lastPathComponent, "Resources")) {
-        $directoryUrl = $directoryUrl->appendingPathComponent("Resources");
+    if (!string_is_equal($directoryURL->lastPathComponent, "Resources")) {
+        $directoryURL = $directoryURL->appendingPathComponent("Resources");
     }
-    bindtextdomain($domain, $directoryUrl->path);
+    bindtextdomain($domain, $directoryURL->path);
     bind_textdomain_codeset($domain, "UTF-8");
     textdomain($domain);
     return gettext($string);
