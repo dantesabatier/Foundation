@@ -435,10 +435,7 @@ final class FileManager extends ObjectClass
      */
     public function fileExists(string $path, ?bool &$isDirectory = null): bool
     {
-        if (func_num_args() > 1) {
-            $isDirectory = is_dir($path);
-        }
-        /** @psalm-suppress ReferenceConstraintViolation */
+        $isDirectory = func_num_args() > 1 ? is_dir($path) : false;
         return file_exists($path);
     }
 
