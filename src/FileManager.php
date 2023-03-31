@@ -431,12 +431,14 @@ final class FileManager extends ObjectClass
      * @param string $path The path of a file or directory.
      * @param bool $isDirectory Upon return, contains true if path is a directory or if the final path element is a symbolic link that points to a directory; otherwise, contains false.
      * @return bool true if a file at the specified path exists, or false if the file's does not exist or its existence could not be determined.
+     * @param-out bool $isDirectory
      */
     public function fileExists(string $path, ?bool &$isDirectory = null): bool
     {
         if (func_num_args() > 1) {
             $isDirectory = is_dir($path);
         }
+        /** @psalm-suppress ReferenceConstraintViolation */
         return file_exists($path);
     }
 
