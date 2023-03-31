@@ -312,9 +312,9 @@ final class FileManager extends ObjectClass
     public function trashItem(URL $url, ?URL &$resultingItemURL = null): bool
     {
         $directory = $this->url(SearchPathDirectory::trashDirectory, SearchPathDomainMask::local, null, true);
-        $filename = (function (string $name, string $extension, URL $directoryURL): string{
+        $filename = (function (string $name, string $extension, URL $directoryURL): string {
             $index = 1;
-            while ($this->fileExists($directoryURL->appendingPathComponent("$name")->appendingPathExtension($extension)->path)) {
+            while ($this->fileExists($directoryURL->appendingPathComponent($name)->appendingPathExtension($extension)->path)) {
                 $name = preg_replace("/\d+/u", "", $name) . $index;
                 $index++;
             }
@@ -435,7 +435,7 @@ final class FileManager extends ObjectClass
      */
     public function fileExists(string $path, ?bool &$isDirectory = null): bool
     {
-        $isDirectory = func_num_args() > 1 ? is_dir($path) : false;
+        $isDirectory = func_num_args() > 1 && is_dir($path);
         return file_exists($path);
     }
 
