@@ -182,9 +182,15 @@ class HTTPURLProtocol extends NativeProtocol
         $easyHandle->setNoBody($request->httpMethod === HTTPRequestMethod::head);
         /** @var Dictionary<string> $customHeaders */
         $customHeaders = $request->allHTTPHeaderFields ?? new Dictionary();
-        $customHeaders["Connection"] = "keep-alive";
-        $customHeaders["User-Agent"] = sprintf("%s (unknown version) curl/%s %s/%s (%s)", ProcessInfo::processInfo()->processName, curl_version()["version"], php_uname("s"), php_uname("r"), php_uname("m"));
-        $customHeaders["Accept-Language"] = Locale::getPrimaryLanguage(Locale::getDefault());
+        if (!$request->valueForHttpHeaderField("Connection")) {
+            $customHeaders["Connection"] = "keep-alive";
+        }
+        if (!$request->valueForHttpHeaderField("User-Agent")) {
+            $customHeaders["User-Agent"] = sprintf("%s (unknown version) curl/%s %s/%s (%s)", ProcessInfo::processInfo()->processName, curl_version()["version"], php_uname("s"), php_uname("r"), php_uname("m"));
+        }
+        if (!$request->valueForHttpHeaderField("Accept-Language")) {
+            $customHeaders["Accept-Language"] = Locale::getPrimaryLanguage(Locale::getDefault());
+        }
         if ($body->rawValue !== TaskBodyRawValue::none) {
             $customHeaders["Expect"] = "";
         }
