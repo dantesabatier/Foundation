@@ -8,7 +8,6 @@ use Sabatier\Foundation\Dictionary;
 use Sabatier\Foundation\ObjectClass;
 use Sabatier\Foundation\URL;
 use function Sabatier\Foundation\string_has_prefix;
-use function Sabatier\Foundation\string_is_equal;
 
 /**
  * A URL load request that is independent of protocol or URL scheme.
@@ -51,18 +50,14 @@ class URLRequest extends ObjectClass
     {
         if ($name == "httpBody") {
             $httpBody = null;
-            if ($this->httpMethod !== HTTPRequestMethod::get && $this->httpMethod !== HTTPRequestMethod::head && $this->httpMethod !== HTTPRequestMethod::options) {
+            if ($this->httpMethod !== HTTPRequestMethod::trace) {
                 $contentType = $this->valueForHttpHeaderField("Content-Type") ?? "text/plain";
-                $mediaType = $contentType;
-                if (str_contains($contentType, ";")) {
-                    [$mediaType,] = explode(";", $contentType);
-                }
-                if (string_is_equal($mediaType, "application/x-www-form-urlencoded", CompareOptions::caseInsensitive)) {
+                if (string_has_prefix($contentType, "application/x-www-form-urlencoded", CompareOptions::caseInsensitive)) {
                     parse_str(urldecode(file_get_contents("php://input")), $body);
                     if (!empty($body)) {
                         $httpBody = json_encode($body);
                     }
-                } elseif (string_has_prefix($mediaType, "multipart/form-data", CompareOptions::caseInsensitive)) {
+                } elseif (string_has_prefix($contentType, "multipart/form-data", CompareOptions::caseInsensitive)) {
                     $httpBody = json_encode(empty($_FILES) ? $_POST : $_FILES);
                 } else {
                     $httpBody = file_get_contents("php://input");
