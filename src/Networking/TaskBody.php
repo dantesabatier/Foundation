@@ -10,7 +10,7 @@ use Sabatier\Foundation\URL;
 /** @internal */
 readonly class TaskBody
 {
-    private function __construct(public TaskBodyRawValue $rawValue, public ?string $data = null, public ?URL $fileURL = null)
+    private function __construct(public TaskBodyRawValue $rawValue, public ?string $data = null, public ?URL $fileURL = null, public mixed $stream = null)
     {
     }
 
@@ -29,13 +29,18 @@ readonly class TaskBody
         return new TaskBody(TaskBodyRawValue::file, fileURL: $fileURL);
     }
 
+    public static function stream(mixed $stream): TaskBody
+    {
+        return new TaskBody(TaskBodyRawValue::stream, stream: $stream);
+    }
+
     /**
      * @throws Exception
      */
     public function getBodyLength(): ?int
     {
         return match ($this->rawValue) {
-            TaskBodyRawValue::none => 0,
+            TaskBodyRawValue::none, TaskBodyRawValue::stream => 0,
             TaskBodyRawValue::data => strlen((string)$this->data),
             TaskBodyRawValue::file => FileManager::default()->attributesOfItem((string)$this->fileURL?->path)[FileAttributeKey::size]
         };

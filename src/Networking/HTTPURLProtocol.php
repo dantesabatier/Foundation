@@ -155,6 +155,7 @@ class HTTPURLProtocol extends NativeProtocol
                     break;
                 case TaskBodyRawValue::data:
                 case TaskBodyRawValue::file:
+                case TaskBodyRawValue::stream:
                     if ($data = $body->data) {
                         $easyHandle->set($data, CURLOPT_POSTFIELDS);
                     } elseif ($fileURL = $body->fileURL) {
@@ -179,16 +180,14 @@ class HTTPURLProtocol extends NativeProtocol
         $easyHandle->setTimeout((int)$request->timeoutInterval);
         $easyHandle->setAutomaticBodyDecompression(true);
         $easyHandle->setNoBody($request->httpMethod === HTTPRequestMethod::head);
-        $name = ProcessInfo::processInfo()->processName;
-        $version = curl_version()["version"];
-        $osType = php_uname("s");
-        $osRelease = php_uname("r");
-        $osMachineType = php_uname("m");
         /** @var Dictionary<string> $customHeaders */
         $customHeaders = $request->allHTTPHeaderFields ?? new Dictionary();
         $customHeaders["Connection"] = "keep-alive";
-        $customHeaders["User-Agent"] = "$name (unknown version) curl/$version $osType/$osRelease ($osMachineType)";
+        $customHeaders["User-Agent"] = sprintf("%s (unknown version) curl/%s %s/%s (%s)", ProcessInfo::processInfo()->processName, curl_version()["version"], php_uname("s"), php_uname("r"), php_uname("m"));
         $customHeaders["Accept-Language"] = Locale::getPrimaryLanguage(Locale::getDefault());
+        if ($body->rawValue !== TaskBodyRawValue::none) {
+            $customHeaders["Expect"] = "";
+        }
         if ($request->httpMethod === HTTPRequestMethod::post && $request->valueForHttpHeaderField("Content-Type") === null && $request->httpBody !== null) {
             $customHeaders["Content-Type"] = "application/x-www-form-urlencoded";
         }

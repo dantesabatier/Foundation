@@ -8,4 +8,5 @@ enum TaskBodyRawValue: int
     case none = 0;
     case data = 1;
     case file = 2;
+    case stream = 3;
 }
