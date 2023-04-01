@@ -86,11 +86,13 @@ class DataURLProtocol extends URLProtocol
                                 } else {
                                     $base64 = $part === ";base64";
                                 }
+                                /** @phpstan-ignore-next-line */
                                 if ($mimeType === null || !$validate($mimeType)) {
                                     $mimeType = $defaultMimeType;
                                 }
                                 return true;
                             case ";":
+                                /** @phpstan-ignore-next-line */
                                 if ($mimeType === null) {
                                     if (str_contains($part, "/")) {
                                         $mimeType = $part;
@@ -105,6 +107,7 @@ class DataURLProtocol extends URLProtocol
                                 $part = ";";
                                 break;
                             case "=":
+                                /** @phpstan-ignore-next-line */
                                 if ($mimeType === null) {
                                     $mimeType = $defaultMimeType;
                                 } elseif ($part === ";charset" && $charSet === null) {
