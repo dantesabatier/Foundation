@@ -2,12 +2,13 @@
 
 namespace Sabatier\Foundation\Networking;
 
+use Sabatier\Foundation\FileHandle;
 use Sabatier\Foundation\URL;
 
 /** @internal */
 readonly class DataDrain
 {
-    private function __construct(public DataDrainRawValue $rawValue = DataDrainRawValue::inMemory, public string $bodyData = "", public ?URL $fileURL = null, public mixed $fileHandle = null)
+    private function __construct(public DataDrainRawValue $rawValue = DataDrainRawValue::inMemory, public string $bodyData = "", public ?URL $fileURL = null, public ?FileHandle $fileHandle = null)
     {
     }
 
@@ -16,7 +17,7 @@ readonly class DataDrain
         return new DataDrain(DataDrainRawValue::inMemory, $data);
     }
 
-    public static function toFile(?URL $fileURL, mixed $fileHandle): DataDrain
+    public static function toFile(URL $fileURL, FileHandle $fileHandle): DataDrain
     {
         return new DataDrain(DataDrainRawValue::toFile, fileURL: $fileURL, fileHandle: $fileHandle);
     }

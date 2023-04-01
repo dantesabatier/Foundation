@@ -5,6 +5,7 @@ namespace Sabatier\Foundation\Networking;
 use Exception;
 use Sabatier\Foundation\Dictionary;
 use Sabatier\Foundation\Error;
+use Sabatier\Foundation\FileHandle;
 use Sabatier\Foundation\FileManager;
 use Sabatier\Foundation\ProcessInfo;
 use Sabatier\Foundation\SearchPathDirectory;
@@ -111,7 +112,7 @@ abstract class NativeProtocol extends URLProtocol implements EasyHandleDelegate
         $behaviour = $session->behaviour($task);
         return match ($behaviour->rawValue) {
             TaskBehaviourRawValue::noDelegate, TaskBehaviourRawValue::taskDelegate, TaskBehaviourRawValue::dataCompletionHandler => DataDrain::inMemory(),
-            TaskBehaviourRawValue::downloadCompletionHandler => DataDrain::toFile($this->tempFileURL, fopen($this->tempFileURL->path, "w+"))
+            TaskBehaviourRawValue::downloadCompletionHandler => DataDrain::toFile($this->tempFileURL, FileHandle::fileHandleForUpdatingURL($this->tempFileURL))
         };
     }
 
