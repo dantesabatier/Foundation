@@ -5,6 +5,7 @@ namespace Sabatier\Foundation\Networking;
 use CURLFile;
 use Exception;
 use Locale;
+use Sabatier\Foundation\CompareOptions;
 use Sabatier\Foundation\ComparisonResult;
 use Sabatier\Foundation\Date;
 use Sabatier\Foundation\Dictionary;
@@ -13,6 +14,7 @@ use Sabatier\Foundation\ProcessInfo;
 use Sabatier\Foundation\URL;
 use Sabatier\Foundation\URLFileTypeMappings;
 use function Sabatier\Foundation\fatal_error;
+use function Sabatier\Foundation\string_is_equal;
 use const Sabatier\Foundation\CocoaErrorDomain;
 use const Sabatier\Foundation\LocalizedDescriptionKey;
 use const Sabatier\Foundation\URLErrorDomain;
@@ -182,17 +184,25 @@ class HTTPURLProtocol extends NativeProtocol
         $easyHandle->setNoBody($request->httpMethod === HTTPRequestMethod::head);
         /** @var Dictionary<string> $customHeaders */
         $customHeaders = $request->allHTTPHeaderFields ?? new Dictionary();
-        if (!$customHeaders->valueForCaseInsensitiveKey("Connection")) {
-            $customHeaders["Connection"] = "keep-alive";
-        }
-        if (!$customHeaders->valueForCaseInsensitiveKey("User-Agent")) {
-            $customHeaders["User-Agent"] = sprintf("%s (unknown version) curl/%s %s/%s (%s)", ProcessInfo::processInfo()->processName, curl_version()["version"], php_uname("s"), php_uname("r"), php_uname("m"));
-        }
-        if (!$customHeaders->valueForCaseInsensitiveKey("Accept-Language")) {
-            $customHeaders["Accept-Language"] = Locale::getPrimaryLanguage(Locale::getDefault());
+        $names = $customHeaders->keys;
+        foreach (["Connection", "User-Agent", "Accept-Language"] as $name) {
+            if (!$names->contains(fn(string $e): bool => string_is_equal($name, $e, CompareOptions::caseInsensitive))) {
+                $names->append($name);
+                $customHeaders[$name] = match ($name) {
+                    "Connection" => "keep-alive",
+                    "User-Agent" => sprintf("%s (unknown version) curl/%s %s/%s (%s)", ProcessInfo::processInfo()->processName, curl_version()["version"], php_uname("s"), php_uname("r"), php_uname("m")),
+                    "Accept-Language" => Locale::getPrimaryLanguage(Locale::getDefault()),
+                };
+            }
         }
         if ($body->rawValue !== TaskBodyRawValue::none) {
-            $customHeaders["Expect"] = "";
+            /** @noinspection PhpForeachOverSingleElementArrayLiteralInspection */
+            foreach (["Expect"] as $name) {
+                if (!$names->contains(fn(string $e): bool => string_is_equal($name, $e, CompareOptions::caseInsensitive))) {
+                    $names->append($name);
+                    $customHeaders[$name] = "";
+                }
+            }
         }
         if (($request->httpMethod === HTTPRequestMethod::post && $request->valueForHttpHeaderField("Content-Type") === null && $request->httpBody !== null) || $request->httpBodyStream !== null || $body->rawValue === TaskBodyRawValue::stream) {
             $customHeaders["Content-Type"] = "application/x-www-form-urlencoded";
