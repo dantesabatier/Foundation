@@ -103,7 +103,7 @@ final class FileHandle extends ObjectClass
     public static function standardError(): FileHandle
     {
         if (self::$standardError === null) {
-            self::$standardError = new FileHandle(STDERR);
+            self::$standardError = new FileHandle(fopen('php://stderr', 'w'));
         }
         return self::$standardError;
     }
@@ -118,7 +118,7 @@ final class FileHandle extends ObjectClass
     public static function standardInput(): FileHandle
     {
         if (self::$standardInput === null) {
-            self::$standardInput = new FileHandle(STDIN);
+            self::$standardInput = new FileHandle(fopen('php://stdin', 'r'));
         }
         return self::$standardInput;
     }
@@ -133,7 +133,7 @@ final class FileHandle extends ObjectClass
     public static function standardOutput(): FileHandle
     {
         if (self::$standardOutput === null) {
-            self::$standardOutput = new FileHandle(STDOUT);
+            self::$standardOutput = new FileHandle(fopen('php://stdout', 'w'));
         }
         return self::$standardOutput;
     }
