@@ -1,0 +1,200 @@
+<?php
+
+namespace Sabatier\Foundation;
+
+use Exception;
+
+/**
+ * An object-oriented wrapper for a file descriptor.
+ * @property-read string $availableData The data currently available in the receiver. The data currently available through the receiver, up to the maximum size that can be represented by a string. If the receiver is a file, this method returns the data obtained by reading the file from the current file pointer to the end of the file. If the receiver is a communications channel, this method reads up to a buffer of data and returns it; if no data is available, the method blocks. Returns an empty data object if the end of file is reached. This method raises {@see fileHandleOperationException} if attempts to determine the file-handle type fail or if attempts to read from the file or channel fail.
+ */
+final class FileHandle extends ObjectClass
+{
+    /** @var string Raised by FileHandle if attempts to determine file-handle type fail or if attempts to read from a file or channel fail. */
+    public const fileHandleOperationException = "FileHandleOperationException";
+    private static ?FileHandle $standardError = null;
+    private static ?FileHandle $standardInput = null;
+    private static ?FileHandle $standardOutput = null;
+    /** @var resource */
+    private readonly mixed $handle;
+
+    /**
+     * @throws Exception
+     */
+    public function __construct(URL $url, string $mode)
+    {
+        $this->handle = unsafe_value(fn() => fopen($url->absoluteString, $mode));
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function __destruct()
+    {
+        $this->close();
+    }
+
+    public function __get(string $name)
+    {
+        /** @noinspection PhpUnhandledExceptionInspection */
+        return match ($name) {
+            "availableData" => $this->read(PHP_INT_MAX) ?? "",
+            default => $this->valueForUndefinedKey($name)
+        };
+    }
+
+    /**
+     * The shared file handle associated with the standard error file.
+     *
+     * Conventionally this is a terminal device where the system sends error messages. There’s one standard error file handle per process; it’s a shared instance.
+     * When using this method to create a file handle object, the file handle owns its associated file descriptor and is responsible for closing it.
+     * @return FileHandle The shared file handle associated with the standard error file.
+     * @throws Exception
+     */
+    public static function standardError(): FileHandle
+    {
+        if (self::$standardError === null) {
+            self::$standardError = new FileHandle(new URL("php://stderr"), "w");
+        }
+        return self::$standardError;
+    }
+
+    /**
+     * The file handle associated with the standard input file.
+     *
+     * Conventionally this is a terminal device on which the user enters a stream of data. There’s one standard input file handle per process; it’s a shared instance.
+     * When using this method to create a file handle object, the file handle owns its associated file descriptor and is responsible for closing it.
+     * @return FileHandle The shared file handle associated with the standard input file.
+     * @throws Exception
+     */
+    public static function standardInput(): FileHandle
+    {
+        if (self::$standardInput === null) {
+            self::$standardInput = new FileHandle(new URL("php://stdin"), "r");
+        }
+        return self::$standardInput;
+    }
+
+    /**
+     * The file handle associated with the standard output file.
+     *
+     * Conventionally this is a terminal device that receives a stream of data from a program. There’s one standard output file handle per process; it’s a shared instance.
+     * When using this method to create a file handle object, the file handle owns its associated file descriptor and is responsible for closing it.
+     * @return FileHandle The shared file handle associated with the standard output file.
+     * @throws Exception
+     */
+    public static function standardOutput(): FileHandle
+    {
+        if (self::$standardOutput === null) {
+            self::$standardOutput = new FileHandle(new URL("php://stdout"), "w");
+        }
+        return self::$standardOutput;
+    }
+
+    /**
+     * Reads the available data synchronously up to the end of file or maximum number of bytes.
+     *
+     * This method invokes {@see read()} as part of its implementation.
+     * @return string|null The data available through the file handle up to the maximum size that can be represented by a string or, if a communications channel, until an end-of-file indicator is returned.
+     * @throws Exception
+     */
+    public function readToEnd(): ?string
+    {
+        return $this->read(PHP_INT_MAX);
+    }
+
+    /**
+     * Reads data synchronously up to the specified number of bytes.
+     *
+     * If the handle represents a file, this method returns the data obtained by reading length bytes starting at the current file pointer. If length bytes aren’t available, this method returns the data from the current file pointer to the end of the file. If the handle is a communications channel, the method reads up to length bytes from the channel. Returns an empty string if the handle is at the file’s end or if the communications channel returns an end-of-file indicator.
+     * @param int $count The number of bytes to read from the file handle.
+     * @return string|null The data available through the receiver up to a maximum of length bytes, or the maximum size that can be represented by a string, whichever is the smaller.
+     * @throws Exception This method throws an error if attempts to determine the file-handle type fail or if attempts to read from the file or channel fail.
+     */
+    public function read(int $count): ?string
+    {
+        $data = "";
+        while (strlen($data) < $count) {
+            if (!($buffer = unsafe_value(fn(): false|string => fread($this->handle, min($count - strlen($data), 8192))))) {
+                break;
+            }
+            $data .= $buffer;
+        }
+        return empty($data) ? null : $data;
+    }
+
+    /**
+     * Writes the specified data synchronously to the file handle.
+     *
+     * If the handle represents a file, writing takes place at the file pointer’s current position. After it writes the data, the method advances the file pointer by the number of bytes written.
+     * @param string $data The data to write to the file handle.
+     * @throws Exception This method throws an error if the file descriptor is closed or isn’t valid, if the handle represents an unconnected pipe or socket endpoint, if there isn’t any free space on the file system, or if any other writing error occurs.
+     */
+    public function write(string $data): void
+    {
+        unsafe_value(fn(): int|false => fwrite($this->handle, $data));
+    }
+
+    /**
+     * Gets the position of the file pointer within the file.
+     * @return int The position of the file pointer within the file.
+     * @throws Exception Throws an error if called on a file handle representing a pipe or socket, or if the file descriptor is closed.
+     */
+    public function offset(): int
+    {
+        return unsafe_value(fn(): int => ftell($this->handle));
+    }
+
+    /**
+     * Places the file pointer at the end of the file referenced by the file handle and returns the new file offset.
+     * @return int The file offset with the file pointer at the end of the file. This is therefore equal to the size of the file.
+     * @throws Exception Throws an error if called on a file handle representing a pipe or socket, or if the file descriptor is closed.
+     */
+    public function seekToEnd(): int
+    {
+        unsafe_value(fn(): int => fseek($this->handle, -1, SEEK_END));
+        return $this->offset();
+    }
+
+    /**
+     * Moves the file pointer to the specified offset within the file.
+     * @param int $offset The offset to seek to.
+     * @throws Exception Throws an error if called on a file handle representing a pipe or socket, if the file descriptor is closed, or if any other error occurs while seeking.
+     */
+    public function seek(int $offset): void
+    {
+        unsafe_value(fn(): int => fseek($this->handle, $offset));
+    }
+
+    /**
+     * Disallows further access to the represented file or communications channel and signals end of file on communications channels that permit writing.
+     * @throws Exception
+     */
+    public function close(): void
+    {
+        unsafe_value(fn(): bool => fclose($this->handle));
+    }
+
+    /**
+     * Causes all in-memory data and attributes of the file represented by the file handle to write to permanent storage.
+     *
+     * Programs that require the file to always be in a known state should call this method. An invocation of this method doesn't return until memory is flushed.
+     * @throws Exception
+     */
+    public function synchronize(): void
+    {
+        unsafe_value(fn(): bool => fsync($this->handle));
+    }
+
+    /**
+     * Truncates or extends the file represented by the file handle to a specified offset within the file and puts the file pointer at that position.
+     *
+     * If the file is extended (if offset is beyond the current end of file), the added characters are null bytes.
+     * @param int $offset The offset within the file that marks the new end of the file.
+     * @throws Exception
+     */
+    public function truncate(int $offset): void
+    {
+        unsafe_value(fn(): bool => ftruncate($this->handle, $offset));
+    }
+}
