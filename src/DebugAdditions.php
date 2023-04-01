@@ -150,9 +150,15 @@ function invalid_mutation(): never
     throw new InternalInconsistencyException("attempting to mutate an immutable object");
 }
 
+/**
+ * @template Result
+ * @param Closure(): Result $block
+ * @return Result
+ * @throws Exception
+ */
 function unsafe_value(Closure $block): mixed
 {
-    set_error_handler(/** @throws ErrorException */ fn(int $severity, string $message, string $file, int $line): bool => throw new ErrorException($message, 0, $severity, $file, $line)); // @phpstan-ignore-line
+    set_error_handler(/** @throws Exception */ fn(int $severity, string $message, string $file, int $line): bool => throw new ErrorException($message, 0, $severity, $file, $line)); // @phpstan-ignore-line
     $value = $block();
     restore_error_handler();
     return $value;
