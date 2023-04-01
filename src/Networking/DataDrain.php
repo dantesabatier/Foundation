@@ -17,7 +17,7 @@ readonly class DataDrain
         return new DataDrain(DataDrainRawValue::inMemory, $data);
     }
 
-    public static function toFile(URL $fileURL, FileHandle $fileHandle): DataDrain
+    public static function toFile(URL $fileURL, ?FileHandle $fileHandle): DataDrain
     {
         return new DataDrain(DataDrainRawValue::toFile, fileURL: $fileURL, fileHandle: $fileHandle);
     }

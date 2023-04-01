@@ -111,8 +111,9 @@ abstract class NativeProtocol extends URLProtocol implements EasyHandleDelegate
         $session = $task->session;
         $behaviour = $session->behaviour($task);
         return match ($behaviour->rawValue) {
-            TaskBehaviourRawValue::noDelegate, TaskBehaviourRawValue::taskDelegate, TaskBehaviourRawValue::dataCompletionHandler => DataDrain::inMemory(),
-            TaskBehaviourRawValue::downloadCompletionHandler => DataDrain::toFile($this->tempFileURL, FileHandle::fileHandleForUpdatingURL($this->tempFileURL))
+            TaskBehaviourRawValue::noDelegate, TaskBehaviourRawValue::taskDelegate => DataDrain::ignore(),
+            TaskBehaviourRawValue::dataCompletionHandler => DataDrain::inMemory(),
+            TaskBehaviourRawValue::downloadCompletionHandler => DataDrain::toFile($this->tempFileURL, FileHandle::fileHandleForWritingToURL($this->tempFileURL))
         };
     }
 
