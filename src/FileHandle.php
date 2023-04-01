@@ -1,5 +1,7 @@
 <?php
 
+/** @noinspection PhpMixedReturnTypeCanBeReducedInspection */
+
 namespace Sabatier\Foundation;
 
 use Exception;
@@ -15,15 +17,12 @@ final class FileHandle extends ObjectClass
     private static ?FileHandle $standardError = null;
     private static ?FileHandle $standardInput = null;
     private static ?FileHandle $standardOutput = null;
-    /** @var resource */
-    private readonly mixed $handle;
 
     /**
-     * @throws Exception
+     * @param resource $rawHandle
      */
-    public function __construct(URL $url, string $mode)
+    private function __construct(public readonly mixed $rawHandle)
     {
-        $this->handle = unsafe_value(fn() => fopen($url->absoluteString, $mode));
     }
 
     /**
@@ -44,17 +43,67 @@ final class FileHandle extends ObjectClass
     }
 
     /**
+     * Returns a file handle initialized for reading the file, device, or named socket at the specified URL.
+     *
+     * The file pointer is set to the beginning of the file. You cannot write data to the returned file handle object. Use the {@see readToEnd()} or {@see read()} methods to read data from it.
+     * When using this method to create a file handle object, the file handle owns its associated file descriptor and is responsible for closing it.
+     * @param URL $url The URL of the file, device, or named socket to access.
+     * @return FileHandle|null The initialized file handle object or nil if no file exists at url.
+     * @throws Exception
+     */
+    public static function fileHandleForReadingFromURL(URL $url): ?FileHandle
+    {
+        if (!($handle = unsafe_value(fn(): mixed => fopen($url->absoluteString, "r")))) {
+            return null;
+        }
+        return new FileHandle($handle);
+    }
+
+    /**
+     * Returns a file handle initialized for writing to the file, device, or named socket at the specified URL.
+     *
+     * The file pointer is set to the beginning of the file. The returned object responds only to {@see write()}.
+     * When using this method to create a file handle object, the file handle owns its associated file descriptor and is responsible for closing it.
+     * @param URL $url The URL of the file, device, or named socket to access.
+     * @return FileHandle|null The initialized file handle object or nil if no file exists at url.
+     * @throws Exception
+     */
+    public static function fileHandleForWritingToURL(URL $url): ?FileHandle
+    {
+        if (!($handle = unsafe_value(fn(): mixed => fopen($url->absoluteString, "w")))) {
+            return null;
+        }
+        return new FileHandle($handle);
+    }
+
+    /**
+     * Returns a file handle initialized for reading and writing to the file, device, or named socket at the specified URL.
+     *
+     * The file pointer is set to the beginning of the file. The returned object responds to both {@see read()}... messages and {@see write()}.
+     * When using this method to create a file handle object, the file handle owns its associated file descriptor and is responsible for closing it.
+     * @param URL $url The URL of the file, device, or named socket to access.
+     * @return FileHandle|null The initialized file handle object or nil if no file exists at url.
+     * @throws Exception
+     */
+    public static function fileHandleForUpdatingURL(URL $url): ?FileHandle
+    {
+        if (!($handle = unsafe_value(fn(): mixed => fopen($url->absoluteString, "w+")))) {
+            return null;
+        }
+        return new FileHandle($handle);
+    }
+
+    /**
      * The shared file handle associated with the standard error file.
      *
      * Conventionally this is a terminal device where the system sends error messages. There’s one standard error file handle per process; it’s a shared instance.
      * When using this method to create a file handle object, the file handle owns its associated file descriptor and is responsible for closing it.
      * @return FileHandle The shared file handle associated with the standard error file.
-     * @throws Exception
      */
     public static function standardError(): FileHandle
     {
         if (self::$standardError === null) {
-            self::$standardError = new FileHandle(new URL("php://stderr"), "w");
+            self::$standardError = new FileHandle(STDERR);
         }
         return self::$standardError;
     }
@@ -65,12 +114,11 @@ final class FileHandle extends ObjectClass
      * Conventionally this is a terminal device on which the user enters a stream of data. There’s one standard input file handle per process; it’s a shared instance.
      * When using this method to create a file handle object, the file handle owns its associated file descriptor and is responsible for closing it.
      * @return FileHandle The shared file handle associated with the standard input file.
-     * @throws Exception
      */
     public static function standardInput(): FileHandle
     {
         if (self::$standardInput === null) {
-            self::$standardInput = new FileHandle(new URL("php://stdin"), "r");
+            self::$standardInput = new FileHandle(STDIN);
         }
         return self::$standardInput;
     }
@@ -81,12 +129,11 @@ final class FileHandle extends ObjectClass
      * Conventionally this is a terminal device that receives a stream of data from a program. There’s one standard output file handle per process; it’s a shared instance.
      * When using this method to create a file handle object, the file handle owns its associated file descriptor and is responsible for closing it.
      * @return FileHandle The shared file handle associated with the standard output file.
-     * @throws Exception
      */
     public static function standardOutput(): FileHandle
     {
         if (self::$standardOutput === null) {
-            self::$standardOutput = new FileHandle(new URL("php://stdout"), "w");
+            self::$standardOutput = new FileHandle(STDOUT);
         }
         return self::$standardOutput;
     }
@@ -115,7 +162,7 @@ final class FileHandle extends ObjectClass
     {
         $data = "";
         while (strlen($data) < $count) {
-            if (!($buffer = unsafe_value(fn(): false|string => fread($this->handle, min($count - strlen($data), 8192))))) {
+            if (!($buffer = unsafe_value(fn(): false|string => fread($this->rawHandle, min($count - strlen($data), 8192))))) {
                 break;
             }
             $data .= $buffer;
@@ -132,7 +179,7 @@ final class FileHandle extends ObjectClass
      */
     public function write(string $data): void
     {
-        unsafe_value(fn(): int|false => fwrite($this->handle, $data));
+        unsafe_value(fn(): int|false => fwrite($this->rawHandle, $data));
     }
 
     /**
@@ -142,7 +189,7 @@ final class FileHandle extends ObjectClass
      */
     public function offset(): int
     {
-        return unsafe_value(fn(): int => ftell($this->handle));
+        return unsafe_value(fn(): int => ftell($this->rawHandle));
     }
 
     /**
@@ -152,7 +199,7 @@ final class FileHandle extends ObjectClass
      */
     public function seekToEnd(): int
     {
-        unsafe_value(fn(): int => fseek($this->handle, -1, SEEK_END));
+        unsafe_value(fn(): int => fseek($this->rawHandle, -1, SEEK_END));
         return $this->offset();
     }
 
@@ -163,7 +210,7 @@ final class FileHandle extends ObjectClass
      */
     public function seek(int $offset): void
     {
-        unsafe_value(fn(): int => fseek($this->handle, $offset));
+        unsafe_value(fn(): int => fseek($this->rawHandle, $offset));
     }
 
     /**
@@ -172,7 +219,8 @@ final class FileHandle extends ObjectClass
      */
     public function close(): void
     {
-        unsafe_value(fn(): bool => fclose($this->handle));
+        /** @psalm-suppress InvalidPropertyAssignmentValue */
+        unsafe_value(fn(): bool => fclose($this->rawHandle));
     }
 
     /**
@@ -183,7 +231,7 @@ final class FileHandle extends ObjectClass
      */
     public function synchronize(): void
     {
-        unsafe_value(fn(): bool => fsync($this->handle));
+        unsafe_value(fn(): bool => fsync($this->rawHandle));
     }
 
     /**
@@ -195,6 +243,6 @@ final class FileHandle extends ObjectClass
      */
     public function truncate(int $offset): void
     {
-        unsafe_value(fn(): bool => ftruncate($this->handle, $offset));
+        unsafe_value(fn(): bool => ftruncate($this->rawHandle, $offset));
     }
 }
