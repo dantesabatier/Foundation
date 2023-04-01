@@ -60,6 +60,7 @@ class FTPURLProtocol extends NativeProtocol
                     break;
                 case TaskBodyRawValue::data:
                 case TaskBodyRawValue::file:
+                case TaskBodyRawValue::stream:
                     if ($length = $body->getBodyLength()) {
                         $easyHandle->setRequestBodyLength($length);
                         $this->task->countOfBytesExpectedToSend = $length;
