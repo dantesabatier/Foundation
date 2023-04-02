@@ -96,7 +96,6 @@ final class URL extends ObjectClass
                 $steps = substr_count($relative, "../");
                 $numberOfComponents = $baseURL->pathComponents->count();
                 if ($steps >= $numberOfComponents) {
-                    trigger_error("{$this->debugDescription()} components in the relative url are too many", E_USER_WARNING);
                     $steps = ($numberOfComponents - 1);
                 }
                 while ($steps > 0) {
