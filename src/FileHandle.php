@@ -33,9 +33,11 @@ final class FileHandle extends ObjectClass
         $this->close();
     }
 
+    /**
+     * @throws Exception
+     */
     public function __get(string $name)
     {
-        /** @noinspection PhpUnhandledExceptionInspection */
         return match ($name) {
             "availableData" => $this->read(PHP_INT_MAX) ?? "",
             default => $this->valueForUndefinedKey($name)
