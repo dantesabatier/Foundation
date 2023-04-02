@@ -159,7 +159,9 @@ abstract class NativeProtocol extends URLProtocol implements EasyHandleDelegate
                 $this->internalState = InternalState::fulfillingFromCache($cachedResponse);
                 $this->client?->urlProtocolCachedResponseIsValid($this, $cachedResponse);
                 $this->client?->urlProtocolDidReceiveCacheStoragePolicy($this, $cachedResponse->response, URLCacheStoragePolicy::notAllowed);
-                $this->client?->urlProtocolDidLoad($this, $cachedResponse->data);
+                if ($data = $cachedResponse->data) {
+                    $this->client?->urlProtocolDidLoad($this, $data);
+                }
                 $this->client?->urlProtocolDidFinishLoading($this);
                 $this->internalState = InternalState::taskCompleted();
             } else {
