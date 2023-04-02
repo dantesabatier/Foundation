@@ -18,16 +18,16 @@ class DiskEntry
 
     public static function entry(URL $url): ?DiskEntry
     {
-        if ($url->pathExtension === self::pathExtension) {
+        if ($url->pathExtension !== self::pathExtension) {
             return null;
         }
         $parts = preg_split(sprintf("/%s/", preg_quote(".", "/")), $url->deletingPathExtension()->lastPathComponent, -1, PREG_SPLIT_NO_EMPTY);
-        if (count($parts) !== 2) {
+        if (count($parts) !== 3) {
             return null;
         }
-        [$timeString, $identifier] = $parts;
+        [$t1, $t2, $identifier] = $parts;
         $entry = new DiskEntry($url);
-        $entry->date = new Date((float)$timeString);
+        $entry->date = new Date((float)$t1 . $t2);
         $entry->identifier = $identifier;
         return $entry;
     }
