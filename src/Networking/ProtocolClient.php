@@ -46,8 +46,7 @@ class ProtocolClient implements URLProtocolClient
                 /** @var URLSessionDelegate $delegate */
                 $delegate = $behaviour->taskDelegate;
                 if ($delegate instanceof URLSessionDataDelegate && $task instanceof URLSessionDataTask) {
-                    $delegate->urlSessionDataTaskDidReceiveResponse($session, $task, $response, function (/** @noinspection PhpUnusedParameterInspection */ URLSessionResponseDisposition $disposition): void {
-                        trigger_error("Warning: Ignoring disposition from completion handler.");
+                    $delegate->urlSessionDataTaskDidReceiveResponse($session, $task, $response, function (URLSessionResponseDisposition $disposition): void {
                     });
                 } elseif ($delegate instanceof URLSessionWebSocketDelegate && $task instanceof URLSessionWebSocketTask) {
                     $delegate->urlSessionWebSocketTaskDidOpenWithProtocol($session, $task, $task->protocolPicked);
