@@ -109,8 +109,8 @@ abstract class NativeProtocol extends URLProtocol implements EasyHandleDelegate
         $session = $task->session;
         $behaviour = $session->behaviour($task);
         return match ($behaviour->rawValue) {
-            TaskBehaviourRawValue::noDelegate, TaskBehaviourRawValue::taskDelegate => DataDrain::ignore(),
-            TaskBehaviourRawValue::dataCompletionHandler => DataDrain::inMemory(),
+            TaskBehaviourRawValue::noDelegate => DataDrain::ignore(),
+            TaskBehaviourRawValue::taskDelegate, TaskBehaviourRawValue::dataCompletionHandler => DataDrain::inMemory(),
             TaskBehaviourRawValue::downloadCompletionHandler => DataDrain::toFile($this->tempFileURL, FileHandle::fileHandleForWritingToURL($this->tempFileURL))
         };
     }
@@ -205,7 +205,6 @@ abstract class NativeProtocol extends URLProtocol implements EasyHandleDelegate
             }
             return EasyHandleAction::proceed;
         }
-        $this->notifyDelegateAboutReceivedData($data);
         $this->internalState = InternalState::transferInProgress($ts->byAppendingBodyData($data));
         return EasyHandleAction::proceed;
     }
@@ -280,33 +279,6 @@ abstract class NativeProtocol extends URLProtocol implements EasyHandleDelegate
             fatal_error("Received body data, but the header is not complete, yet.");
         }
         return null;
-    }
-
-    /**
-     * @throws Exception
-     */
-    public function notifyDelegateAboutReceivedData(string $data): void
-    {
-        $task = $this->task;
-        $session = $task->session;
-        $behaviour = $task->session->behaviour($task);
-        switch ($behaviour->rawValue) {
-            case TaskBehaviourRawValue::taskDelegate:
-                /** @var URLSessionDelegate $delegate */
-                $delegate = $behaviour->taskDelegate;
-                if ($delegate instanceof URLSessionDataDelegate && $task instanceof URLSessionDataTask) {
-                    $delegate->urlSessionDataTaskReceiveData($session, $task, $data);
-                } elseif ($task instanceof URLSessionDownloadTask && $delegate instanceof URLSessionDownloadDelegate) {
-                    $bytesWritten = strlen($data);
-                    $task->countOfBytesReceived += $bytesWritten;
-                    $delegate->urlSessionDownloadTaskDidWriteData($session, $task, $bytesWritten, $task->countOfBytesReceived, $task->countOfBytesExpectedToReceive);
-                }
-                break;
-            case TaskBehaviourRawValue::noDelegate:
-            case TaskBehaviourRawValue::dataCompletionHandler:
-            case TaskBehaviourRawValue::downloadCompletionHandler:
-                break;
-        }
     }
 
     /**
@@ -421,10 +393,17 @@ abstract class NativeProtocol extends URLProtocol implements EasyHandleDelegate
         /** @var DataDrain $bodyDataDrain */
         $bodyDataDrain = $this->internalState->bodyDataDrain;
         $data = $bodyDataDrain->bodyData;
-        if ($bodyDataDrain->rawValue == DataDrainRawValue::inMemory) {
-            $this->client?->urlProtocolDidLoad($this, $data);
-        } elseif ($bodyDataDrain->rawValue == DataDrainRawValue::toFile || $task instanceof URLSessionDownloadTask) {
-            self::setProperty($bodyDataDrain->fileURL, "temporaryFileURL", $this->request);
+        switch ($bodyDataDrain->rawValue) {
+            case DataDrainRawValue::inMemory:
+                $this->client?->urlProtocolDidLoad($this, $data);
+                break;
+            case DataDrainRawValue::toFile:
+                if ($task instanceof URLSessionDownloadTask) {
+                    self::setProperty($bodyDataDrain->fileURL, "temporaryFileURL", $this->request);
+                }
+                break;
+            case DataDrainRawValue::ignore:
+                break;
         }
         $this->client?->urlProtocolDidFinishLoading($this);
         $this->internalState = InternalState::taskCompleted();
