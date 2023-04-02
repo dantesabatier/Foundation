@@ -27,7 +27,7 @@ class Date extends ObjectClass
     }
 
     #[Pure]
-    #[ArrayShape(["timeIntervalSinceReferenceDate" => "float", "timeIntervalSinceNow" => "float", "timeIntervalSince1970" => "float"])]
+    #[ArrayShape(["timeIntervalSinceReferenceDate" => "float"])]
     public function __serialize(): array
     {
         return ["timeIntervalSinceReferenceDate" => $this->timeIntervalSinceReferenceDate];
