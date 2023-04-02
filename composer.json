@@ -28,10 +28,6 @@
     "ext-gettext": "*",
     "ext-dom": "*"
   },
-  "require-dev": {
-    "vimeo/psalm": "^4.3",
-    "jetbrains/phpstorm-attributes": "^1.0"
-  },
   "config": {
     "platform": {
       "ext-pcntl": "8.2",
