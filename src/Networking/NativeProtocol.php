@@ -33,10 +33,10 @@ abstract class NativeProtocol extends URLProtocol implements EasyHandleDelegate
 
     public function __construct(URLSessionTask $task, ?CachedURLResponse $cachedResponse = null, ?URLProtocolClient $client = null)
     {
-        parent::__construct($task, $cachedResponse, $client);
-        unset($this->internalState);
-        unset($this->easyHandle);
         unset($this->tempFileURL);
+        parent::__construct($task, $cachedResponse, $client);
+        $this->internalState = InternalState::initial();
+        $this->easyHandle = new EasyHandle($this);
     }
 
     /**
@@ -45,8 +45,6 @@ abstract class NativeProtocol extends URLProtocol implements EasyHandleDelegate
     public function __get(string $name)
     {
         return $this->$name = match ($name) {
-            "internalState" => InternalState::initial(),
-            "easyHandle" => new EasyHandle($this),
             "tempFileURL" => (function (): URL {
                 $tempFileURL = FileManager::default()->url(SearchPathDirectory::cachesDirectory, SearchPathDomainMask::local, null, true)->appendingPathComponent(uniqid((string)(new SystemRandomNumberGenerator())->next(), true))->appendPathExtension($this->task->originalRequest?->url?->pathExtension ?? "");
                 FileManager::default()->createFile($tempFileURL->path, null);
