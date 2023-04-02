@@ -43,6 +43,14 @@ interface URLSessionTaskDelegate extends URLSessionDelegate
     public function urlSessionTaskDidSendBodyData(URLSession $session, URLSessionTask $task, float $bytesSent, float $totalBytesSent, float $totalBytesExpectedToSend): void;
 
     /**
+     * Tells the delegate when a task requires a new request body stream to send to the remote server.
+     * @param URLSession $session The session containing the task that needs a new body stream.
+     * @param URLSessionTask $task The task that needs a new body stream.
+     * @param Closure(mixed): void $completionHandler A completion handler that your delegate method should call with the new body stream.
+     */
+    public function urlSessionTaskNeedNewBodyStream(URLSession $session, URLSessionTask $task, Closure $completionHandler): void;
+
+    /**
      * Requests credentials from the delegate in response to an authentication request from the remote server.
      *
      * @param URLSession $session The session containing the task whose request requires authentication.
