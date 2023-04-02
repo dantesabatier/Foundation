@@ -198,7 +198,7 @@ abstract class NativeProtocol extends URLProtocol implements EasyHandleDelegate
         if ($response = $this->validateHeaderComplete($ts)) {
             $ts->response = $response;
         }
-        if (($httpResponse = $ts->response) && $httpResponse instanceof HTTPURLResponse && in_range($httpResponse->statusCode, 301, 308)) {
+        if (($httpResponse = $ts->response) && $httpResponse instanceof HTTPURLResponse && in_range($httpResponse->statusCode, HTTPStatusCode::movedPermanently, HTTPStatusCode::permanentRedirect)) {
             if ($this instanceof HTTPURLProtocol) {
                 /** @psalm-suppress PossiblyNullOperand */
                 $this->lastRedirectBody .= $data;
