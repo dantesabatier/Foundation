@@ -77,8 +77,12 @@ abstract class URLSessionTask extends ObjectClass
         $this->taskIdentifier = $taskIdentifier;
         $this->currentRequest = $request;
         $this->progress = new Progress();
-        if (!$body && ($bodyData = $request->httpBody)) {
-            $body = TaskBody::data($bodyData);
+        if ($body === null) {
+            if ($bodyData = $request->httpBody) {
+                $body = TaskBody::data($bodyData);
+            } elseif ($bodyStream = $request->httpBodyStream) {
+                $body = TaskBody::stream($bodyStream);
+            }
         }
         $this->knownBody = $body;
         $this->protocolStorage = ProtocolState::toBeCreated();
@@ -187,7 +191,19 @@ abstract class URLSessionTask extends ObjectClass
             $completion($body);
             return;
         }
-        $completion(TaskBody::none());
+        $session = $this->session;
+        $delegate = $session->delegate;
+        if ($delegate instanceof URLSessionTaskDelegate) {
+            $delegate->urlSessionTaskNeedNewBodyStream($session, $this, function (mixed $stream) use ($completion): void {
+                if ($stream) {
+                    $completion(TaskBody::stream($stream));
+                } else {
+                    $completion(TaskBody::none());
+                }
+            });
+        } else {
+            $completion(TaskBody::none());
+        }
     }
 
     /**
