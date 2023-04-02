@@ -346,6 +346,8 @@ class HTTPURLProtocol extends NativeProtocol
                     case HTTPStatusCode::movedPermanently:
                     case HTTPStatusCode::found:
                     case HTTPStatusCode::seeOther:
+                    case HTTPStatusCode::useProxy:
+                    case HTTPStatusCode::switchProxy:
                     case HTTPStatusCode::temporaryRedirect:
                     case HTTPStatusCode::permanentRedirect:
                         break;
