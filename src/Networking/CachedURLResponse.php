@@ -4,12 +4,11 @@ namespace Sabatier\Foundation\Networking;
 
 use Sabatier\Foundation\Date;
 use Sabatier\Foundation\Dictionary;
-use Sabatier\Foundation\ObjectClass;
 
 /**
  * A cached response to a URL request.
  */
-class CachedURLResponse extends ObjectClass
+class CachedURLResponse
 {
     /** @internal */
     public Date $date;
