@@ -35,9 +35,9 @@ class Date extends ObjectClass
 
     public function __unserialize(array $data): void
     {
-        $this->timeIntervalSinceReferenceDate = $data["timeIntervalSinceReferenceDate"];
-        $this->timeIntervalSinceNow = $data["timeIntervalSinceNow"];
-        $this->timeIntervalSince1970 = $data["timeIntervalSince1970"];
+        $this->timeIntervalSinceReferenceDate = $data["timeIntervalSinceReferenceDate"] ?? absolute_time_get_current();
+        $this->timeIntervalSinceNow = $this->timeIntervalSinceReferenceDate - absolute_time_get_current();
+        $this->timeIntervalSince1970 = $this->timeIntervalSinceReferenceDate - self::timeIntervalBetween1970AndReferenceDate;
     }
 
     /**
