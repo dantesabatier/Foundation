@@ -352,7 +352,7 @@ class HTTPURLProtocol extends NativeProtocol
                     case HTTPStatusCode::permanentRedirect:
                         break;
                     default:
-                        $this->client?->urlProtocolDidReceiveCacheStoragePolicy($this, $response, URLCacheStoragePolicy::allowed);
+                        $this->client?->urlProtocolDidReceiveCacheStoragePolicy($this, $response, URLCacheStoragePolicy::notAllowed);
                         break;
                 }
                 break;
