@@ -18,7 +18,7 @@ class ProtocolClient implements URLProtocolClient
 {
     private ?string $cacheableData = null;
     private ?URLResponse $cacheableResponse = null;
-    private URLCacheStoragePolicy $cachePolicy = URLCacheStoragePolicy::allowed;
+    private URLCacheStoragePolicy $cachePolicy = URLCacheStoragePolicy::notAllowed;
 
     /**
      * @throws Exception
