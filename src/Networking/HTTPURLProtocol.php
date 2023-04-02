@@ -14,6 +14,7 @@ use Sabatier\Foundation\ProcessInfo;
 use Sabatier\Foundation\URL;
 use Sabatier\Foundation\URLFileTypeMappings;
 use function Sabatier\Foundation\fatal_error;
+use function Sabatier\Foundation\in_range;
 use function Sabatier\Foundation\string_is_equal;
 use const Sabatier\Foundation\CocoaErrorDomain;
 use const Sabatier\Foundation\LocalizedDescriptionKey;
@@ -342,16 +343,8 @@ class HTTPURLProtocol extends NativeProtocol
         $behaviour = $session->behaviour($this->task);
         switch ($behaviour->rawValue) {
             case TaskBehaviourRawValue::taskDelegate:
-                switch ($response->statusCode) {
-                    case HTTPStatusCode::movedPermanently:
-                    case HTTPStatusCode::found:
-                    case HTTPStatusCode::seeOther:
-                    case HTTPStatusCode::notModified:
-                    case HTTPStatusCode::temporaryRedirect:
-                        break;
-                    default:
-                        $this->client?->urlProtocolDidReceiveCacheStoragePolicy($this, $response, URLCacheStoragePolicy::notAllowed);
-                        break;
+                if (!in_range($response->statusCode, HTTPStatusCode::movedPermanently, HTTPStatusCode::permanentRedirect)) {
+                    $this->client?->urlProtocolDidReceiveCacheStoragePolicy($this, $response, URLCacheStoragePolicy::notAllowed);
                 }
                 break;
             case TaskBehaviourRawValue::noDelegate:
