@@ -215,6 +215,10 @@ class ProtocolClient implements URLProtocolClient
                 $delegate = $behaviour->taskDelegate;
                 if ($delegate instanceof URLSessionDataDelegate && $task instanceof URLSessionDataTask) {
                     $delegate->urlSessionDataTaskReceiveData($session, $task, $data);
+                } elseif ($task instanceof URLSessionDownloadTask && $delegate instanceof URLSessionDownloadDelegate) {
+                    $bytesWritten = strlen($data);
+                    $task->countOfBytesReceived += $bytesWritten;
+                    $delegate->urlSessionDownloadTaskDidWriteData($session, $task, $bytesWritten, $task->countOfBytesReceived, $task->countOfBytesExpectedToReceive);
                 }
                 break;
             default:
@@ -265,8 +269,8 @@ class ProtocolClient implements URLProtocolClient
             $cacheable = new CachedURLResponse($cacheableResponse, $data, $this->cachePolicy);
             $protocolAllows = $protocol instanceof NativeProtocol && $protocol->canCache($cacheable);
             if ($protocolAllows) {
-                if (($delegate = $session->delegate) &&
-                    $delegate instanceof URLSessionDataDelegate) {
+                $delegate = $session->delegate;
+                if ($delegate instanceof URLSessionDataDelegate) {
                     $delegate->urlSessionDataTaskWillCacheResponse($session, $task, $cacheable, function (?CachedURLResponse $actualCacheable) use ($task, $cache): void {
                         if ($actualCacheable) {
                             $cache->storeCachedResponseForDataTask($actualCacheable, $task);
