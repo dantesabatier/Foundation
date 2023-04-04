@@ -32,3 +32,7 @@ const URLErrorUnknown = -1;
 const URLErrorTimedOut = -1001;
 /** @var int A redirect loop was detected or the threshold for number of allowable redirects was exceeded (currently 16). */
 const URLErrorHTTPTooManyRedirects = -1007;
+/** @var int The specified file doesn't exist. */
+const URLErrorFileDoesNotExist = -1100;
+/** @var int A resource couldn't be read because of insufficient permissions. */
+const URLErrorNoPermissionsToReadFile = -1102;
