@@ -107,6 +107,7 @@ class ProtocolClient implements URLProtocolClient
                 } else {
                     $task->cancel();
                 }
+                return;
             }
             $proceed(null);
         };
