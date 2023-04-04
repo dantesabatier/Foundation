@@ -256,8 +256,11 @@ abstract class URLSessionTask extends ObjectClass
     {
         return match ($authScheme) {
             URLAuthenticationMethodHTTPBasic => function (/** @noinspection PhpUnusedParameterInspection */ URLSessionTask $task, URLSessionAuthChallengeDisposition $disposition, ?URLCredential $credential): void {
+                $user = $credential?->user ?? "";
+                $password = $credential?->password;
+                $encodedString = base64_encode("$user:$password");
                 $task->authRequest = $task->originalRequest;
-                $task->authRequest?->setValueForHttpHeaderField(sprintf("Basic %s:%s", $credential?->user ?? "", $credential?->password ?? ""), "Authorization");
+                $task->authRequest?->setValueForHttpHeaderField("Basic $encodedString", "Authorization");
             },
             default => function (/** @noinspection PhpUnusedParameterInspection */ URLSessionTask $task, URLSessionAuthChallengeDisposition $disposition, ?URLCredential $credential) use ($authScheme): void {
                 fatal_error("This URLSession implementation doesn't currently handle $authScheme authentication.");
