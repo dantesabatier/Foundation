@@ -5,7 +5,10 @@ namespace Sabatier\Foundation\Networking;
 use Iterator;
 use function Sabatier\Foundation\in_range;
 
-/** @internal */
+/**
+ * @template-implements Iterator<PercentDecoderElement>
+ * @internal
+ */
 class PercentDecoder implements Iterator
 {
     private int $index = 0;
