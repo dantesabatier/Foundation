@@ -25,7 +25,7 @@ readonly class Notification implements CustomStringConvertible
     {
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         return $this->description();
     }

@@ -2,9 +2,12 @@
 
 namespace Sabatier\Foundation;
 
+use ArrayAccess;
+use Iterator;
+
 /**
- * @psalm-require-implements \ArrayAccess
- * @psalm-require-implements \Iterator
+ * @psalm-require-implements ArrayAccess
+ * @psalm-require-implements Iterator
  */
 trait IteratorAlgorithms
 {

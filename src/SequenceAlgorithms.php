@@ -47,11 +47,7 @@ trait SequenceAlgorithms
 
     public function isEqual(mixed $other): bool
     {
-        if ($other instanceof self) {
-            /** @psalm-suppress InvalidArgument */
-            return $this->elementsEqual($other);
-        }
-        return false;
+        return $this->elementsEqual($other);
     }
 
     public function toArray(): array
