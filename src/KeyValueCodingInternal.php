@@ -41,6 +41,7 @@ function kvc_components(string $keyPath): array
     }
     $collection = "";
     $property = "";
+    /** @var string[] $components */
     $components = preg_split(sprintf("/%s/", preg_quote(".", "/")), substring_to_index($keyPath, $idx), -1, PREG_SPLIT_NO_EMPTY);
     $numberOfComponents = count($components);
     if ($numberOfComponents) {

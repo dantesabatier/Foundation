@@ -21,7 +21,7 @@ use UnexpectedValueException;
 class URLDirectoryEnumerator extends DirectoryEnumerator
 {
     private readonly RecursiveIteratorIterator $iterator;
-    private ?URL $current = null;
+    private ?URL $currentURL = null;
     private bool $shouldContinue = false;
     private bool $isPostOrderDirectory = false;
 
@@ -44,9 +44,9 @@ class URLDirectoryEnumerator extends DirectoryEnumerator
 
     public function fileAttributes(): ?Dictionary
     {
-        if ($current = $this->current) {
+        if ($currentURL = $this->currentURL) {
             try {
-                return FileManager::default()->attributesOfItem($current->path);
+                return FileManager::default()->attributesOfItem($currentURL->path);
             } catch (Exception) {
                 return null;
             }
@@ -57,11 +57,6 @@ class URLDirectoryEnumerator extends DirectoryEnumerator
     public function level(): int
     {
         return $this->iterator->getDepth();
-    }
-
-    public function skipDescendents(): void
-    {
-        $this->skipDescendants();
     }
 
     public function skipDescendants(): void
@@ -83,7 +78,7 @@ class URLDirectoryEnumerator extends DirectoryEnumerator
                     if ($exception instanceof UnexpectedValueException) {
                         $code = FileReadNoPermissionError;
                     }
-                    return $errorHandler($this->current, new Error(CocoaErrorDomain, $code, new Dictionary([URLErrorKey => $this->current])));
+                    return $errorHandler($this->currentURL, new Error(CocoaErrorDomain, $code, new Dictionary([URLErrorKey => $this->currentURL])));
                 }
                 return false;
             };
@@ -102,7 +97,7 @@ class URLDirectoryEnumerator extends DirectoryEnumerator
                                 $url->setTemporaryResourceValue($value, $key);
                             }
                         }
-                        $this->current = $url;
+                        $this->currentURL = $url;
                         yield $url;
                         $this->shouldContinue = $this->isEnumeratingDirectoryPostOrder();
                     } catch (Exception $exception) {

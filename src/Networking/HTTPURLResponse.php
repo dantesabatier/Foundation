@@ -17,7 +17,9 @@ use function Sabatier\Foundation\string_is_equal;
 class HTTPURLResponse extends URLResponse
 {
     public readonly string $httpVersion;
-    /** @var Dictionary<mixed> All HTTP header fields of the response. */
+    /** @var int The response’s HTTP status code. */
+    public readonly int $statusCode;
+    /** @var Dictionary All HTTP header fields of the response. */
     public readonly Dictionary $allHeaderFields;
 
     /**
@@ -25,16 +27,17 @@ class HTTPURLResponse extends URLResponse
      * @param URL $url The URL from which the response was generated.
      * @param int $statusCode The HTTP status code to return (404, for example).
      * @param string|null $httpVersion The version of the HTTP response as returned by the server. This is typically represented as "HTTP/1.1".
-     * @param Dictionary<mixed>|null $headerFields A dictionary representing the keys and values from the server's response header.
+     * @param Dictionary|null $headerFields A dictionary representing the keys and values from the server's response header.
      */
-    public function __construct(URL $url, #[ExpectedValues(valuesFromClass: HTTPStatusCode::class)] public readonly int $statusCode = HTTPStatusCode::ok, ?string $httpVersion = null, ?Dictionary $headerFields = null)
+    public function __construct(URL $url, #[ExpectedValues(valuesFromClass: HTTPStatusCode::class)] int $statusCode = HTTPStatusCode::ok, ?string $httpVersion = null, ?Dictionary $headerFields = null)
     {
+        $this->statusCode = $statusCode;
         $this->httpVersion = $httpVersion ?? $_SERVER["SERVER_PROTOCOL"] ?? "HTTP/1.1";
         $this->allHeaderFields = (function () use ($headerFields): Dictionary {
             if ($headerFields === null) {
                 return new Dictionary();
             }
-            /** @var Dictionary<mixed> $canonicalizedFields */
+            /** @var Dictionary $canonicalizedFields */
             $canonicalizedFields = new Dictionary();
             foreach ($headerFields as $key => $value) {
                 if (empty($key)) {

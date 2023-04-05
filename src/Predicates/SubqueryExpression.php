@@ -18,10 +18,10 @@ class SubqueryExpression extends Expression
 
     public function expressionValue(mixed $object = null, ?Dictionary $context = null): Collection
     {
-        /** @var ArrayClass<mixed> $collection */
+        /** @var ArrayClass $collection */
         $collection = $this->collectionExpression->expressionValue($object, $context) ?? new ArrayClass();
         assert($collection instanceof Collection);
-        /** @var Dictionary<mixed>|null $context */
+        /** @var Dictionary|null $context */
         $context ??= new Dictionary();
         $context[$this->variable()] ??= Expression::expressionForEvaluatedObject();
         $predicate = $this->predicate->withSubstitutionVariables($context);

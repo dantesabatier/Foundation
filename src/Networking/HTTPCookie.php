@@ -47,12 +47,12 @@ class HTTPCookie extends ObjectClass
     public readonly ?string $comment;
     /** @var URL|null The cookie's comment URL. */
     public readonly ?URL $commentURL;
-    /** @var Dictionary<mixed> The cookie's properties. */
+    /** @var Dictionary The cookie's properties. */
     public readonly Dictionary $properties;
 
     /**
      * Creates an HTTP cookie instance with the given cookie properties.
-     * @param Dictionary<mixed> $properties The properties for the new cookie object, expressed as key-value pairs.
+     * @param Dictionary $properties The properties for the new cookie object, expressed as key-value pairs.
      */
     public function __construct(Dictionary $properties)
     {
@@ -175,7 +175,7 @@ class HTTPCookie extends ObjectClass
         $scanner->charactersToBeSkipped = " \t\n\r";
         if ($scanner->scanUpString(";", $pair) && $pair && ($components = self::splitNameValue($pair))) {
             [$name, $value] = $components;
-            /** @var Dictionary<mixed> $properties */
+            /** @var Dictionary $properties */
             $properties = new Dictionary();
             $properties[HTTPCookiePropertyKey::name] = $name;
             $properties[HTTPCookiePropertyKey::value] = $value;

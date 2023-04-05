@@ -37,7 +37,7 @@ final class Bundle extends ObjectClass
     public readonly ?URL $sharedSupportURL;
     /** @var string|null The receiver's bundle identifier. */
     public readonly ?string $bundleIdentifier;
-    /** @var Dictionary<mixed>|null A dictionary, constructed from the bundle's Info.plist file, that contains information about the receiver. */
+    /** @var Dictionary|null A dictionary, constructed from the bundle's Info.plist file, that contains information about the receiver. */
     public readonly ?Dictionary $infoDictionary;
     /** @var ArrayClass<string> $localizations A list of all the localizations contained in the bundle. An array of string objects containing language IDs for all the localizations contained in the bundle. */
     public readonly ArrayClass $localizations;
@@ -46,7 +46,7 @@ final class Bundle extends ObjectClass
     /** @var string|null The localization for the development language.
      * This property corresponds to the value in the CFBundleDevelopmentRegion key of the bundle's property list (Info.plist). */
     public readonly ?string $developmentLocalization;
-    /** @var Dictionary<mixed>|null A dictionary with the keys from the bundle's localized property list. This property uses the preferred localization for the current user when determining which resources to include. If the preferred localization is not available, this property chooses the most appropriate localization found in the bundle. */
+    /** @var Dictionary|null A dictionary with the keys from the bundle's localized property list. This property uses the preferred localization for the current user when determining which resources to include. If the preferred localization is not available, this property chooses the most appropriate localization found in the bundle. */
     public readonly ?Dictionary $localizedInfoDictionary;
     /** @var class-string|null $principalClass The bundle's principal class. */
     public readonly ?string $principalClass;
@@ -271,13 +271,13 @@ final class Bundle extends ObjectClass
     {
         $extensions ??= new ArrayClass();
         if ($extensions->isEmpty() && $name && ($extension = pathinfo($name, PATHINFO_EXTENSION))) {
-            /** @psalm-suppress InvalidScalarArgument */
+            /** @psalm-suppress InvalidArgument */
             $extensions->append($extension);
         }
         $languages ??= new ArrayClass([""]);
         $resources = $languages->flatMap(fn(string $language): iterable => FileManager::default()->contentsOfDirectory($language ? $baseURL->appendingPathComponent($language) : $baseURL, null, DirectoryEnumerationOptions::skipsHiddenFiles))->filter(function (URL $url, int $idx, bool &$stop) use ($name, $extensions, $limit): bool {
             $pathExtension = $url->pathExtension;
-            /** @psalm-suppress InvalidScalarArgument */
+            /** @psalm-suppress InvalidArgument */
             $ok = $name ? (string_is_equal($url->deletingPathExtension()->lastPathComponent, pathinfo($name, PATHINFO_FILENAME)) && (empty($pathExtension) || $extensions->containsElement($pathExtension))) : (empty($pathExtension) || $extensions->containsElement($pathExtension));
             $stop = $ok && $limit > 0 && $limit >= $idx;
             return $ok;

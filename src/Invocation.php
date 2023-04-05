@@ -11,7 +11,7 @@ class Invocation
     public string $selector;
     /** @var object The receiver's target, or nil if the receiver has no target. The target is the receiver of the message sent by {@see invoke()}. */
     public object $target;
-    /** @var ArrayClass<mixed> */
+    /** @var ArrayClass */
     public ArrayClass $arguments;
     public mixed $returnValue;
 

@@ -44,7 +44,7 @@ interface Sequence extends Traversable, Countable, Comparable, ExpressibleByArra
 
     /**
      * Returns a Boolean value indicating whether this sequence and another sequence contain equivalent elements in the same order, using the given predicate as the equivalence test.
-     * @param Sequence $sequence A sequence to compare to this sequence.
+     * @param Sequence<Index, Element> $sequence A sequence to compare to this sequence.
      * @param Closure(Element, Element): bool|null $areEquivalent A predicate that returns true if its two arguments are equivalent; otherwise, false.
      * @return bool true if this sequence and other contain equivalent items, using areEquivalent as the equivalence test; otherwise, false.
      */

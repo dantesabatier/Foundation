@@ -38,7 +38,7 @@ interface KeyValueCoding
      * Returns a dictionary containing the property values identified by each of the keys in a given array.
      * The default implementation invokes {@see valueForKey()} for each key in keys.
      * @param ArrayClass<string> $keys An array containing string objects that identify properties of the receiver.
-     * @return Dictionary<mixed> A dictionary containing as keys the property names in keys,
+     * @return Dictionary A dictionary containing as keys the property names in keys,
      * with corresponding values being the corresponding property values.
      */
     public function dictionaryWithValues(ArrayClass $keys): Dictionary;
@@ -56,7 +56,7 @@ interface KeyValueCoding
      * Returns a mutable array proxy that provides read-write access to an ordered to-many relationship specified by a given key.
      * Objects added to the mutable array become related to the receiver, and objects removed from the mutable array become unrelated. The default implementation recognizes the same simple accessor methods and array accessor methods as {@see valueForKey()}, and follows the same direct instance variable access policies, but always returns a mutable collection proxy object instead of the immutable collection that {@see valueForKey()} would return.
      * @param string $key The name of an ordered to-many relationship.
-     * @return ArrayClass<mixed> A mutable array proxy that provides read-write access to the ordered to-many relationship specified by key.
+     * @return ArrayClass A mutable array proxy that provides read-write access to the ordered to-many relationship specified by key.
      */
     public function mutableArrayValueForKey(string $key): ArrayClass;
 
@@ -66,7 +66,7 @@ interface KeyValueCoding
      * The default implementation recognizes the same simple accessor methods and set accessor methods as {@see valueForKey()}, and follows the same direct instance variable access policies.
      * The default implementation raises an exception if relationship key cannot be found.
      * @param string $key The name of an unordered to-many relationship.
-     * @return Set<mixed> A mutable set that provides read-write access to the unordered to-many relationship specified by key.
+     * @return Set A mutable set that provides read-write access to the unordered to-many relationship specified by key.
      */
     public function mutableSetValueForKey(string $key): Set;
 
@@ -82,7 +82,7 @@ interface KeyValueCoding
     /**
      * Sets properties of the receiver with values from a given dictionary, using its keys to identify the properties.
      * The default implementation invokes {@see setValueForKey()} for each key-value pair.
-     * @param Dictionary<mixed> $keyedValues
+     * @param Dictionary $keyedValues
      */
     public function setValuesForKeys(Dictionary $keyedValues): void;
 

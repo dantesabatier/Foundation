@@ -20,7 +20,7 @@ class Predicate extends ObjectClass
     /**
      * Initializes a predicate by substituting the values in a given array into a format string and parsing the result.
      * @param string $format The format string for the new predicate.
-     * @param ArrayClass<mixed> $arguments The arguments to substitute into format. Values are substituted in the order they appear in the array.
+     * @param ArrayClass $arguments The arguments to substitute into format. Values are substituted in the order they appear in the array.
      * @return Predicate|null A new predicate by substituting the values in arguments into format, and parsing the result.
      */
     public static function format(string $format, ArrayClass $arguments = new ArrayClass()): ?Predicate
@@ -46,7 +46,7 @@ class Predicate extends ObjectClass
 
     /**
      * Returns a copy of the predicate with the predicate's variables substituted by values specified in a given substitution variables dictionary.
-     * @param Dictionary<mixed> $variables The substitution variables dictionary.
+     * @param Dictionary $variables The substitution variables dictionary.
      * The dictionary must contain key-value pairs for all variables in the receiver.
      * @return Predicate A copy of the receiver with the predicate's variables substituted by values specified in variables.
      * The predicate itself is not modified by this method, so you can reuse it for any number of substitutions.
@@ -68,7 +68,7 @@ class Predicate extends ObjectClass
     /**
      * Returns a Boolean value indicating whether the specified object matches the conditions specified by the predicate after substituting in the values in a given Variables dictionary.
      * @param mixed $object The object against which to evaluate the predicate.
-     * @param Dictionary<mixed>|null $substitutionVariables The substitution variables dictionary.
+     * @param Dictionary|null $substitutionVariables The substitution variables dictionary.
      * The dictionary must contain key-value pairs for all variables in the predicate.
      * @return bool true if object matches the conditions specified by the predicate after substituting in the values in variables for any replacement tokens, otherwise false.
      */

@@ -26,7 +26,7 @@ class Error extends ObjectClass
      * Returns an Error object initialized for a given domain and code with a given userInfo dictionary.
      * @param string $domain The error domain—this can be one of the predefined Error domains, or an arbitrary string describing a custom domain. domain must not be nil. See Error Domains for a list of predefined domains.
      * @param int $code The error code for the error.
-     * @param Dictionary<mixed>|null $userInfo The userInfo dictionary for the error. userInfo may be nil.
+     * @param Dictionary|null $userInfo The userInfo dictionary for the error. userInfo may be nil.
      */
     public function __construct(public readonly string $domain, public readonly int $code, public readonly ?Dictionary $userInfo = null)
     {

@@ -28,7 +28,7 @@ class Expression extends ObjectClass
     /**
      * Initializes the expression with the specified expression format and array of arguments.
      * @param string $format The expression format.
-     * @param ArrayClass<mixed> $arguments An array of arguments to be used with the expressionFormat string.
+     * @param ArrayClass $arguments An array of arguments to be used with the expressionFormat string.
      * @return Expression|null An initialized Expression object with the specified arguments.
      */
     public static function expressionWithFormat(string $format, ArrayClass $arguments = new ArrayClass()): ?Expression
@@ -147,7 +147,7 @@ class Expression extends ObjectClass
 
     /**
      * Creates an Expression object that will use the Block for evaluating objects.
-     * @param Closure(mixed, ArrayClass<Expression>, Dictionary<mixed>|null): mixed $block The Block is applied to the object to be evaluated.
+     * @param Closure(mixed, ArrayClass<Expression>, Dictionary|null): mixed $block The Block is applied to the object to be evaluated.
      * @param ArrayClass<Expression>|null $arguments An array containing Expression objects that will be used as parameters during the invocation of selector.
      * For a selector taking no parameters, the array should be empty.
      * For a selector taking one or more parameters, the array should contain one Expression object which will evaluate to an instance of the appropriate type for each parameter.
@@ -327,7 +327,7 @@ class Expression extends ObjectClass
     }
 
     /**
-     * @return Closure(mixed|null, ArrayClass<Expression>, Dictionary<mixed>|null): mixed
+     * @return Closure(mixed, ArrayClass<Expression>, Dictionary|null): mixed
      * Accessing this property raises an exception if it is not applicable to the expression.
      */
     public function expressionBlock(): Closure

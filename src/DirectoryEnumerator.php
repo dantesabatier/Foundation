@@ -31,11 +31,6 @@ abstract class DirectoryEnumerator implements IteratorAggregate
     /**
      * Causes the receiver to skip recursion into the most recently obtained subdirectory.
      */
-    abstract public function skipDescendents(): void;
-
-    /**
-     * Causes the receiver to skip recursion into the most recently obtained subdirectory.
-     */
     abstract public function skipDescendants(): void;
 
     abstract public function isEnumeratingDirectoryPostOrder(): bool;

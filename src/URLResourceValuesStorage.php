@@ -87,7 +87,7 @@ class URLResourceValuesStorage
             throw new InvalidArgumentException();
         }
         $path = $url->path;
-        /** @var Dictionary<mixed> $result */
+        /** @var Dictionary $result */
         $result = new Dictionary();
         $info = new SplFileInfo($path);
         /** @var string $key */

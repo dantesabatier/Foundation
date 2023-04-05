@@ -8,7 +8,7 @@ use Exception;
 readonly class ApplicationPreferences
 {
     public URL $url;
-    /** @var Dictionary<mixed> */
+    /** @var Dictionary */
     public Dictionary $dictionaryRepresentation;
 
     public function __construct(public string $domainName)

@@ -109,7 +109,7 @@ class URLSessionWebSocketTask extends URLSessionTask
     public function resume(): void
     {
         if (!EasyHandle::supportsWebSockets()) {
-            /** @var Dictionary<mixed> $userInfo */
+            /** @var Dictionary $userInfo */
             $userInfo = new Dictionary([LocalizedDescriptionKey => ""]);
             if ($url = $this->originalRequest?->url) {
                 $userInfo[URLErrorFailingURLErrorKey] = $url;

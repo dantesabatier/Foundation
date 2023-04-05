@@ -80,7 +80,7 @@ class FlattenSequence extends ObjectClass implements Sequence, IteratorAggregate
         return (new $baseClass($this))->flatMap($transform);
     }
 
-    public function getIterator(): Traversable
+    public function getIterator(): Generator
     {
         return (function (): Generator {
             $recursive = function (iterable $iterable) use (&$recursive): Traversable {

@@ -492,7 +492,7 @@ final class FileManager extends ObjectClass
     /**
      * Returns the attributes of the item at a given path.
      * @param string $path The path of a file or directory.
-     * @return Dictionary<mixed> A dictionary object that describes the attributes (file, directory, symlink, and so on) of the file specified by path.
+     * @return Dictionary A dictionary object that describes the attributes (file, directory, symlink, and so on) of the file specified by path.
      * @throws Exception
      */
     public function attributesOfItem(string $path): Dictionary

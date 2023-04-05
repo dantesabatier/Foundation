@@ -37,6 +37,7 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
         filtered as private collectionFiltered;
         sorted as private collectionSorted;
         allSatisfy as private collectionAllSatisfy;
+        joined as private collectionJoined;
     }
 
     /**
@@ -355,7 +356,7 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
      */
     public function joined(): FlattenSequence
     {
-        return new FlattenSequence($this);
+        return $this->collectionJoined();
     }
 
     /**

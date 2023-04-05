@@ -33,7 +33,7 @@ final class URLSessionConfiguration
     public int $httpMaximumConnectionsPerHost = 6;
     /** @var bool A Boolean value that determines whether the session should use HTTP pipelining. This property determines whether tasks within sessions based on this configuration should use HTTP pipelining. You can also enable pipelining on a per-task basis by creating the task with an {@see URLRequest} object. */
     public bool $httpShouldUsePipelining = false;
-    /** @var Dictionary<mixed>|null A dictionary containing information about the proxy to use within this session. This property controls which proxy tasks within sessions based on this configuration use when connecting to remote hosts. The default value is NULL, which means that tasks use the default system settings. */
+    /** @var Dictionary|null A dictionary containing information about the proxy to use within this session. This property controls which proxy tasks within sessions based on this configuration use when connecting to remote hosts. The default value is NULL, which means that tasks use the default system settings. */
     public ?Dictionary $connectionProxyDictionary = null;
 
     public function __construct()

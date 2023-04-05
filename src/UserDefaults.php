@@ -115,7 +115,7 @@ class UserDefaults
     /**
      * Returns the dictionary object associated with the specified key.
      * @param string $key A key in the current user's defaults database.
-     * @return Dictionary<mixed>|null The dictionary object associated with the specified key, or nil if the key does not exist or its value is not a dictionary.
+     * @return Dictionary|null The dictionary object associated with the specified key, or nil if the key does not exist or its value is not a dictionary.
      */
     public function dictionary(string $key): ?Dictionary
     {
@@ -191,7 +191,7 @@ class UserDefaults
 
     /**
      * Returns a dictionary that contains a union of all key-value pairs in the domains in the search list.
-     * @return Dictionary<mixed> A dictionary containing the keys. The keys are names of defaults and the value corresponding to each key is a property list object (Data, String, Number, Date, Array, or Dictionary).
+     * @return Dictionary A dictionary containing the keys. The keys are names of defaults and the value corresponding to each key is a property list object (Data, String, Number, Date, Array, or Dictionary).
      */
     public function dictionaryRepresentation(): Dictionary
     {
@@ -278,7 +278,7 @@ class UserDefaults
      *
      * If there is no registration domain, one is created using the specified dictionary, and {@see registrationDomain} is added to the end of the search list.
      * The contents of the registration domain are not written to disk; you need to call this method each time your application starts. You can place a plist file in the application's Resources directory and call {@see register()} with the contents that you read in from that file.
-     * @param Dictionary<mixed> $defaults The dictionary of keys and values you want to register.
+     * @param Dictionary $defaults The dictionary of keys and values you want to register.
      */
     public function register(Dictionary $defaults): void
     {
@@ -310,7 +310,7 @@ class UserDefaults
      *
      * Calling this method is equivalent to initializing a user defaults object with {@see __construct()} passing domainName and calling the {@see dictionaryRepresentation()} method on it.
      * @param string $domainName The name of the domain to be represented.
-     * @return Dictionary<mixed> A dictionary containing keys for each default name and their corresponding default values.
+     * @return Dictionary A dictionary containing keys for each default name and their corresponding default values.
      */
     public function persistentDomain(string $domainName): Dictionary
     {
@@ -322,7 +322,7 @@ class UserDefaults
      *
      * Calling this method is equivalent to initializing a user defaults object with {@see __construct()} passing domainName, and calling the {@see setObject()} method for each key-value pair in domain.
      * When a persistent domain is changed, an {@see didChangeNotification} is posted.
-     * @param Dictionary<mixed> $domain A dictionary of keys and values you want to assign to the domain.
+     * @param Dictionary $domain A dictionary of keys and values you want to assign to the domain.
      * @param string $domainName The name of the domain whose contents you want to set.
      */
     public function setPersistentDomain(Dictionary $domain, string $domainName): void
