@@ -7,23 +7,19 @@ use JetBrains\PhpStorm\Pure;
 
 /**
  * A specific point in time, independent of any calendar or time zone.
+ * @property-read float $timeIntervalSinceReferenceDate The interval between the date value and 00:00:00 UTC on 1 January 2001. This property's value is negative if the date object is earlier than the system's absolute reference date (00:00:00 UTC on 1 January 2001).
+ * @property-read float $timeIntervalSinceNow The time interval between the date value and the current date and time. If the date is earlier than the current date and time, this property's value is negative.
+ * @property-read float $timeIntervalSince1970 The interval between the date value and 00:00:00 UTC on 1 January 1970. This property's value is negative if the date object is earlier than 00:00:00 UTC on 1 January 1970.
  */
 class Date extends ObjectClass
 {
     /** @var float The number of seconds from 1 January 1970 to the reference date, 1 January 2001. */
     final public const timeIntervalBetween1970AndReferenceDate = kCFAbsoluteTimeIntervalSince1970;
-    /** @var float The time interval between the date value and the current date and time. If the date is earlier than the current date and time, this property's value is negative. */
-    public readonly float $timeIntervalSinceNow;
-    /** @var float The interval between the date value and 00:00:00 UTC on 1 January 1970. This property's value is negative if the date object is earlier than 00:00:00 UTC on 1 January 1970. */
-    public readonly float $timeIntervalSince1970;
-    /** @var float The interval between the date value and 00:00:00 UTC on 1 January 2001. This property's value is negative if the date object is earlier than the system's absolute reference date (00:00:00 UTC on 1 January 2001). */
-    public float $timeIntervalSinceReferenceDate;
+    private float $timeIntervalSinceReferenceDate;
 
     public function __construct(?float $time = null)
     {
         $this->timeIntervalSinceReferenceDate = $time ?? absolute_time_get_current();
-        $this->timeIntervalSinceNow = $this->timeIntervalSinceReferenceDate - absolute_time_get_current();
-        $this->timeIntervalSince1970 = $this->timeIntervalSinceReferenceDate - self::timeIntervalBetween1970AndReferenceDate;
     }
 
     #[Pure]
@@ -36,8 +32,27 @@ class Date extends ObjectClass
     public function __unserialize(array $data): void
     {
         $this->timeIntervalSinceReferenceDate = $data["timeIntervalSinceReferenceDate"] ?? absolute_time_get_current();
-        $this->timeIntervalSinceNow = $this->timeIntervalSinceReferenceDate - absolute_time_get_current();
-        $this->timeIntervalSince1970 = $this->timeIntervalSinceReferenceDate - self::timeIntervalBetween1970AndReferenceDate;
+    }
+
+    public function __get(string $name)
+    {
+        return match ($name) {
+            "timeIntervalSinceReferenceDate" => $this->timeIntervalSinceReferenceDate,
+            "timeIntervalSinceNow" => $this->timeIntervalSinceReferenceDate - absolute_time_get_current(),
+            "timeIntervalSince1970" => $this->timeIntervalSinceReferenceDate - self::timeIntervalBetween1970AndReferenceDate,
+            default => $this->valueForUndefinedKey($name)
+        };
+    }
+
+    /**
+     * Returns a date instance that represents the current date and time, at the moment of access.
+     *
+     * This property is equivalent to calling the constructor. If you assign this value to a variable or property, the assigned value doesn't automatically update as time passes.
+     * @return Date
+     */
+    public static function now(): Date
+    {
+        return new Date();
     }
 
     /**
@@ -178,10 +193,12 @@ class Date extends ObjectClass
 
     /**
      * Generates a locale-aware string representation of a date using the default date format style.
+     * @param string $format
+     * @return string
      */
-    public function formatted(): string
+    public function formatted(string $format = "Y-m-d H:i:s"): string
     {
-        return date("Y-m-d H:i:s", (int)$this->timeIntervalSinceReferenceDate);
+        return date($format, (int)$this->timeIntervalSinceReferenceDate);
     }
 
     public function description(): string
