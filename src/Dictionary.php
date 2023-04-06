@@ -401,7 +401,7 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
      * @param string $key The key for which to return the corresponding value.
      * @return Element|null The value associated with key.
      */
-    public function valueForKey(string $key)
+    public function valueForKey(string $key): mixed
     {
         return $this->offsetGet($key);
     }

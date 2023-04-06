@@ -512,6 +512,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
      */
     public function replaceSubrange(Range $subrange, Collection $newElements): void
     {
+        /** @psalm-suppress InvalidArgument */
         $this->rangeReplaceableCollectionReplaceSubrange($subrange, $newElements);
     }
 

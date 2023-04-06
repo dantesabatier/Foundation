@@ -259,7 +259,7 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
         throw new UndefinedKeyException(sprintf("%s is not key value coding compliant for the key \"%s\"", $this->debugDescription(), $key));
     }
 
-    public function valueForKey(string $key)
+    public function valueForKey(string $key): mixed
     {
         if (property_exists($this, $key)) {
             return $this->$key;
@@ -281,7 +281,7 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
         $this->setValueForUndefinedKey($value, $key);
     }
 
-    public function valueForKeyPath(string $keyPath)
+    public function valueForKeyPath(string $keyPath): mixed
     {
         $components = components_from_key_path($keyPath);
         $key = $components->key;
