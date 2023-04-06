@@ -37,6 +37,5 @@ class HTTPCookiePropertyKey
     final const version = "Version";
     /** @internal */
     final const created = "Created";
-    /** @internal */
     final const httpOnly = "HttpOnly";
 }
