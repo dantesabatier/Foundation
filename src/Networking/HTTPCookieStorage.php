@@ -251,8 +251,8 @@ class HTTPCookieStorage extends ObjectClass
     /**
      * Returns all the cookie storage's cookies that are sent to a specified URL.
      *
-     * You can use the requestHeaderFields(with:) method of HTTPCookie to turn the array returned by this method into a set of header fields to add to a URLRequest object.
-     * If you override this method, also override {@see HTTPCookieStorage::getCookiesFor()}.
+     * You can use the {@see HTTPCookie::requestHeaderFields()} method of HTTPCookie to turn the array returned by this method into a set of header fields to add to a URLRequest object.
+     * If you override this method, also override {@see getCookiesFor()}.
      *
      * @param URL $url The URL to filter on.
      * @return ArrayClass<HTTPCookie>|null An array of cookies whose URL matches the provided URL.
