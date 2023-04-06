@@ -193,7 +193,7 @@ class HTTPCookieStorage extends ObjectClass
         } else {
             $this->allCookies->setValueForKey($cookie, $key);
         }
-        $this->allCookies->filter(fn(HTTPCookie $cookie): bool => ($expiresDate = $cookie->expiresDate) && $expiresDate->timeIntervalSinceNow < 0);
+        $this->allCookies->removeAll(fn(HTTPCookie $cookie): bool => ($expiresDate = $cookie->expiresDate) && $expiresDate->timeIntervalSinceNow < 0);
         $this->updatePersistentStore();
     }
 
