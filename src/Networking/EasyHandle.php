@@ -322,7 +322,7 @@ final class EasyHandle
         if (!($url = $this->url) || !($storage = $this->configuration?->httpCookieStorage)) {
             return;
         }
-        $headerComponents = explode(":", $data);
+        $headerComponents = explode(":", $data, 2);
         /** @var Dictionary<string> $headerFields */
         $headerFields = new Dictionary();
         if (count($headerComponents) > 1) {
