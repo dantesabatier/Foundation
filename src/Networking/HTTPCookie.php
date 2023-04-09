@@ -2,7 +2,6 @@
 
 namespace Sabatier\Foundation\Networking;
 
-use DateTimeInterface;
 use InvalidArgumentException;
 use Sabatier\Foundation\ArrayClass;
 use Sabatier\Foundation\Date;
@@ -181,7 +180,7 @@ class HTTPCookie extends ObjectClass
             $properties[HTTPCookiePropertyKey::name] = $name;
             $properties[HTTPCookiePropertyKey::value] = $value;
             $properties[HTTPCookiePropertyKey::originURL] = $url;
-            $scanner->scanLocation++;
+            $scanner->scanLocation += 1;
             while ($scanner->scanUpCharacters(";", $pair) && $pair) {
                 if ($components = self::splitNameValue($pair)) {
                     [$name, $value] = $components;
@@ -205,12 +204,12 @@ class HTTPCookie extends ObjectClass
                             break;
                     }
                 }
-                $scanner->scanLocation++;
+                $scanner->scanLocation += 1;
             }
             /** @var string|null $domain */
             $domain = $properties[HTTPCookiePropertyKey::domain];
             if ($domain) {
-                if (!str_starts_with($domain, ".") && !filter_var($domain, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+                if (!str_starts_with($domain, ".") && filter_var($domain, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
                     $properties[HTTPCookiePropertyKey::domain] = ".$domain";
                 }
             } else {
@@ -251,25 +250,6 @@ class HTTPCookie extends ObjectClass
     }
 
     public function description(): string
-    {
-        $properties = new Dictionary([
-            HTTPCookiePropertyKey::domain => $this->domain,
-            HTTPCookiePropertyKey::name => $this->name,
-            HTTPCookiePropertyKey::path => $this->path,
-            HTTPCookiePropertyKey::value => $this->value,
-            HTTPCookiePropertyKey::version => $this->version,
-            HTTPCookiePropertyKey::sameSitePolicy => $this->sameSitePolicy,
-            HTTPCookiePropertyKey::httpOnly => $this->isHTTPOnly,
-            HTTPCookiePropertyKey::expires => $this->expiresDate?->formatted(DateTimeInterface::COOKIE),
-            HTTPCookiePropertyKey::comment => $this->comment,
-            HTTPCookiePropertyKey::commentURL => $this->commentURL,
-            HTTPCookiePropertyKey::maximumAge => $this->properties[HTTPCookiePropertyKey::maximumAge],
-            HTTPCookiePropertyKey::originURL => $this->properties[HTTPCookiePropertyKey::originURL]
-        ]);
-        return $properties->mapValues(fn(mixed $value, string $key): string => sprintf("%s=%s", $key, human_readable_value($value)))->values->join("; ");
-    }
-
-    public function debugDescription(): string
     {
         return sprintf("<HTTPCookie version:%d name:\"%s\" value:\"%s\" expires:%s sessionOnly:%s domain:\"%s\" path:\"%s\" isSecure:%s comment:%s ports:{%s}", $this->version, $this->name, $this->value, human_readable_value($this->expiresDate), human_readable_value($this->isSessionOnly), $this->domain, $this->path, human_readable_value($this->isSecure), human_readable_value($this->comment), $this->portList?->join(",") ?? 0);
     }
