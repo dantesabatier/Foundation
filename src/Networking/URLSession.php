@@ -67,7 +67,10 @@ final class URLSession implements URLSessionProtocol
         return self::$shared;
     }
 
-    private function createConfiguredRequest(URLRequest $request): URLRequest
+    /**
+     * @internal
+     */
+    public function createConfiguredRequest(URLRequest $request): URLRequest
     {
         return $this->configuration->configure($request);
     }
