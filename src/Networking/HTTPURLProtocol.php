@@ -255,7 +255,7 @@ class HTTPURLProtocol extends NativeProtocol
                 $this->didCompleteRedirectCallback($request);
             });
         } else {
-            $configuredRequest = $session->configuration->configure($request);
+            $configuredRequest = $session->createConfiguredRequest($request);
             $task->knownBody = TaskBody::none();
             $this->startNewTransfer($configuredRequest);
         }
