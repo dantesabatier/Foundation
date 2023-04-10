@@ -144,12 +144,12 @@ class HTTPCookieStorage extends ObjectClass
         if ($this->isEphemeral || !($cookieFileURL = $this->cookieFileURL)) {
             return;
         }
-        /** @var Dictionary<Dictionary> $persistDictionary */
-        $persistDictionary = new Dictionary();
         $persistent = $this->allCookies->filter(fn(HTTPCookie $cookie): bool => $cookie->expiresDate !== null && $cookie->expiresDate->timeIntervalSinceNow > 0 && !$cookie->isSessionOnly);
-        foreach ($persistent as $key => $value) {
-            $persistDictionary[$key] = $value->properties;
-        }
+        /** @var Dictionary<Dictionary> $persistDictionary */
+        $persistDictionary = $persistent->reduce(new Dictionary(), function(Dictionary $result, HTTPCookie $cookie, string $key): Dictionary {
+            $result[$key] = $cookie->properties;
+            return $result;
+        });
         PropertyListSerialization::writePropertyList($persistDictionary, $cookieFileURL);
     }
 
@@ -262,7 +262,7 @@ class HTTPCookieStorage extends ObjectClass
         if (!($host = $url->host)) {
             return null;
         }
-        return $this->allCookies->values->filter(fn(HTTPCookie $cookie): bool => str_starts_with($cookie->domain, ".") ? string_has_suffix($host, $cookie->domain, CompareOptions::caseInsensitive) : string_is_equal($cookie->domain, $host, CompareOptions::caseInsensitive));
+        return $this->allCookies->filter(fn(HTTPCookie $cookie): bool => str_starts_with($cookie->domain, ".") ? string_has_suffix($host, $cookie->domain, CompareOptions::caseInsensitive) : string_is_equal($cookie->domain, $host, CompareOptions::caseInsensitive))->values;
     }
 
     /**
