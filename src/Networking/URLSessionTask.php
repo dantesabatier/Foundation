@@ -305,7 +305,6 @@ abstract class URLSessionTask extends ObjectClass
         $this->suspendCount += 1;
         $this->updateTaskState();
         if ($this->suspendCount === 1) {
-            /** @noinspection PhpUnhandledExceptionInspection */
             $this->getProtocol(function (?URLProtocol $protocol): void {
                 $protocol?->stopLoading();
             });
@@ -321,7 +320,6 @@ abstract class URLSessionTask extends ObjectClass
             return;
         }
         $this->updateTaskState();
-        /** @noinspection PhpUnhandledExceptionInspection */
         $this->getProtocol(function (?URLProtocol $protocol): void {
             if (!$protocol instanceof URLProtocol) {
                 return;
