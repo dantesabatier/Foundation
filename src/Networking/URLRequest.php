@@ -44,6 +44,27 @@ class URLRequest extends ObjectClass
     }
 
     /**
+     * @return array<string, mixed>
+     */
+    public function getParsedBody(): array
+    {
+        $contentType = $this->valueForHttpHeaderField("Content-Type") ?? "text/plain";
+        $mediaType = $contentType;
+        if (str_contains($contentType, ";")) {
+            [$mediaType,] = explode(";", $contentType);
+        }
+        return match ($mediaType) {
+            "application/x-www-form-urlencoded" => (function (): array {
+                parse_str(urldecode((string)$this->httpBody), $result);
+                return $result;
+            })(),
+            "multipart/form-data" => $_POST,
+            "application/json" => json_decode($this->httpBody ?? "[]") ?? [],
+            default => []
+        };
+    }
+
+    /**
      * Adds a value to the header field.
      * This method provides the ability to add values to header fields incrementally. If a value was previously set for the specified field, the supplied value is appended to the existing value using the appropriate field delimiter (a comma).
      * @param string $value The value for the header field.
