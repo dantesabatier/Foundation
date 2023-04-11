@@ -59,7 +59,7 @@ class URLRequest extends ObjectClass
                 return $result;
             })(),
             "multipart/form-data" => $_POST,
-            "application/json" => json_decode($this->httpBody ?? "[]") ?? [],
+            "application/json" => json_decode($this->httpBody ?? "[]", true) ?? [],
             default => []
         };
     }
