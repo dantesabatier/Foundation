@@ -56,7 +56,7 @@ class HTTPCookie extends ObjectClass
      */
     public function __construct(Dictionary $properties)
     {
-        if (!($path = $properties[HTTPCookiePropertyKey::path]) || !($name = $properties[HTTPCookiePropertyKey::name]) || !($value = $properties[HTTPCookiePropertyKey::value])) {
+        if (!($name = $properties[HTTPCookiePropertyKey::name]) || !($value = $properties[HTTPCookiePropertyKey::value]) || !($path = $properties[HTTPCookiePropertyKey::path])) {
             throw new InvalidArgumentException();
         }
         /** @var string|null $domain */
@@ -68,9 +68,9 @@ class HTTPCookie extends ObjectClass
                 $domain = $originalURL->host;
             }
         }
-        $this->path = $path;
         $this->name = $name;
         $this->value = $value;
+        $this->path = $path;
         $this->domain = $domain ?? throw new InvalidArgumentException();
         $this->isSecure = !empty($properties[HTTPCookiePropertyKey::secure]);
         $this->version = (int)($properties[HTTPCookiePropertyKey::version] == 1);
@@ -146,7 +146,7 @@ class HTTPCookie extends ObjectClass
     private static function splitNameValue(string $pair): array
     {
         $components = explode("=", $pair, 2);
-        $name = ucwords(trim($components[0]));
+        $name = trim($components[0]);
         $value = null;
         if (count($components) > 1) {
             $value = trim($components[1]);
@@ -184,10 +184,12 @@ class HTTPCookie extends ObjectClass
             while ($scanner->scanUpCharacters(";", $pair) && $pair) {
                 if ($components = self::splitNameValue($pair)) {
                     [$name, $value] = $components;
+                    $name = ucwords($name);
                     switch ($name) {
                         case HTTPCookiePropertyKey::secure:
                         case HTTPCookiePropertyKey::discard:
                         case HTTPCookiePropertyKey::httpOnly:
+                        case HTTPCookiePropertyKey::sameSitePolicy:
                             $properties[$name] = "TRUE";
                             break;
                         case HTTPCookiePropertyKey::comment:
@@ -206,6 +208,7 @@ class HTTPCookie extends ObjectClass
                 }
                 $scanner->scanLocation += 1;
             }
+            $properties[HTTPCookiePropertyKey::version] ??= 1;
             /** @var string|null $domain */
             $domain = $properties[HTTPCookiePropertyKey::domain];
             if ($domain) {
