@@ -1,7 +1,5 @@
 <?php
 
-/** @noinspection PhpUnused */
-
 namespace Sabatier\Foundation\Networking;
 
 use Closure;
@@ -146,7 +144,7 @@ class HTTPCookieStorage extends ObjectClass
         }
         $persistent = $this->allCookies->filter(fn(HTTPCookie $cookie): bool => $cookie->expiresDate !== null && $cookie->expiresDate->timeIntervalSinceNow > 0 && !$cookie->isSessionOnly);
         /** @var Dictionary<Dictionary> $persistDictionary */
-        $persistDictionary = $persistent->reduce(new Dictionary(), function(Dictionary $result, HTTPCookie $cookie, string $key): Dictionary {
+        $persistDictionary = $persistent->reduce(new Dictionary(), function (Dictionary $result, HTTPCookie $cookie, string $key): Dictionary {
             $result[$key] = $cookie->properties;
             return $result;
         });
@@ -184,7 +182,7 @@ class HTTPCookieStorage extends ObjectClass
      */
     public function setCookie(HTTPCookie $cookie): void
     {
-        if ($this->cookieAcceptPolicy == HTTPCookieAcceptPolicy::never) {
+        if ($this->cookieAcceptPolicy === HTTPCookieAcceptPolicy::never) {
             return;
         }
         $key = "$cookie->domain$cookie->path$cookie->name";
