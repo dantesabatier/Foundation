@@ -38,4 +38,5 @@ class HTTPCookiePropertyKey
     /** @internal */
     final const created = "Created";
     final const httpOnly = "HttpOnly";
+    final const lifetime = "lifetime";
 }
