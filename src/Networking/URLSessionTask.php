@@ -268,12 +268,17 @@ abstract class URLSessionTask extends ObjectClass
                         if (!($realm = $parameters["realm"]) || !($uri = $parameters["uri"]) || !($algorithm = $parameters["algorithm"]) || !($nonce = $parameters["nonce"]) || !($qop = $parameters["qop"]) || !($opaque = $parameters["opaque"])) {
                             return null;
                         }
+                        $algo = match ($parameters["algorithm"]) {
+                            "SHA-512-256" => "sha512",
+                            "SHA-256" => "sha256",
+                            default => "md5"
+                        };
                         $nc = sprintf("%08x", $this->previousFailureCount);
-                        $cnonce = hash("sha256", ProcessInfo::processInfo()->globallyUniqueString);
-                        $HA1 = hash("sha256", "$username:$realm:$password");
-                        $HA2 = hash("sha256", "$request->httpMethod:$uri");
-                        $response = hash("sha256", "$HA1:$nonce:$nc:$cnonce:$qop:$HA2");
-                        return "username=\"$username\", realm=\"$realm\", uri=\"$uri\", algorithm=\"SHA-256\", nonce=\"$nonce\", nc=\"$nc\", cnonce=\"$cnonce\", qop=\"$qop\", response=\"$response\", opaque=\"$opaque\"";
+                        $cnonce = hash($algo, ProcessInfo::processInfo()->globallyUniqueString);
+                        $HA1 = hash($algo, "$username:$realm:$password");
+                        $HA2 = hash($algo, "$request->httpMethod:$uri");
+                        $response = hash($algo, "$HA1:$nonce:$nc:$cnonce:$qop:$HA2");
+                        return "username=\"$username\", realm=\"$realm\", uri=\"$uri\", algorithm=\"$algorithm\", nonce=\"$nonce\", nc=\"$nc\", cnonce=\"$cnonce\", qop=\"$qop\", response=\"$response\", opaque=\"$opaque\"";
                     })(),
                     default => null
                 })) {
