@@ -199,7 +199,7 @@ final class URL extends ObjectClass
         $components->path = $path;
         $components->query = $this->query;
         $components->fragment = $this->fragment;
-        $this->string = $components->string ?? throw new InvalidArgumentException();
+        $this->string = $components->string ?? throw new InternalInconsistencyException();
     }
 
     private function storage(): URLResourceValuesStorage
