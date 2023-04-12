@@ -51,9 +51,9 @@ interface URLProtocolClient
      *
      * The protocol client guarantees that it will answer the request on the same thread that called this method. The client may add a default credential to the challenge it issues to the connection delegate, if protocol did not provide one.
      * @param URLProtocol $protocol The URL protocol object sending the message.
-     * @param URLAuthenticationChallenge $challenge The authentication challenge that has been received.
+     * @param URLAuthenticationChallenge $authenticationChallenge The authentication challenge that has been received.
      */
-    public function urlProtocolDidReceive(URLProtocol $protocol, URLAuthenticationChallenge $challenge): void;
+    public function urlProtocolDidReceive(URLProtocol $protocol, URLAuthenticationChallenge $authenticationChallenge): void;
 
     /**
      * Tells the client that the load request failed due to an error.

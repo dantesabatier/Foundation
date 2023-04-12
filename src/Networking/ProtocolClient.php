@@ -82,25 +82,27 @@ class ProtocolClient implements URLProtocolClient
     /**
      * @throws Exception
      */
-    public function urlProtocolDidReceive(URLProtocol $protocol, URLAuthenticationChallenge $challenge): void
+    public function urlProtocolDidReceive(URLProtocol $protocol, URLAuthenticationChallenge $authenticationChallenge): void
     {
         $task = $protocol->task;
         $session = $task->session;
-        $proceed = function (?URLCredential $credential) use ($challenge, $task): void {
-            $protectionSpace = $challenge->protectionSpace;
-            $authScheme = $protectionSpace->authenticationMethod;
+        $proceed = function (?URLCredential $credential) use ($authenticationChallenge, $task): void {
             $task->suspend();
-            $handler = $task->authHandler($authScheme);
+            $protectionSpace = $authenticationChallenge->protectionSpace;
+            $authenticationMethod = $protectionSpace->authenticationMethod;
+            /** @var Challenge $challenge */
+            $challenge = $protectionSpace->associatedValueForKey("challenge");
+            $handler = $task->authHandler($authenticationMethod, $challenge);
             $handler($task, URLSessionAuthChallengeDisposition::useCredential, $credential);
             if ($credential) {
-                $task->lastCredentialUsedFromStorageDuringAuthentication = (object)["protectionSpace" => $protectionSpace, "credential" => $credential];
+                $task->lastCredentialUsedFromStorageDuringAuthentication = (object)["protectionSpace" => $authenticationChallenge->protectionSpace, "credential" => $credential];
             } else {
                 $task->lastCredentialUsedFromStorageDuringAuthentication = null;
             }
             $task->resume();
         };
-        $attemptProceedingWithDefaultCredential = function () use ($challenge, $task, $proceed): void {
-            if ($credential = $challenge->proposedCredential) {
+        $attemptProceedingWithDefaultCredential = function () use ($authenticationChallenge, $task, $proceed): void {
+            if ($credential = $authenticationChallenge->proposedCredential) {
                 $last = $task->lastCredentialUsedFromStorageDuringAuthentication;
                 if ($last?->credential !== $credential) {
                     $proceed($credential);
@@ -113,7 +115,7 @@ class ProtocolClient implements URLProtocolClient
         };
         $delegate = $session->delegate;
         if ($delegate instanceof URLSessionTaskDelegate) {
-            $delegate->urlSessionTaskDidReceiveChallenge($session, $task, $challenge, function (URLSessionAuthChallengeDisposition $disposition, ?URLCredential $credential) use ($task, $proceed, $attemptProceedingWithDefaultCredential): void {
+            $delegate->urlSessionTaskDidReceiveChallenge($session, $task, $authenticationChallenge, function (URLSessionAuthChallengeDisposition $disposition, ?URLCredential $credential) use ($task, $proceed, $attemptProceedingWithDefaultCredential): void {
                 switch ($disposition) {
                     case URLSessionAuthChallengeDisposition::useCredential:
                         $proceed($credential);

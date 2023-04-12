@@ -8,6 +8,7 @@ use Sabatier\Foundation\ArrayClass;
 use Sabatier\Foundation\Dictionary;
 use Sabatier\Foundation\Error;
 use Sabatier\Foundation\ObjectClass;
+use Sabatier\Foundation\ProcessInfo;
 use Sabatier\Foundation\Progress;
 use function Sabatier\Foundation\fatal_error;
 use const Sabatier\Foundation\CocoaErrorDomain;
@@ -248,23 +249,38 @@ abstract class URLSessionTask extends ObjectClass
     }
 
     /**
-     * @param string $authScheme
+     * @param string $method
+     * @param Challenge $challenge
      * @return Closure(URLSessionTask, URLSessionAuthChallengeDisposition, URLCredential|null): void
      * @internal
      */
-    public function authHandler(string $authScheme): Closure
+    public function authHandler(string $method, Challenge $challenge): Closure
     {
-        return match ($authScheme) {
-            URLAuthenticationMethodHTTPBasic => function (/** @noinspection PhpUnusedParameterInspection */ URLSessionTask $task, URLSessionAuthChallengeDisposition $disposition, ?URLCredential $credential): void {
-                $user = $credential?->user ?? "";
-                $password = $credential?->password;
-                $encodedString = base64_encode("$user:$password");
-                $task->authRequest = $task->originalRequest;
-                $task->authRequest?->setValueForHttpHeaderField("Basic $encodedString", "Authorization");
-            },
-            default => function (/** @noinspection PhpUnusedParameterInspection */ URLSessionTask $task, URLSessionAuthChallengeDisposition $disposition, ?URLCredential $credential) use ($authScheme): void {
-                fatal_error("This URLSession implementation doesn't currently handle $authScheme authentication.");
+        return function (URLSessionTask $task, URLSessionAuthChallengeDisposition $disposition, ?URLCredential $credential) use ($method, $challenge): void {
+            /** @var URLRequest $request */
+            $request = $task->originalRequest;
+            $username = $credential?->user ?? "";
+            $password = $credential?->password ?? "";
+            if (!($authorization = "$challenge->authScheme " . match ($method) {
+                    URLAuthenticationMethodHTTPBasic => base64_encode("$username:$password"),
+                    URLAuthenticationMethodHTTPDigest => (function () use ($password, $username, $request, $challenge): ?string {
+                        $parameters = $challenge->authParameters;
+                        if (!($realm = $parameters["realm"]) || !($uri = $parameters["uri"]) || !($algorithm = $parameters["algorithm"]) || !($nonce = $parameters["nonce"]) || !($qop = $parameters["qop"]) || !($opaque = $parameters["opaque"])) {
+                            return null;
+                        }
+                        $nc = sprintf("%08x", $this->previousFailureCount);
+                        $cnonce = hash("sha256", ProcessInfo::processInfo()->globallyUniqueString);
+                        $HA1 = hash("sha256", "$username:$realm:$password");
+                        $HA2 = hash("sha256", "$request->httpMethod:$uri");
+                        $response = hash("sha256", "$HA1:$nonce:$nc:$cnonce:$qop:$HA2");
+                        return "username=\"$username\", realm=\"$realm\", uri=\"$uri\", algorithm=\"SHA-256\", nonce=\"$nonce\", nc=\"$nc\", cnonce=\"$cnonce\", qop=\"$qop\", response=\"$response\", opaque=\"$opaque\"";
+                    })(),
+                    default => null
+                })) {
+                fatal_error("This URLSession implementation doesn't currently handle $method authentication.");
             }
+            $task->authRequest = $request;
+            $task->authRequest?->setValueForHttpHeaderField($authorization, "Authorization");
         };
     }
 
