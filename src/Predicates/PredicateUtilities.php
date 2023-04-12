@@ -77,25 +77,25 @@ class PredicateUtilities
     public static function min(ArrayClass|Set $values): ?Number
     {
         $value = $values->min();
-        if ($value !== null) {
-            if ($value instanceof Number) {
-                return $value;
-            }
-            return new Number($value);
+        if ($value === null) {
+            return null;
         }
-        return null;
+        if ($value instanceof Number) {
+            return $value;
+        }
+        return new Number($value);
     }
 
     public static function max(ArrayClass|Set $values): ?Number
     {
         $value = $values->max();
-        if ($value !== null) {
-            if ($value instanceof Number) {
-                return $value;
-            }
-            return new Number($value);
+        if ($value === null) {
+            return null;
         }
-        return null;
+        if ($value instanceof Number) {
+            return $value;
+        }
+        return new Number($value);
     }
 
     public static function median(ArrayClass|Set $values): Number
