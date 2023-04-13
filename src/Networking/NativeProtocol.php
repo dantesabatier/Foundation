@@ -403,8 +403,10 @@ abstract class NativeProtocol extends URLProtocol implements EasyHandleDelegate
             case DataDrainRawValue::ignore:
                 break;
         }
-        $this->internalState = InternalState::initial();
-        $task->session->remove($this->easyHandle);
+        if (!$task->previousFailureCount) {
+            $this->internalState = InternalState::initial();
+            $task->session->remove($this->easyHandle);
+        }
         $this->client?->urlProtocolDidFinishLoading($this);
         $this->internalState = InternalState::taskCompleted();
         $task->session->remove($this->easyHandle);
