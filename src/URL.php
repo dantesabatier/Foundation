@@ -170,7 +170,8 @@ final class URL extends ObjectClass
         } elseif ($name == "isFileURL") {
             return $this->scheme === "file";
         } elseif ($name == "hasDirectoryPath") {
-            return $this->isFileURL && is_dir($this->path) || $this->pathExtension === "";
+            $path = $this->path;
+            return $this->isFileURL && file_exists($path) ? is_dir($path) : $this->pathExtension === "";
         } elseif ($name == "baseURL") {
             return $this->$name;
         } else {
