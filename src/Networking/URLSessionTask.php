@@ -261,31 +261,31 @@ abstract class URLSessionTask extends ObjectClass
             $request = $task->originalRequest;
             $username = $credential?->user ?? "";
             $password = $credential?->password ?? "";
-            if (!($authorization = "$challenge->authScheme " . match ($method) {
-                    URLAuthenticationMethodHTTPBasic => base64_encode("$username:$password"),
-                    URLAuthenticationMethodHTTPDigest => (function () use ($password, $username, $request, $challenge): ?string {
-                        $parameters = $challenge->authParameters;
-                        if (!($realm = $parameters["realm"]) || !($uri = $parameters["uri"]) || !($algorithm = $parameters["algorithm"]) || !($nonce = $parameters["nonce"]) || !($qop = $parameters["qop"]) || !($opaque = $parameters["opaque"])) {
-                            return null;
-                        }
-                        $algo = match ($parameters["algorithm"]) {
-                            "SHA-512-256" => "sha512",
-                            "SHA-256" => "sha256",
-                            default => "md5"
-                        };
-                        $nc = sprintf("%08x", $this->previousFailureCount);
-                        $cnonce = hash($algo, ProcessInfo::processInfo()->globallyUniqueString);
-                        $HA1 = hash($algo, "$username:$realm:$password");
-                        $HA2 = hash($algo, "$request->httpMethod:$uri");
-                        $response = hash($algo, "$HA1:$nonce:$nc:$cnonce:$qop:$HA2");
-                        return "username=\"$username\", realm=\"$realm\", uri=\"$uri\", algorithm=\"$algorithm\", nonce=\"$nonce\", nc=\"$nc\", cnonce=\"$cnonce\", qop=\"$qop\", response=\"$response\", opaque=\"$opaque\"";
-                    })(),
-                    default => null
-                })) {
+            if (!($authorization = match ($method) {
+                URLAuthenticationMethodHTTPBasic => base64_encode("$username:$password"),
+                URLAuthenticationMethodHTTPDigest => (function () use ($password, $username, $request, $challenge): ?string {
+                    $parameters = $challenge->authParameters;
+                    if (!($realm = $parameters["realm"]) || !($uri = $parameters["uri"]) || !($algorithm = $parameters["algorithm"]) || !($nonce = $parameters["nonce"]) || !($qop = $parameters["qop"]) || !($opaque = $parameters["opaque"])) {
+                        return null;
+                    }
+                    $algo = match ($parameters["algorithm"]) {
+                        "SHA-512-256" => "sha512",
+                        "SHA-256" => "sha256",
+                        default => "md5"
+                    };
+                    $nc = sprintf("%08x", $this->previousFailureCount);
+                    $cnonce = hash($algo, ProcessInfo::processInfo()->globallyUniqueString);
+                    $HA1 = hash($algo, "$username:$realm:$password");
+                    $HA2 = hash($algo, "$request->httpMethod:$uri");
+                    $response = hash($algo, "$HA1:$nonce:$nc:$cnonce:$qop:$HA2");
+                    return "username=\"$username\", realm=\"$realm\", uri=\"$uri\", algorithm=\"$algorithm\", nonce=\"$nonce\", nc=\"$nc\", cnonce=\"$cnonce\", qop=\"$qop\", response=\"$response\", opaque=\"$opaque\"";
+                })(),
+                default => null
+            })) {
                 fatal_error("This URLSession implementation doesn't currently handle $method authentication.");
             }
             $task->authRequest = $request;
-            $task->authRequest?->setValueForHttpHeaderField($authorization, "Authorization");
+            $task->authRequest?->setValueForHttpHeaderField("$challenge->authScheme $authorization", "Authorization");
         };
     }
 
