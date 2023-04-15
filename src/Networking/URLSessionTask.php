@@ -285,7 +285,7 @@ abstract class URLSessionTask extends ObjectClass
                 fatal_error("This URLSession implementation doesn't currently handle $method authentication.");
             }
             $task->authRequest = $request;
-            $task->authRequest?->setValueForHttpHeaderField("$challenge->authScheme $authorization", "Authorization");
+            $task->authRequest->setValueForHttpHeaderField("$challenge->authScheme $authorization", "Authorization");
         };
     }
 
