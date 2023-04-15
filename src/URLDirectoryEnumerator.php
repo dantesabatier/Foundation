@@ -76,9 +76,15 @@ class URLDirectoryEnumerator extends DirectoryEnumerator
                     continue;
                 }
                 if ($keys = $this->keys) {
-                    $values = $url->resourceValues(new Set($keys));
-                    foreach ($values->allValues as $key => $value) {
-                        $url->setTemporaryResourceValue($value, $key);
+                    try {
+                        $values = $url->resourceValues(new Set($keys));
+                        foreach ($values->allValues as $key => $value) {
+                            $url->setTemporaryResourceValue($value, $key);
+                        }
+                    } catch (Exception) {
+                        if (($errorHandler = $this->errorHandler) && !$errorHandler(new Error(CocoaErrorDomain, FileReadNoPermissionError), $url)) {
+                            break;
+                        }
                     }
                 }
                 $this->currentURL = $url;
