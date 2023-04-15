@@ -263,7 +263,7 @@ final class FileManager extends ObjectClass
                 return false;
             }
             /** @var int|null $posixPermissions */
-            $posixPermissions = $attributes?->valueForKey(FileAttributeKey::posixPermissions);
+            $posixPermissions = $attributes?->valueForKey(FileAttributeKey::posixPermissions) ?? 0755;
             if ($posixPermissions !== null) {
                 chmod($path, $posixPermissions);
             }
@@ -283,14 +283,15 @@ final class FileManager extends ObjectClass
      */
     public function removeItem(URL $fileURL): bool
     {
-        return unsafe_value(function () use ($fileURL): bool {
+        return $this->fileExists($fileURL->path) && unsafe_value(function () use ($fileURL): bool {
             $process = function () use ($fileURL): bool {
                 if (!$fileURL->hasDirectoryPath) {
                     return unlink($fileURL->path);
                 }
-                $urls = $this->contentsOfDirectory($fileURL);
-                foreach ($urls as $url) {
-                    $url->hasDirectoryPath ? $this->removeItem($url) : unlink($url->path);
+                if ($enumerator = $this->enumerator($fileURL)) {
+                    foreach ($enumerator as $url) {
+                        $this->removeItem($url);
+                    }
                 }
                 return rmdir($fileURL->path);
             };
