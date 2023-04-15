@@ -109,9 +109,7 @@ class ProtocolClient implements URLProtocolClient
                 } else {
                     $task->cancel();
                 }
-                return;
             }
-            $proceed(null);
         };
         $delegate = $session->delegate;
         if ($delegate instanceof URLSessionTaskDelegate) {
