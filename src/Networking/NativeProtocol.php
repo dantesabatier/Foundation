@@ -396,12 +396,18 @@ abstract class NativeProtocol extends URLProtocol implements EasyHandleDelegate
                 $this->client?->urlProtocolDidLoad($this, $data);
                 break;
             case DataDrainRawValue::toFile:
-                if ($task instanceof URLSessionDownloadTask) {
-                    self::setProperty($bodyDataDrain->fileURL, "temporaryFileURL", $this->request);
-                }
-                break;
             case DataDrainRawValue::ignore:
                 break;
+        }
+        if ($task instanceof URLSessionDownloadTask) {
+            if (!($fileURL = $bodyDataDrain->fileURL)) {
+                $fileURL = $this->tempFileURL;
+                try {
+                    FileManager::default()->createFile($fileURL->path, $data);
+                } catch (Exception) {
+                }
+            }
+            self::setProperty($fileURL, "temporaryFileURL", $this->request);
         }
         if (!$task->previousFailureCount) {
             $this->internalState = InternalState::initial();
