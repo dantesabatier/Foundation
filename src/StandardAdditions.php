@@ -418,13 +418,12 @@ function is_serialized(mixed $value, bool $strict = true): bool
     switch ($token) {
         case "s":
             if ($strict) {
-                if ("\"" !== substr($value, -2, 1)) {
+                if (substr($value, -2, 1) !== "\"") {
                     return false;
                 }
             } elseif (!str_contains($value, "\"")) {
                 return false;
             }
-            break;
         case "a":
         case "O":
             return (bool)preg_match("/^$token:\d+:/s", $value);
