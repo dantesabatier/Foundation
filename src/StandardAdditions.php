@@ -387,35 +387,36 @@ function is_serialized(mixed $value, bool $strict = true): bool
         return false;
     }
     $value = trim($value);
-    if ("N;" === $value) {
+    if ($value === "N;") {
         return true;
     }
     if (strlen($value) < 4) {
         return false;
     }
-    if (":" !== $value[1]) {
+    if ($value[1] === ":") {
         return false;
     }
     if ($strict) {
         $last = substr($value, -1);
-        if (";" !== $last && "}" !== $last) {
+        if ($last !== ";" && $last !== "}") {
             return false;
         }
     } else {
         $semicolon = strpos($value, ";");
         $brace = strpos($value, "}");
-        if (false === $semicolon && false === $brace) {
+        if ($semicolon === false && $brace === false) {
             return false;
         }
-        if (false !== $semicolon && $semicolon < 3) {
+        if ($semicolon !== false && $semicolon < 3) {
             return false;
         }
-        if (false !== $brace && $brace < 4) {
+        if ($brace !== false && $brace < 4) {
             return false;
         }
     }
     $token = $value[0];
     switch ($token) {
+        /** @noinspection PhpMissingBreakStatementInspection */
         case "s":
             if ($strict) {
                 if (substr($value, -2, 1) !== "\"") {
