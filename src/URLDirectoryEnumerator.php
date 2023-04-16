@@ -24,7 +24,7 @@ class URLDirectoryEnumerator extends DirectoryEnumerator
 
     public function __construct(private readonly URL $url, private readonly ?ArrayClass $keys = null, #[ExpectedValues(flagsFromClass: DirectoryEnumerationOptions::class)] private readonly int $options = DirectoryEnumerationOptions::skipsHiddenFiles, private readonly ?Closure $errorHandler = null)
     {
-        $this->iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($this->url->path, FilesystemIterator::SKIP_DOTS), RecursiveIteratorIterator::CHILD_FIRST);
+        $this->iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($this->url->path, FilesystemIterator::SKIP_DOTS | FilesystemIterator::UNIX_PATHS), RecursiveIteratorIterator::CHILD_FIRST);
     }
 
     public function directoryAttributes(): ?Dictionary
@@ -67,10 +67,13 @@ class URLDirectoryEnumerator extends DirectoryEnumerator
     {
         return (function (): Generator {
             foreach ($this->iterator as $path) {
-                if ((($this->options & DirectoryEnumerationOptions::skipsSubdirectoryDescendants || $this->options & DirectoryEnumerationOptions::skipsPackageDescendants) && is_dir($path) && !pathinfo($path, PATHINFO_EXTENSION)) || (($this->options & DirectoryEnumerationOptions::skipsHiddenFiles) && is_hidden($path))) {
+                $url = URL::fileURL($path);
+                if (($this->options & DirectoryEnumerationOptions::skipsSubdirectoryDescendants || $this->options & DirectoryEnumerationOptions::skipsPackageDescendants) && $url->hasDirectoryPath && !$url->pathExtension) {
+                    break;
+                }
+                if ($this->options & DirectoryEnumerationOptions::skipsHiddenFiles && is_hidden($path)) {
                     continue;
                 }
-                $url = URL::fileURL($path);
                 if ($this->shouldContinue) {
                     $this->isPostOrderDirectory = $url->hasDirectoryPath;
                     continue;
