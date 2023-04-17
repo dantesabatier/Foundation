@@ -416,17 +416,16 @@ function is_serialized(mixed $value, bool $strict = true): bool
     $token = $value[0];
     switch ($token) {
         case "s":
-        case "a":
-        case "O":
-            if ($token === "s") {
-                if ($strict) {
-                    if (substr($value, -2, 1) !== "\"") {
-                        return false;
-                    }
-                } elseif (!str_contains($value, "\"")) {
+            if ($strict) {
+                if (substr($value, -2, 1) !== "\"") {
                     return false;
                 }
+            } elseif (!str_contains($value, "\"")) {
+                return false;
             }
+        // no break
+        case "a":
+        case "O":
             return (bool)preg_match("/^$token:\d+:/s", $value);
         case "b":
         case "i":
