@@ -68,7 +68,7 @@ class URLDirectoryEnumerator extends DirectoryEnumerator
         return (function (): Generator {
             foreach ($this->iterator as $path) {
                 $url = URL::fileURL($path);
-                if ((($this->options & DirectoryEnumerationOptions::skipsSubdirectoryDescendants || $this->options & DirectoryEnumerationOptions::skipsPackageDescendants) && $url->deletingLastPathComponent()->lastPathComponent !== $this->url->lastPathComponent) || $this->options & DirectoryEnumerationOptions::skipsHiddenFiles && is_hidden($path)) {
+                if ((($this->options & DirectoryEnumerationOptions::skipsSubdirectoryDescendants || $this->options & DirectoryEnumerationOptions::skipsPackageDescendants) && !$this->url->isEqual($url->deletingLastPathComponent())) || $this->options & DirectoryEnumerationOptions::skipsHiddenFiles && is_hidden($path)) {
                     continue;
                 }
                 if ($this->shouldContinue) {
