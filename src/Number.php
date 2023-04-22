@@ -22,7 +22,7 @@ class Number extends Value
 
     /**
      * Returns a Number object initialized to contain a given value.
-     * @param scalar $value The value for the new number.
+     * @param bool|float|int|string $value The value for the new number.
      */
     public function __construct(bool|float|int|string $value)
     {
