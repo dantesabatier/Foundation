@@ -425,11 +425,7 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
      */
     public function setValueForKey(mixed $value, string $key): void
     {
-        if ($value === null) {
-            $this->offsetUnset($key);
-        } else {
-            $this->offsetSet($key, $value);
-        }
+        $this->offsetSet($key, $value);
     }
 
     /**
@@ -536,9 +532,9 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
     {
         if ($value === null) {
             unset($this->reserved[$offset]);
-            return;
+        } else {
+            $this->reserved[$offset] = $value;
         }
-        $this->reserved[$offset] = $value;
     }
 
     /**
