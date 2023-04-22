@@ -80,6 +80,7 @@ abstract class ValueTransformer extends ObjectClass
      *
      * A subclass should override this method to return the appropriate class.
      * @return class-string The class of the value returned by the receiver for a forward transformation.
+     * @psalm-suppress InvalidReturnType
      */
     public static function transformedValueClass(): string
     {
