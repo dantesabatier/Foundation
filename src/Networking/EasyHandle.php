@@ -7,6 +7,7 @@ use Exception;
 use Sabatier\Foundation\ArrayClass;
 use Sabatier\Foundation\Dictionary;
 use Sabatier\Foundation\Error;
+use Sabatier\Foundation\InternalInconsistencyException;
 use Sabatier\Foundation\ProcessInfo;
 use Sabatier\Foundation\URL;
 use Sabatier\Foundation\URLComponents;
@@ -395,7 +396,11 @@ final class EasyHandle
         $payload = "";
         do {
             $data = $read(2);
-            [$byte1, $byte2] = array_values(unpack("C*", $data));
+            $elements = array_values(unpack("C*", $data));
+            if (count($elements) < 2) {
+                throw new InternalInconsistencyException();
+            }
+            [$byte1, $byte2] = $elements;
             $isFinal = (bool)($byte1 & 0b10000000);
             $isMasked = (bool)($byte2 & 0b10000000);
             $length = $byte2 & 0b01111111;
