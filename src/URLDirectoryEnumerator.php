@@ -66,6 +66,8 @@ class URLDirectoryEnumerator extends DirectoryEnumerator
     public function getIterator(): Traversable
     {
         return (function (): Generator {
+            /** @var Set<string>|null $keys */
+            $keys = $this->keys ? new Set($this->keys) : null;
             foreach ($this->iterator as $path) {
                 $url = URL::fileURL($path);
                 if ((($this->options & DirectoryEnumerationOptions::skipsSubdirectoryDescendants || $this->options & DirectoryEnumerationOptions::skipsPackageDescendants) && !$this->url->isEqual($url->deletingLastPathComponent())) || $this->options & DirectoryEnumerationOptions::skipsHiddenFiles && is_hidden($path)) {
@@ -75,9 +77,9 @@ class URLDirectoryEnumerator extends DirectoryEnumerator
                     $this->isPostOrderDirectory = $url->hasDirectoryPath;
                     continue;
                 }
-                if ($keys = $this->keys) {
+                if ($keys !== null) {
                     try {
-                        $values = $url->resourceValues(new Set($keys));
+                        $values = $url->resourceValues($keys);
                         foreach ($values->allValues as $key => $value) {
                             $url->setTemporaryResourceValue($value, $key);
                         }
