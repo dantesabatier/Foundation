@@ -207,7 +207,9 @@ class Expression extends ObjectClass
      * The arguments for the expression.
      *
      * An expression's arguments is the array of expressions that will be passed as parameters during invocation of the selector on the operand of a function expression.
-     * @return ArrayClass<Expression>|null Accessing this property raises an exception if it is not applicable to the expression.
+     *  Accessing this property raises an exception if it is not applicable to the expression.
+     * @return ArrayClass<Expression>|null
+     * @psalm-suppress InvalidReturnType
      */
     public function arguments(): ?ArrayClass
     {
@@ -216,7 +218,9 @@ class Expression extends ObjectClass
 
     /**
      * The collection of expressions in an aggregate expression, or the collection element of a subquery expression.
-     * @return mixed Accessing this property raises an exception if it is not applicable to the expression.
+     *
+     *  Accessing this property raises an exception if it is not applicable to the expression.
+     * @return mixed
      */
     public function collection(): mixed
     {
@@ -233,7 +237,9 @@ class Expression extends ObjectClass
 
     /**
      * The function for the expression.
-     * @return string Accessing this property raises an exception if it is not applicable to the expression.
+     *
+     *  Accessing this property raises an exception if it is not applicable to the expression.
+     * @return string
      */
     public function function (): string
     {
@@ -242,7 +248,9 @@ class Expression extends ObjectClass
 
     /**
      * The key path for the expression.
-     * @return string Accessing this property raises an exception if it is not applicable to the expression.
+     *
+     *  Accessing this property raises an exception if it is not applicable to the expression.
+     * @return string
      */
     public function keyPath(): string
     {
@@ -251,9 +259,11 @@ class Expression extends ObjectClass
 
     /**
      * The operand for the expression.
-     * @return Expression|null Accessing this property raises an exception if it is not applicable to the expression.
+     *
+     * Accessing this property raises an exception if it is not applicable to the expression.
      * The operand for an expression is the object on which the expression's selector or block will be invoked.
      * The object is the result of evaluating a key path or one of the defined functions.
+     * @return Expression|null
      */
     public function operand(): ?Expression
     {
@@ -262,7 +272,9 @@ class Expression extends ObjectClass
 
     /**
      * The predicate of a subquery expression.
-     * @return Predicate Accessing this property raises an exception if it is not applicable to the expression.
+     *
+     *  Accessing this property raises an exception if it is not applicable to the expression.
+     * @return Predicate
      */
     public function predicate(): Predicate
     {
@@ -271,7 +283,9 @@ class Expression extends ObjectClass
 
     /**
      * The left expression of an aggregate expression.
-     * @return Expression Accessing this property raises an exception if it is not applicable to the expression.
+     *
+     * Accessing this property raises an exception if it is not applicable to the expression.
+     * @return Expression
      */
     public function left(): Expression
     {
@@ -280,7 +294,9 @@ class Expression extends ObjectClass
 
     /**
      * The right expression of an aggregate expression.
-     * @return Expression Accessing this property raises an exception if it is not applicable to the expression.
+     *
+     * Accessing this property raises an exception if it is not applicable to the expression.
+     * @return Expression
      */
     public function right(): Expression
     {
@@ -289,7 +305,9 @@ class Expression extends ObjectClass
 
     /**
      * The variable for the expression.
-     * @return string Accessing this property raises an exception if it is not applicable to the expression.
+     *
+     *  Accessing this property raises an exception if it is not applicable to the expression.
+     * @return string
      */
     public function variable(): string
     {
@@ -307,8 +325,7 @@ class Expression extends ObjectClass
     /**
      * Evaluates an expression using a given object and context.
      * @param mixed|null $object The object against which the expression is evaluated.
-     * @param Dictionary|null $context A dictionary that the expression can use to store temporary state for
-     * one predicate evaluation. Can be nil.
+     * @param Dictionary|null $context A dictionary that the expression can use to store temporary state for one predicate evaluation. Can be nil.
      * Note that context is mutable, and that it can only be accessed during the evaluation of the expression.
      * You must not attempt to retain it for use elsewhere.
      * @return mixed The evaluated object.
@@ -327,8 +344,9 @@ class Expression extends ObjectClass
     }
 
     /**
-     * @return Closure(mixed, ArrayClass<Expression>, Dictionary|null): mixed
      * Accessing this property raises an exception if it is not applicable to the expression.
+     * @return Closure(mixed, ArrayClass<Expression>, Dictionary|null): mixed
+     * @psalm-suppress InvalidReturnType
      */
     public function expressionBlock(): Closure
     {
@@ -336,7 +354,8 @@ class Expression extends ObjectClass
     }
 
     /**
-     * @return Expression Accessing this property raises an exception if it is not applicable to the expression.
+     *  Accessing this property raises an exception if it is not applicable to the expression.
+     * @return Expression
      */
     public function true(): Expression
     {
@@ -344,7 +363,8 @@ class Expression extends ObjectClass
     }
 
     /**
-     * @return Expression Accessing this property raises an exception if it is not applicable to the expression.
+     *  Accessing this property raises an exception if it is not applicable to the expression.
+     * @return Expression
      */
     public function false(): Expression
     {
