@@ -436,6 +436,12 @@ function is_serialized(mixed $value, bool $strict = true): bool
     return false;
 }
 
+function is_password(string $value): bool
+{
+    /** @noinspection SpellCheckingInspection */
+    return string_begins_with($value, "\$2[abxy]", CompareOptions::quoted);
+}
+
 function is_equal(mixed $a, mixed $b): bool
 {
     return $a instanceof Equatable ? $a->isEqual($b) : $a === $b;
