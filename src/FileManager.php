@@ -263,7 +263,7 @@ final class FileManager extends ObjectClass
                 return false;
             }
             /** @var int|null $posixPermissions */
-            $posixPermissions = $attributes?->valueForKey(FileAttributeKey::posixPermissions) ?? 0755;
+            $posixPermissions = $attributes?->valueForKey(FileAttributeKey::posixPermissions);
             if ($posixPermissions !== null) {
                 chmod($path, $posixPermissions);
             }
