@@ -206,7 +206,7 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
 
     public static function keyPathsForValuesAffectingValueForKey(string $key): Set
     {
-        $selector = sprintf("%s%s", "keyPathsForValuesAffectingValueFor", ucfirst($key));
+        $selector = "keyPathsForValuesAffectingValueFor" . ucfirst($key);
         if (static::instancesRespond($selector)) {
             return static::$selector();
         }
@@ -215,7 +215,7 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
 
     public static function automaticallyNotifiesObserversForKey(string $key): bool
     {
-        $selector = sprintf("%s%s", "automaticallyNotifiesObserversFor", ucfirst($key));
+        $selector = "automaticallyNotifiesObserversFor" . ucfirst($key);
         if (static::instancesRespond($selector)) {
             return static::$selector();
         }
@@ -224,7 +224,7 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
 
     public function validateValueForKey(mixed &$value, string $key): bool
     {
-        $selector = sprintf("%s%s", "validate", ucfirst($key));
+        $selector = "validate" . ucfirst($key);
         if ($this->responds($selector)) {
             return $this->perform($selector, [&$value]);
         }
