@@ -317,8 +317,7 @@ function localized_string(string $string, string $domain = "Localizable", string
 
 function document_root_directory(): string
 {
-    /** @psalm-suppress PossiblyUndefinedArrayOffset */
-    $path = $_SERVER["DOCUMENT_ROOT"];
+    $path = $_SERVER["DOCUMENT_ROOT"] ?? "";
     /** @psalm-suppress RedundantCondition */
     if (RUNNING_FROM_CLI) {
         if (isset($_SERVER["PWD"])) {
