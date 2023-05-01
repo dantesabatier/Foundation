@@ -3,6 +3,7 @@
 namespace Sabatier\Foundation;
 
 use Closure;
+use InvalidArgumentException;
 
 /**
  * @psalm-require-implements Sequence
@@ -39,10 +40,10 @@ trait SequenceAlgorithms
 
     public function compare(mixed $other): ComparisonResult
     {
-        if ($other instanceof Sequence) {
-            return ComparisonResult::from($this->count() <=> $other->count());
+        if (!$other instanceof Sequence) {
+            throw new InvalidArgumentException(sprintf("Invalid argument: expecting %s, \"%s\" given", Sequence::class, typeof($other)));
         }
-        return ComparisonResult::orderedDescending;
+        return ComparisonResult::from($this->count() <=> $other->count());
     }
 
     public function isEqual(mixed $other): bool
@@ -75,7 +76,7 @@ trait SequenceAlgorithms
     
     public function elementsEqual(Sequence $sequence, ?Closure $areEquivalent = null): bool
     {
-        if ($this->compare($sequence) != ComparisonResult::orderedSame) {
+        if ($this->compare($sequence) !== ComparisonResult::orderedSame) {
             return false;
         }
         $areEquivalent ??= fn(mixed $e0, mixed $e1): bool => is_equal($e0, $e1);
