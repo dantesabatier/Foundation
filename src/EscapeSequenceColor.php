@@ -2,6 +2,9 @@
 
 namespace Sabatier\Foundation;
 
+/**
+ * These constants are used by the {@see escape_sequence()} function.
+ */
 enum EscapeSequenceColor: int
 {
     case black = 30;
