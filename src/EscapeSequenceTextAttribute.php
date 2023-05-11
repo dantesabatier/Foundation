@@ -2,6 +2,9 @@
 
 namespace Sabatier\Foundation;
 
+/**
+ * These constants are used by the {@see escape_sequence()} function.
+ */
 enum EscapeSequenceTextAttribute: int
 {
     case normal = 0;
