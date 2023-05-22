@@ -3,7 +3,6 @@
 namespace Sabatier\Foundation;
 
 use InvalidArgumentException;
-use JetBrains\PhpStorm\ArrayShape;
 use JetBrains\PhpStorm\Pure;
 
 /**
@@ -23,8 +22,6 @@ class Date extends ObjectClass
         $this->timeIntervalSinceReferenceDate = $time ?? absolute_time_get_current();
     }
 
-    #[Pure]
-    #[ArrayShape(["timeIntervalSinceReferenceDate" => "float"])]
     public function __serialize(): array
     {
         return ["timeIntervalSinceReferenceDate" => $this->timeIntervalSinceReferenceDate];
@@ -130,10 +127,7 @@ class Date extends ObjectClass
 
     public function isEqual(mixed $other): bool
     {
-        if ($other instanceof Date) {
-            return $this->compare($other) === ComparisonResult::orderedSame;
-        }
-        return false;
+        return $this->compare($other) === ComparisonResult::orderedSame;
     }
 
     /**
