@@ -469,11 +469,16 @@ final class URL extends ObjectClass
         return $this->description();
     }
 
+    public function compare(mixed $other): ComparisonResult
+    {
+        if (!$other instanceof URL) {
+            throw new InvalidArgumentException(sprintf("Invalid argument: expecting %s, \"%s\" given", URL::class, typeof($other)));
+        }
+        return ComparisonResult::from(string_compare($this->absoluteString, $other->absoluteString, CompareOptions::caseInsensitive));
+    }
+
     public function isEqual(mixed $other): bool
     {
-        if ($other instanceof URL) {
-            return string_is_equal($this->absoluteString, $other->absoluteString, CompareOptions::caseInsensitive);
-        }
-        return false;
+        return $this->compare($other) === ComparisonResult::orderedSame;
     }
 }
