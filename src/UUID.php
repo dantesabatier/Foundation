@@ -3,7 +3,6 @@
 namespace Sabatier\Foundation;
 
 use InvalidArgumentException;
-use JetBrains\PhpStorm\ArrayShape;
 
 /**
  * A universally unique value that can be used to identify types, interfaces, and other items.
@@ -25,7 +24,6 @@ class UUID extends ObjectClass
         $this->uuidString = $uuidString ?? uuid_generate();
     }
 
-    #[ArrayShape(["uuidString" => "string"])]
     public function __serialize(): array
     {
         return ["uuidString" => $this->uuidString];
@@ -38,12 +36,10 @@ class UUID extends ObjectClass
 
     public function compare(mixed $other): ComparisonResult
     {
-        if (is_string($other)) {
-            return ComparisonResult::from(uuid_compare($this->uuidString, $other));
-        } elseif ($other instanceof UUID) {
-            return $this->compare($other->uuidString);
+        if (!$other instanceof UUID) {
+            throw new InvalidArgumentException(sprintf("Invalid argument: expecting %s, \"%s\" given", UUID::class, typeof($other)));
         }
-        throw new InvalidArgumentException(sprintf("Invalid argument: expecting %s, \"%s\" given", UUID::class, typeof($other)));
+        return ComparisonResult::from(uuid_compare($this->uuidString, $other->uuidString));
     }
 
     public function isEqual(mixed $other): bool
