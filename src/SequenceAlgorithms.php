@@ -55,7 +55,7 @@ trait SequenceAlgorithms
     {
         return $this->reserved;
     }
-    
+
     public function contains(Closure $predicate): bool
     {
         /**
@@ -68,12 +68,12 @@ trait SequenceAlgorithms
         }
         return false;
     }
-    
+
     public function containsElement(mixed $element): bool
     {
         return $this->contains(fn(mixed $e): bool => is_equal($e, $element));
     }
-    
+
     public function elementsEqual(Sequence $sequence, ?Closure $areEquivalent = null): bool
     {
         if ($this->compare($sequence) !== ComparisonResult::orderedSame) {
@@ -99,7 +99,7 @@ trait SequenceAlgorithms
         }
         return null;
     }
-    
+
     public function min(): mixed
     {
         $min = null;
@@ -110,7 +110,7 @@ trait SequenceAlgorithms
         }
         return $min;
     }
-    
+
     public function max(): mixed
     {
         $max = null;
@@ -121,7 +121,7 @@ trait SequenceAlgorithms
         }
         return $max;
     }
-    
+
     public function reduce(mixed $initialResult, Closure $updateAccumulatingResult): mixed
     {
         foreach (clone $this as $i => $e) {
@@ -129,7 +129,7 @@ trait SequenceAlgorithms
         }
         return $initialResult;
     }
-    
+
     public function sum(): int|float
     {
         return $this->reduce(0, fn(int|float &$r, string|int|float|Number $e): int|float => $r += pn($e));
@@ -143,7 +143,7 @@ trait SequenceAlgorithms
         }
         return $instance;
     }
-    
+
     public function compactMap(Closure $transform): self
     {
         $instance = new self();
@@ -155,7 +155,7 @@ trait SequenceAlgorithms
         }
         return $instance;
     }
-    
+
     public function flatMap(Closure $transform): self
     {
         $instance = new self();
