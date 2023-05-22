@@ -43,7 +43,7 @@ class UUID extends ObjectClass
         } elseif ($other instanceof UUID) {
             return $this->compare($other->uuidString);
         }
-        return parent::compare($other);
+        throw new InvalidArgumentException(sprintf("Invalid argument: expecting %s, \"%s\" given", UUID::class, typeof($other)));
     }
 
     public function isEqual(mixed $other): bool
