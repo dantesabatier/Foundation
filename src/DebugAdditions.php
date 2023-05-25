@@ -20,7 +20,7 @@ if (!defined("RUNNING_FROM_CLI")) {
 }
 
 if (!defined("HAS_ESCAPE_SEQUENCES")) {
-    define("HAS_ESCAPE_SEQUENCES", function_exists("posix_isatty") ? posix_isatty(STDOUT) : (getenv("ANSICON") !== false || getenv("ConEmuANSI") === "ON"));
+    define("HAS_ESCAPE_SEQUENCES", RUNNING_FROM_CLI  && (function_exists("posix_isatty") ? posix_isatty(STDOUT) : (getenv("ANSICON") !== false || getenv("ConEmuANSI") === "ON")));
 }
 
 function debuglog(string $string): void
@@ -28,7 +28,7 @@ function debuglog(string $string): void
     print $string . PHP_EOL;
 }
 
-#[Deprecated("since Foundation 0.1, use debuglog() instead", "debuglog(%parametersList%)")]
+#[Deprecated("since Foundation 0.1, use debuglog() instead", "debuglog(%parametersList%)", "0.1")]
 function cli_log(string $string): void
 {
     trigger_error(sprintf("%s() is deprecated, use debuglog() instead", __FUNCTION__), E_USER_DEPRECATED);
