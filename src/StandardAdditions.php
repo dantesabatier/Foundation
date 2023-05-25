@@ -170,7 +170,7 @@ function in_string(string $string, string $substring, #[ExpectedValues(flagsFrom
 function string_compare(string $string, string $other, #[ExpectedValues(flagsFromClass: CompareOptions::class)] int $options = CompareOptions::none): int
 {
     if ($options !== CompareOptions::none) {
-        if ($collator = Collator::create("root")) {
+        if (class_exists("Collator") && ($collator = Collator::create("root"))) {
             $collator->setAttribute(Collator::STRENGTH, Collator::PRIMARY);
             if (!($options & CompareOptions::diacriticInsensitive)) {
                 $collator->setAttribute(Collator::STRENGTH, Collator::SECONDARY);
