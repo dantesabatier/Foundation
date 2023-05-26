@@ -20,7 +20,7 @@ if (!defined("RUNNING_FROM_CLI")) {
 }
 
 if (!defined("HAS_ESCAPE_SEQUENCES")) {
-    define("HAS_ESCAPE_SEQUENCES", RUNNING_FROM_CLI  && (function_exists("posix_isatty") ? posix_isatty(STDOUT) : (getenv("ANSICON") !== false || getenv("ConEmuANSI") === "ON")));
+    define("HAS_ESCAPE_SEQUENCES", RUNNING_FROM_CLI && (function_exists("posix_isatty") ? posix_isatty(STDOUT) : (getenv("ANSICON") !== false || getenv("ConEmuANSI") === "ON")));
 }
 
 function debuglog(string $string): void
