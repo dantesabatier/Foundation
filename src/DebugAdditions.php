@@ -28,7 +28,7 @@ function debuglog(string $string): void
     print $string . PHP_EOL;
 }
 
-#[Deprecated("since Foundation 0.1, use debuglog() instead", "debuglog(%parametersList%)", "0.1")]
+#[Deprecated("since Foundation 0.1, use debuglog() instead", "debuglog(%parametersList%)")]
 function cli_log(string $string): void
 {
     trigger_error(sprintf("%s() is deprecated, use debuglog() instead", __FUNCTION__), E_USER_DEPRECATED);
