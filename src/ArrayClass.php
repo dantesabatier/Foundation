@@ -76,7 +76,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
     }
 
     /**
-     * @param iterable<int, Element> $iterable
+     * @param iterable<Element> $iterable
      */
     public function __construct(iterable $iterable = [])
     {
