@@ -87,7 +87,7 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
     }
 
     /**
-     * @param iterable<Element> $iterable
+     * @param iterable<int, Element> $iterable
      */
     public function __construct(iterable $iterable = [])
     {
