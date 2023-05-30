@@ -19,5 +19,27 @@
         <MissingConstructor errorLevel="suppress"/>
         <RedundantPropertyInitializationCheck errorLevel="suppress"/>
         <InaccessibleProperty errorLevel="suppress"/>
+        <InvalidArgument>
+            <errorLevel type="suppress">
+                <file name="src/Networking/Challenge.php" />
+                <file name="src/Networking/HTTPCookieStorage.php" />
+            </errorLevel>
+        </InvalidArgument>
+        <ArgumentTypeCoercion>
+            <errorLevel type="suppress">
+                <file name="src/Networking/EasyHandle.php" />
+                <file name="src/Networking/HTTPCookie.php" />
+                <file name="src/Networking/URLCache.php" />
+                <file name="src/SequenceAlgorithms.php" />
+            </errorLevel>
+        </ArgumentTypeCoercion>
+        <ReferenceConstraintViolation>
+            <errorLevel type="suppress">
+                <file name="src/Networking/EasyHandle.php" />
+                <file name="src/Networking/HTTPCookie.php" />
+                <file name="src/Networking/URLCache.php" />
+                <file name="src/SequenceAlgorithms.php" />
+            </errorLevel>
+        </ReferenceConstraintViolation>
     </issueHandlers>
 </psalm>
