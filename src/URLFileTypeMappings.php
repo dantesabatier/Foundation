@@ -21,6 +21,10 @@ final class URLFileTypeMappings
         return self::$shared;
     }
 
+    /**
+     * @param string $mimeType
+     * @return ArrayClass<string>|null
+     */
     public function extensions(string $mimeType): ?ArrayClass
     {
         return $this->internal->MIMETypeToExtensionList[$mimeType];
