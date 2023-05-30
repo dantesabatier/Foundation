@@ -531,7 +531,7 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
     public function offsetSet(mixed $offset, mixed $value): void
     {
         if ($value === null) {
-            unset($this->reserved[$offset]);
+            $this->offsetUnset($offset);
         } else {
             $this->reserved[$offset] = $value;
         }
@@ -542,9 +542,8 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
      */
     public function offsetUnset(mixed $offset): void
     {
-        if (!$this->offsetExists($offset)) {
-            return;
+        if ($this->offsetExists($offset)) {
+            unset($this->reserved[$offset]);
         }
-        unset($this->reserved[$offset]);
     }
 }
