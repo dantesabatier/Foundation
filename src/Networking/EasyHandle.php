@@ -357,7 +357,7 @@ final class EasyHandle
             $data = $this->fill($this->rawHandle);
             $buffer .= $data;
             $this->didReceiveHeaderData($data, strlen($data));
-        } while (substr_count($buffer, "\r\n\r\n") == 0);
+        } while (substr_count($buffer, "\r\n\r\n") === 0);
     }
 
     public function disconnect(): void
