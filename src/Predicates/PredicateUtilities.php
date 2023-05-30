@@ -116,6 +116,7 @@ class PredicateUtilities
         if (!$values->isEmpty()) {
             /** @var Dictionary<int> $occurrences */
             $occurrences = $values->reduce(new Dictionary(), function (Dictionary $result, Number|int|float $element): Dictionary {
+                /** @psalm-suppress NullOperand */
                 $result[(string)$element] += 1;
                 return $result;
             });
