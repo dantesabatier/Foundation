@@ -18,12 +18,16 @@ class SetExpression extends Expression
 
     public function expressionValue(mixed $object = null, ?Dictionary $context = null): mixed
     {
+        /** @var Set|ArrayClass $left */
         $left = $this->left()->expressionValue($object, $context) ?? new Set();
         if ($left instanceof ArrayClass) {
+            /** @var Set $left */
             $left = new Set($left);
         }
+        /** @var Set|ArrayClass $right */
         $right = $this->right()->expressionValue($object, $context) ?? new Set();
         if ($right instanceof ArrayClass) {
+            /** @var Set $right */
             $right = new Set($right);
         }
         $value = $left;
