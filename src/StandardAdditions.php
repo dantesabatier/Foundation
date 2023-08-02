@@ -57,7 +57,7 @@ function array_passing_test(callable $predicate, array $array, FilteringMethod $
                 $elements[$key] = $value;
             }
         }
-        if (/** @phpstan-ignore-line */ $stop) {
+        if ($stop) {
             break;
         }
     }

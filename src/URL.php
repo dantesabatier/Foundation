@@ -218,20 +218,22 @@ final class URL extends ObjectClass
      */
     public static function fileURL(string $path): URL
     {
-        $string = "";
-        if (/** @phpstan-ignore-line */ TARGET_OS_WINDOWS) {
-            $path = str_replace("\\", "/", (string)parse_url($path, PHP_URL_PATH));
+        if (empty($path)) {
+            throw new InvalidArgumentException("Invalid argument: expecting path, empty string given");
+        }
+        if (TARGET_OS_WINDOWS) {
+            $path = str_replace("\\", "/", $path);
         }
         $scheme = parse_url($path, PHP_URL_SCHEME);
-        if (empty($scheme) && !empty($path)) {
+        if (empty($scheme)) {
             $scheme = "file";
-            $string .= "$scheme:";
+        } else {
+            $path = parse_url($path, PHP_URL_PATH);
         }
         if ($scheme !== "file") {
             throw new InvalidArgumentException("Invalid url scheme \"$scheme\"");
         }
-        $string .= "//$path";
-        return new URL($string);
+        return new URL("$scheme://$path");
     }
 
     /**

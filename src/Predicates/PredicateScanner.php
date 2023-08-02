@@ -269,7 +269,7 @@ class PredicateScanner extends Scanner
                 /** @psalm-suppress PossiblyNullArgument */
                 $subexpressions[] = $this->parseExpression(); // @phpstan-ignore-line
             }
-            if (/** @phpstan-ignore-line */ !$this->scanString("}")) {
+            if (!$this->scanString("}")) {
                 throw new InvalidArgumentException("Invalid argument: missing closing \"}\" at index $this->scanLocation");
             }
             return Expression::expressionForAggregate($subexpressions); // @phpstan-ignore-line
@@ -331,7 +331,7 @@ class PredicateScanner extends Scanner
                     case "q":
                         $this->scanString("q");
                         /** @psalm-suppress RedundantCondition */
-                        if (/** @phpstan-ignore-line */ !$this->isAtEnd) {
+                        if (!$this->isAtEnd) {
                             $c = $this->string[$this->scanLocation];
                             if ($c === "i" || $c === "u" || $c === "x" || $c === "X") {
                                 $this->scanLocation += 1;
@@ -507,7 +507,7 @@ class PredicateScanner extends Scanner
                         /** @psalm-suppress PossiblyNullArgument */
                         $subexpressions[] = $this->parseExpression(); // @phpstan-ignore-line
                     }
-                    if (/** @phpstan-ignore-line */ !$this->scanString(")")) {
+                    if (!$this->scanString(")")) {
                         throw new InvalidArgumentException("Invalid argument: missing closing \")\" at index $this->scanLocation");
                     }
                 }

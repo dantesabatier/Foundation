@@ -299,7 +299,7 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
                 $instance[$i] = $e;
             }
             /** @psalm-suppress TypeDoesNotContainType */
-            if (/** @phpstan-ignore-line */ $stop) {
+            if ($stop) {
                 break;
             }
         }
