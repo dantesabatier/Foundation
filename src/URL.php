@@ -222,7 +222,7 @@ final class URL extends ObjectClass
             throw new InvalidArgumentException("Invalid argument: expecting path, empty string given");
         }
         if (TARGET_OS_WINDOWS) {
-            $path = str_replace("\\", "/", $path);
+            $path = str_replace("\\", "/", parse_url($path, PHP_URL_PATH));
         }
         $scheme = parse_url($path, PHP_URL_SCHEME);
         if (empty($scheme)) {
