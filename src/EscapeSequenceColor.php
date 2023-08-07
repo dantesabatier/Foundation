@@ -7,6 +7,7 @@ namespace Sabatier\Foundation;
  */
 enum EscapeSequenceColor: int
 {
+    case none = 0;
     case black = 30;
     case red = 31;
     case green = 32;
