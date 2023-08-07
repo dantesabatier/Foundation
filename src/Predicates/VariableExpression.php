@@ -43,6 +43,11 @@ class VariableExpression extends Expression
         return $this->variable;
     }
 
+    public function operand(): ?Expression
+    {
+        return $this;
+    }
+
     #[Pure]
     public function predicateFormat(): string
     {
