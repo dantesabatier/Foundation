@@ -317,7 +317,7 @@ class PredicateUtilities
         return canonical($string);
     }
 
-    public static function concat(string $separator, ArrayClass $arguments): string
+    public static function concat(string $separator = "", ArrayClass $arguments = new ArrayClass()): string
     {
         return $arguments->join($separator);
     }
