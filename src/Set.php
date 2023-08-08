@@ -112,7 +112,7 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
      * Returns a bool value indicating whether the sequence contains an element that satisfies the given predicate.
      * Available when Element conforms to {@see Equatable}.
      * @param Element $element The element to find in the sequence.
-     * @return bool {@see true} if the element was found in the sequence; otherwise, {@see false}.
+     * @return bool true if the element was found in the sequence; otherwise, false.
      */
     public function containsElement(mixed $element): bool
     {
@@ -299,7 +299,7 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
     /**
      * Returns a Boolean value indicating whether every element of a sequence satisfies a given predicate.
      * @param Closure(Element, int=): bool $predicate A closure that takes an element of the sequence as its argument and returns a Boolean value that indicates whether the passed element satisfies a condition.
-     * @return bool {@see true} if the sequence contains an element that satisfies predicate; otherwise, {@see false}.
+     * @return bool true if the sequence contains an element that satisfies predicate; otherwise, false.
      */
     public function allSatisfy(Closure $predicate): bool
     {
@@ -611,7 +611,7 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
      * Returns a Boolean value that indicates whether the set is a subset of another set.
      * Set A is a subset of another set B if every member of A is also a member of B.
      * @param SetAlgebra<Element> $other Another set.
-     * @return bool {@see true} if the set is a subset of other; otherwise, {@see false}.
+     * @return bool true if the set is a subset of other; otherwise, false.
      */
     public function isSubset(SetAlgebra $other): bool
     {
@@ -622,7 +622,7 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
      * Returns a Boolean value that indicates whether this set is a superset of the given set.
      * Set A is a superset of another set B if every member of B is also a member of A.
      * @param SetAlgebra<Element> $other Another set.
-     * @return bool {@see true} if the set is a superset of other; otherwise, {@see false}.
+     * @return bool true if the set is a superset of other; otherwise, false.
      */
     public function isSuperset(SetAlgebra $other): bool
     {
@@ -632,7 +632,7 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
     /**
      * Returns a Boolean value that indicates whether the set has no members in common with the given set.
      * @param SetAlgebra<Element> $other Another set.
-     * @return bool {@see true} if the set has no elements in common with other; otherwise, {@see false}.
+     * @return bool true if the set has no elements in common with other; otherwise, false.
      */
     public function isDisjoint(SetAlgebra $other): bool
     {

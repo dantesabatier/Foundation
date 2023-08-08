@@ -38,7 +38,7 @@ interface Sequence extends Traversable, Countable, Comparable, ExpressibleByArra
      *
      * Available when Element conforms to {@see Equatable}.
      * @param Element $element The element to find in the sequence.
-     * @return bool {@see true} if the element was found in the sequence; otherwise, {@see false}.
+     * @return bool true if the element was found in the sequence; otherwise, false.
      */
     public function containsElement(mixed $element): bool;
 

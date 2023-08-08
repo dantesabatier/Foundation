@@ -15,7 +15,7 @@ class OptionSet
      * Returns a Boolean value that indicates whether the given element exists in the set.
      *
      * @param int $element The element to find in the sequence.
-     * @return bool {@see true} if the element was found in the sequence; otherwise, {@see false}.
+     * @return bool true if the element was found in the sequence; otherwise, false.
      */
     public function contains(int $element): bool
     {

@@ -197,7 +197,7 @@ function string_compare(string $string, string $other, #[ExpectedValues(flagsFro
  * @param string $string The receiver string.
  * @param string $other The string with which to compare.
  * @param int $options The options for the comparison.
- * @return bool {@see true} if the strings are lexically equals.
+ * @return bool true if the strings are lexically equals.
  */
 function string_is_equal(string $string, string $other, #[ExpectedValues(flagsFromClass: CompareOptions::class)] int $options = CompareOptions::none): bool
 {
@@ -209,7 +209,7 @@ function string_is_equal(string $string, string $other, #[ExpectedValues(flagsFr
  * @param string $string The receiver string.
  * @param string $prefix The string with which to compare.
  * @param int $options The options for the comparison.
- * @return bool {@see true} if the initial characters of the string are the same as the characters of prefix; otherwise, {@see false}.
+ * @return bool true if the initial characters of the string are the same as the characters of prefix; otherwise, false.
  */
 function string_has_prefix(string $string, string $prefix, #[ExpectedValues(flagsFromClass: CompareOptions::class)] int $options = CompareOptions::none): bool
 {
@@ -221,7 +221,7 @@ function string_has_prefix(string $string, string $prefix, #[ExpectedValues(flag
  * @param string $string The receiver string.
  * @param string $suffix The string with which to compare.
  * @param int $options The options for the comparison.
- * @return bool {@see true} if the final characters of the string are the same as the characters of suffix; otherwise, {@see false}.
+ * @return bool true if the final characters of the string are the same as the characters of suffix; otherwise, false.
  */
 function string_has_suffix(string $string, string $suffix, #[ExpectedValues(flagsFromClass: CompareOptions::class)] int $options = CompareOptions::none): bool
 {

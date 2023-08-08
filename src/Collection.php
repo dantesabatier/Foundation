@@ -106,7 +106,7 @@ interface Collection extends Sequence, ArrayAccess
     /**
      * Returns a Boolean value indicating whether every element of a sequence satisfies a given predicate.
      * @param Closure(Element, Index=): bool $predicate A closure that takes an element of the sequence as its argument and returns a Boolean value that indicates whether the passed element satisfies a condition.
-     * @return bool {@see true} if the sequence contains an element that satisfies predicate; otherwise, {@see false}.
+     * @return bool true if the sequence contains an element that satisfies predicate; otherwise, false.
      */
     public function allSatisfy(Closure $predicate): bool;
 

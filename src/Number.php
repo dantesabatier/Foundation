@@ -52,7 +52,7 @@ class Number extends Value
      * The compare() method follows the standard C rules for type conversion. For example, if you compare a Number object that has an integer value with a Number object that has a floating point value, the integer value is converted to a floating-point value for comparison.
      * @param mixed $other The number to compare to the number object's value.
      * This value must not be nil.
-     * @return ComparisonResult {@see ComparisonResult::orderedAscending} if the value of $other is greater than the number object's, {@see ComparisonResult::orderedSame} if they're equal, and {@see ComparisonResult::orderedDescending} if the value of $other is less than the number object's.
+     * @return ComparisonResult orderedAscending if the value of $other is greater than the number object's, orderedSame if they're equal, and orderedDescending if the value of $other is less than the number object's.
      */
     public function compare(mixed $other): ComparisonResult
     {

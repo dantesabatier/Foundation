@@ -76,7 +76,7 @@ interface SetAlgebra extends MutableCollection
      *
      * Set A is a subset of another set B if every member of A is also a member of B.
      * @param SetAlgebra<Element> $other Another set.
-     * @return bool {@see true} if the set is a subset of other; otherwise, {@see false}.
+     * @return bool true if the set is a subset of other; otherwise, false.
      */
     public function isSubset(SetAlgebra $other): bool;
 
@@ -85,14 +85,14 @@ interface SetAlgebra extends MutableCollection
      *
      * Set A is a superset of another set B if every member of B is also a member of A.
      * @param SetAlgebra $other Another set.
-     * @return bool {@see true} if the set is a superset of other; otherwise, {@see false}.
+     * @return bool true if the set is a superset of other; otherwise, false.
      */
     public function isSuperset(SetAlgebra $other): bool;
 
     /**
      * Returns a Boolean value that indicates whether the set has no members in common with the given set.
      * @param SetAlgebra<Element> $other Another set.
-     * @return bool {@see true} if the set has no elements in common with other; otherwise, {@see false}.
+     * @return bool true if the set has no elements in common with other; otherwise, false.
      */
     public function isDisjoint(SetAlgebra $other): bool;
 }

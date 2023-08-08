@@ -113,7 +113,7 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
      *
      * Available when Element conforms to {@see Equatable}.
      * @param Element $element The element to find in the sequence.
-     * @return bool {@see true} if the element was found in the sequence; otherwise, {@see false}.
+     * @return bool true if the element was found in the sequence; otherwise, false.
      */
     public function containsElement(mixed $element): bool
     {
@@ -341,7 +341,7 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
     /**
      * Returns a Boolean value indicating whether every element of a sequence satisfies a given predicate.
      * @param Closure(Element, string=): bool $predicate A closure that takes an element of the sequence as its argument and returns a Boolean value that indicates whether the passed element satisfies a condition.
-     * @return bool {@see true} if the sequence contains an element that satisfies predicate; otherwise, {@see false}.
+     * @return bool true if the sequence contains an element that satisfies predicate; otherwise, false.
      */
 
     public function allSatisfy(Closure $predicate): bool
