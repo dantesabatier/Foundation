@@ -175,7 +175,7 @@ class HTTPCookie extends ObjectClass
         $scanner->charactersToBeSkipped = "\t\n\r";
         if ($scanner->scanUpString(";", $pair) && $pair && ($components = self::splitNameValue($pair))) {
             [$name, $value] = $components;
-            /** @var Dictionary $properties */
+            /** @var Dictionary<mixed> $properties */
             $properties = new Dictionary();
             $properties[HTTPCookiePropertyKey::name] = $name;
             $properties[HTTPCookiePropertyKey::value] = $value;

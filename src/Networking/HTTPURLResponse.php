@@ -37,7 +37,7 @@ class HTTPURLResponse extends URLResponse
             if ($headerFields === null) {
                 return new Dictionary();
             }
-            /** @var Dictionary $canonicalizedFields */
+            /** @var Dictionary<mixed> $canonicalizedFields */
             $canonicalizedFields = new Dictionary();
             foreach ($headerFields as $key => $value) {
                 if (empty($key)) {

@@ -21,7 +21,7 @@ readonly class ArrayConverter
 
     private function newArray(array $array): ArrayClass
     {
-        /** @var ArrayClass $arrayClass */
+        /** @var ArrayClass<mixed> $arrayClass */
         $arrayClass = new ArrayClass();
         foreach ($array as $element) {
             if (is_array($element)) {
@@ -35,7 +35,7 @@ readonly class ArrayConverter
 
     private function newDictionary(array $array): Dictionary
     {
-        /** @var Dictionary $dictionary */
+        /** @var Dictionary<mixed> $dictionary */
         $dictionary = new Dictionary();
         foreach ($array as $key => $value) {
             if (is_array($value)) {

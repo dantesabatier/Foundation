@@ -179,6 +179,7 @@ trait CollectionAlgorithms
     public function valueForKeyPath(string $keyPath): mixed
     {
         if ($keyPath === "" || $keyPath[0] !== "@") {
+            /** @noinspection PhpMultipleClassDeclarationsInspection */
             return parent::valueForKeyPath($keyPath);
         }
         $components = components_from_key_path($keyPath);
@@ -190,6 +191,7 @@ trait CollectionAlgorithms
         $value = $this;
         $remainderPath = $components->remainderPath;
         if ($remainderPath) {
+            /** @noinspection PhpMultipleClassDeclarationsInspection */
             $value = parent::valueForKeyPath($remainderPath);
             assert($value instanceof self);
         }

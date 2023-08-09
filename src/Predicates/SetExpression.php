@@ -16,7 +16,7 @@ class SetExpression extends Expression
         parent::__construct($expressionType);
     }
 
-    public function expressionValue(mixed $object = null, ?Dictionary $context = null): mixed
+    public function expressionValue(mixed $object = null, ?Dictionary $context = null): Set
     {
         /** @var Set|ArrayClass $left */
         $left = $this->left()->expressionValue($object, $context) ?? new Set();

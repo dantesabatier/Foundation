@@ -111,7 +111,7 @@ class HTTPCookieStorage extends ObjectClass
 
     private function createCookie(Dictionary $properties): HTTPCookie
     {
-        /** @var Dictionary $cookieProperties */
+        /** @var Dictionary<mixed> $cookieProperties */
         $cookieProperties = new Dictionary();
         foreach ($properties as $key => $value) {
             if ($key === HTTPCookiePropertyKey::expires) {
