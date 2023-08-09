@@ -264,15 +264,15 @@ class PredicateScanner extends Scanner
                 return Expression::expressionForConstantValue($subexpressions);
             }
             /** @psalm-suppress PossiblyNullArgument */
-            $subexpressions[] = $this->parseExpression(); // @phpstan-ignore-line
+            $subexpressions[] = $this->parseExpression();
             while ($this->scanString(",")) {
                 /** @psalm-suppress PossiblyNullArgument */
-                $subexpressions[] = $this->parseExpression(); // @phpstan-ignore-line
+                $subexpressions[] = $this->parseExpression();
             }
             if (!$this->scanString("}")) {
                 throw new InvalidArgumentException("Invalid argument: missing closing \"}\" at index $this->scanLocation");
             }
-            return Expression::expressionForAggregate($subexpressions); // @phpstan-ignore-line
+            return Expression::expressionForAggregate($subexpressions);
         }
         if ($this->scanKeyword("TRUE") || $this->scanKeyword("YES")) {
             return Expression::expressionForConstantValue(true);
@@ -381,9 +381,7 @@ class PredicateScanner extends Scanner
             if (!$this->scanString(",")) {
                 throw new InvalidArgumentException("Invalid argument: expecting \",\" at index $this->scanLocation");
             }
-            /** @phpstan-ignore-next-line */
             $variable = $this->parseExpression() ?? throw new InvalidArgumentException("Invalid argument: expecting expression at index $this->scanLocation");
-            /** @phpstan-ignore-next-line */
             if (!$this->scanString(",")) {
                 throw new InvalidArgumentException("Invalid argument: expecting \",\" at index $this->scanLocation");
             }
@@ -402,11 +400,9 @@ class PredicateScanner extends Scanner
                 throw new InvalidArgumentException("Invalid argument: expecting \",\" at index $this->scanLocation");
             }
             $trueExpression = $this->parseExpression() ?? throw new InvalidArgumentException("Invalid argument: expecting expression at index $this->scanLocation");
-            /** @phpstan-ignore-next-line */
             if (!$this->scanString(",")) {
                 throw new InvalidArgumentException("Invalid argument: expecting \",\" at index $this->scanLocation");
             }
-            /** @phpstan-ignore-next-line */
             $falseExpression = $this->parseExpression() ?? throw new InvalidArgumentException("Invalid argument: expecting expression at index $this->scanLocation");
             if (!$this->scanString(")")) {
                 throw new InvalidArgumentException("Invalid argument: expecting \")\" at index $this->scanLocation");
@@ -422,7 +418,6 @@ class PredicateScanner extends Scanner
             $argument = $this->parseExpression() ?? throw new InvalidArgumentException("Invalid argument: expecting expression at index $this->scanLocation");
             $arguments->append($argument);
             while ($this->scanString(",")) {
-                /** @phpstan-ignore-next-line */
                 $argument = $this->parseExpression() ?? throw new InvalidArgumentException("Invalid argument: expecting expression at index $this->scanLocation");
                 $arguments->append($argument);
             }
@@ -502,10 +497,10 @@ class PredicateScanner extends Scanner
                 $subexpressions = new ArrayClass();
                 if (!$this->scanString(")")) {
                     /** @psalm-suppress PossiblyNullArgument */
-                    $subexpressions[] = $this->parseExpression(); // @phpstan-ignore-line
+                    $subexpressions[] = $this->parseExpression();
                     while ($this->scanString(",")) {
                         /** @psalm-suppress PossiblyNullArgument */
-                        $subexpressions[] = $this->parseExpression(); // @phpstan-ignore-line
+                        $subexpressions[] = $this->parseExpression();
                     }
                     if (!$this->scanString(")")) {
                         throw new InvalidArgumentException("Invalid argument: missing closing \")\" at index $this->scanLocation");

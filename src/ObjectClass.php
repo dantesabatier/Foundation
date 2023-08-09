@@ -39,7 +39,7 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
     #[Pure]
     final public function superclass(): string
     {
-        return get_parent_class($this); // @phpstan-ignore-line
+        return get_parent_class($this);
     }
 
     #[Pure]

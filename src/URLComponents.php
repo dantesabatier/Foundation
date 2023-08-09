@@ -32,7 +32,7 @@ class URLComponents extends ObjectClass
         if ($string && ($components = parse_url($string))) {
             foreach ($components as $key => $value) {
                 if (!empty($value)) {
-                    $this->$key = $value; // @phpstan-ignore-line
+                    $this->$key = $value;
                 }
             }
         }

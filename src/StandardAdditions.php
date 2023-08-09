@@ -372,7 +372,6 @@ function temporary_directory(): string
  */
 function is_hidden(string $filename): bool
 {
-    /** @phpstan-ignore-next-line */
     if (USE_UNSAFE_FUNCTIONS && TARGET_OS_WINDOWS) {
         $attributes = trim(unsafe_value(fn(): string => (string)shell_exec("FOR %A IN (" . "\"" . $filename . "\"" . ") DO @ECHO %~aA")));
         return $attributes[3] === "h" || $attributes[4] === "s";

@@ -175,7 +175,6 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
      * @param Closure(Element, string=): Result $transform A mapping closure. transform accepts an element of this sequence as its parameter and returns a transformed value of the same or of a different type.
      * @return ArrayClass<Result> An array containing the transformed elements of this sequence.
      * @psalm-suppress ImplementedReturnTypeMismatch
-     * @phpstan-ignore-next-line
      */
     public function map(Closure $transform): ArrayClass
     {
@@ -193,7 +192,6 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
      * @param Closure(Element, string=): Result $transform A closure that accepts an element of this sequence as its argument and returns an optional value.
      * @return ArrayClass<Result> An array of the non-nil results of calling transform with each element of the sequence.
      * @psalm-suppress ImplementedReturnTypeMismatch
-     * @phpstan-ignore-next-line
      */
     public function compactMap(Closure $transform): ArrayClass
     {
@@ -232,7 +230,6 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
      * @param Closure(Element, string=): iterable<Result> $transform
      * @return ArrayClass<Result>
      * @psalm-suppress ImplementedReturnTypeMismatch
-     * @phpstan-ignore-next-line
      */
     public function flatMap(Closure $transform): ArrayClass
     {

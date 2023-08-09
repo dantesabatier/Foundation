@@ -83,7 +83,6 @@ class HTTPURLProtocol extends NativeProtocol
             }
             $hasCacheControl = true;
         }
-        /** @phpstan-ignore-next-line */
         if (!$hasCacheControl && $cacheControl !== null && in_array("no-cache", array_map(fn(string $part): string => strtolower(trim($part)), explode(",", $cacheControl)))) {
             return false;
         }

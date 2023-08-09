@@ -17,7 +17,6 @@ abstract class ValueTransformer extends ObjectClass
     private static function valueTransformers(): Dictionary
     {
         if (static::$valueTransformers === null) {
-            /** @phpstan-ignore-next-line */
             static::$valueTransformers = new Dictionary([
                 NegateBooleanTransformerName => new NegateBooleanTransformer(),
                 UnarchiveFromDataTransformerName => new UnarchiveFromDataTransformer(),
