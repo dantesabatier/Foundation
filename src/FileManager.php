@@ -285,15 +285,19 @@ final class FileManager extends ObjectClass
     {
         return $this->fileExists($fileURL->path) && unsafe_value(function () use ($fileURL): bool {
                 $process = function () use ($fileURL): bool {
+                    $path = $fileURL->path;
+                    if (is_link($path)) {
+                        return true;
+                    }
                     if (!$fileURL->hasDirectoryPath) {
-                        return unlink($fileURL->path);
+                        return unlink($path);
                     }
                     if ($enumerator = $this->enumerator($fileURL)) {
                         foreach ($enumerator as $url) {
                             $this->removeItem($url);
                         }
                     }
-                    return rmdir($fileURL->path);
+                    return rmdir($path);
                 };
                 if ($delegate = $this->delegate) {
                     return $delegate->fileManagerShouldRemoveItemAtURL($this, $fileURL) && $process();
