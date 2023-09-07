@@ -2,21 +2,43 @@
 
 namespace Sabatier\Foundation;
 
-/** @internal */
+/**
+ * @template T
+ * @internal
+ */
 readonly class ArrayConverter
 {
-    private function __construct(private array $array)
+    /** @var ArrayClass<T> */
+    public ArrayClass $array;
+    /** @var Dictionary<T> */
+    public Dictionary $dictionary;
+
+    /** @var array<array-key, T> $reserved */
+    public function __construct(private array $reserved)
     {
+        unset($this->array);
+        unset($this->dictionary);
     }
 
+    public function __get(string $name)
+    {
+        $this->$name = match ($name) {
+            "array" => $this->array(),
+            "dictionary" => $this->dictionary(),
+            default => throw new UndefinedKeyException()
+        };
+    }
+
+    /** @deprecated */
     public static function arrayWithArray(array $array): ArrayClass
     {
-        return (new ArrayConverter($array))->array();
+        return (new ArrayConverter($array))->array;
     }
 
+    /** @deprecated */
     public static function dictionaryWithArray(array $array): Dictionary
     {
-        return (new ArrayConverter($array))->dictionary();
+        return (new ArrayConverter($array))->dictionary;
     }
 
     private function newArray(array $array): ArrayClass
@@ -49,14 +71,14 @@ readonly class ArrayConverter
 
     private function array(): ArrayClass
     {
-        return $this->newArray($this->array);
+        return $this->newArray($this->reserved);
     }
 
     private function dictionary(): Dictionary
     {
-        if (!is_sequential($this->array)) {
-            return $this->newDictionary($this->array);
+        if (!is_sequential($this->reserved)) {
+            return $this->newDictionary($this->reserved);
         }
-        return $this->newDictionary(array_combine(array_map(fn(int $i): string => human_readable_value($i), array_keys($this->array)), array_values($this->array)));
+        return $this->newDictionary(array_combine(array_map(fn(int $i): string => human_readable_value($i), array_keys($this->reserved)), array_values($this->reserved)));
     }
 }

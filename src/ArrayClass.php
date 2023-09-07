@@ -93,7 +93,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
 
     public static function arrayWithArray(array $array): ArrayClass
     {
-        return ArrayConverter::arrayWithArray($array);
+        return (new ArrayConverter($array))->array;
     }
 
     /**

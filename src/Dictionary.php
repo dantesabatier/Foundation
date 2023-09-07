@@ -65,7 +65,7 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
 
     public static function dictionaryWithArray(array $array): Dictionary
     {
-        return ArrayConverter::dictionaryWithArray($array);
+        return (new ArrayConverter($array))->dictionary;
     }
 
     /**
