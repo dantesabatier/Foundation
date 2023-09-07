@@ -13,7 +13,9 @@ readonly class ArrayConverter
     /** @var Dictionary<T> */
     public Dictionary $dictionary;
 
-    /** @var array<array-key, T> $reserved */
+    /**
+     * @param array<array-key, T> $reserved
+     */
     public function __construct(private array $reserved)
     {
         unset($this->array);
@@ -29,18 +31,10 @@ readonly class ArrayConverter
         };
     }
 
-    /** @deprecated */
-    public static function arrayWithArray(array $array): ArrayClass
-    {
-        return (new ArrayConverter($array))->array;
-    }
-
-    /** @deprecated */
-    public static function dictionaryWithArray(array $array): Dictionary
-    {
-        return (new ArrayConverter($array))->dictionary;
-    }
-
+    /**
+     * @param array<T> $array
+     * @return ArrayClass<T>
+     */
     private function newArray(array $array): ArrayClass
     {
         /** @var ArrayClass<mixed> $arrayClass */
@@ -55,6 +49,10 @@ readonly class ArrayConverter
         return $arrayClass;
     }
 
+    /**
+     * @param array<T> $array
+     * @return Dictionary<T>
+     */
     private function newDictionary(array $array): Dictionary
     {
         /** @var Dictionary<mixed> $dictionary */
@@ -69,10 +67,17 @@ readonly class ArrayConverter
         return $dictionary;
     }
 
+    /**
+     * @return ArrayClass<T>
+     */
     private function array(): ArrayClass
     {
         return $this->newArray($this->reserved);
     }
+
+    /**
+     * @return Dictionary<T>
+     */
 
     private function dictionary(): Dictionary
     {
