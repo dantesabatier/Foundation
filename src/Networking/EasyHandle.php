@@ -4,6 +4,8 @@ namespace Sabatier\Foundation\Networking;
 
 use CurlHandle;
 use Exception;
+use Random\Engine\Secure;
+use Random\Randomizer;
 use Sabatier\Foundation\ArrayClass;
 use Sabatier\Foundation\Dictionary;
 use Sabatier\Foundation\Error;
@@ -109,13 +111,12 @@ final class EasyHandle
             if ($port = $url->port) {
                 $authority .= ":" . $port;
             }
-            /** @noinspection PhpUnhandledExceptionInspection */
             $this->allHeaderFields = new Dictionary([
                 "Host" => $authority,
                 "Upgrade" => "WebSocket",
                 "Connection" => "Upgrade",
-                "Sec-WebSocket-Key" => base64_encode(random_bytes(16)),
-                "Sec-WebSocket-Version" => "13"
+                "Sec-WebSocket-Key" => base64_encode((new Randomizer(new Secure()))->getBytes(16)),
+                "Sec-WebSocket-Version" => 13
             ]);
             $this->url = $url;
             $this->rawHandle = stream_socket_client($url->absoluteString);
