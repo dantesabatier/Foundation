@@ -438,7 +438,7 @@ final class EasyHandle
                     $code = 0;
                     if ($length > 0) {
                         $binary = $payload[0] . $payload[1];
-                        $code = current(unpack('n', $payload));
+                        $code = current(unpack("n", $payload));
                     }
                     if ($length >= 2) {
                         $payload = substring_from_index($payload, 2);
