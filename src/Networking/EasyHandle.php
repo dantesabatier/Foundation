@@ -116,7 +116,7 @@ final class EasyHandle
                 "Upgrade" => "WebSocket",
                 "Connection" => "Upgrade",
                 "Sec-WebSocket-Key" => base64_encode((new Randomizer(new Secure()))->getBytes(16)),
-                "Sec-WebSocket-Version" => 13
+                "Sec-WebSocket-Version" => "13"
             ]);
             $this->url = $url;
             $this->rawHandle = stream_socket_client($url->absoluteString);
