@@ -83,7 +83,7 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
 
     public function perform(string $selector, array $arguments = []): mixed
     {
-        if (method_exists($this, $selector)) {
+        if ($this->responds($selector)) {
             return $this->$selector(...$arguments);
         }
         $this->doesNotRecognizeSelector($selector);
