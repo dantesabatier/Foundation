@@ -137,4 +137,9 @@ class Error extends ObjectClass
     {
         return sprintf("Error Domain=%s Code=%s %s UserInfo=%s", $this->domain, $this->code, $this->localizedDescription, human_readable_value($this->userInfo));
     }
+
+    public function jsonSerialize(): Dictionary
+    {
+        return new Dictionary([LocalizedDescriptionKey => $this->localizedDescription, LocalizedRecoveryOptionsErrorKey => $this->localizedRecoveryOptions, LocalizedRecoverySuggestionErrorKey => $this->localizedRecoverySuggestion, LocalizedFailureReasonErrorKey => $this->localizedFailureReason]);
+    }
 }
