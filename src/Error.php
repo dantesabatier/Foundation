@@ -140,6 +140,6 @@ class Error extends ObjectClass
 
     public function jsonSerialize(): Dictionary
     {
-        return new Dictionary([LocalizedDescriptionKey => $this->localizedDescription, LocalizedRecoveryOptionsErrorKey => $this->localizedRecoveryOptions, LocalizedRecoverySuggestionErrorKey => $this->localizedRecoverySuggestion, LocalizedFailureReasonErrorKey => $this->localizedFailureReason]);
+        return new Dictionary(["localizedDescription" => $this->localizedDescription, "localizedRecoveryOptions" => $this->localizedRecoveryOptions, "localizedRecoverySuggestion" => $this->localizedRecoverySuggestion, "localizedFailureReason" => $this->localizedFailureReason]);
     }
 }
