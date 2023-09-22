@@ -58,7 +58,7 @@ final class URL extends ObjectClass
                 }
             }
             if (!url_validate($string)) {
-                fatal_error(sprintf("Invalid argument: expecting url string, \"%s\" given", $string));
+                fatal_error("Invalid argument: expecting url string, \"$string\" given");
             }
         }
         $this->string = $string;

@@ -68,7 +68,7 @@ class Range extends ObjectClass implements ExpressibleByArrayLiteral, IteratorAg
     
     public function description(): string
     {
-        return sprintf("[%s...<%s]", $this->lowerBound, $this->upperBound);
+        return "[$this->lowerBound...<$this->upperBound]";
     }
 
     /**

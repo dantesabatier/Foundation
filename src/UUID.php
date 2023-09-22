@@ -17,7 +17,7 @@ class UUID extends ObjectClass
     public function __construct(?string $uuidString = null)
     {
         if ($uuidString && !uuid_validate($uuidString)) {
-            fatal_error(sprintf("Invalid argument: expecting uuid string, \"%s\" given", $uuidString));
+            fatal_error("Invalid argument: expecting uuid string, \"$uuidString\" given");
         }
         $this->uuidString = $uuidString ?? uuid_generate();
     }

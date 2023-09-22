@@ -373,7 +373,7 @@ class UndoManager extends ObjectClass
         if ($actionName == "") {
             return $name;
         }
-        return sprintf("%s %s", $name, $actionName);
+        return "$name $actionName";
     }
 
     /**
@@ -389,7 +389,7 @@ class UndoManager extends ObjectClass
         if ($actionName == "") {
             return $name;
         }
-        return sprintf("%s %s", $name, $actionName);
+        return "$name $actionName";
     }
 
     /**
