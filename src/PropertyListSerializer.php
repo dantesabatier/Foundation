@@ -119,9 +119,10 @@ readonly class PropertyListSerializer
 
     public function propertyList(/** @noinspection PhpUnusedParameterInspection */ string $data, #[ExpectedValues(flagsFromClass: PropertyListSerializationMutabilityOptions::class)] int $options = 0, PropertyListSerializationFormat &$format = null): mixed
     {
-        /** @psalm-suppress ArgumentTypeCoercion */
-        $this->document->loadXML($data) ?: throw new InternalInconsistencyException();
-        $value = $this->value($this->document->documentElement) ?? throw new InternalInconsistencyException();
+        /** @noinspection PhpUnhandledExceptionInspection */
+        $this->document->loadXML($data) ?: fatal_error();
+        /** @noinspection PhpUnhandledExceptionInspection */
+        $value = $this->value($this->document->documentElement) ?? fatal_error();
         if (func_num_args() === 3) {
             $format = PropertyListSerializationFormat::xml;
         }

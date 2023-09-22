@@ -5,6 +5,6 @@ namespace Sabatier\Foundation;
 /**
  * Raised when a key value coding operation fails.
  */
-class UndefinedKeyException extends UnknownKeyException
+class UndefinedKeyException extends InternalInconsistencyException
 {
 }

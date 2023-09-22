@@ -2,9 +2,9 @@
 
 namespace Sabatier\Foundation\Networking;
 
-use InvalidArgumentException;
 use Sabatier\Foundation\ArrayClass;
 use Sabatier\Foundation\ObjectClass;
+use function Sabatier\Foundation\fatal_error;
 use function Sabatier\Foundation\request_concrete_implementation;
 
 /**
@@ -35,7 +35,7 @@ abstract class URLProtocol extends ObjectClass
     {
         $this->task = $task;
         $this->cachedResponse = $cachedResponse;
-        $this->request = $task->originalRequest ?? throw new InvalidArgumentException("A protocol class was requested, but we do not have a request");
+        $this->request = $task->originalRequest ?? fatal_error("A protocol class was requested, but we do not have a request");
         $this->client = $client ?? new ProtocolClient();
     }
 

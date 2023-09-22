@@ -3,10 +3,8 @@
 namespace Sabatier\Foundation;
 
 use Collator;
-use Exception;
 use JetBrains\PhpStorm\ExpectedValues;
 use JetBrains\PhpStorm\Pure;
-use RuntimeException;
 
 /**
  * Returns the current system absolute time.
@@ -341,7 +339,7 @@ function home_directory(): string
     } elseif (!empty($_SERVER["HOMEDRIVE"]) && !empty($_SERVER["HOMEPATH"])) {
         return rtrim($_SERVER["HOMEDRIVE"] . $_SERVER["HOMEPATH"], "\\/");
     } else {
-        throw new RuntimeException("failed to get current user directory");
+        fatal_error("failed to get current user directory");
     }
 }
 
@@ -367,7 +365,6 @@ function temporary_directory(): string
 }
 
 /**
- * @throws Exception
  * @psalm-suppress TypeDoesNotContainType, ForbiddenCode
  */
 function is_hidden(string $filename): bool

@@ -3,7 +3,6 @@
 namespace Sabatier\Foundation;
 
 use Closure;
-use InvalidArgumentException;
 
 /**
  * @psalm-require-implements Sequence
@@ -41,7 +40,7 @@ trait SequenceAlgorithms
     public function compare(mixed $other): ComparisonResult
     {
         if (!$other instanceof Sequence) {
-            throw new InvalidArgumentException(sprintf("Invalid argument: expecting %s, \"%s\" given", Sequence::class, typeof($other)));
+            fatal_error(sprintf("Invalid argument: expecting %s, \"%s\" given", Sequence::class, typeof($other)));
         }
         return ComparisonResult::from($this->count() <=> $other->count());
     }

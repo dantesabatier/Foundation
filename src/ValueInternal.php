@@ -3,7 +3,6 @@
 namespace Sabatier\Foundation;
 
 use JetBrains\PhpStorm\ExpectedValues;
-use RuntimeException;
 
 /** @internal */
 function pv(mixed $v): mixed
@@ -28,14 +27,14 @@ function string_with_options(string $string, #[ExpectedValues(flagsFromClass: Co
         if (function_exists("transliterator_transliterate")) :
             $string = transliterator_transliterate(TransliteratorDefault, $string);
             if ($string === false) {
-                throw new RuntimeException(sprintf("%s() %s", __FUNCTION__, intl_get_error_message()));
+                fatal_error(sprintf("%s() %s", __FUNCTION__, intl_get_error_message()));
             }
         endif;
         if (!($options & CompareOptions::normalized) && function_exists("normalizer_normalize")) {
             $string = normalizer_normalize($string);
             /** @psalm-suppress TypeDoesNotContainType */
             if ($string === false) {
-                throw new RuntimeException(sprintf("%s() %s", __FUNCTION__, intl_get_error_message()));
+                fatal_error(sprintf("%s() %s", __FUNCTION__, intl_get_error_message()));
             }
         }
     }

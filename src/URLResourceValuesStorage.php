@@ -3,7 +3,6 @@
 namespace Sabatier\Foundation;
 
 use Exception;
-use InvalidArgumentException;
 use JetBrains\PhpStorm\ExpectedValues;
 use SplFileInfo;
 
@@ -84,7 +83,7 @@ class URLResourceValuesStorage
     public function read(Set $keys, URL $url): Dictionary
     {
         if (!$url->isFileURL) {
-            throw new InvalidArgumentException();
+            fatal_error();
         }
         $path = $url->path;
         /** @var Dictionary<mixed> $result */
@@ -113,10 +112,7 @@ class URLResourceValuesStorage
             } elseif ($key == URLResourceKey::isExecutableKey) {
                 $result[$key] = $info->isExecutable();
             } elseif ($key == URLResourceKey::isHiddenKey) {
-                try {
-                    $result[$key] = is_hidden($path);
-                } catch (Exception) {
-                }
+                $result[$key] = is_hidden($path);
             } elseif ($key == URLResourceKey::isReadableKey) {
                 $result[$key] = $info->isReadable();
             } elseif ($key == URLResourceKey::isWritableKey) {

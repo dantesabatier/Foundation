@@ -110,7 +110,7 @@ abstract class ValueTransformer extends ObjectClass
     public function reverseTransformedValue(mixed $value): mixed
     {
         if (!static::allowsReverseTransformation()) {
-            throw new InternalInconsistencyException();
+            fatal_error();
         }
         return $this->transformedValue($value);
     }

@@ -9,8 +9,8 @@
 
 namespace Sabatier\Foundation\Predicates;
 
-use InvalidArgumentException;
 use JetBrains\PhpStorm\ExpectedValues;
+use function Sabatier\Foundation\fatal_error;
 
 /** @internal */
 class StringPredicateOperator extends PredicateOperator
@@ -28,7 +28,7 @@ class StringPredicateOperator extends PredicateOperator
             }
         }
         if ($options & ComparisonPredicateOptions::localeSensitive) {
-            throw new InvalidArgumentException(sprintf("%s comparison predicate option \"ComparisonPredicateOptions::localeSensitive\" is not supported by predicate operator %s", self::class, $operatorType->name));
+            fatal_error(sprintf("%s comparison predicate option \"ComparisonPredicateOptions::localeSensitive\" is not supported by predicate operator %s", self::class, $operatorType->name));
         }
         parent::__construct($operatorType, $modifier, $op);
     }

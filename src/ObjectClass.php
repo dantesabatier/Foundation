@@ -10,7 +10,6 @@
 namespace Sabatier\Foundation;
 
 use Closure;
-use InvalidArgumentException;
 use JetBrains\PhpStorm\ExpectedValues;
 use JetBrains\PhpStorm\Pure;
 use JsonSerializable;
@@ -97,7 +96,7 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
      */
     public function doesNotRecognizeSelector(string $selector): never
     {
-        throw new InvalidArgumentException(sprintf("%s %s() unrecognized selector sent to instance", $this->debugDescription(), $selector));
+        fatal_error(sprintf("%s %s() unrecognized selector sent to instance", $this->debugDescription(), $selector));
     }
 
     /**
@@ -342,7 +341,7 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
 
     public function setNilValueForKey(string $key): void
     {
-        throw new InvalidArgumentException(sprintf("%s attribute \"%s\" cannot be null", $this->debugDescription(), $key));
+        fatal_error(sprintf("%s attribute \"%s\" cannot be null", $this->debugDescription(), $key));
     }
 
     public function mutableArrayValueForKey(string $key): ArrayClass

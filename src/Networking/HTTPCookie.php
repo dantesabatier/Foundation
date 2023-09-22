@@ -2,7 +2,6 @@
 
 namespace Sabatier\Foundation\Networking;
 
-use InvalidArgumentException;
 use Sabatier\Foundation\ArrayClass;
 use Sabatier\Foundation\Date;
 use Sabatier\Foundation\Dictionary;
@@ -10,6 +9,7 @@ use Sabatier\Foundation\Number;
 use Sabatier\Foundation\ObjectClass;
 use Sabatier\Foundation\Scanner;
 use Sabatier\Foundation\URL;
+use function Sabatier\Foundation\fatal_error;
 use function Sabatier\Foundation\human_readable_value;
 
 /**
@@ -57,7 +57,7 @@ class HTTPCookie extends ObjectClass
     public function __construct(Dictionary $properties)
     {
         if (!($name = $properties[HTTPCookiePropertyKey::name]) || !($value = $properties[HTTPCookiePropertyKey::value]) || !($path = $properties[HTTPCookiePropertyKey::path])) {
-            throw new InvalidArgumentException();
+            fatal_error();
         }
         /** @var string|null $domain */
         $domain = $properties[HTTPCookiePropertyKey::domain];
@@ -71,7 +71,7 @@ class HTTPCookie extends ObjectClass
         $this->name = $name;
         $this->value = $value;
         $this->path = $path;
-        $this->domain = $domain ?? throw new InvalidArgumentException();
+        $this->domain = $domain ?? fatal_error();
         $this->isSecure = !empty($properties[HTTPCookiePropertyKey::secure]);
         $this->version = (int)($properties[HTTPCookiePropertyKey::version] == 1);
         /** @var string|null $port */

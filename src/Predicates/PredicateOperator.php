@@ -9,12 +9,12 @@
 
 namespace Sabatier\Foundation\Predicates;
 
-use InvalidArgumentException;
 use JetBrains\PhpStorm\ExpectedValues;
 use Sabatier\Foundation\ArrayClass;
 use Sabatier\Foundation\CompareOptions;
 use Sabatier\Foundation\ObjectClass;
 use Sabatier\Foundation\Set;
+use function Sabatier\Foundation\fatal_error;
 use function Sabatier\Foundation\human_readable_value;
 use function Sabatier\Foundation\request_concrete_implementation;
 use function Sabatier\Foundation\typeof;
@@ -39,7 +39,7 @@ class PredicateOperator extends ObjectClass
             PredicateOperatorType::contains => new SubstringPredicateOperator($type, $modifier, $options, SubstringPredicateOperatorPosition::contains),
             PredicateOperatorType::in => new InPredicateOperator($type, $modifier, $options),
             PredicateOperatorType::between => new BetweenPredicateOperator($type, $modifier, $options),
-            default => throw new InvalidArgumentException(sprintf("Invalid argument: %s", $type->name)),
+            default => fatal_error("Invalid argument: $type->name"),
         };
     }
 
@@ -56,7 +56,7 @@ class PredicateOperator extends ObjectClass
                 };
             }
             if (!$left instanceof ArrayClass && !$left instanceof Set) {
-                throw new InvalidArgumentException(sprintf("Invalid argument: the left hand side for an ALL or ANY modifier must be an %s or a %s, \"%s\" given", ArrayClass::class, Set::class, typeof($left)));
+                fatal_error(sprintf("Invalid argument: the left hand side for an ALL or ANY modifier must be an %s or a %s, \"%s\" given", ArrayClass::class, Set::class, typeof($left)));
             }
             if ($left->isEmpty()) {
                 return false;
@@ -108,7 +108,7 @@ class PredicateOperator extends ObjectClass
             PredicateOperatorType::contains => PredicateOperatorSymbol::contains,
             PredicateOperatorType::in => PredicateOperatorSymbol::in,
             PredicateOperatorType::between => PredicateOperatorSymbol::between,
-            default => throw new InvalidArgumentException()
+            default => fatal_error()
         };
     }
 

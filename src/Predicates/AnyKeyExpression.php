@@ -2,8 +2,8 @@
 
 namespace Sabatier\Foundation\Predicates;
 
-use LogicException;
 use Sabatier\Foundation\Dictionary;
+use function Sabatier\Foundation\fatal_error;
 
 /** @internal */
 class AnyKeyExpression extends Expression
@@ -25,7 +25,7 @@ class AnyKeyExpression extends Expression
 
     public function expressionValue(mixed $object = null, ?Dictionary $context = null): mixed
     {
-        throw new LogicException("Cannot evaluate any key expression");
+        fatal_error("Cannot evaluate any key expression");
     }
 
     public function predicateFormat(): string

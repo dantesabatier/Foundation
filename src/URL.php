@@ -10,8 +10,6 @@
 namespace Sabatier\Foundation;
 
 use Closure;
-use Exception;
-use InvalidArgumentException;
 use JetBrains\PhpStorm\ExpectedValues;
 use SplFileInfo;
 
@@ -60,7 +58,7 @@ final class URL extends ObjectClass
                 }
             }
             if (!url_validate($string)) {
-                throw new InvalidArgumentException(sprintf("Invalid argument: expecting url string, \"%s\" given", $string));
+                fatal_error(sprintf("Invalid argument: expecting url string, \"%s\" given", $string));
             }
         }
         $this->string = $string;
@@ -200,7 +198,7 @@ final class URL extends ObjectClass
         $components->path = $path;
         $components->query = $this->query;
         $components->fragment = $this->fragment;
-        $this->string = $components->string ?? throw new InternalInconsistencyException();
+        $this->string = $components->string ?? fatal_error();
     }
 
     private function storage(): URLResourceValuesStorage
@@ -219,7 +217,7 @@ final class URL extends ObjectClass
     public static function fileURL(string $path): URL
     {
         if (empty($path)) {
-            throw new InvalidArgumentException("Invalid argument: expecting path, empty string given");
+            fatal_error("Invalid argument: expecting path, empty string given");
         }
         if (TARGET_OS_WINDOWS) {
             $path = str_replace("\\", "/", parse_url($path, PHP_URL_PATH));
@@ -231,7 +229,7 @@ final class URL extends ObjectClass
             $path = parse_url($path, PHP_URL_PATH);
         }
         if ($scheme !== "file") {
-            throw new InvalidArgumentException("Invalid url scheme \"$scheme\"");
+            fatal_error("Invalid url scheme \"$scheme\"");
         }
         return new URL("$scheme://$path");
     }
@@ -245,7 +243,7 @@ final class URL extends ObjectClass
         $path = $this->path;
         if (!str_ends_with($path, "/")) {
             if ($this->isFileURL && FileManager::default()->fileExists($path, $isDirectory) && !$isDirectory) {
-                throw new InternalInconsistencyException("Cannot append components to a file");
+                fatal_error("Cannot append components to a file");
             }
             $path .= "/";
         }
@@ -346,7 +344,6 @@ final class URL extends ObjectClass
      * Only the values for the keys specified in keys will be populated.
      * @param Set<string> $keys
      * @return URLResourceValues
-     * @throws Exception
      */
     public function resourceValues(Set $keys): URLResourceValues
     {
@@ -361,7 +358,6 @@ final class URL extends ObjectClass
      * If this method returns true and the value is populated with nil, it means that the resource property is not available for the specified resource, and that no errors occurred when determining that the resource property was unavailable.
      * @param mixed $value The location where the value for the resource property identified by key should be stored.
      * @param string $key The name of one of the URL's resource properties.
-     * @throws Exception
      */
     public function getResourceValue(mixed &$value, #[ExpectedValues(valuesFromClass: URLResourceKey::class)] string $key): void
     {
@@ -373,7 +369,6 @@ final class URL extends ObjectClass
      *
      * This method writes the new resource values out to the backing store. Attempts to set a read-only resource property or to set a resource property not supported by the resource are ignored and are not considered errors. This method is currently applicable only to URLs for file system resources.
      * URLResourceValues keeps track of which of its properties have been set. Those values are the ones used by this function to determine which properties to write.
-     * @throws Exception
      */
     public function setResourceValues(URLResourceValues $values): void
     {
@@ -474,7 +469,7 @@ final class URL extends ObjectClass
     public function compare(mixed $other): ComparisonResult
     {
         if (!$other instanceof URL) {
-            throw new InvalidArgumentException(sprintf("Invalid argument: expecting %s, \"%s\" given", URL::class, typeof($other)));
+            fatal_error(sprintf("Invalid argument: expecting %s, \"%s\" given", URL::class, typeof($other)));
         }
         return ComparisonResult::from(string_compare($this->absoluteString, $other->absoluteString, CompareOptions::caseInsensitive));
     }

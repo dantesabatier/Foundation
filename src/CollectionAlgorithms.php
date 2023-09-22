@@ -3,8 +3,6 @@
 namespace Sabatier\Foundation;
 
 use Closure;
-use InvalidArgumentException;
-use OutOfBoundsException;
 use Sabatier\Foundation\Predicates\Predicate;
 use Sabatier\Foundation\Predicates\PredicateUtilities;
 
@@ -23,10 +21,10 @@ trait CollectionAlgorithms
     public function offsetGet(mixed $offset): mixed
     {
         if (!is_int($offset)) {
-            throw new InvalidArgumentException(sprintf("Invalid argument: expecting int, \"%s\" given", typeof($offset)));
+            fatal_error(sprintf("Invalid argument: expecting int, \"%s\" given", typeof($offset)));
         }
         if (!$this->offsetExists($offset)) {
-            throw new OutOfBoundsException(sprintf("%s %s(%s) index \"%s\" out of bounds [%s...<%s]", $this->debugDescription(), __FUNCTION__, $offset, $offset, $this->startIndex(), $this->endIndex()));
+            fatal_error(sprintf("%s %s(%s) index \"%s\" out of bounds [%s...<%s]", $this->debugDescription(), __FUNCTION__, $offset, $offset, $this->startIndex(), $this->endIndex()));
         }
         return $this->reserved[$offset];
     }

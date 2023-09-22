@@ -96,7 +96,7 @@ class UndoManager extends ObjectClass
         }
         if (!$this->group instanceof UndoGroup) {
             if (!$this->groupsByEvent) {
-                throw new InternalInconsistencyException("registerUndo() without beginUndoGrouping()");
+                fatal_error("registerUndo() without beginUndoGrouping()");
             }
             $this->begin();
         }
@@ -135,7 +135,7 @@ class UndoManager extends ObjectClass
             $this->endUndoGrouping();
         }
         if ($this->group !== null) {
-            throw new InternalInconsistencyException("Undo with nested groups");
+            fatal_error("Undo with nested groups");
         }
         $this->undoNestedGroup();
     }
@@ -150,7 +150,7 @@ class UndoManager extends ObjectClass
     {
         NotificationCenter::default()->postNotificationName(UndoManagerCheckpointNotification, $this);
         if ($this->isUndoing || $this->isRedoing) {
-            throw new InternalInconsistencyException("undoNestedGroup() while undoing or redoing");
+            fatal_error("undoNestedGroup() while undoing or redoing");
         }
         if ($this->undoStack->isEmpty()) {
             return;
@@ -187,7 +187,7 @@ class UndoManager extends ObjectClass
     public function redo(): void
     {
         if ($this->isUndoing || $this->isRedoing) {
-            throw new InternalInconsistencyException("Redo while undoing or redoing");
+            fatal_error("Redo while undoing or redoing");
         }
         NotificationCenter::default()->postNotificationName(UndoManagerCheckpointNotification, $this);
         if (!($group = $this->redoStack->popLast())) {
@@ -230,7 +230,7 @@ class UndoManager extends ObjectClass
     {
         $group = $this->group;
         if (!$group instanceof UndoGroup) {
-            throw new InternalInconsistencyException("endUndoGrouping() without beginUndoGrouping()");
+            fatal_error("endUndoGrouping() without beginUndoGrouping()");
         }
         NotificationCenter::default()->postNotificationName(UndoManagerCheckpointNotification, $this);
         if (!$this->isUndoing && !$this->isRedoing) {
@@ -270,11 +270,11 @@ class UndoManager extends ObjectClass
         }
         $nextTarget = $this->nextTarget;
         if ($nextTarget === null) {
-            throw new InternalInconsistencyException("forwardInvocation() without preparation");
+            fatal_error("forwardInvocation() without preparation");
         }
         if ($this->group === null) {
             if (!$this->groupsByEvent) {
-                throw new InternalInconsistencyException("forwardInvocation() without beginUndoGrouping()");
+                fatal_error("forwardInvocation() without beginUndoGrouping()");
             }
             $this->begin();
         }
@@ -306,7 +306,7 @@ class UndoManager extends ObjectClass
     public function enableUndoRegistration(): void
     {
         if ($this->isUndoRegistrationEnabled) {
-            throw new InternalInconsistencyException();
+            fatal_error();
         }
         $this->isUndoRegistrationEnabled = true;
     }

@@ -3,7 +3,6 @@
 namespace Sabatier\Foundation\Predicates;
 
 use Closure;
-use Exception;
 use JetBrains\PhpStorm\ExpectedValues;
 use JetBrains\PhpStorm\Pure;
 use Sabatier\Foundation\ArrayClass;
@@ -168,7 +167,6 @@ class Expression extends ObjectClass
      * For a selector taking one or more parameters, the array should contain one Expression object which will evaluate to an instance of the appropriate type for each parameter.
      * If there is a mismatch between the number of parameters expected and the number you provide during evaluation, an exception may be raised or missing parameters may simply be replaced by nil (which occurs depends on how many parameters are provided, and whether you have over or underflow).
      * @return Expression A new expression that invokes the function name using the parameters in parameters.
-     * @throws Exception This method raises an exception immediately if the selector is invalid; it raises an exception at runtime if the parameters are incorrect.
      */
     public static function expressionForFunction(string $name, ArrayClass $parameters): Expression
     {
@@ -181,7 +179,6 @@ class Expression extends ObjectClass
      * @param string $selector The name of the method to be invoked.
      * @param ArrayClass<Expression>|null $arguments An array containing Expression objects which can be evaluated to provide parameters for the method specified by name.
      * @return Expression An expression which will return the result of invoking the selector named name on the result of evaluating the target expression with the parameters specified by evaluating the elements of parameters. This expression effectively allows your application to invoke any method on any object it can navigate to at runtime. You must consider the security implications of this type of evaluation.
-     * @throws Exception This method throws an exception immediately if the selector is unknown; it throws at runtime if the parameters are incorrect.
      */
     public static function expressionForSelector(Expression $target, string $selector, ?ArrayClass $arguments = null): Expression
     {

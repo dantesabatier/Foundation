@@ -4,9 +4,6 @@ namespace Sabatier\Foundation;
 
 use BackedEnum;
 use Closure;
-use ErrorException;
-use Exception;
-use InvalidArgumentException;
 use JetBrains\PhpStorm\Deprecated;
 use JetBrains\PhpStorm\Pure;
 use Stringable;
@@ -108,7 +105,6 @@ function human_readable_time(float $interval): string
  * @param string $message The string to print. The default is an empty string.
  * @param string $file The file name to print with message. The default is the file where fatal_error() is called.
  * @param int $line The line number to print along with message. The default is the file where fatal_error() is called.
- * @throws Exception
  */
 function fatal_error(string $message = "", string $file = "", int $line = 0): never
 {
@@ -121,45 +117,38 @@ function fatal_error(string $message = "", string $file = "", int $line = 0): ne
             $line = $backtrace["line"];
         }
     }
-    throw new ErrorException($message, 0, 0, $file, $line);
+    throw new InternalInconsistencyException($message, 0, 0, $file, $line);
 }
 
-/**
- * @throws Exception
- */
 function unimplemented(object|string $objectOrClass, string $fn): never
 {
-    throw new InvalidArgumentException(sprintf("%s %s() is not yet implemented", is_object($objectOrClass) ? $objectOrClass::class : $objectOrClass, $fn));
+    fatal_error(sprintf("%s %s() is not yet implemented", is_object($objectOrClass) ? $objectOrClass::class : $objectOrClass, $fn));
 }
 
-/**
- * @throws Exception
- */
 function unsupported(object|string $objectOrClass, string $fn): never
 {
-    throw new InvalidArgumentException(sprintf("%s %s() is not supported", is_object($objectOrClass) ? $objectOrClass::class : $objectOrClass, $fn));
+    fatal_error(sprintf("%s %s() is not supported", is_object($objectOrClass) ? $objectOrClass::class : $objectOrClass, $fn));
 }
 
 function request_concrete_implementation(object|string $objectOrClass, string $fn): never
 {
-    throw new InvalidArgumentException(sprintf("%s %s() requires a subclass implementation", is_object($objectOrClass) ? $objectOrClass::class : $objectOrClass, $fn));
+    fatal_error(sprintf("%s %s() requires a subclass implementation", is_object($objectOrClass) ? $objectOrClass::class : $objectOrClass, $fn));
 }
 
 function invalid_mutation(): never
 {
-    throw new InternalInconsistencyException("attempting to mutate an immutable object");
+    fatal_error("attempting to mutate an immutable object");
 }
 
 /**
  * @template Result
  * @param Closure(): Result $block
  * @return Result
- * @throws Exception
  */
 function unsafe_value(Closure $block): mixed
 {
     /** @psalm-suppress NoValue */
-    set_error_handler(/** @throws ErrorException */ fn(int $severity, string $message, string $file, int $line): bool => throw new ErrorException($message, 0, $severity, $file, $line));
+    set_error_handler(fn(int $severity, string $message, string $file, int $line): bool => throw new InternalInconsistencyException($message, 0, $severity, $file, $line));
     $value = $block();
     restore_error_handler();
     return $value;

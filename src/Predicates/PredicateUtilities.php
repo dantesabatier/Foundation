@@ -15,7 +15,6 @@ use Sabatier\Foundation\ArrayClass;
 use Sabatier\Foundation\CompareOptions;
 use Sabatier\Foundation\Date;
 use Sabatier\Foundation\Dictionary;
-use Sabatier\Foundation\InternalInconsistencyException;
 use Sabatier\Foundation\Nil;
 use Sabatier\Foundation\Number;
 use Sabatier\Foundation\Set;
@@ -23,6 +22,7 @@ use Sabatier\Foundation\SystemRandomNumberGenerator;
 use Sabatier\Foundation\UUID;
 use Stringable;
 use function Sabatier\Foundation\canonical;
+use function Sabatier\Foundation\fatal_error;
 use function Sabatier\Foundation\human_readable_value;
 use function Sabatier\Foundation\is_equal;
 use function Sabatier\Foundation\pn;
@@ -224,14 +224,14 @@ class PredicateUtilities
             return (new Number($value))->boolValue;
         }
         if (!class_exists($type)) {
-            throw new InternalInconsistencyException(sprintf("Cannot cast %s to invalid class %s", human_readable_value($value), $type));
+            fatal_error(sprintf("Cannot cast %s to invalid class %s", human_readable_value($value), $type));
         }
         if (is_a($type, Date::class, true)) {
             return new Date((new Number($value))->floatValue);
         } elseif (is_a($type, Number::class, true)) {
             return new Number($value);
         }
-        throw new InternalInconsistencyException(sprintf("Do not know how to cast %s to class %s", human_readable_value($value), $type));
+        fatal_error(sprintf("Do not know how to cast %s to class %s", human_readable_value($value), $type));
     }
 
     public static function now(): Date

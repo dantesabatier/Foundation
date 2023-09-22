@@ -2,10 +2,10 @@
 
 namespace Sabatier\Foundation\Predicates;
 
-use InvalidArgumentException;
 use JetBrains\PhpStorm\ExpectedValues;
 use Sabatier\Foundation\ArrayClass;
 use Sabatier\Foundation\Dictionary;
+use function Sabatier\Foundation\fatal_error;
 
 /**
  * A specialized predicate that evaluates logical combinations of other predicates.
@@ -62,10 +62,11 @@ class CompoundPredicate extends Predicate
         $type = $this->compoundPredicateType;
         $subpredicates = $this->subpredicates;
         if ($subpredicates->isEmpty()) {
+            /** @noinspection PhpVoidFunctionResultUsedInspection */
             return match ($type) {
                 CompoundPredicateLogicalType::and => TruePredicate::default()->predicateFormat(),
                 CompoundPredicateLogicalType::or => FalsePredicate::default()->predicateFormat(),
-                CompoundPredicateLogicalType::not => throw new InvalidArgumentException("Not predicate must have exactly one subpredicate"),
+                CompoundPredicateLogicalType::not => fatal_error("Not predicate must have exactly one subpredicate"),
             };
         }
         $arguments = $subpredicates->compactMap(function (Predicate $subpredicate): ?string {

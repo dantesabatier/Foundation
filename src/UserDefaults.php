@@ -2,9 +2,6 @@
 
 namespace Sabatier\Foundation;
 
-use Exception;
-use InvalidArgumentException;
-
 /**
  * An interface to the user's defaults database, where you store key-value pairs persistently across launches of your app.
  */
@@ -28,7 +25,7 @@ class UserDefaults
      */
     public function __construct(?string $suiteName = null)
     {
-        $suiteName ??= Bundle::main()->bundleIdentifier ?? throw new InvalidArgumentException();
+        $suiteName ??= Bundle::main()->bundleIdentifier ?? fatal_error();
         $this->suiteName = $suiteName;
         $this->addSuite($this->suiteName);
     }
@@ -91,10 +88,7 @@ class UserDefaults
     public function url(string $key): ?URL
     {
         if ($object = $this->object($key)) {
-            try {
-                return KeyedUnarchiver::unarchiveTopLevelObjectWithData($object);
-            } catch (Exception) {
-            }
+            return KeyedUnarchiver::unarchiveTopLevelObjectWithData($object);
         }
         return null;
     }
@@ -195,7 +189,7 @@ class UserDefaults
      */
     public function dictionaryRepresentation(): Dictionary
     {
-        return self::standardUserPreferences()->valueForKey($this->suiteName)?->dictionaryRepresentation ?? throw new InternalInconsistencyException();
+        return self::standardUserPreferences()->valueForKey($this->suiteName)?->dictionaryRepresentation ?? fatal_error();
     }
 
     /**
@@ -257,10 +251,7 @@ class UserDefaults
      */
     public function setURL(?URL $value, string $key): void
     {
-        try {
-            $this->setObject($value ? KeyedArchiver::archivedData($value) : null, $key);
-        } catch (Exception) {
-        }
+        $this->setObject($value ? KeyedArchiver::archivedData($value) : null, $key);
     }
 
     /**

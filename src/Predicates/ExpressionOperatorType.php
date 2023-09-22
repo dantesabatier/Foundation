@@ -2,8 +2,8 @@
 
 namespace Sabatier\Foundation\Predicates;
 
-use InvalidArgumentException;
 use Sabatier\Foundation\CompareOptions;
+use function Sabatier\Foundation\fatal_error;
 use function Sabatier\Foundation\string_is_equal;
 
 /** @internal */
@@ -184,7 +184,7 @@ enum ExpressionOperatorType: int
         } elseif (string_is_equal($functionName, "nullIf:", CompareOptions::caseInsensitive)) {
             return ExpressionOperatorType::nullIf;
         } else {
-            throw new InvalidArgumentException(sprintf("%s unable to parse selector name \"%s\" into supported method", ExpressionOperatorType::class, $functionName));
+            fatal_error(sprintf("%s unable to parse selector name \"%s\" into supported method", ExpressionOperatorType::class, $functionName));
         }
     }
 

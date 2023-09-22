@@ -9,8 +9,8 @@
 
 namespace Sabatier\Foundation\Predicates;
 
-use InvalidArgumentException;
 use Sabatier\Foundation\Sequence;
+use function Sabatier\Foundation\fatal_error;
 use function Sabatier\Foundation\in_string;
 use function Sabatier\Foundation\string_is_equal;
 use function Sabatier\Foundation\typeof;
@@ -26,6 +26,6 @@ class InPredicateOperator extends PredicateOperator
         } elseif ($right instanceof Sequence) {
             return $right->contains(fn(string $string): bool => string_is_equal($string, $left, $options));
         }
-        throw new InvalidArgumentException(sprintf("Invalid argument: expecting \"string, %s\", \"%s\" given", Sequence::class, typeof($right)));
+        fatal_error(sprintf("Invalid argument: expecting \"string, %s\", \"%s\" given", Sequence::class, typeof($right)));
     }
 }

@@ -2,8 +2,8 @@
 
 namespace Sabatier\Foundation\Networking;
 
-use RuntimeException;
 use Sabatier\Foundation\URL;
+use function Sabatier\Foundation\fatal_error;
 
 /** @internal */
 class TransferState
@@ -24,11 +24,11 @@ class TransferState
     public function byAppendingHTTP(string $data): TransferState
     {
         if (!($header = $this->parsedResponseHeader->byAppending($data, fn(string $headerLine): bool => empty($headerLine)))) {
-            throw new RuntimeException();
+            fatal_error();
         }
         if ($header->rawVale === ParsedResponseHeaderRawVale::complete) {
             if (!($response = $header->lines->createHTTPURLResponse($this->url))) {
-                throw new RuntimeException();
+                fatal_error();
             }
             return new TransferState($this->url, $this->parsedResponseHeader, $response, $this->bodyDataDrain);
         } else {
@@ -42,11 +42,11 @@ class TransferState
             return $this;
         }
         if (!($header = $this->parsedResponseHeader->byAppending($data, fn(): bool => str_starts_with($data, (string)FTPHeaderCode::openDataConnection->value)))) {
-            throw new RuntimeException();
+            fatal_error();
         }
         if ($header->rawVale === ParsedResponseHeaderRawVale::complete) {
             if (!($response = $header->lines->createURLResponse($this->url, $contentLength))) {
-                throw new RuntimeException();
+                fatal_error();
             }
             return new TransferState($this->url, $this->parsedResponseHeader, $response, $this->bodyDataDrain);
         } else {

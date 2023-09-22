@@ -11,7 +11,6 @@ namespace Sabatier\Foundation;
 
 use Closure;
 use Fiber;
-use InvalidArgumentException;
 use Throwable;
 
 /**
@@ -93,44 +92,36 @@ final class OperationQueue extends ObjectClass
      *
      * Once added, the specified operation remains in the queue until it finishes executing.
      * @param Operation $operation The operation to be added to the queue.
-     * @throws InvalidArgumentException An operation object can be in at most one operation queue at a time and this method throws an {@see InvalidArgumentException} exception if the operation is already in another queue.
-     * Similarly, this method throws an {@see InvalidArgumentException} exception if the operation is currently
-     * executing or has already finished executing.
      */
     public function addOperation(Operation $operation): void
     {
-        try {
-            $fiber = new Fiber(function () use ($operation): void {
-                if ($operation->isExecuting || $operation->isFinished) {
-                    throw new InvalidArgumentException();
+        $fiber = new Fiber(function () use ($operation): void {
+            if ($operation->isExecuting || $operation->isFinished) {
+                fatal_error();
+            }
+            Fiber::suspend();
+            $this->operations->append($operation);
+            $this->operations->sort(fn(Operation $op0, Operation $op1): int => ComparisonResult::orderedAscending->value * ($op0->queuePriority->value <=> $op1->queuePriority->value));
+            $operation->observe("isFinished", KeyValueObservingOptions::new, function (Operation $operation): void {
+                if ($operation->isFinished) {
+                    $this->operations->remove($operation);
                 }
-                Fiber::suspend();
-                $this->operations->append($operation);
-                $this->operations->sort(fn(Operation $op0, Operation $op1): int => ComparisonResult::orderedAscending->value * ($op0->queuePriority->value <=> $op1->queuePriority->value));
-                $operation->observe("isFinished", KeyValueObservingOptions::new, function (Operation $operation): void {
-                    if ($operation->isFinished) {
-                        $this->operations->remove($operation);
-                    }
-                });
-                $operation->queue = $this;
+            });
+            $operation->queue = $this;
+            if ($operation->isReady) {
+                $operation->start();
+                return;
+            }
+            $operation->observe("isReady", KeyValueObservingOptions::new, function (Operation $operation): void {
                 if ($operation->isReady) {
                     $operation->start();
-                    return;
                 }
-                $operation->observe("isReady", KeyValueObservingOptions::new, function (Operation $operation): void {
-                    if ($operation->isReady) {
-                        $operation->start();
-                    }
-                });
-                $this->addOperations($operation->dependencies);
             });
-            $fiber->start();
-            while (!$fiber->isTerminated()) {
-                $fiber->resume();
-            }
-        } catch (Throwable $throwable) {
-            $throwableClass = $throwable::class;
-            throw new $throwableClass($throwable->getMessage(), $throwable->getCode());
+            $this->addOperations($operation->dependencies);
+        });
+        $fiber->start();
+        while (!$fiber->isTerminated()) {
+            $fiber->resume();
         }
     }
 
@@ -142,6 +133,7 @@ final class OperationQueue extends ObjectClass
      * Once added, the specified operation remains in the queue until its isFinished method returns true.
      * @param ArrayClass<Operation> $operations The operations to be added to the queue.
      * @param bool $waitUntilFinished If true, the current thread is blocked until all the specified operations finish executing. If false, the operations are added to the queue and control returns immediately to the caller.
+     * @throws Throwable
      */
     public function addOperations(ArrayClass $operations, bool $waitUntilFinished = false): void
     {

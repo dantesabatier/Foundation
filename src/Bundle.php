@@ -11,7 +11,6 @@ namespace Sabatier\Foundation;
 
 use Exception;
 use GdImage;
-use InvalidArgumentException;
 use Locale;
 use ReflectionClass;
 
@@ -73,7 +72,7 @@ final class Bundle extends ObjectClass
         unset($this->localizedInfoDictionary);
         unset($this->principalClass);
         if (!FileManager::default()->fileExists($url->path, $isDirectory) || !$isDirectory) {
-            throw new InvalidArgumentException("Invalid bundle url \"$url\"");
+            fatal_error("Invalid bundle url \"$url\"");
         }
         $this->bundleURL = $url;
     }
@@ -208,22 +207,18 @@ final class Bundle extends ObjectClass
      */
     public static function bundleForClass(string $class): Bundle
     {
-        try {
-            if (!($path = (new ReflectionClass($class))->getFileName())) {
-                throw new InvalidArgumentException();
-            }
-            $url = URL::fileURL($path);
-            while ($url->path !== "/") {
-                $url->deleteLastPathComponent();
-                if (string_is_equal($url->lastPathComponent, "src", CompareOptions::caseInsensitive)) {
-                    $url->deleteLastPathComponent();
-                    break;
-                }
-            }
-            return self::bundleWithURL($url);
-        } catch (Exception $exception) {
-            throw new InvalidArgumentException($exception->getMessage(), (int)$exception->getCode(), $exception);
+        if (!($path = (new ReflectionClass($class))->getFileName())) {
+            fatal_error();
         }
+        $url = URL::fileURL($path);
+        while ($url->path !== "/") {
+            $url->deleteLastPathComponent();
+            if (string_is_equal($url->lastPathComponent, "src", CompareOptions::caseInsensitive)) {
+                $url->deleteLastPathComponent();
+                break;
+            }
+        }
+        return self::bundleWithURL($url);
     }
 
     /**

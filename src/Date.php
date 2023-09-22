@@ -2,7 +2,6 @@
 
 namespace Sabatier\Foundation;
 
-use InvalidArgumentException;
 use JetBrains\PhpStorm\Pure;
 
 /**
@@ -120,7 +119,7 @@ class Date extends ObjectClass
     public function compare(mixed $other): ComparisonResult
     {
         if (!$other instanceof Date) {
-            throw new InvalidArgumentException(sprintf("Invalid argument: expecting %s, \"%s\" given", Date::class, typeof($other)));
+            fatal_error(sprintf("Invalid argument: expecting %s, \"%s\" given", Date::class, typeof($other)));
         }
         return ComparisonResult::from($this->timeIntervalSinceReferenceDate <=> $other->timeIntervalSinceReferenceDate);
     }

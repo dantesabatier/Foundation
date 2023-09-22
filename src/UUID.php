@@ -2,8 +2,6 @@
 
 namespace Sabatier\Foundation;
 
-use InvalidArgumentException;
-
 /**
  * A universally unique value that can be used to identify types, interfaces, and other items.
  */
@@ -19,7 +17,7 @@ class UUID extends ObjectClass
     public function __construct(?string $uuidString = null)
     {
         if ($uuidString && !uuid_validate($uuidString)) {
-            throw new InvalidArgumentException(sprintf("Invalid argument: expecting uuid string, \"%s\" given", $uuidString));
+            fatal_error(sprintf("Invalid argument: expecting uuid string, \"%s\" given", $uuidString));
         }
         $this->uuidString = $uuidString ?? uuid_generate();
     }
@@ -37,7 +35,7 @@ class UUID extends ObjectClass
     public function compare(mixed $other): ComparisonResult
     {
         if (!$other instanceof UUID) {
-            throw new InvalidArgumentException(sprintf("Invalid argument: expecting %s, \"%s\" given", UUID::class, typeof($other)));
+            fatal_error(sprintf("Invalid argument: expecting %s, \"%s\" given", UUID::class, typeof($other)));
         }
         return ComparisonResult::from(uuid_compare($this->uuidString, $other->uuidString));
     }

@@ -9,7 +9,7 @@
 
 namespace Sabatier\Foundation\Predicates;
 
-use InvalidArgumentException;
+use function Sabatier\Foundation\fatal_error;
 use function Sabatier\Foundation\typeof;
 
 /** @internal */
@@ -23,7 +23,7 @@ class CustomPredicateOperator extends PredicateOperator
     public function performPrimitiveOperation(mixed $left, mixed $right): bool
     {
         if (!is_object($left)) {
-            throw new InvalidArgumentException(sprintf("Invalid argument: expecting \"object\", \"%s\" given", typeof($left)));
+            fatal_error(sprintf("Invalid argument: expecting \"object\", \"%s\" given", typeof($left)));
         }
         $selector = $this->selector;
         $arguments = [$right];

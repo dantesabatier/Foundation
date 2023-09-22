@@ -11,7 +11,6 @@ namespace Sabatier\Foundation;
 
 use Closure;
 use Exception;
-use InvalidArgumentException;
 use JetBrains\PhpStorm\ExpectedValues;
 
 /**
@@ -150,7 +149,7 @@ final class FileManager extends ObjectClass
      */
     public function url(SearchPathDirectory $directory, #[ExpectedValues(flagsFromClass: SearchPathDomainMask::class)] int $domain = SearchPathDomainMask::local, ?URL $url = null, bool $shouldCreate = false): URL
     {
-        $fileURL = $this->urls($directory, $domain)->first() ?? throw new InvalidArgumentException();
+        $fileURL = $this->urls($directory, $domain)->first() ?? fatal_error();
         if ($directory === SearchPathDirectory::itemReplacementDirectory) {
             if ($url && ($domain & SearchPathDomainMask::user)) {
                 $components = new URLComponents($fileURL->absoluteString);

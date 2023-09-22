@@ -2,11 +2,11 @@
 
 namespace Sabatier\Foundation\Predicates;
 
-use InvalidArgumentException;
 use JetBrains\PhpStorm\ExpectedValues;
 use Sabatier\Foundation\CompareOptions;
 use Sabatier\Foundation\ComparisonResult;
 use Sabatier\Foundation\ObjectClass;
+use function Sabatier\Foundation\fatal_error;
 use function Sabatier\Foundation\string_compare;
 
 /** @internal */
@@ -24,7 +24,7 @@ class ComparisonPredicateOperator extends PredicateOperator
             return match ($variant) {
                 PredicateOperatorType::lessThan, PredicateOperatorType::lessThanOrEqualTo => false,
                 PredicateOperatorType::greaterThan, PredicateOperatorType::greaterThanOrEqualTo => true,
-                default => throw new InvalidArgumentException("Invalid predicate operator variant: $variant->name"),
+                default => fatal_error("Invalid predicate operator variant: $variant->name")
             };
         }
         if ($left === null || $right === null) {
@@ -38,7 +38,7 @@ class ComparisonPredicateOperator extends PredicateOperator
                 PredicateOperatorType::lessThanOrEqualTo => $comparison !== ComparisonResult::orderedDescending,
                 PredicateOperatorType::greaterThan => $comparison === ComparisonResult::orderedDescending,
                 PredicateOperatorType::greaterThanOrEqualTo => $comparison !== ComparisonResult::orderedAscending,
-                default => throw new InvalidArgumentException("Invalid predicate operator variant: $variant->name"),
+                default => fatal_error("Invalid predicate operator variant: $variant->name")
             };
         }
         if ($left instanceof ObjectClass) {
@@ -52,7 +52,7 @@ class ComparisonPredicateOperator extends PredicateOperator
             PredicateOperatorType::lessThanOrEqualTo => $left <= $right,
             PredicateOperatorType::greaterThan => $left > $right,
             PredicateOperatorType::greaterThanOrEqualTo => $left >= $right,
-            default => throw new InvalidArgumentException("Invalid predicate operator variant: $variant->name"),
+            default => fatal_error("Invalid predicate operator variant: $variant->name")
         };
     }
 }

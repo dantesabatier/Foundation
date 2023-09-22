@@ -3,13 +3,11 @@
 namespace Sabatier\Foundation\Networking;
 
 use CurlHandle;
-use Exception;
 use Random\Engine\Secure;
 use Random\Randomizer;
 use Sabatier\Foundation\ArrayClass;
 use Sabatier\Foundation\Dictionary;
 use Sabatier\Foundation\Error;
-use Sabatier\Foundation\InternalInconsistencyException;
 use Sabatier\Foundation\ProcessInfo;
 use Sabatier\Foundation\URL;
 use Sabatier\Foundation\URLComponents;
@@ -336,10 +334,7 @@ final class EasyHandle
         }
         $storage->setCookies($cookies, $url);
     }
-
-    /**
-     * @throws Exception
-     */
+    
     public function connect(): void
     {
         if (!($url = $this->url)) {
@@ -377,7 +372,6 @@ final class EasyHandle
 
     /**
      * @return array{string, URLSessionWebSocketOperation}
-     * @throws Exception
      */
     public function receiveWebSocketsData(): array
     {
@@ -399,7 +393,7 @@ final class EasyHandle
             $data = $read(2);
             $elements = array_values(unpack("C*", $data));
             if (count($elements) < 2) {
-                throw new InternalInconsistencyException();
+                fatal_error();
             }
             [$byte1, $byte2] = $elements;
             $isFinal = (bool)($byte1 & 0b10000000);
@@ -459,10 +453,7 @@ final class EasyHandle
         } while (!$isFinal);
         return [$payload, $operation];
     }
-
-    /**
-     * @throws Exception
-     */
+    
     public function sendWebSocketsData(string $data, URLSessionWebSocketOperation $operation): void
     {
         $parts = new ArrayClass(str_split($data, 4096) ?: [""]);

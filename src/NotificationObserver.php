@@ -9,8 +9,6 @@
 
 namespace Sabatier\Foundation;
 
-use InvalidArgumentException;
-
 /** @internal */
 class NotificationObserver extends ObjectClass
 {
@@ -20,14 +18,14 @@ class NotificationObserver extends ObjectClass
 
     public function postNotification(Notification $notification): void
     {
-        $callable = $this->callable ?? throw new InternalInconsistencyException();
+        $callable = $this->callable ?? fatal_error();
         if (is_callable($callable)) {
             $callable($notification);
             return;
         }
-        $observer = $this->observer ?? throw new InternalInconsistencyException();
+        $observer = $this->observer ?? fatal_error();
         if (!method_exists($observer, $callable)) {
-            throw new InvalidArgumentException(sprintf("%s %s() unrecognized selector sent to instance", human_readable_value($observer), $callable));
+            fatal_error(sprintf("%s %s() unrecognized selector sent to instance", human_readable_value($observer), $callable));
         }
         $observer->$callable($notification);
     }
