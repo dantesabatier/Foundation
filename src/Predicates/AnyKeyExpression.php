@@ -23,7 +23,7 @@ class AnyKeyExpression extends Expression
         return AnyKeyExpression::$default;
     }
 
-    public function expressionValue(mixed $object = null, ?Dictionary $context = null): mixed
+    public function expressionValue(mixed $object = null, ?Dictionary $context = null): never
     {
         fatal_error("Cannot evaluate any key expression");
     }

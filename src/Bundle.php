@@ -207,18 +207,23 @@ final class Bundle extends ObjectClass
      */
     public static function bundleForClass(string $class): Bundle
     {
-        if (!($path = (new ReflectionClass($class))->getFileName())) {
-            fatal_error();
-        }
-        $url = URL::fileURL($path);
-        while ($url->path !== "/") {
-            $url->deleteLastPathComponent();
-            if (string_is_equal($url->lastPathComponent, "src", CompareOptions::caseInsensitive)) {
-                $url->deleteLastPathComponent();
-                break;
+        try {
+            if (!($path = (new ReflectionClass($class))->getFileName())) {
+                fatal_error();
             }
+            $url = URL::fileURL($path);
+            while ($url->path !== "/") {
+                $url->deleteLastPathComponent();
+                if (string_is_equal($url->lastPathComponent, "src", CompareOptions::caseInsensitive)) {
+                    $url->deleteLastPathComponent();
+                    break;
+                }
+            }
+            return self::bundleWithURL($url);
+        } catch (Exception $exception) {
+            /** @psalm-suppress UnsafeInstantiation */
+            throw new ($exception::class)($exception->getMessage(), $exception->getCode(), $exception);
         }
-        return self::bundleWithURL($url);
     }
 
     /**
