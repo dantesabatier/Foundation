@@ -9,10 +9,10 @@
 
 namespace Sabatier\Foundation;
 
-use Exception;
 use GdImage;
 use Locale;
 use ReflectionClass;
+use Throwable;
 
 /**
  * A representation of the code and resources stored in a bundle directory on disk.
@@ -220,9 +220,9 @@ final class Bundle extends ObjectClass
                 }
             }
             return self::bundleWithURL($url);
-        } catch (Exception $exception) {
+        } catch (Throwable $throwable) {
             /** @psalm-suppress UnsafeInstantiation */
-            throw new ($exception::class)($exception->getMessage(), $exception->getCode(), $exception);
+            throw new ($throwable::class)($throwable->getMessage(), $throwable->getCode(), $throwable);
         }
     }
 

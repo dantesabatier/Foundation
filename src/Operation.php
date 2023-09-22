@@ -80,8 +80,7 @@ abstract class Operation extends ObjectClass
                 $fiber->resume();
             }
         } catch (Throwable $throwable) {
-            $throwableClass = $throwable::class;
-            throw new $throwableClass($throwable->getMessage(), $throwable->getCode());
+            throw new ($throwable::class)($throwable->getMessage(), $throwable->getCode());
         }
     }
 
