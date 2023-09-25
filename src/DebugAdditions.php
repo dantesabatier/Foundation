@@ -148,7 +148,7 @@ function invalid_mutation(): never
 function unsafe_value(Closure $block): mixed
 {
     /** @psalm-suppress NoValue */
-    set_error_handler(fn(int $severity, string $message, string $file, int $line): bool => throw new InternalInconsistencyException($message, 0, $severity, $file, $line));
+    set_error_handler(fn(int $severity, string $message, string $file, int $line): bool => fatal_error($message, $file, $line));
     $value = $block();
     restore_error_handler();
     return $value;
