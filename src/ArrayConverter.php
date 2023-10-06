@@ -38,6 +38,9 @@ readonly class ArrayConverter
         /** @psalm-suppress UnsafeInstantiation */
         $collection = new $class();
         foreach ($array as $i => $e) {
+            if (method_exists($e, "toArray")) {
+                $e = $e->toArray();
+            }
             if (is_array($e)) {
                 $collection[$i] = $this->newCollection($e, is_sequential($e) ? ArrayClass::class : Dictionary::class);
             } else {
