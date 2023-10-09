@@ -54,6 +54,14 @@ class SortDescriptor extends ObjectClass
     {
     }
 
+    public function isEqual(mixed $other): bool
+    {
+        if ($other instanceof SortDescriptor) {
+            return $this->key === $other->key && $this->ascending === $other->ascending;
+        }
+        return false;
+    }
+
     public function description(): string
     {
         return sprintf("%s %s", $this->key, human_readable_value($this->ascending));
