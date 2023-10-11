@@ -131,7 +131,7 @@ final class URLSession implements URLSessionProtocol
      * Creates a task that retrieves the contents of the specified URL, then calls a handler upon completion.
      *
      * @param URL $url The URL to be retrieved.
-     * @param DataCompletionHandler|null $completionHandler The completion handler to call when the load request is complete. This handler is executed on the delegate queue. If you pass nil, only the session delegate methods are called when the task completes, making this method equivalent to the dataTask(with:) method.
+     * @param DataCompletionHandler|null $completionHandler The completion handler to call when the load request is complete. This handler is executed on the delegate queue. If you pass nil, only the session delegate methods are called when the task completes, making this method equivalent to the {@see dataTaskWithRequest()} method.
      * @return URLSessionDataTask The new session data task.
      * @throws Exception
      */

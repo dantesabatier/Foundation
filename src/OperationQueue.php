@@ -162,7 +162,7 @@ final class OperationQueue extends ObjectClass
     /**
      * Cancels all queued and executing operations.
      *
-     * This method calls the cancel() method on all operations currently in the queue.
+     * This method calls the {@see Operation::cancel()} method on all operations currently in the queue.
      */
     public function cancelAllOperations(): void
     {
