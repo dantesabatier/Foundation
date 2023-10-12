@@ -3,7 +3,6 @@
 namespace Sabatier\Foundation\Networking;
 
 use Closure;
-use Exception;
 use Sabatier\Foundation\ArrayClass;
 use Sabatier\Foundation\Dictionary;
 use Sabatier\Foundation\Error;
@@ -20,6 +19,12 @@ use const Sabatier\Foundation\UserCancelledError;
 
 /**
  * A task, like downloading a specific resource, performed in a URL session.
+ * @property float $countOfBytesExpectedToReceive The number of bytes that the task expects to receive in the response body. This value is determined based on the Content-Length header received from the server. If that header is absent, the value is {@see URLSessionTransferSizeUnknown}.
+ * @property float $countOfBytesReceived The number of bytes that the task has received from the server in the response body.
+ * @property float $countOfBytesExpectedToSend The number of bytes that the task has received from the server in the response body.
+ * @property float $countOfBytesSent The number of bytes that the task has sent to the server in the request body.
+ * @property float $countOfBytesClientExpectsToSend A best-guess upper bound on the number of bytes the client expects to send.
+ * @property float $countOfBytesClientExpectsToReceive A best-guess upper bound on the number of bytes the client expects to receive.
  */
 abstract class URLSessionTask extends ObjectClass
 {
@@ -29,14 +34,10 @@ abstract class URLSessionTask extends ObjectClass
     public float $priority = URLSessionTaskPriority::default;
     /** @var Progress A representation of the overall task progress. */
     public Progress $progress;
-    /** @var float The number of bytes that the task expects to receive in the response body. This value is determined based on the Content-Length header received from the server. If that header is absent, the value is {@see URLSessionTransferSizeUnknown}. */
-    public float $countOfBytesExpectedToReceive = URLSessionTransferSizeUnknown;
-    /** @var float The number of bytes that the task has received from the server in the response body. */
-    public float $countOfBytesReceived = 0.0;
-    /** @var float The number of bytes that the task expects to send in the request body. */
-    public float $countOfBytesExpectedToSend = URLSessionTransferSizeUnknown;
-    /** @var float The number of bytes that the task has sent to the server in the request body. */
-    public float $countOfBytesSent = 0.0;
+    protected float $countOfBytesExpectedToReceive = URLSessionTransferSizeUnknown;
+    protected float $countOfBytesReceived = 0.0;
+    protected float $countOfBytesExpectedToSend = URLSessionTransferSizeUnknown;
+    protected float $countOfBytesSent = 0.0;
     /** @var URLRequest|null The URL request object currently being handled by the task. This value is typically the same as the initial request ({@see originalRequest}) except when the server has responded to the initial request with a redirect to a different URL. */
     public ?URLRequest $currentRequest = null;
     /** @var URLRequest|null The original request object passed when the task was created. This value is typically the same as the currently active request ({@see currentRequest}) except when the server has responded to the initial request with a redirect to a different URL. */
@@ -51,10 +52,8 @@ abstract class URLSessionTask extends ObjectClass
     public ?Error $error = null;
     /** @var URLSessionTaskDelegate|null A delegate specific to the task. This task-specific delegate receives messages from the task before the session's delegate receives them. This is similar to the behavior of the delegate parameter used by the asychronous methods in URLSession like bytes(for:delegate:) and data(for:delegate:). */
     public ?URLSessionTaskDelegate $delegate = null;
-    /** @var float A best-guess upper bound on the number of bytes the client expects to send. */
-    public float $countOfBytesClientExpectsToSend = URLSessionTransferSizeUnknown;
-    /** @var float A best-guess upper bound on the number of bytes the client expects to receive. */
-    public float $countOfBytesClientExpectsToReceive = URLSessionTransferSizeUnknown;
+    protected float $countOfBytesClientExpectsToSend = URLSessionTransferSizeUnknown;
+    protected float $countOfBytesClientExpectsToReceive = URLSessionTransferSizeUnknown;
     /** @internal */
     public readonly URLSession $session;
     /** @internal */
@@ -88,6 +87,24 @@ abstract class URLSessionTask extends ObjectClass
         }
         $this->knownBody = $body;
         $this->protocolStorage = ProtocolState::toBeCreated();
+    }
+
+    public function __get(string $name)
+    {
+        return match ($name) {
+            "countOfBytesExpectedToReceive", "countOfBytesReceived", "countOfBytesExpectedToSend", "countOfBytesSent", "countOfBytesClientExpectsToSend", "countOfBytesClientExpectsToReceive" => $this->$name,
+            default => $this->valueForUndefinedKey($name)
+        };
+    }
+
+    public function __set(string $name, $value): void
+    {
+        if ("countOfBytesExpectedToReceive" || "countOfBytesReceived" || "countOfBytesExpectedToSend" || "countOfBytesSent" || "countOfBytesClientExpectsToSend" || "countOfBytesClientExpectsToReceive") {
+            $this->$name = $value;
+            $this->updateProgress();
+        } else {
+            $this->setValueForUndefinedKey($value, $name);
+        }
     }
 
     /** @internal */
@@ -208,14 +225,12 @@ abstract class URLSessionTask extends ObjectClass
         }
     }
 
-    /**
-     * @throws Exception
-     */
     public function updateProgress(): void
     {
         $progress = $this->progress;
         switch ($this->state) {
             case URLSessionTaskState::running:
+                /** @noinspection PhpUnhandledExceptionInspection */
                 if ($bodyLength = $this->knownBody?->getBodyLength()) {
                     $toBeSent = $bodyLength;
                 } elseif ($this->countOfBytesExpectedToSend > 0) {

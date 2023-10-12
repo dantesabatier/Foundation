@@ -58,6 +58,8 @@ class Progress
     /** @var int|null A value that represents the speed of data processing, in bytes per second. */
     public ?int $throughput = null;
 
+    private ?Progress $parent;
+
     /** @var Dictionary<mixed> A dictionary of arbitrary values for the receiver. */
     public Dictionary $userInfo;
 
@@ -69,17 +71,34 @@ class Progress
      */
     public function __construct(?Progress $parent = null, ?Dictionary $userInfo = null)
     {
+        $this->parent = $parent;
+        $this->userInfo = $userInfo ?? new Dictionary();
     }
 
     /**
      * Creates and returns a progress instance with the specified unit count that isn’t part of any existing progress tree.
-     * @param int $totalUnitCount The total number of units of work to assign to the progress instance.
+     * @param float $totalUnitCount The total number of units of work to assign to the progress instance.
      * @return Progress A new progress instance with its containing progress object set to nil.
      */
-    public static function discreteProgress(int $totalUnitCount): Progress
+    public static function discreteProgress(float $totalUnitCount): Progress
     {
         $progress = new Progress();
         $progress->totalUnitCount = $totalUnitCount;
+        return $progress;
+    }
+
+    /**
+     * Creates a progress instance for the specified progress object with a unit count that’s a portion of the containing object’s total unit count.
+     * @param float $totalUnitCount The total number of units of work to assign to the progress instance.
+     * @param Progress|null $parent The containing progress object for the created Progress object.
+     * @param float $pendingUnitCount The unit count for the progress object.
+     * @return Progress
+     */
+    public static function progress(float $totalUnitCount = 0.0, ?Progress $parent = null, float $pendingUnitCount = 0.0): Progress
+    {
+        $progress = new Progress($parent);
+        $progress->totalUnitCount = $totalUnitCount;
+        $progress->completedUnitCount = $totalUnitCount - $pendingUnitCount;
         return $progress;
     }
 
