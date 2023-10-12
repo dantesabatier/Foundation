@@ -252,7 +252,7 @@ abstract class URLSessionTask extends ObjectClass
                 }
                 $received = $this->countOfBytesReceived;
                 $progress->completedUnitCount = $sent + $received;
-                $progress->totalUnitCount = ($toBeSent && $toBeReceived) ? $toBeSent + $toBeReceived : URLSessionTransferSizeUnknown;
+                $progress->totalUnitCount = $toBeSent + $toBeReceived;
                 break;
             case URLSessionTaskState::suspended:
             case URLSessionTaskState::canceling:
