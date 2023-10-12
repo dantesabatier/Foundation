@@ -99,7 +99,7 @@ abstract class URLSessionTask extends ObjectClass
 
     public function __set(string $name, $value): void
     {
-        if ("countOfBytesExpectedToReceive" || "countOfBytesReceived" || "countOfBytesExpectedToSend" || "countOfBytesSent" || "countOfBytesClientExpectsToSend" || "countOfBytesClientExpectsToReceive") {
+        if ($name == "countOfBytesExpectedToReceive" || $name == "countOfBytesReceived" || $name == "countOfBytesExpectedToSend" || $name == "countOfBytesSent" || $name == "countOfBytesClientExpectsToSend" || $name == "countOfBytesClientExpectsToReceive") {
             $this->willChangeValueForKey($name);
             $this->$name = $value;
             $this->didChangeValueForKey($name);

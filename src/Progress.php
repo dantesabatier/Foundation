@@ -6,13 +6,13 @@ use Closure;
 
 /**
  * An object that conveys ongoing progress to the user for a specified task.
+ * @property float $totalUnitCount The total number of tracked units of work for the current progress.
+ * @property float $completedUnitCount The number of completed units of work for the current job.
  */
 class Progress extends ObjectClass
 {
-    /** @var float The total number of tracked units of work for the current progress. */
-    public float $totalUnitCount = 0.0;
-    /** @var float The number of completed units of work for the current job. */
-    public float $completedUnitCount = 0.0;
+    protected float $totalUnitCount = 0.0;
+    protected float $completedUnitCount = 0.0;
     /** @var string A localized description of tracked progress for the receiver. */
     public string $localizedDescription = "";
     /** @var string A more specific localized description of tracked progress for the receiver. */
@@ -57,6 +57,25 @@ class Progress extends ObjectClass
     {
         $this->parent = $parent;
         $this->userInfo = $userInfo ?? new Dictionary();
+    }
+
+    public function __get(string $name)
+    {
+        return match ($name) {
+            "totalUnitCount", "completedUnitCount" => $this->$name,
+            default => $this->valueForUndefinedKey($name)
+        };
+    }
+
+    public function __set(string $name, $value): void
+    {
+        if ($name == "totalUnitCount" || $name == "completedUnitCount") {
+            $this->willChangeValueForKey($name);
+            $this->$name = $value;
+            $this->didChangeValueForKey($name);
+        } else {
+            $this->setValueForUndefinedKey($value, $name);
+        }
     }
 
     /**
