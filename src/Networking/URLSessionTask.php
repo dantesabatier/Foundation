@@ -78,6 +78,7 @@ abstract class URLSessionTask extends ObjectClass
         $this->taskIdentifier = $taskIdentifier;
         $this->currentRequest = $request;
         $this->progress = new Progress();
+        $this->progress->cancellationHandler = fn() => $this->cancel();
         if ($body === null) {
             if ($bodyData = $request->httpBody) {
                 $body = TaskBody::data($bodyData);

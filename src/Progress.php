@@ -15,10 +15,10 @@ class Progress
     public float $completedUnitCount = 0.0;
 
     /** @var string A localized description of tracked progress for the receiver. */
-    public string $localizedDescription;
+    public string $localizedDescription = "";
 
     /** @var string A more specific localized description of tracked progress for the receiver. */
-    public string $localizedAdditionalDescription;
+    public string $localizedAdditionalDescription = "";
 
     /** @var bool A Boolean value that indicates whether the receiver is tracking work that you can cancel. */
     public bool $isCancellable = true;
@@ -139,6 +139,13 @@ class Progress
      */
     public function cancel(): void
     {
+        if ($this->isCancellable && !$this->isCancelled) {
+            $cancellationHandler = $this->cancellationHandler;
+            if ($cancellationHandler) {
+                $cancellationHandler();
+            }
+            $this->isCancelled = true;
+        }
     }
 
     /**
@@ -150,6 +157,13 @@ class Progress
      */
     public function pause(): void
     {
+        if ($this->isPausable && !$this->isPaused) {
+            $pausingHandler = $this->pausingHandler;
+            if ($pausingHandler) {
+                $pausingHandler();
+            }
+            $this->isPaused = true;
+        }
     }
 
     /**
@@ -161,6 +175,13 @@ class Progress
      */
     public function resume(): void
     {
+        if ($this->isPausable && $this->isPaused) {
+            $resumingHandler = $this->resumingHandler;
+            if ($resumingHandler) {
+                $resumingHandler();
+            }
+            $this->isPaused = false;
+        }
     }
 
     /**
