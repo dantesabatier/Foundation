@@ -7,61 +7,45 @@ use Closure;
 /**
  * An object that conveys ongoing progress to the user for a specified task.
  */
-class Progress
+class Progress extends ObjectClass
 {
     /** @var float The total number of tracked units of work for the current progress. */
     public float $totalUnitCount = 0.0;
     /** @var float The number of completed units of work for the current job. */
     public float $completedUnitCount = 0.0;
-
     /** @var string A localized description of tracked progress for the receiver. */
     public string $localizedDescription = "";
-
     /** @var string A more specific localized description of tracked progress for the receiver. */
     public string $localizedAdditionalDescription = "";
-
     /** @var bool A Boolean value that indicates whether the receiver is tracking work that you can cancel. */
     public bool $isCancellable = true;
-
     /** @var bool A Boolean value that Indicates whether the receiver is tracking canceled work. */
     public bool $isCancelled = false;
-
     /** @var Closure(): void|null The block to invoke when canceling progress. */
     public ?Closure $cancellationHandler = null;
-
     /** @var bool A Boolean value that indicates whether the receiver is tracking work that you can pause. */
     public bool $isPausable = false;
-
     /** @var bool A Boolean value that indicates whether the receiver is tracking paused work. */
     public bool $isPaused = false;
-
     /** @var Closure(): void|null The block to invoke when pausing progress. */
     public ?Closure $pausingHandler = null;
-
     /** @var bool A Boolean value that indicates whether the tracked progress is indeterminate. */
     public bool $isIndeterminate = false;
-
     /** @var float The fraction of the overall work that the progress object completes, including work from its suboperations. */
     public float $fractionCompleted = 0.0;
-
     /** @var bool A Boolean value that indicates the progress object is complete. */
     public bool $isFinished = false;
-
     /** @var Closure(): void|null The block to invoke when progress resumes. */
     public ?Closure $resumingHandler = null;
-
     /** @var string|null An object that represents the kind of progress for the progress object. */
     public ?string $kind = null;
-
     /** @var float|null A value that indicates the estimated amount of time remaining to complete the progress. */
     public ?float $estimatedTimeRemaining = null;
     /** @var int|null A value that represents the speed of data processing, in bytes per second. */
     public ?int $throughput = null;
-
-    private ?Progress $parent;
-
     /** @var Dictionary<mixed> A dictionary of arbitrary values for the receiver. */
     public Dictionary $userInfo;
+    private ?Progress $parent;
 
     /**
      * @param Progress|null $parent The containing Progress object, if any, to notify when reporting progress, or to consult when checking for cancellation.
