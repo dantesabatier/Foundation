@@ -13,7 +13,7 @@ use JetBrains\PhpStorm\ExpectedValues;
  * @property-read bool $isPaused A Boolean value that indicates whether the receiver is tracking paused work. By default, Progress is KVO-compliant for this property. It sends notifications on the same thread that updates the property. If the receiver has a paused containing progress object, the receiver reports a paused status.
  * @property-read bool $isIndeterminate A Boolean value that indicates whether the tracked progress is indeterminate. Use isIndeterminate progress only when you’re unable to determine a reasonable value for either {@see $completedUnitCount} or {@see $totalUnitCount}. Progress is indeterminate when the value of the totalUnitCount or completedUnitCount is less than zero or if both values are zero. When progress is indeterminate, {@see $fractionCompleted} returns 0.0 and {@see $isFinished} returns false. By default, Progress is KVO-compliant for this property. It sends notifications on the same thread that updates the property.
  * @property-read float $fractionCompleted The fraction of the overall work that the progress object completes, including work from its suboperations.
- * @property-read bool $isFinished A Boolean value that indicates the progress object is complete. A progress object finishes when the {@see completedUnitCount} equals or exceeds the {@see $totalUnitCount}. By default, Progress is KVO-compliant for this property. It sends notifications on the same thread that updates the property.
+ * @property-read bool $isFinished A Boolean value that indicates the progress object is complete. A progress object finishes when the {@see $completedUnitCount} equals or exceeds the {@see $totalUnitCount}. By default, Progress is KVO-compliant for this property. It sends notifications on the same thread that updates the property.
  * @property-read bool $isOld A Boolean value that indicates when the observed progress object invokes the publish method before you subscribe to it. The publish and subscribe mechanism is generally level-triggered, in that when you invoke {@see addSubscriber()}, the system invokes your block for every relevant published and unpublished progress object. Sometimes you need to implement edge-triggered behavior, in which you do something either exactly when new progress begins or not at all. In the example above, the Dock doesn’t animate file icons when this method returns true. There’s no reliable definition of before in this case, which involves multiple processes in a preemptively scheduled system. Don’t use this method for anything more important than best efforts at animating. It can be inaccurate due to processes coming and going from unpredictable user actions.
  * @psalm-type UnpublishingHandler = Closure(): void
  * @psalm-type PublishingHandler = Closure(Progress): ?UnpublishingHandler
@@ -188,7 +188,7 @@ class Progress extends ObjectClass
     /**
      * Cancels progress tracking.
      *
-     * This method invokes the block for {@see cancellationHandler}, if there is one, and ensures that any subsequent reads of the {@see isCancelled} property return true.
+     * This method invokes the block for {@see $cancellationHandler}, if there is one, and ensures that any subsequent reads of the {@see $isCancelled} property return true.
      *
      * If the receiver has subpopulations, the system cancels their progress as well.
      */
@@ -206,7 +206,7 @@ class Progress extends ObjectClass
     /**
      * Pauses progress tracking.
      *
-     * This method invokes the block for {@see pausingHandler}, if there is one, and ensures that any subsequent reads of the {@see isPaused} property return true.
+     * This method invokes the block for {@see $pausingHandler}, if there is one, and ensures that any subsequent reads of the {@see $isPaused} property return true.
      *
      * If the receiver has suboperations, the system pauses their progress as well.
      */
@@ -224,7 +224,7 @@ class Progress extends ObjectClass
     /**
      * Resumes progress tracking.
      *
-     * This method invokes the block for {@see resumingHandler}, if there is one, and ensures that any subsequent reads of the {@see isPaused} property return false.
+     * This method invokes the block for {@see $resumingHandler}, if there is one, and ensures that any subsequent reads of the {@see $isPaused} property return false.
      *
      * If the receiver has suboperations, the system resumes their progress as well.
      */
@@ -242,7 +242,7 @@ class Progress extends ObjectClass
     /**
      * Sets a value in the user info dictionary.
      *
-     * Use this method to set a value in the {@see userInfo} dictionary, with appropriate KVO notification for properties with values that can depend on values in the user info dictionary, like {@see localizedDescription}.
+     * Use this method to set a value in the {@see $userInfo} dictionary, with appropriate KVO notification for properties with values that can depend on values in the user info dictionary, like {@see $localizedDescription}.
      *
      * Supply a value of nil to remove an existing dictionary entry for a specified key.
      * @param mixed $objectOrNil The object to set for the specified key, or nil to remove an existing entry in the dictionary.
@@ -258,7 +258,7 @@ class Progress extends ObjectClass
      *
      * Entries in the user info dictionary determine whether another process can discover the progress object to observe it, and how it does that. For example, a {@see ProgressUserInfoKey::fileURLKey} entry makes a progress object discoverable by corresponding invokers of {@see addSubscriber()}. The system constrains access to the published progress URL with your app sandbox. If you can’t see the file due to the app’s sandbox restrictions, you can’t observe the progress on it.
      *
-     * When you make a progress object observable by other processes, you must ensure that at least {@see localizedDescription}, {@see isIndeterminate}, and {@see fractionCompleted} always work when you send proxies of your progress object in other processes. You make {@see isIndeterminate} and {@see fractionCompleted} work by accurately setting the total and completed unit counts of the progress. You make {@see localizedDescription} work by setting the value of the kind property to something valid, like file, and then fulfilling the requirements for that kind of progress.
+     * When you make a progress object observable by other processes, you must ensure that at least {@see $localizedDescription}, {@see $isIndeterminate}, and {@see $fractionCompleted} always work when you send proxies of your progress object in other processes. You make {@see $isIndeterminate} and {@see $fractionCompleted} work by accurately setting the total and completed unit counts of the progress. You make {@see $localizedDescription} work by setting the value of the kind property to something valid, like file, and then fulfilling the requirements for that kind of progress.
      *
      * You can instead set the value of localizedDescription directly, but that’s not perfectly reliable because other processes might be using a different localization than yours.
      *
