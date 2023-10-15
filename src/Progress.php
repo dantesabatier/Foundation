@@ -77,7 +77,7 @@ class Progress extends ObjectClass
     public function __get(string $name)
     {
         return match ($name) {
-            "totalUnitCount", "completedUnitCount", "isCancelled", "isPaused", "isIndeterminate", "fractionCompleted" => $this->$name,
+            "totalUnitCount", "completedUnitCount", "isCancelled", "isPaused", "isIndeterminate", "fractionCompleted", "isFinished", "isOld" => $this->$name,
             default => $this->valueForUndefinedKey($name)
         };
     }
@@ -88,6 +88,24 @@ class Progress extends ObjectClass
             $this->willChangeValueForKey($name);
             $this->$name = $value;
             $this->didChangeValueForKey($name);
+            if ($this->totalUnitCount && $this->completedUnitCount) {
+                $fractionCompleted = $this->completedUnitCount / $this->totalUnitCount;
+                $isIndeterminate = false;
+                $isFinished = $this->completedUnitCount === $this->totalUnitCount;
+            } else {
+                $fractionCompleted = 0.0;
+                $isIndeterminate = true;
+                $isFinished = false;
+            }
+            $this->willChangeValueForKey("fractionCompleted");
+            $this->fractionCompleted = $fractionCompleted;
+            $this->didChangeValueForKey("fractionCompleted");
+            $this->willChangeValueForKey("isIndeterminate");
+            $this->isIndeterminate = $isIndeterminate;
+            $this->didChangeValueForKey("isIndeterminate");
+            $this->willChangeValueForKey("isFinished");
+            $this->isFinished = $isFinished;
+            $this->didChangeValueForKey("isFinished");
         } else {
             $this->setValueForUndefinedKey($value, $name);
         }
@@ -172,7 +190,7 @@ class Progress extends ObjectClass
      *
      * This method invokes the block for {@see cancellationHandler}, if there is one, and ensures that any subsequent reads of the {@see isCancelled} property return true.
      *
-     * If the receiver has suboperations, the system cancels their progress as well.
+     * If the receiver has subpopulations, the system cancels their progress as well.
      */
     public function cancel(): void
     {
@@ -232,19 +250,19 @@ class Progress extends ObjectClass
      */
     public function setUserInfoObject(mixed $objectOrNil, string $key): void
     {
-        $this->userInfo[$key] = $objectOrNil;
+        $this->userInfo->setValueForKey($objectOrNil, $key);
     }
 
     /**
      * Publishes the progress object for other processes to observe it.
-     * 
-     * Entries in the user info dictionary determine whether another process can discover the progress object to observe it, and how it does that. For example, a fileURLKey entry makes a progress object discoverable by corresponding invokers of addSubscriber(forFileURL:withPublishingHandler:). The system constrains access to the published progress URL with your app sandbox. If you can’t see the file due to the app’s sandbox restrictions, you can’t observe the progress on it.
-     * 
-     * When you make a progress object observable by other processes, you must ensure that at least localizedDescription, isIndeterminate, and fractionCompleted always work when you send proxies of your progress object in other processes. You make isIndeterminate and fractionCompleted work by accurately setting the total and completed unit counts of the progress. You make localizedDescription work by setting the value of the kind property to something valid, like file, and then fulfilling the requirements for that kind of progress.
-     * 
+     *
+     * Entries in the user info dictionary determine whether another process can discover the progress object to observe it, and how it does that. For example, a {@see ProgressUserInfoKey::fileURLKey} entry makes a progress object discoverable by corresponding invokers of {@see addSubscriber()}. The system constrains access to the published progress URL with your app sandbox. If you can’t see the file due to the app’s sandbox restrictions, you can’t observe the progress on it.
+     *
+     * When you make a progress object observable by other processes, you must ensure that at least {@see localizedDescription}, {@see isIndeterminate}, and {@see fractionCompleted} always work when you send proxies of your progress object in other processes. You make {@see isIndeterminate} and {@see fractionCompleted} work by accurately setting the total and completed unit counts of the progress. You make {@see localizedDescription} work by setting the value of the kind property to something valid, like file, and then fulfilling the requirements for that kind of progress.
+     *
      * You can instead set the value of localizedDescription directly, but that’s not perfectly reliable because other processes might be using a different localization than yours.
-     * 
-     * You can publish an instance of Progress one time only.
+     *
+     * You can publish an instance of {@see Progress} one time only.
      */
     public function publish(): void
     {
@@ -259,18 +277,20 @@ class Progress extends ObjectClass
 
     /**
      * Registers a file URL to hear about the progress of a file operation.
+     *
+     * The system invokes the passed-in block when a progress object calls {@see publish()} with a {@see ProgressUserInfoKey::fileURLKey} user info dictionary entry that’s a URL that is the same as this method’s URL, or that is an item that the URL directly contains. The progress object that passes to your block is a proxy of the published progress object. The passed-in block may return another block. If it does, the system invokes the returned block when the observed progress object invokes {@see unpublish()}, the publishing process terminates, or you invoke {@see removeSubscriber()}. The system invokes the blocks you provide on the main thread.
      * @param URL $url The URL of the file to observe.
      * @param PublishingHandler $publishingHandler A closure that the system invokes when a progress object that represents a file operation matching the specified URL calls publish().
-     * @return mixed
+     * @return mixed A proxy of the progress object to observe.
      */
-    public function addSubscriber(URL $url, Closure $publishingHandler): mixed
+    public function addSubscriber(/** @noinspection PhpUnusedParameterInspection */ URL $url, Closure $publishingHandler): mixed
     {
         return null;
     }
 
     /**
      * Removes a proxy progress object that the add subscriber method returns.
-     * 
+     *
      * If the block for {@see addSubscriber()} returns a closure, the system invokes that closure on the main thread when you invoke removeSubscriber().
      * @param mixed $subscriber The proxy of the progress object to observe.
      */
