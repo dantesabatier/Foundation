@@ -3,11 +3,20 @@
 namespace Sabatier\Foundation;
 
 use Closure;
+use JetBrains\PhpStorm\ExpectedValues;
 
 /**
  * An object that conveys ongoing progress to the user for a specified task.
  * @property float $totalUnitCount The total number of tracked units of work for the current progress.
  * @property float $completedUnitCount The number of completed units of work for the current job.
+ * @property-read bool $isCancelled A Boolean value that Indicates whether the receiver is tracking canceled work.
+ * @property-read bool $isPaused A Boolean value that indicates whether the receiver is tracking paused work.
+ * @property-read bool $isIndeterminate A Boolean value that indicates whether the tracked progress is indeterminate.
+ * @property-read float $fractionCompleted The fraction of the overall work that the progress object completes, including work from its suboperations.
+ * @property-read bool $isFinished A Boolean value that indicates the progress object is complete.
+ * @property-read bool $isOld A Boolean value that indicates when the observed progress object invokes the publish method before you subscribe to it.
+ * @psalm-type UnpublishingHandler = Closure(): void
+ * @psalm-type PublishingHandler = Closure(Progress): ?UnpublishingHandler
  */
 class Progress extends ObjectClass
 {
@@ -19,32 +28,38 @@ class Progress extends ObjectClass
     public string $localizedAdditionalDescription = "";
     /** @var bool A Boolean value that indicates whether the receiver is tracking work that you can cancel. */
     public bool $isCancellable = true;
-    /** @var bool A Boolean value that Indicates whether the receiver is tracking canceled work. */
-    public bool $isCancelled = false;
+    protected bool $isCancelled = false;
     /** @var Closure(): void|null The block to invoke when canceling progress. */
     public ?Closure $cancellationHandler = null;
     /** @var bool A Boolean value that indicates whether the receiver is tracking work that you can pause. */
     public bool $isPausable = false;
-    /** @var bool A Boolean value that indicates whether the receiver is tracking paused work. */
-    public bool $isPaused = false;
+    protected bool $isPaused = false;
     /** @var Closure(): void|null The block to invoke when pausing progress. */
     public ?Closure $pausingHandler = null;
-    /** @var bool A Boolean value that indicates whether the tracked progress is indeterminate. */
-    public bool $isIndeterminate = false;
-    /** @var float The fraction of the overall work that the progress object completes, including work from its suboperations. */
-    public float $fractionCompleted = 0.0;
-    /** @var bool A Boolean value that indicates the progress object is complete. */
-    public bool $isFinished = false;
+    protected bool $isIndeterminate = false;
+    protected float $fractionCompleted = 0.0;
+    protected bool $isFinished = false;
     /** @var Closure(): void|null The block to invoke when progress resumes. */
     public ?Closure $resumingHandler = null;
     /** @var string|null An object that represents the kind of progress for the progress object. */
+    #[ExpectedValues(valuesFromClass: ProgressKind::class)]
     public ?string $kind = null;
     /** @var float|null A value that indicates the estimated amount of time remaining to complete the progress. */
     public ?float $estimatedTimeRemaining = null;
     /** @var int|null A value that represents the speed of data processing, in bytes per second. */
     public ?int $throughput = null;
     /** @var Dictionary<mixed> A dictionary of arbitrary values for the receiver. */
-    public Dictionary $userInfo;
+    public readonly Dictionary $userInfo;
+    /** @var string|null The kind of file operation for the progress object. */
+    #[ExpectedValues(valuesFromClass: ProgressKindFile::class)]
+    public ?string $fileOperationKind = null;
+    /** @var URL|null A URL that represents the file for the current progress object. */
+    public ?URL $fileURL = null;
+    /** @var int|null The total number of files for a file progress object. */
+    public ?int $fileTotalCount = null;
+    /** @var int|null The number of completed files for a file progress object. */
+    public ?int $fileCompletedCount = null;
+    protected bool $isOld = false;
     private ?Progress $parent;
 
     /**
@@ -62,7 +77,7 @@ class Progress extends ObjectClass
     public function __get(string $name)
     {
         return match ($name) {
-            "totalUnitCount", "completedUnitCount" => $this->$name,
+            "totalUnitCount", "completedUnitCount", "isCancelled", "isPaused", "isIndeterminate", "fractionCompleted" => $this->$name,
             default => $this->valueForUndefinedKey($name)
         };
     }
@@ -218,5 +233,48 @@ class Progress extends ObjectClass
     public function setUserInfoObject(mixed $objectOrNil, string $key): void
     {
         $this->userInfo[$key] = $objectOrNil;
+    }
+
+    /**
+     * Publishes the progress object for other processes to observe it.
+     * 
+     * Entries in the user info dictionary determine whether another process can discover the progress object to observe it, and how it does that. For example, a fileURLKey entry makes a progress object discoverable by corresponding invokers of addSubscriber(forFileURL:withPublishingHandler:). The system constrains access to the published progress URL with your app sandbox. If you can’t see the file due to the app’s sandbox restrictions, you can’t observe the progress on it.
+     * 
+     * When you make a progress object observable by other processes, you must ensure that at least localizedDescription, isIndeterminate, and fractionCompleted always work when you send proxies of your progress object in other processes. You make isIndeterminate and fractionCompleted work by accurately setting the total and completed unit counts of the progress. You make localizedDescription work by setting the value of the kind property to something valid, like file, and then fulfilling the requirements for that kind of progress.
+     * 
+     * You can instead set the value of localizedDescription directly, but that’s not perfectly reliable because other processes might be using a different localization than yours.
+     * 
+     * You can publish an instance of Progress one time only.
+     */
+    public function publish(): void
+    {
+    }
+
+    /**
+     * Removes a progress object from publication, making it unobservable by other processes.
+     */
+    public function unpublish(): void
+    {
+    }
+
+    /**
+     * Registers a file URL to hear about the progress of a file operation.
+     * @param URL $url The URL of the file to observe.
+     * @param PublishingHandler $publishingHandler A closure that the system invokes when a progress object that represents a file operation matching the specified URL calls publish().
+     * @return mixed
+     */
+    public function addSubscriber(URL $url, Closure $publishingHandler): mixed
+    {
+        return null;
+    }
+
+    /**
+     * Removes a proxy progress object that the add subscriber method returns.
+     * 
+     * If the block for {@see addSubscriber()} returns a closure, the system invokes that closure on the main thread when you invoke removeSubscriber().
+     * @param mixed $subscriber The proxy of the progress object to observe.
+     */
+    public function removeSubscriber(mixed $subscriber): void
+    {
     }
 }
