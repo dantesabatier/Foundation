@@ -82,7 +82,7 @@ class Progress extends ObjectClass
         };
     }
 
-    public function __set(string $name, $value): void
+    public function __set(string $name, mixed $value): void
     {
         if ($name == "totalUnitCount" || $name == "completedUnitCount") {
             $this->willChangeValueForKey($name);
