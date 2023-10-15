@@ -9,12 +9,12 @@ use JetBrains\PhpStorm\ExpectedValues;
  * An object that conveys ongoing progress to the user for a specified task.
  * @property float $totalUnitCount The total number of tracked units of work for the current progress.
  * @property float $completedUnitCount The number of completed units of work for the current job.
- * @property-read bool $isCancelled A Boolean value that Indicates whether the receiver is tracking canceled work.
- * @property-read bool $isPaused A Boolean value that indicates whether the receiver is tracking paused work.
- * @property-read bool $isIndeterminate A Boolean value that indicates whether the tracked progress is indeterminate.
+ * @property-read bool $isCancelled A Boolean value that Indicates whether the receiver is tracking canceled work. By default, Progress is KVO-compliant for this property. It sends notifications on the same thread that updates the property. If the receiver has a canceled containing progress object, the receiver reports a canceled status.
+ * @property-read bool $isPaused A Boolean value that indicates whether the receiver is tracking paused work. By default, Progress is KVO-compliant for this property. It sends notifications on the same thread that updates the property. If the receiver has a paused containing progress object, the receiver reports a paused status.
+ * @property-read bool $isIndeterminate A Boolean value that indicates whether the tracked progress is indeterminate. Use isIndeterminate progress only when you’re unable to determine a reasonable value for either {@see $completedUnitCount} or {@see $totalUnitCount}. Progress is indeterminate when the value of the totalUnitCount or completedUnitCount is less than zero or if both values are zero. When progress is indeterminate, {@see $fractionCompleted} returns 0.0 and {@see $isFinished} returns false. By default, Progress is KVO-compliant for this property. It sends notifications on the same thread that updates the property.
  * @property-read float $fractionCompleted The fraction of the overall work that the progress object completes, including work from its suboperations.
- * @property-read bool $isFinished A Boolean value that indicates the progress object is complete.
- * @property-read bool $isOld A Boolean value that indicates when the observed progress object invokes the publish method before you subscribe to it.
+ * @property-read bool $isFinished A Boolean value that indicates the progress object is complete. A progress object finishes when the {@see completedUnitCount} equals or exceeds the {@see $totalUnitCount}. By default, Progress is KVO-compliant for this property. It sends notifications on the same thread that updates the property.
+ * @property-read bool $isOld A Boolean value that indicates when the observed progress object invokes the publish method before you subscribe to it. The publish and subscribe mechanism is generally level-triggered, in that when you invoke {@see addSubscriber()}, the system invokes your block for every relevant published and unpublished progress object. Sometimes you need to implement edge-triggered behavior, in which you do something either exactly when new progress begins or not at all. In the example above, the Dock doesn’t animate file icons when this method returns true. There’s no reliable definition of before in this case, which involves multiple processes in a preemptively scheduled system. Don’t use this method for anything more important than best efforts at animating. It can be inaccurate due to processes coming and going from unpredictable user actions.
  * @psalm-type UnpublishingHandler = Closure(): void
  * @psalm-type PublishingHandler = Closure(Progress): ?UnpublishingHandler
  */
@@ -283,7 +283,7 @@ class Progress extends ObjectClass
      * @param PublishingHandler $publishingHandler A closure that the system invokes when a progress object that represents a file operation matching the specified URL calls publish().
      * @return mixed A proxy of the progress object to observe.
      */
-    public function addSubscriber(/** @noinspection PhpUnusedParameterInspection */ URL $url, Closure $publishingHandler): mixed
+    public static function addSubscriber(/** @noinspection PhpUnusedParameterInspection */ URL $url, Closure $publishingHandler): mixed
     {
         return null;
     }
@@ -294,7 +294,7 @@ class Progress extends ObjectClass
      * If the block for {@see addSubscriber()} returns a closure, the system invokes that closure on the main thread when you invoke removeSubscriber().
      * @param mixed $subscriber The proxy of the progress object to observe.
      */
-    public function removeSubscriber(mixed $subscriber): void
+    public static function removeSubscriber(mixed $subscriber): void
     {
     }
 }
