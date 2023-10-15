@@ -91,7 +91,7 @@ class Progress extends ObjectClass
             if ($this->totalUnitCount && $this->completedUnitCount) {
                 $fractionCompleted = $this->completedUnitCount / $this->totalUnitCount;
                 $isIndeterminate = false;
-                $isFinished = $this->completedUnitCount === $this->totalUnitCount;
+                $isFinished = $this->completedUnitCount >= $this->totalUnitCount;
             } else {
                 $fractionCompleted = 0.0;
                 $isIndeterminate = true;
