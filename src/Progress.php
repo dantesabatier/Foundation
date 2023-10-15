@@ -36,7 +36,7 @@ class Progress extends ObjectClass
     protected bool $isPaused = false;
     /** @var Closure(): void|null The block to invoke when pausing progress. */
     public ?Closure $pausingHandler = null;
-    protected bool $isIndeterminate = false;
+    protected bool $isIndeterminate = true;
     protected float $fractionCompleted = 0.0;
     protected bool $isFinished = false;
     /** @var Closure(): void|null The block to invoke when progress resumes. */
