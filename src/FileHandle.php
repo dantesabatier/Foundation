@@ -98,7 +98,7 @@ final class FileHandle extends ObjectClass
     /**
      * The shared file handle associated with the standard error file.
      *
-     * Conventionally this is a terminal device where the system sends error messages. There’s one standard error file handle per process; it’s a shared instance.
+     * Conventionally this is a terminal device where the system sends error messages. There's one standard error file handle per process; it's a shared instance.
      * When using this method to create a file handle object, the file handle owns its associated file descriptor and is responsible for closing it.
      * @return FileHandle The shared file handle associated with the standard error file.
      */
@@ -113,7 +113,7 @@ final class FileHandle extends ObjectClass
     /**
      * The file handle associated with the standard input file.
      *
-     * Conventionally this is a terminal device on which the user enters a stream of data. There’s one standard input file handle per process; it’s a shared instance.
+     * Conventionally this is a terminal device on which the user enters a stream of data. There's one standard input file handle per process; it's a shared instance.
      * When using this method to create a file handle object, the file handle owns its associated file descriptor and is responsible for closing it.
      * @return FileHandle The shared file handle associated with the standard input file.
      */
@@ -128,7 +128,7 @@ final class FileHandle extends ObjectClass
     /**
      * The file handle associated with the standard output file.
      *
-     * Conventionally this is a terminal device that receives a stream of data from a program. There’s one standard output file handle per process; it’s a shared instance.
+     * Conventionally this is a terminal device that receives a stream of data from a program. There's one standard output file handle per process; it's a shared instance.
      * When using this method to create a file handle object, the file handle owns its associated file descriptor and is responsible for closing it.
      * @return FileHandle The shared file handle associated with the standard output file.
      */
@@ -155,7 +155,7 @@ final class FileHandle extends ObjectClass
     /**
      * Reads data synchronously up to the specified number of bytes.
      *
-     * If the handle represents a file, this method returns the data obtained by reading length bytes starting at the current file pointer. If length bytes aren’t available, this method returns the data from the current file pointer to the end of the file. If the handle is a communications channel, the method reads up to length bytes from the channel. Returns an empty string if the handle is at the file’s end or if the communications channel returns an end-of-file indicator.
+     * If the handle represents a file, this method returns the data obtained by reading length bytes starting at the current file pointer. If length bytes aren't available, this method returns the data from the current file pointer to the end of the file. If the handle is a communications channel, the method reads up to length bytes from the channel. Returns an empty string if the handle is at the file's end or if the communications channel returns an end-of-file indicator.
      * @param int $count The number of bytes to read from the file handle.
      * @return string|null The data available through the receiver up to a maximum of length bytes, or the maximum size that can be represented by a string, whichever is the smaller.
      * @throws Exception This method throws an error if attempts to determine the file-handle type fail or if attempts to read from the file or channel fail.
@@ -175,9 +175,9 @@ final class FileHandle extends ObjectClass
     /**
      * Writes the specified data synchronously to the file handle.
      *
-     * If the handle represents a file, writing takes place at the file pointer’s current position. After it writes the data, the method advances the file pointer by the number of bytes written.
+     * If the handle represents a file, writing takes place at the file pointer's current position. After it writes the data, the method advances the file pointer by the number of bytes written.
      * @param string $data The data to write to the file handle.
-     * @throws Exception This method throws an error if the file descriptor is closed or isn’t valid, if the handle represents an unconnected pipe or socket endpoint, if there isn’t any free space on the file system, or if any other writing error occurs.
+     * @throws Exception This method throws an error if the file descriptor is closed or isn't valid, if the handle represents an unconnected pipe or socket endpoint, if there isn't any free space on the file system, or if any other writing error occurs.
      */
     public function write(string $data): void
     {

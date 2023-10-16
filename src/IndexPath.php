@@ -472,8 +472,8 @@ class IndexPath extends ObjectClass implements MutableCollection, Iterator
 
     /**
      * Returns a new index path containing the elements of this one plus the given element.
-     * @param int $index Index to append to the index path’s indexes.
-     * @return IndexPath A new index path containing the receiving index path’s indexes and index.
+     * @param int $index Index to append to the index path's indexes.
+     * @return IndexPath A new index path containing the receiving index path's indexes and index.
      */
     public function appending(int $index): IndexPath
     {

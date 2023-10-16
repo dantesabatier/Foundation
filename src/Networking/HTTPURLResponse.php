@@ -17,7 +17,7 @@ use function Sabatier\Foundation\string_is_equal;
 class HTTPURLResponse extends URLResponse
 {
     public readonly string $httpVersion;
-    /** @var int The response’s HTTP status code. */
+    /** @var int The response's HTTP status code. */
     public readonly int $statusCode;
     /** @var Dictionary All HTTP header fields of the response. */
     public readonly Dictionary $allHeaderFields;
