@@ -94,17 +94,15 @@ class Progress extends ObjectClass
     public function __set(string $name, mixed $value): void
     {
         if ($name == "totalUnitCount" || $name == "completedUnitCount") {
-            if ($value !== $this->$name) {
-                $this->willChangeValueForKey("isFinished");
-                $this->willChangeValueForKey("isIndeterminate");
-                $this->willChangeValueForKey("fractionCompleted");
-                $this->willChangeValueForKey($name);
-                $this->$name = $value;
-                $this->didChangeValueForKey($name);
-                $this->didChangeValueForKey("isFinished");
-                $this->didChangeValueForKey("isIndeterminate");
-                $this->didChangeValueForKey("fractionCompleted");
-            }
+            $this->willChangeValueForKey("isFinished");
+            $this->willChangeValueForKey("isIndeterminate");
+            $this->willChangeValueForKey("fractionCompleted");
+            $this->willChangeValueForKey($name);
+            $this->$name = $value;
+            $this->didChangeValueForKey($name);
+            $this->didChangeValueForKey("isFinished");
+            $this->didChangeValueForKey("isIndeterminate");
+            $this->didChangeValueForKey("fractionCompleted");
         } else {
             $this->setValueForUndefinedKey($value, $name);
         }
