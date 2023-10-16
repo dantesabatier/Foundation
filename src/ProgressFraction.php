@@ -110,6 +110,14 @@ class ProgressFraction extends ObjectClass
         }
     }
 
+    public function isEqual(mixed $other): bool
+    {
+        if ($other instanceof ProgressFraction) {
+            return $this->total == $other->total && $this->completed == $other->completed;
+        }
+        return false;
+    }
+
     public function add(ProgressFraction $addend): ProgressFraction
     {
         return $this->math($addend, fn(float $l, float $r): float => $l + $r, fn() => []);
