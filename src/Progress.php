@@ -84,9 +84,17 @@ class Progress extends ObjectClass
     {
         return match ($name) {
             "totalUnitCount", "completedUnitCount", "isCancelled", "isPaused", "isOld" => $this->$name,
-            "isIndeterminate" => !($this->totalUnitCount && $this->completedUnitCount),
-            "fractionCompleted" => $this->totalUnitCount && $this->completedUnitCount ? $this->completedUnitCount / $this->totalUnitCount : 0.0,
-            "isFinished" => $this->totalUnitCount && $this->completedUnitCount && $this->completedUnitCount >= $this->totalUnitCount,
+            "isIndeterminate" => $this->completedUnitCount < 0 || $this->totalUnitCount < 0 || ($this->completedUnitCount == 0 && $this->totalUnitCount == 0),
+            "isFinished" => (($this->completedUnitCount >= $this->totalUnitCount) && $this->completedUnitCount > 0 && $this->totalUnitCount > 0) || ($this->completedUnitCount > 0 && $this->totalUnitCount == 0),
+            "fractionCompleted" => (function (): float {
+                if ($this->isIndeterminate) {
+                    return 0.0;
+                } else if ($this->totalUnitCount == 0) {
+                    return 1.0;
+                } else {
+                    return $this->completedUnitCount / $this->totalUnitCount;
+                }
+            })(),
             default => $this->valueForUndefinedKey($name)
         };
     }
