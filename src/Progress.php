@@ -55,7 +55,7 @@ class Progress extends ObjectClass
     /** @var int|null The number of completed files for a file progress object. */
     public ?int $fileCompletedCount = null;
     protected bool $isOld = false;
-    private ?Progress $parent;
+    private ?Progress $parent = null;
     /** @var Set<Progress> */
     private Set $children;
     private ProgressFraction $fraction;
@@ -98,11 +98,21 @@ class Progress extends ObjectClass
             if ($this->fraction->total != $value && $this->fraction->total > 0) {
                 $this->childFraction = $this->childFraction->multiply(new ProgressFraction($this->fraction->total, $value));
             }
+            $this->willChangeValueForKey($name);
             $this->fraction->total = $value;
+            $this->didChangeValueForKey($name);
             $this->updateFractionCompleted($previous, $this->overallFraction());
         } elseif ($name == "completedUnitCount") {
             $previous = $this->overallFraction();
+            $this->willChangeValueForKey("isIndeterminate");
+            $this->willChangeValueForKey("isFinished");
+            $this->willChangeValueForKey("fractionCompleted");
+            $this->willChangeValueForKey($name);
             $this->fraction->completed = $value;
+            $this->didChangeValueForKey($name);
+            $this->didChangeValueForKey("isIndeterminate");
+            $this->didChangeValueForKey("isFinished");
+            $this->didChangeValueForKey("fractionCompleted");
             $this->updateFractionCompleted($previous, $this->overallFraction());
         } else {
             $this->setValueForUndefinedKey($value, $name);
