@@ -158,20 +158,20 @@ class Progress extends ObjectClass
 
     /**
      * Sets the progress object as the current object of the current thread, and assigns the amount of work for the next suboperation progress object to perform.
-     * @param int $unitCount The number of units of work for the next progress object that initializes when you invoke {@see __construct()} in the current thread with this progress object as the containing progress object.
+     * @param float $unitCount The number of units of work for the next progress object that initializes when you invoke {@see __construct()} in the current thread with this progress object as the containing progress object.
      *
      * The number represents the portion of work to perform in relation to the total number of units of work, which is the value of the progress object’s totalUnitCount property. The units of work for this parameter must be the same units of work in the progress object’s totalUnitCount property.
      */
-    public function becomeCurrent(int $unitCount): void
+    public function becomeCurrent(float $unitCount): void
     {
     }
 
     /**
      * Adds a process object as a suboperation of a progress tree.
      * @param Progress $child The progress instance to add to the progress tree.
-     * @param int $unitCount The number of units of work for the new suboperation to complete.
+     * @param float $unitCount The number of units of work for the new suboperation to complete.
      */
-    public function addChild(Progress $child, int $unitCount): void
+    public function addChild(Progress $child, float $unitCount): void
     {
         $child->parent === null ?: fatal_error("The Progress was already the child of another Progress");
         $child->setParent($this, $unitCount);
@@ -193,11 +193,11 @@ class Progress extends ObjectClass
     /**
      * @template ReturnType of mixed
      * Retrieves the current thread’s progress object, executes the specified block, and increments the progress object by the specified units of work.
-     * @param int $unitCount The number of units of work to increment for the current progress object. This number represents the portion of work that is complete in relation to the total number of units of work for the current thread’s progress object. The units of work for this parameter must be the same units of work as the current progress object’s {@see $totalUnitCount} property.
+     * @param float $unitCount The number of units of work to increment for the current progress object. This number represents the portion of work that is complete in relation to the total number of units of work for the current thread’s progress object. The units of work for this parameter must be the same units of work as the current progress object’s {@see $totalUnitCount} property.
      * @param Closure(): ReturnType $work A block that wraps the work you specify to complete for incrementing the current progress.
      * @return ReturnType The return type and value of the block that you specify for the work parameter.
      */
-    public function performAsCurrent(/** @noinspection PhpUnusedParameterInspection */ int $unitCount, Closure $work)
+    public function performAsCurrent(/** @noinspection PhpUnusedParameterInspection */ float $unitCount, Closure $work)
     {
         return null;
     }
