@@ -94,27 +94,35 @@ class Progress extends ObjectClass
     public function __set(string $name, mixed $value): void
     {
         if ($name == "totalUnitCount" || $name == "completedUnitCount") {
-            $this->willChangeValueForKey($name);
-            $this->$name = $value;
-            $this->didChangeValueForKey($name);
-            if ($this->totalUnitCount && $this->completedUnitCount) {
-                $fractionCompleted = $this->completedUnitCount / $this->totalUnitCount;
-                $isIndeterminate = false;
-                $isFinished = $this->completedUnitCount >= $this->totalUnitCount;
-            } else {
-                $fractionCompleted = 0.0;
-                $isIndeterminate = true;
-                $isFinished = false;
+            if ($value !== $this->$name) {
+                $this->willChangeValueForKey($name);
+                $this->$name = $value;
+                $this->didChangeValueForKey($name);
+                if ($this->totalUnitCount && $this->completedUnitCount) {
+                    $fractionCompleted = $this->completedUnitCount / $this->totalUnitCount;
+                    $isIndeterminate = false;
+                    $isFinished = $this->completedUnitCount >= $this->totalUnitCount;
+                } else {
+                    $fractionCompleted = 0.0;
+                    $isIndeterminate = true;
+                    $isFinished = false;
+                }
+                if ($fractionCompleted !== $this->fractionCompleted) {
+                    $this->willChangeValueForKey("fractionCompleted");
+                    $this->fractionCompleted = $fractionCompleted;
+                    $this->didChangeValueForKey("fractionCompleted");
+                }
+                if ($isIndeterminate !== $this->isIndeterminate) {
+                    $this->willChangeValueForKey("isIndeterminate");
+                    $this->isIndeterminate = $isIndeterminate;
+                    $this->didChangeValueForKey("isIndeterminate");
+                }
+                if ($isFinished !== $this->isFinished) {
+                    $this->willChangeValueForKey("isFinished");
+                    $this->isFinished = $isFinished;
+                    $this->didChangeValueForKey("isFinished");
+                }
             }
-            $this->willChangeValueForKey("fractionCompleted");
-            $this->fractionCompleted = $fractionCompleted;
-            $this->didChangeValueForKey("fractionCompleted");
-            $this->willChangeValueForKey("isIndeterminate");
-            $this->isIndeterminate = $isIndeterminate;
-            $this->didChangeValueForKey("isIndeterminate");
-            $this->willChangeValueForKey("isFinished");
-            $this->isFinished = $isFinished;
-            $this->didChangeValueForKey("isFinished");
         } else {
             $this->setValueForUndefinedKey($value, $name);
         }
