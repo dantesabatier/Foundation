@@ -11,17 +11,15 @@ use JetBrains\PhpStorm\ExpectedValues;
  * @property float $completedUnitCount The number of completed units of work for the current job.
  * @property-read bool $isCancelled A Boolean value that Indicates whether the receiver is tracking canceled work. By default, Progress is KVO-compliant for this property. It sends notifications on the same thread that updates the property. If the receiver has a canceled containing progress object, the receiver reports a canceled status.
  * @property-read bool $isPaused A Boolean value that indicates whether the receiver is tracking paused work. By default, Progress is KVO-compliant for this property. It sends notifications on the same thread that updates the property. If the receiver has a paused containing progress object, the receiver reports a paused status.
- * @property-read bool $isIndeterminate A Boolean value that indicates whether the tracked progress is indeterminate. Use isIndeterminate progress only when you’re unable to determine a reasonable value for either {@see $completedUnitCount} or {@see $totalUnitCount}. Progress is indeterminate when the value of the totalUnitCount or completedUnitCount is less than zero or if both values are zero. When progress is indeterminate, {@see $fractionCompleted} returns 0.0 and {@see $isFinished} returns false. By default, Progress is KVO-compliant for this property. It sends notifications on the same thread that updates the property.
+ * @property-read bool $isIndeterminate A Boolean value that indicates whether the tracked progress is indeterminate. Use isIndeterminate progress only when you're unable to determine a reasonable value for either {@see $completedUnitCount} or {@see $totalUnitCount}. Progress is indeterminate when the value of the totalUnitCount or completedUnitCount is less than zero or if both values are zero. When progress is indeterminate, {@see $fractionCompleted} returns 0.0 and {@see $isFinished} returns false. By default, Progress is KVO-compliant for this property. It sends notifications on the same thread that updates the property.
  * @property-read float $fractionCompleted The fraction of the overall work that the progress object completes, including work from its suboperations.
  * @property-read bool $isFinished A Boolean value that indicates the progress object is complete. A progress object finishes when the {@see $completedUnitCount} equals or exceeds the {@see $totalUnitCount}. By default, Progress is KVO-compliant for this property. It sends notifications on the same thread that updates the property.
- * @property-read bool $isOld A Boolean value that indicates when the observed progress object invokes the publish method before you subscribe to it. The publish and subscribe mechanism is generally level-triggered, in that when you invoke {@see addSubscriber()}, the system invokes your block for every relevant published and unpublished progress object. Sometimes you need to implement edge-triggered behavior, in which you do something either exactly when new progress begins or not at all. In the example above, the Dock doesn’t animate file icons when this method returns true. There’s no reliable definition of before in this case, which involves multiple processes in a preemptively scheduled system. Don’t use this method for anything more important than best efforts at animating. It can be inaccurate due to processes coming and going from unpredictable user actions.
+ * @property-read bool $isOld A Boolean value that indicates when the observed progress object invokes the publish method before you subscribe to it. The publish and subscribe mechanism is generally level-triggered, in that when you invoke {@see addSubscriber()}, the system invokes your block for every relevant published and unpublished progress object. Sometimes you need to implement edge-triggered behavior, in which you do something either exactly when new progress begins or not at all. In the example above, the Dock doesn't animate file icons when this method returns true. There's no reliable definition of before in this case, which involves multiple processes in a preemptively scheduled system. Don't use this method for anything more important than best efforts at animating. It can be inaccurate due to processes coming and going from unpredictable user actions.
  * @psalm-type UnpublishingHandler = Closure(): void
  * @psalm-type PublishingHandler = Closure(Progress): ?UnpublishingHandler
  */
 class Progress extends ObjectClass
 {
-    protected float $totalUnitCount = 0.0;
-    protected float $completedUnitCount = 0.0;
     /** @var string A localized description of tracked progress for the receiver. */
     public string $localizedDescription = "";
     /** @var string A more specific localized description of tracked progress for the receiver. */
@@ -83,36 +81,64 @@ class Progress extends ObjectClass
     public function __get(string $name)
     {
         return match ($name) {
-            "totalUnitCount", "completedUnitCount", "isCancelled", "isPaused", "isOld" => $this->$name,
-            "isIndeterminate" => $this->completedUnitCount < 0 || $this->totalUnitCount < 0 || ($this->completedUnitCount == 0 && $this->totalUnitCount == 0),
-            "isFinished" => (($this->completedUnitCount >= $this->totalUnitCount) && $this->completedUnitCount > 0 && $this->totalUnitCount > 0) || ($this->completedUnitCount > 0 && $this->totalUnitCount == 0),
-            "fractionCompleted" => (function (): float {
-                if ($this->isIndeterminate) {
-                    return 0.0;
-                } else if ($this->totalUnitCount == 0) {
-                    return 1.0;
-                } else {
-                    return $this->completedUnitCount / $this->totalUnitCount;
-                }
-            })(),
+            "isCancelled", "isPaused", "isOld" => $this->$name,
+            "totalUnitCount" => $this->fraction->total,
+            "completedUnitCount" => $this->fraction->completed,
+            "isIndeterminate" => $this->fraction->isIndeterminate,
+            "isFinished" => $this->fraction->isFinished,
+            "fractionCompleted" => $this->fraction->total > 0 ? $this->fraction->fractionCompleted : $this->fraction->add($this->childFraction)->fractionCompleted,
             default => $this->valueForUndefinedKey($name)
         };
     }
 
     public function __set(string $name, mixed $value): void
     {
-        if ($name == "totalUnitCount" || $name == "completedUnitCount") {
-            $this->willChangeValueForKey("isFinished");
-            $this->willChangeValueForKey("isIndeterminate");
-            $this->willChangeValueForKey("fractionCompleted");
-            $this->willChangeValueForKey($name);
-            $this->$name = $value;
-            $this->didChangeValueForKey($name);
-            $this->didChangeValueForKey("isFinished");
-            $this->didChangeValueForKey("isIndeterminate");
-            $this->didChangeValueForKey("fractionCompleted");
+        if ($name == "totalUnitCount") {
+            $previous = $this->overallFraction();
+            if ($this->fraction->total != $value && $this->fraction->total > 0) {
+                $this->childFraction = $this->childFraction->multiply(new ProgressFraction($this->fraction->total, $value));
+            }
+            $this->fraction->total = $value;
+            $this->updateFractionCompleted($previous, $this->overallFraction());
+        } elseif ($name == "completedUnitCount") {
+            $previous = $this->overallFraction();
+            $this->fraction->completed = $value;
+            $this->updateFractionCompleted($previous, $this->overallFraction());
         } else {
             $this->setValueForUndefinedKey($value, $name);
+        }
+    }
+
+    private function overallFraction(): ProgressFraction
+    {
+        return $this->fraction->add($this->childFraction);
+    }
+
+    private function updateChild(Progress $child, ProgressFraction $previous, ProgressFraction $next, float $portion): void
+    {
+        $previousOverallFraction = $this->overallFraction();
+        $multiple = new ProgressFraction($portion, $this->fraction->total);
+        $oldFractionOfParent = $previous->multiply($multiple);
+        if (!$previous->isIndeterminate) {
+            $this->childFraction = $this->childFraction->subtract($oldFractionOfParent);
+        }
+        if (!$next->isIndeterminate) {
+            $this->childFraction = $this->childFraction->add($next->multiply($multiple));
+        }
+        if ($next->isFinished) {
+            $this->children->remove($child);
+            if ($portion != 0) {
+                $this->fraction->completed += $portion;
+                $this->childFraction = $this->childFraction->subtract($multiple->multiply($next));
+            }
+        }
+        $this->updateFractionCompleted($previousOverallFraction, $this->overallFraction());
+    }
+
+    private function updateFractionCompleted(ProgressFraction $from, ProgressFraction $to): void
+    {
+        if (!$from->isEqual($to)) {
+            $this->parent?->updateChild($this, $from, $to, $this->portionOfParent);
         }
     }
 
@@ -127,7 +153,7 @@ class Progress extends ObjectClass
     }
 
     /**
-     * Creates and returns a progress instance with the specified unit count that isn’t part of any existing progress tree.
+     * Creates and returns a progress instance with the specified unit count that isn't part of any existing progress tree.
      * @param float $totalUnitCount The total number of units of work to assign to the progress instance.
      * @return Progress A new progress instance with its containing progress object set to nil.
      */
@@ -139,7 +165,7 @@ class Progress extends ObjectClass
     }
 
     /**
-     * Creates a progress instance for the specified progress object with a unit count that’s a portion of the containing object’s total unit count.
+     * Creates a progress instance for the specified progress object with a unit count that's a portion of the containing object's total unit count.
      * @param float $totalUnitCount The total number of units of work to assign to the progress instance.
      * @param Progress|null $parent The containing progress object for the created Progress object.
      * @param float $pendingUnitCount The unit count for the progress object.
@@ -166,7 +192,7 @@ class Progress extends ObjectClass
      * Sets the progress object as the current object of the current thread, and assigns the amount of work for the next suboperation progress object to perform.
      * @param float $unitCount The number of units of work for the next progress object that initializes when you invoke {@see __construct()} in the current thread with this progress object as the containing progress object.
      *
-     * The number represents the portion of work to perform in relation to the total number of units of work, which is the value of the progress object’s totalUnitCount property. The units of work for this parameter must be the same units of work in the progress object’s totalUnitCount property.
+     * The number represents the portion of work to perform in relation to the total number of units of work, which is the value of the progress object's totalUnitCount property. The units of work for this parameter must be the same units of work in the progress object's totalUnitCount property.
      */
     public function becomeCurrent(float $unitCount): void
     {
@@ -198,8 +224,8 @@ class Progress extends ObjectClass
 
     /**
      * @template ReturnType of mixed
-     * Retrieves the current thread’s progress object, executes the specified block, and increments the progress object by the specified units of work.
-     * @param float $unitCount The number of units of work to increment for the current progress object. This number represents the portion of work that is complete in relation to the total number of units of work for the current thread’s progress object. The units of work for this parameter must be the same units of work as the current progress object’s {@see $totalUnitCount} property.
+     * Retrieves the current thread's progress object, executes the specified block, and increments the progress object by the specified units of work.
+     * @param float $unitCount The number of units of work to increment for the current progress object. This number represents the portion of work that is complete in relation to the total number of units of work for the current thread's progress object. The units of work for this parameter must be the same units of work as the current progress object's {@see $totalUnitCount} property.
      * @param Closure(): ReturnType $work A block that wraps the work you specify to complete for incrementing the current progress.
      * @return ReturnType The return type and value of the block that you specify for the work parameter.
      */
@@ -295,11 +321,11 @@ class Progress extends ObjectClass
     /**
      * Publishes the progress object for other processes to observe it.
      *
-     * Entries in the user info dictionary determine whether another process can discover the progress object to observe it, and how it does that. For example, a {@see ProgressUserInfoKey::fileURLKey} entry makes a progress object discoverable by corresponding invokers of {@see addSubscriber()}. The system constrains access to the published progress URL with your app sandbox. If you can’t see the file due to the app’s sandbox restrictions, you can’t observe the progress on it.
+     * Entries in the user info dictionary determine whether another process can discover the progress object to observe it, and how it does that. For example, a {@see ProgressUserInfoKey::fileURLKey} entry makes a progress object discoverable by corresponding invokers of {@see addSubscriber()}. The system constrains access to the published progress URL with your app sandbox. If you can't see the file due to the app's sandbox restrictions, you can't observe the progress on it.
      *
      * When you make a progress object observable by other processes, you must ensure that at least {@see $localizedDescription}, {@see $isIndeterminate}, and {@see $fractionCompleted} always work when you send proxies of your progress object in other processes. You make {@see $isIndeterminate} and {@see $fractionCompleted} work by accurately setting the total and completed unit counts of the progress. You make {@see $localizedDescription} work by setting the value of the kind property to something valid, like file, and then fulfilling the requirements for that kind of progress.
      *
-     * You can instead set the value of localizedDescription directly, but that’s not perfectly reliable because other processes might be using a different localization than yours.
+     * You can instead set the value of localizedDescription directly, but that's not perfectly reliable because other processes might be using a different localization than yours.
      *
      * You can publish an instance of {@see Progress} one time only.
      */
@@ -317,7 +343,7 @@ class Progress extends ObjectClass
     /**
      * Registers a file URL to hear about the progress of a file operation.
      *
-     * The system invokes the passed-in block when a progress object calls {@see publish()} with a {@see ProgressUserInfoKey::fileURLKey} user info dictionary entry that’s a URL that is the same as this method’s URL, or that is an item that the URL directly contains. The progress object that passes to your block is a proxy of the published progress object. The passed-in block may return another block. If it does, the system invokes the returned block when the observed progress object invokes {@see unpublish()}, the publishing process terminates, or you invoke {@see removeSubscriber()}. The system invokes the blocks you provide on the main thread.
+     * The system invokes the passed-in block when a progress object calls {@see publish()} with a {@see ProgressUserInfoKey::fileURLKey} user info dictionary entry that's a URL that is the same as this method's URL, or that is an item that the URL directly contains. The progress object that passes to your block is a proxy of the published progress object. The passed-in block may return another block. If it does, the system invokes the returned block when the observed progress object invokes {@see unpublish()}, the publishing process terminates, or you invoke {@see removeSubscriber()}. The system invokes the blocks you provide on the main thread.
      * @param URL $url The URL of the file to observe.
      * @param PublishingHandler $publishingHandler A closure that the system invokes when a progress object that represents a file operation matching the specified URL calls publish().
      * @return mixed A proxy of the progress object to observe.
