@@ -2,11 +2,12 @@
 
 namespace Sabatier\Foundation;
 
+use Closure;
+
 /**
  * @property-read bool $isIndeterminate
  * @property-read bool $isFinished
  * @property-read float $fractionCompleted
- * @property-read bool $isNaN
  * @internal
  */
 class ProgressFraction extends ObjectClass
@@ -29,7 +30,6 @@ class ProgressFraction extends ObjectClass
                     return $this->completed / $this->total;
                 }
             })(),
-            "isNaN" => $this->total == 0,
             default => $this->valueForUndefinedKey($name),
         };
     }
@@ -39,6 +39,35 @@ class ProgressFraction extends ObjectClass
         $denominator = 131072;
         $numerator = $double / (1.0 / (float)$denominator);
         return [$numerator, $numerator];
+    }
+
+    private static function greatestCommonDivisor(float $inA, float $inB): float
+    {
+        $a = $inA;
+        $b = $inB;
+        do {
+            $tmp = $b;
+            $b = $a % $b;
+            $a = $tmp;
+        } while ($b != 0);
+        return $a;
+    }
+
+    private static function leastCommonMultiple(float $a, float $b): ?float
+    {
+        return $a / self::greatestCommonDivisor($a, $b);
+    }
+
+    private static function simplify(float $n, float $d): array
+    {
+        $gcd = self::greatestCommonDivisor($n, $d);
+        return [$n / $gcd, $d / $gcd];
+    }
+
+    private function simplified(): ProgressFraction
+    {
+        [$completed, $total] = self::simplify($this->completed, $this->total);
+        return new self($completed, $total);
     }
 
     public static function fraction(float $double, bool $overflowed = false): ProgressFraction
@@ -51,24 +80,54 @@ class ProgressFraction extends ObjectClass
         return $fraction;
     }
 
-    public function add(/** @noinspection PhpUnusedParameterInspection */ ProgressFraction $addend): ProgressFraction
+    /**
+     * @param ProgressFraction $fraction
+     * @param Closure(float, float): float $whichOperator
+     * @param Closure(float, float): array{float, boolean} $whichOverflow
+     * @return ProgressFraction
+     */
+    private function math(ProgressFraction $fraction, Closure $whichOperator, Closure $whichOverflow): ProgressFraction
     {
-        unimplemented($this, __FUNCTION__);
+        !($this->total == 0 && $fraction->total == 0) ?: fatal_error("Attempt to add or subtract invalid fraction");
+        if ($this->total == 0) {
+            return $fraction;
+        }
+        if ($fraction->total == 0) {
+            return $this;
+        }
+        if ($this->overflowed || $fraction->overflowed) {
+            return ProgressFraction::fraction($whichOperator($this->fractionCompleted, $fraction->fractionCompleted, true));
+        }
+        if ($lcm = self::leastCommonMultiple($this->total, $fraction->total)) {
+            return new ProgressFraction($whichOperator($this->completed * ($lcm / $this->total), $fraction->completed * ($lcm / $fraction->total)), $lcm);
+        } else {
+            $lhsSimplified = $this->simplified();
+            $rhsSimplified = $fraction->simplified();
+            if ($lcm = self::leastCommonMultiple($lhsSimplified->total, $rhsSimplified->total)) {
+                return new self($whichOverflow($lhsSimplified->completed * ($lcm / $lhsSimplified->total), $rhsSimplified->completed * ($lcm / $rhsSimplified->total)), $lcm);
+            }
+            return ProgressFraction::fraction($whichOperator($this->fractionCompleted, $fraction->fractionCompleted, true));
+        }
     }
 
-    public function subtract(/** @noinspection PhpUnusedParameterInspection */ ProgressFraction $subtracting): ProgressFraction
+    public function add(ProgressFraction $addend): ProgressFraction
     {
-        unimplemented($this, __FUNCTION__);
+        return $this->math($addend, fn(float $l, float $r): float => $l + $r, fn() => []);
     }
 
-    public function multiply(/** @noinspection PhpUnusedParameterInspection */ ProgressFraction $factor): ProgressFraction
+    public function subtract(ProgressFraction $subtracting): ProgressFraction
     {
-        unimplemented($this, __FUNCTION__);
+        return $this->math($subtracting, fn(float $l, float $r): float => $l - $r, fn() => []);
     }
 
-    public function divide(/** @noinspection PhpUnusedParameterInspection */ ProgressFraction $divisor): ProgressFraction
+    public function multiply(ProgressFraction $factor): ProgressFraction
     {
-        unimplemented($this, __FUNCTION__);
+        return $this->math($factor, fn(float $l, float $r): float => $l * $r, fn() => []);
+    }
+
+    public function divide(ProgressFraction $divisor): ProgressFraction
+    {
+        return $this->math($divisor, fn(float $l, float $r): float => $l / $r, fn() => []);
     }
 
     public function debugDescription(): string
