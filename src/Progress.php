@@ -86,7 +86,7 @@ class Progress extends ObjectClass
             "totalUnitCount", "completedUnitCount", "isCancelled", "isPaused", "isOld" => $this->$name,
             "isIndeterminate" => !($this->totalUnitCount && $this->completedUnitCount),
             "fractionCompleted" => $this->totalUnitCount && $this->completedUnitCount ? $this->completedUnitCount / $this->totalUnitCount : 0.0,
-            "isFinished" => $this->totalUnitCount && $this->completedUnitCount ? $this->completedUnitCount >= $this->totalUnitCount : false,
+            "isFinished" => $this->totalUnitCount && $this->completedUnitCount && $this->completedUnitCount >= $this->totalUnitCount,
             default => $this->valueForUndefinedKey($name)
         };
     }
@@ -95,15 +95,15 @@ class Progress extends ObjectClass
     {
         if ($name == "totalUnitCount" || $name == "completedUnitCount") {
             if ($value !== $this->$name) {
-                $this->willChangeValueForKey("fractionCompleted");
-                $this->willChangeValueForKey("isIndeterminate");
                 $this->willChangeValueForKey("isFinished");
+                $this->willChangeValueForKey("isIndeterminate");
+                $this->willChangeValueForKey("fractionCompleted");
                 $this->willChangeValueForKey($name);
                 $this->$name = $value;
                 $this->didChangeValueForKey($name);
-                $this->didChangeValueForKey("fractionCompleted");
-                $this->didChangeValueForKey("isIndeterminate");
                 $this->didChangeValueForKey("isFinished");
+                $this->didChangeValueForKey("isIndeterminate");
+                $this->didChangeValueForKey("fractionCompleted");
             }
         } else {
             $this->setValueForUndefinedKey($value, $name);
