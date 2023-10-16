@@ -36,9 +36,6 @@ class Progress extends ObjectClass
     protected bool $isPaused = false;
     /** @var Closure(): void|null The block to invoke when pausing progress. */
     public ?Closure $pausingHandler = null;
-    protected bool $isIndeterminate = true;
-    protected float $fractionCompleted = 0.0;
-    protected bool $isFinished = false;
     /** @var Closure(): void|null The block to invoke when progress resumes. */
     public ?Closure $resumingHandler = null;
     /** @var string|null An object that represents the kind of progress for the progress object. */
@@ -86,7 +83,10 @@ class Progress extends ObjectClass
     public function __get(string $name)
     {
         return match ($name) {
-            "totalUnitCount", "completedUnitCount", "isCancelled", "isPaused", "isIndeterminate", "fractionCompleted", "isFinished", "isOld" => $this->$name,
+            "totalUnitCount", "completedUnitCount", "isCancelled", "isPaused", "isOld" => $this->$name,
+            "isIndeterminate" => !($this->totalUnitCount && $this->completedUnitCount),
+            "fractionCompleted" => $this->totalUnitCount && $this->completedUnitCount ? $this->completedUnitCount / $this->totalUnitCount : 0.0,
+            "isFinished" => $this->totalUnitCount && $this->completedUnitCount ? $this->completedUnitCount >= $this->totalUnitCount : false,
             default => $this->valueForUndefinedKey($name)
         };
     }
@@ -95,33 +95,15 @@ class Progress extends ObjectClass
     {
         if ($name == "totalUnitCount" || $name == "completedUnitCount") {
             if ($value !== $this->$name) {
+                $this->willChangeValueForKey("fractionCompleted");
+                $this->willChangeValueForKey("isIndeterminate");
+                $this->willChangeValueForKey("isFinished");
                 $this->willChangeValueForKey($name);
                 $this->$name = $value;
                 $this->didChangeValueForKey($name);
-                if ($this->totalUnitCount && $this->completedUnitCount) {
-                    $fractionCompleted = $this->completedUnitCount / $this->totalUnitCount;
-                    $isIndeterminate = false;
-                    $isFinished = $this->completedUnitCount >= $this->totalUnitCount;
-                } else {
-                    $fractionCompleted = 0.0;
-                    $isIndeterminate = true;
-                    $isFinished = false;
-                }
-                if ($fractionCompleted !== $this->fractionCompleted) {
-                    $this->willChangeValueForKey("fractionCompleted");
-                    $this->fractionCompleted = $fractionCompleted;
-                    $this->didChangeValueForKey("fractionCompleted");
-                }
-                if ($isIndeterminate !== $this->isIndeterminate) {
-                    $this->willChangeValueForKey("isIndeterminate");
-                    $this->isIndeterminate = $isIndeterminate;
-                    $this->didChangeValueForKey("isIndeterminate");
-                }
-                if ($isFinished !== $this->isFinished) {
-                    $this->willChangeValueForKey("isFinished");
-                    $this->isFinished = $isFinished;
-                    $this->didChangeValueForKey("isFinished");
-                }
+                $this->didChangeValueForKey("fractionCompleted");
+                $this->didChangeValueForKey("isIndeterminate");
+                $this->didChangeValueForKey("isFinished");
             }
         } else {
             $this->setValueForUndefinedKey($value, $name);
