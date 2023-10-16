@@ -110,6 +110,16 @@ class Progress extends ObjectClass
         }
     }
 
+    public function valueForKey(string $key): mixed
+    {
+        return $this->$key;
+    }
+
+    public function setValueForKey(mixed $value, string $key): void
+    {
+        $this->$key = $value;
+    }
+
     /**
      * Creates and returns a progress instance with the specified unit count that isn’t part of any existing progress tree.
      * @param float $totalUnitCount The total number of units of work to assign to the progress instance.
