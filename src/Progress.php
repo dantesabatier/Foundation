@@ -27,7 +27,7 @@ class Progress extends ObjectClass
     /** @var string A more specific localized description of tracked progress for the receiver. */
     public string $localizedAdditionalDescription = "";
     /** @var bool A Boolean value that indicates whether the receiver is tracking work that you can cancel. */
-    public bool $isCancellable = true;
+    public bool $isCancellable = false;
     protected bool $isCancelled = false;
     /** @var Closure(): void|null The block to invoke when canceling progress. */
     public ?Closure $cancellationHandler = null;
@@ -61,6 +61,11 @@ class Progress extends ObjectClass
     public ?int $fileCompletedCount = null;
     protected bool $isOld = false;
     private ?Progress $parent;
+    /** @var Set<Progress> */
+    private Set $children;
+    private ProgressFraction $fraction;
+    private ProgressFraction $childFraction;
+    private float $portionOfParent = 0.0;
 
     /**
      * @param Progress|null $parent The containing Progress object, if any, to notify when reporting progress, or to consult when checking for cancellation.
@@ -70,8 +75,12 @@ class Progress extends ObjectClass
      */
     public function __construct(?Progress $parent = null, ?Dictionary $userInfo = null)
     {
-        $this->parent = $parent;
         $this->userInfo = $userInfo ?? new Dictionary();
+        $this->children = new Set();
+        $this->fraction = new ProgressFraction();
+        $this->childFraction = new ProgressFraction();
+        $this->childFraction->total = 1.0;
+        $parent?->addChild($this, $this->totalUnitCount);
     }
 
     public function __get(string $name)
@@ -130,11 +139,11 @@ class Progress extends ObjectClass
      * @param float $pendingUnitCount The unit count for the progress object.
      * @return Progress
      */
-    public static function progress(float $totalUnitCount = 0.0, ?Progress $parent = null, float $pendingUnitCount = 0.0): Progress
+    public static function progress(float $totalUnitCount, ?Progress $parent = null, float $pendingUnitCount = 0.0): Progress
     {
-        $progress = new Progress($parent);
+        $progress = new Progress();
         $progress->totalUnitCount = $totalUnitCount;
-        $progress->completedUnitCount = $totalUnitCount - $pendingUnitCount;
+        $parent?->addChild($progress, $pendingUnitCount);
         return $progress;
     }
 
@@ -164,6 +173,21 @@ class Progress extends ObjectClass
      */
     public function addChild(Progress $child, int $unitCount): void
     {
+        $child->parent === null ?: fatal_error("The Progress was already the child of another Progress");
+        $child->setParent($this, $unitCount);
+        $this->children->append($child);
+        if ($this->isCancelled) {
+            $child->cancel();
+        }
+        if ($this->isPaused) {
+            $child->pause();
+        }
+    }
+
+    private function setParent(Progress $parent, float $portion): void
+    {
+        $this->parent = $parent;
+        $this->portionOfParent = $portion;
     }
 
     /**
@@ -195,11 +219,14 @@ class Progress extends ObjectClass
     public function cancel(): void
     {
         if ($this->isCancellable && !$this->isCancelled) {
+            $this->isCancelled = true;
             $cancellationHandler = $this->cancellationHandler;
             if ($cancellationHandler) {
                 $cancellationHandler();
             }
-            $this->isCancelled = true;
+            foreach ($this->children as $child) {
+                $child->cancel();
+            }
         }
     }
 
@@ -213,11 +240,14 @@ class Progress extends ObjectClass
     public function pause(): void
     {
         if ($this->isPausable && !$this->isPaused) {
+            $this->isPaused = true;
             $pausingHandler = $this->pausingHandler;
             if ($pausingHandler) {
                 $pausingHandler();
             }
-            $this->isPaused = true;
+            foreach ($this->children as $child) {
+                $child->pause();
+            }
         }
     }
 
@@ -231,11 +261,14 @@ class Progress extends ObjectClass
     public function resume(): void
     {
         if ($this->isPausable && $this->isPaused) {
+            $this->isPaused = false;
             $resumingHandler = $this->resumingHandler;
             if ($resumingHandler) {
                 $resumingHandler();
             }
-            $this->isPaused = false;
+            foreach ($this->children as $child) {
+                $child->resume();
+            }
         }
     }
 
