@@ -21,7 +21,7 @@ trait CollectionAlgorithms
     public function offsetGet(mixed $offset): mixed
     {
         if (!is_int($offset)) {
-            fatal_error(sprintf("Invalid argument: expecting int, \"%s\" given", typeof($offset)));
+            fatal_error(sprintf("Invalid argument: expecting int, \"%s\"(%s) given", human_readable_value($offset), typeof($offset)));
         }
         if (!$this->offsetExists($offset)) {
             fatal_error(sprintf("%s %s(%s) index \"%s\" out of bounds [%s...<%s]", $this->debugDescription(), __FUNCTION__, $offset, $offset, $this->startIndex(), $this->endIndex()));
