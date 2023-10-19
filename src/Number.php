@@ -38,9 +38,9 @@ class Number extends Value
     public function __get(string $name)
     {
         return $this->$name = match ($name) {
-            "boolValue" => (bool) $this->value,
-            "floatValue", "doubleValue" => (float) $this->value,
-            "intValue" => (int) $this->value,
+            "boolValue" => (bool)$this->value,
+            "floatValue", "doubleValue" => (float)$this->value,
+            "intValue" => (int)$this->value,
             "stringValue" => human_readable_value($this->value),
             default => $this->valueForUndefinedKey($name)
         };
