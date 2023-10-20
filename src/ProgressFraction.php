@@ -24,10 +24,12 @@ class ProgressFraction extends ObjectClass
             "fractionCompleted" => (function (): float {
                 if ($this->isIndeterminate) {
                     return 0.0;
-                } else if ($this->total == 0) {
-                    return 1.0;
                 } else {
-                    return $this->completed / $this->total;
+                    if ($this->total == 0) {
+                        return 1.0;
+                    } else {
+                        return $this->completed / $this->total;
+                    }
                 }
             })(),
             default => $this->valueForUndefinedKey($name),
@@ -53,7 +55,7 @@ class ProgressFraction extends ObjectClass
         return $a;
     }
 
-    private static function leastCommonMultiple(float $a, float $b): ?float
+    private static function leastCommonMultiple(float $a, float $b): float
     {
         return $a / self::greatestCommonDivisor($a, $b);
     }
@@ -96,7 +98,7 @@ class ProgressFraction extends ObjectClass
             return $this;
         }
         if ($this->overflowed || $fraction->overflowed) {
-            return ProgressFraction::fraction($whichOperator($this->fractionCompleted, $fraction->fractionCompleted, true));
+            return ProgressFraction::fraction($whichOperator($this->fractionCompleted, $fraction->fractionCompleted), true);
         }
         if ($lcm = self::leastCommonMultiple($this->total, $fraction->total)) {
             return new ProgressFraction($whichOperator($this->completed * ($lcm / $this->total), $fraction->completed * ($lcm / $fraction->total)), $lcm);
@@ -104,9 +106,10 @@ class ProgressFraction extends ObjectClass
             $lhsSimplified = $this->simplified();
             $rhsSimplified = $fraction->simplified();
             if ($lcm = self::leastCommonMultiple($lhsSimplified->total, $rhsSimplified->total)) {
-                return new self($whichOverflow($lhsSimplified->completed * ($lcm / $lhsSimplified->total), $rhsSimplified->completed * ($lcm / $rhsSimplified->total)), $lcm);
+                [$completed, $overflowed] = $whichOverflow($lhsSimplified->completed * ($lcm / $lhsSimplified->total), $rhsSimplified->completed * ($lcm / $rhsSimplified->total));
+                return new self($completed, $lcm, $overflowed);
             }
-            return ProgressFraction::fraction($whichOperator($this->fractionCompleted, $fraction->fractionCompleted, true));
+            return ProgressFraction::fraction($whichOperator($this->fractionCompleted, $fraction->fractionCompleted), true);
         }
     }
 
@@ -120,22 +123,26 @@ class ProgressFraction extends ObjectClass
 
     public function add(ProgressFraction $addend): ProgressFraction
     {
-        return $this->math($addend, fn(float $l, float $r): float => $l + $r, fn() => []);
+        /** @psalm-suppress ArgumentTypeCoercion */
+        return $this->math($addend, fn(float $l, float $r): float => $l + $r, fn(): array => []);
     }
 
     public function subtract(ProgressFraction $subtracting): ProgressFraction
     {
-        return $this->math($subtracting, fn(float $l, float $r): float => $l - $r, fn() => []);
+        /** @psalm-suppress ArgumentTypeCoercion */
+        return $this->math($subtracting, fn(float $l, float $r): float => $l - $r, fn(): array => []);
     }
 
     public function multiply(ProgressFraction $factor): ProgressFraction
     {
-        return $this->math($factor, fn(float $l, float $r): float => $l * $r, fn() => []);
+        /** @psalm-suppress ArgumentTypeCoercion */
+        return $this->math($factor, fn(float $l, float $r): float => $l * $r, fn(): array => []);
     }
 
     public function divide(ProgressFraction $divisor): ProgressFraction
     {
-        return $this->math($divisor, fn(float $l, float $r): float => $l / $r, fn() => []);
+        /** @psalm-suppress ArgumentTypeCoercion */
+        return $this->math($divisor, fn(float $l, float $r): float => $l / $r, fn(): array => []);
     }
 
     public function debugDescription(): string
