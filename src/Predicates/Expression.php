@@ -15,6 +15,9 @@ use function Sabatier\Foundation\request_concrete_implementation;
  */
 class Expression extends ObjectClass
 {
+    /** @internal */
+    public readonly bool $usesKVC;
+
     /**
      * Initializes the expression with the specified expression type.
      *
@@ -22,6 +25,15 @@ class Expression extends ObjectClass
      */
     protected function __construct(public readonly ExpressionType $expressionType = ExpressionType::undefined)
     {
+        unset($this->usesKVC);
+    }
+
+    public function __get(string $name)
+    {
+        return $this->$name = match ($name) {
+            "usesKVC" => str_contains((string)$this, "@"),
+            default => $this->valueForUndefinedKey($name)
+        };
     }
 
     /**
