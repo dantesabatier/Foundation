@@ -70,7 +70,7 @@ trait CollectionAlgorithms
         $i += 1;
     }
 
-    public function firstIndex(Closure $where): mixed
+    public function firstIndex(Closure $where): int|null
     {
         $i = $this->startIndex();
         $end = $this->endIndex();
@@ -83,7 +83,7 @@ trait CollectionAlgorithms
         return null;
     }
 
-    public function indexOf(mixed $element): mixed
+    public function indexOf(mixed $element): int|null
     {
         return $this->firstIndex(fn(mixed $e): bool => is_equal($e, $element));
     }
