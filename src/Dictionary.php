@@ -268,7 +268,7 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
      */
     public function indexOf(mixed $element): ?string
     {
-        return $this->collectionIndexOf($element);
+        return $this->firstIndex(fn(mixed $e): bool => is_equal($e, $element));
     }
 
     /**
