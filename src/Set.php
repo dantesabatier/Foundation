@@ -692,7 +692,9 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
      */
     public function offsetSet(mixed $offset, mixed $value): void
     {
-        $this->collectionOffsetSet($offset, $value);
+        if (!$this->containsElement($value)) {
+            $this->collectionOffsetSet($offset, $value);
+        }
     }
 
     /**
