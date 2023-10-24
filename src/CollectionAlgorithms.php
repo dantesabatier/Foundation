@@ -83,7 +83,6 @@ trait CollectionAlgorithms
         return null;
     }
 
-    /** @noinspection PhpMixedReturnTypeCanBeReducedInspection */
     public function indexOf(mixed $element): mixed
     {
         return $this->firstIndex(fn(mixed $e): bool => is_equal($e, $element));
