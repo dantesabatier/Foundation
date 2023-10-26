@@ -404,6 +404,21 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
     }
 
     /**
+     * Adds a given key-value pair to the dictionary.
+     * @param Element|null $value The value for key.
+     * @param string $key The key for value.
+     */
+    public function setValueForKey(mixed $value, string $key): void
+    {
+        $this->offsetSet($key, $value);
+    }
+
+    public function setValueForKeyPath(mixed $value, string $keyPath): void
+    {
+        unimplemented($this, __FUNCTION__);
+    }
+
+    /**
      * As on {@see valueForKey()} but for case-insensitive key.
      * @return Element|null
      */
@@ -413,16 +428,6 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
             return $this->offsetGet($key);
         }
         return $this->first(fn(mixed $e, string $k): bool => string_is_equal($k, $key, CompareOptions::caseInsensitive));
-    }
-
-    /**
-     * Adds a given key-value pair to the dictionary.
-     * @param Element|null $value The value for key.
-     * @param string $key The key for value.
-     */
-    public function setValueForKey(mixed $value, string $key): void
-    {
-        $this->offsetSet($key, $value);
     }
 
     /**
