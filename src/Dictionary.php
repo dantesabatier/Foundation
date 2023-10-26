@@ -413,11 +413,6 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
         $this->offsetSet($key, $value);
     }
 
-    public function setValueForKeyPath(mixed $value, string $keyPath): void
-    {
-        unimplemented($this, __FUNCTION__);
-    }
-
     /**
      * As on {@see valueForKey()} but for case-insensitive key.
      * @return Element|null
