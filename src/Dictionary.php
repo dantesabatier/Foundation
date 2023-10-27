@@ -115,11 +115,9 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
      * </code>
      * @return Dictionary<mixed>
      */
-    public static function uniquingKeys(Sequence $keysAndValues, Closure $combine): Dictionary
+    public static function uniquingKeys(/** @noinspection PhpUnusedParameterInspection */ Sequence $keysAndValues, Closure $combine): Dictionary
     {
-        $instance = new Dictionary();
-        $instance->merge($keysAndValues, $combine);
-        return $instance;
+        unimplemented(static::class, __FUNCTION__);
     }
 
     /**
