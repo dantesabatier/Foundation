@@ -87,14 +87,14 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
     }
 
     /**
-     * @param iterable<int, Element> $iterable
+     * @param iterable<int, Element> $elements
      */
-    public function __construct(iterable $iterable = [])
+    public function __construct(iterable $elements = [])
     {
-        if ($iterable instanceof Set) {
-            $this->reserved = $iterable->toArray();
+        if ($elements instanceof Set) {
+            $this->reserved = $elements->toArray();
         } else {
-            $this->appendContentsOf($iterable);
+            $this->appendContentsOf($elements);
         }
     }
 

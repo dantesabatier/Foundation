@@ -41,14 +41,14 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
     }
 
     /**
-     * @param iterable<string, Element> $iterable
+     * @param iterable<string, Element> $uniqueKeysWithValues
      */
-    public function __construct(iterable $iterable = [])
+    public function __construct(iterable $uniqueKeysWithValues = [])
     {
-        if ($iterable instanceof Dictionary) {
-            $this->reserved = $iterable->toArray();
+        if ($uniqueKeysWithValues instanceof Dictionary) {
+            $this->reserved = $uniqueKeysWithValues->toArray();
         } else {
-            foreach ($iterable as $key => $value) {
+            foreach ($uniqueKeysWithValues as $key => $value) {
                 $this[$key] = $value;
             }
         }

@@ -76,18 +76,18 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
     }
 
     /**
-     * @param iterable<Element> $iterable
+     * @param iterable<Element> $elements
      */
-    public function __construct(iterable $iterable = [])
+    public function __construct(iterable $elements = [])
     {
-        if ($iterable instanceof ArrayClass || $iterable instanceof Set) {
-            $this->reserved = $iterable->toArray();
-        } elseif ($iterable instanceof Dictionary) {
-            $this->reserved = $iterable->values->toArray();
-        } elseif (is_array($iterable)) {
-            $this->reserved = is_sequential($iterable) ? $iterable : array_values($iterable);
+        if ($elements instanceof ArrayClass || $elements instanceof Set) {
+            $this->reserved = $elements->toArray();
+        } elseif ($elements instanceof Dictionary) {
+            $this->reserved = $elements->values->toArray();
+        } elseif (is_array($elements)) {
+            $this->reserved = is_sequential($elements) ? $elements : array_values($elements);
         } else {
-            $this->appendContentsOf($iterable);
+            $this->appendContentsOf($elements);
         }
     }
 
