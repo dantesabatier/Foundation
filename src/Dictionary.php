@@ -107,10 +107,10 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
      * The following example shows how to choose the first and last values for any duplicate keys:
      * <code>
      * $pairsWithDuplicateKeys = [("a", 1), ("b", 2), ("a", 3), ("b", 4)]
-     * $firstValues = Dictionary::uniquingKeys($pairsWithDuplicateKeys, fn(mixed $first, mixed $last): mixed => $first)
+     * $firstValues = Dictionary::uniquingKeys($pairsWithDuplicateKeys, fn(int $first, int $last): int => $first)
      * // ["b": 2, "a": 1]
      *
-     * $lastValues = Dictionary::uniquingKeys($pairsWithDuplicateKeys, fn(mixed $first, mixed $last): mixed => $last)
+     * $lastValues = Dictionary::uniquingKeys($pairsWithDuplicateKeys, fn(int $first, int $last): int => $last)
      * // ["b": 4, "a": 3]
      * </code>
      * @return Dictionary<mixed>
