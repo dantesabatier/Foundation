@@ -79,7 +79,7 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
      * // ["E": ["Efua"], "K": ["Kofi", "Kweku"], "A": ["Abena", "Akosua"]]
      * </code>
      * The new studentsByLetter dictionary has three entries, with students' names grouped by the keys "E", "K", and "A".
-     * @param Sequence $values A sequence of values to group into a dictionary.
+     * @param Sequence<string, mixed> $values A sequence of values to group into a dictionary.
      * @param Closure(mixed): string $by A closure that returns a key for each element in values.
      * @return Dictionary<ArrayClass<Dictionary>>
      */
@@ -95,6 +95,21 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
                 $instance[$k] = new ArrayClass([$e]);
             }
         }
+        return $instance;
+    }
+
+    /**
+     * Creates a new dictionary from the key-value pairs in the given sequence, using a combining closure to determine the value for any duplicate keys.
+     *
+     * You use this initializer to create a dictionary when you have a sequence of key-value tuples that might have duplicate keys. As the dictionary is built, the initializer calls the combine closure with the current and new values for any duplicate keys. Pass a closure as combine that returns the value to use in the resulting dictionary: The closure can choose between the two values, combine them to produce a new value, or even throw an error.
+     * @param Sequence<string, mixed> $keysAndValues A sequence of key-value pairs to use for the new dictionary.
+     * @param Closure(mixed, mixed): mixed $combine A closure that is called with the values for any duplicate keys that are encountered. The closure returns the desired value for the final dictionary.
+     * @return Dictionary<mixed>
+     */
+    public static function uniquingKeys(Sequence $keysAndValues, Closure $combine): Dictionary
+    {
+        $instance = new Dictionary();
+        $instance->merge($keysAndValues, $combine);
         return $instance;
     }
 
@@ -361,11 +376,11 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
      *
      * Use the combine closure to select a value to use in the updated dictionary, or to combine existing and new values.
      * As the key-values pairs in other are merged with this dictionary, the combine closure is called with the current and new values for any duplicate keys that are encountered.
-     * @param Dictionary<Element> $other A dictionary to merge.
+     * @param Sequence<string, Element> $other A dictionary to merge.
      * @param Closure(Element, Element): Element|null $combine A closure that takes the current and new values for any duplicate keys.
      * The closure returns the desired value for the final dictionary.
      */
-    public function merge(Dictionary $other, ?Closure $combine = null): void
+    public function merge(Sequence $other, ?Closure $combine = null): void
     {
         foreach ($other as $key => $value) {
             $new = $value;
