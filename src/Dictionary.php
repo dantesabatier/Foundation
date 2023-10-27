@@ -104,6 +104,15 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
      * You use this initializer to create a dictionary when you have a sequence of key-value tuples that might have duplicate keys. As the dictionary is built, the initializer calls the combine closure with the current and new values for any duplicate keys. Pass a closure as combine that returns the value to use in the resulting dictionary: The closure can choose between the two values, combine them to produce a new value, or even throw an error.
      * @param Sequence<string, mixed> $keysAndValues A sequence of key-value pairs to use for the new dictionary.
      * @param Closure(mixed, mixed): mixed $combine A closure that is called with the values for any duplicate keys that are encountered. The closure returns the desired value for the final dictionary.
+     * The following example shows how to choose the first and last values for any duplicate keys:
+     * <code>
+     * $pairsWithDuplicateKeys = [("a", 1), ("b", 2), ("a", 3), ("b", 4)]
+     * $firstValues = Dictionary::uniquingKeys($pairsWithDuplicateKeys, fn(mixed $first, mixed $last): mixed => $first)
+     * // ["b": 2, "a": 1]
+     *
+     * $lastValues = Dictionary::uniquingKeys($pairsWithDuplicateKeys, fn(mixed $first, mixed $last): mixed => $last)
+     * // ["b": 4, "a": 3]
+     * </code>
      * @return Dictionary<mixed>
      */
     public static function uniquingKeys(Sequence $keysAndValues, Closure $combine): Dictionary
