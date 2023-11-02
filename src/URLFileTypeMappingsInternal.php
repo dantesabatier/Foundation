@@ -24,6 +24,7 @@ final readonly class URLFileTypeMappingsInternal
                 $scanner->charactersToBeSkipped = PHP_EOL;
                 while ($scanner->scanUpCharacters(PHP_EOL, $line)) {
                     if (isset($line[0]) && $line[0] !== "#" && preg_match_all("#(\S+)#", $line, $matches) && isset($matches[1]) && (count($matches[1])) > 1) {
+                        /** @var ArrayClass<string> $extensions */
                         $extensions = new ArrayClass($matches[1]);
                         /** @var string $mimeType */
                         $mimeType = $extensions->popFirst();
