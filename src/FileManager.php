@@ -556,12 +556,7 @@ final class FileManager extends ObjectClass
      */
     public function contents(string $path): ?string
     {
-        return unsafe_value(function () use ($path): ?string {
-            if (is_dir($path)) {
-                return null;
-            }
-            return file_get_contents($path);
-        });
+        return is_dir($path) ? null : unsafe_value(fn(): string => file_get_contents($path));
     }
 
     private function setNewAttributes(?Dictionary $attributes, string $path): void
