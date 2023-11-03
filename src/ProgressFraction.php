@@ -21,17 +21,7 @@ class ProgressFraction extends ObjectClass
         return match ($name) {
             "isIndeterminate" => $this->completed < 0 || $this->total < 0 || ($this->completed == 0 && $this->total == 0),
             "isFinished" => (($this->completed >= $this->total) && $this->completed > 0 && $this->total > 0) || ($this->completed > 0 && $this->total == 0),
-            "fractionCompleted" => (function (): float {
-                if ($this->isIndeterminate) {
-                    return 0.0;
-                } else {
-                    if ($this->total == 0) {
-                        return 1.0;
-                    } else {
-                        return $this->completed / $this->total;
-                    }
-                }
-            })(),
+            "fractionCompleted" => $this->isIndeterminate ? 0.0 : ($this->total == 0 ? 1.0 : $this->completed / $this->total),
             default => $this->valueForUndefinedKey($name),
         };
     }
