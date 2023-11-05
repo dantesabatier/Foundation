@@ -2,9 +2,16 @@
 
 namespace Sabatier\Foundation;
 
+use Random\Engine\Secure;
+use Random\Randomizer;
+
 const UUID_NULL = "00000000-0000-0000-0000-000000000000";
 
-/** @internal */
+function read_random(int $numBytes): string
+{
+    return (new Randomizer(new Secure()))->getBytes($numBytes);
+}
+
 function nanotime(): float
 {
     [$s, $n] = hrtime();
@@ -30,8 +37,7 @@ function uuid_validate(string $uuid): bool
 
 function uuid_generate_random(): string
 {
-    /** @noinspection PhpUnhandledExceptionInspection */
-    $out = random_bytes(16);
+    $out = read_random(16);
     $out[6] = chr(ord($out[6]) & 0x0f | 0x40);
     $out[8] = chr(ord($out[8]) & 0x3f | 0x80);
     return vsprintf("%s%s-%s-%s-%s-%s%s%s", str_split(bin2hex($out), 4));
@@ -40,8 +46,7 @@ function uuid_generate_random(): string
 function uuid_generate_time(): string
 {
     $time = read_time();
-    /** @noinspection PhpUnhandledExceptionInspection */
-    $out = random_bytes(16);
+    $out = read_random(16);
     $out[0] = chr((int)$time >> 24);
     $out[1] = chr((int)$time >> 16);
     $out[2] = chr((int)$time >> 8);
