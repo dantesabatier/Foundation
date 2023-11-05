@@ -18,7 +18,6 @@ function nanotime(): float
     return ($s + $n);
 }
 
-/** @internal */
 function read_time(): float
 {
     $time = nanotime();
