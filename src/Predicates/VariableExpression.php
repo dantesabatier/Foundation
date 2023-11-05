@@ -9,7 +9,6 @@ use function Sabatier\Foundation\human_readable_value;
 /** @internal */
 class VariableExpression extends Expression
 {
-    #[Pure]
     public function __construct(private readonly string $variable)
     {
         parent::__construct(ExpressionType::variable);
