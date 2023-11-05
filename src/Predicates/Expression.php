@@ -84,7 +84,6 @@ class Expression extends ObjectClass
      * @param string $variable The key for the variable to extract from the variable bindings dictionary.
      * @return Expression A new expression that extracts from the variable bindings dictionary the value for the key string.
      */
-    #[Pure]
     public static function expressionForVariable(string $variable): Expression
     {
         return new VariableExpression($variable);
