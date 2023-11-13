@@ -2,6 +2,7 @@
 
 namespace Sabatier\Foundation;
 
+use BackedEnum;
 use DateTime;
 use DOMDocument;
 use DOMElement;
@@ -42,6 +43,8 @@ readonly class PropertyListSerializer
             $element->appendChild($document->createElement("real", (string)$obj));
         } elseif ($obj instanceof Date) {
             $element->appendChild($document->createElement("date", (string)$obj));
+        } elseif ($obj instanceof Value || $obj instanceof BackedEnum) {
+            $this->append($obj->value, $element);
         } elseif ($obj instanceof ArrayClass || $obj instanceof Set || $obj instanceof Dictionary || is_array($obj)) {
             $parent = $document->createElement(($obj instanceof ArrayClass || $obj instanceof Set || (is_array($obj) && is_sequential($obj))) ? "array" : "dict");
             $element->appendChild($parent);
