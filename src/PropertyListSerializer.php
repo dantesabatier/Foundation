@@ -36,7 +36,7 @@ readonly class PropertyListSerializer
         } elseif (is_string($obj)) {
             $element->appendChild($document->createElement("string", $obj));
         } elseif (is_bool($obj)) {
-            $element->appendChild($document->createElement($obj ? "true" : "false"));
+            $element->appendChild($document->createElement(human_readable_value($obj)));
         } elseif (is_int($obj)) {
             $element->appendChild($document->createElement("integer", (string)$obj));
         } elseif (is_float($obj)) {
