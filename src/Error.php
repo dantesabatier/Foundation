@@ -19,8 +19,8 @@ class Error extends ObjectClass
     public readonly ?string $localizedRecoverySuggestion;
     /** @var string|null A string containing the localized explanation of the reason for the error. The object in the user info dictionary for the key {@see LocalizedFailureReasonErrorKey}. */
     public readonly ?string $localizedFailureReason;
-    /** @var mixed The object in the user info dictionary corresponding to the {@see RecoveryAttempterErrorKey} key. If userInfo doesn't contain a value for {@see RecoveryAttempterErrorKey}, this property is nil. */
-    public readonly mixed $recoveryAttempter;
+    /** @var ErrorRecoveryAttempting The object in the user info dictionary corresponding to the {@see RecoveryAttempterErrorKey} key. If userInfo doesn't contain a value for {@see RecoveryAttempterErrorKey}, this property is nil. */
+    public readonly ErrorRecoveryAttempting $recoveryAttempter;
 
     /**
      * Returns an Error object initialized for a given domain and code with a given userInfo dictionary.
