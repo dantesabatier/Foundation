@@ -103,8 +103,8 @@ final class OperationQueue extends ObjectClass
                 Fiber::suspend();
                 $this->operations->append($operation);
                 $this->operations->sort(fn(Operation $op0, Operation $op1): int => ComparisonResult::orderedAscending->value * ($op0->queuePriority->value <=> $op1->queuePriority->value));
-                $operation->observe("isFinished", KeyValueObservingOptions::new, function (Operation $operation): void {
-                    if ($operation->isFinished) {
+                $operation->observe("isFinished", KeyValueObservingOptions::new, function (Operation $operation, KeyValueObservedChange $change): void {
+                    if ($change->newValue) {
                         $this->operations->remove($operation);
                     }
                 });
@@ -113,8 +113,8 @@ final class OperationQueue extends ObjectClass
                     $operation->start();
                     return;
                 }
-                $operation->observe("isReady", KeyValueObservingOptions::new, function (Operation $operation): void {
-                    if ($operation->isReady) {
+                $operation->observe("isReady", KeyValueObservingOptions::new, function (Operation $operation, KeyValueObservedChange $change): void {
+                    if ($change->newValue) {
                         $operation->start();
                     }
                 });
