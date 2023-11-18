@@ -122,8 +122,8 @@ abstract class Operation extends ObjectClass
         $this->willChangeValueForKey("isReady");
         $this->isReady = false;
         $this->didChangeValueForKey("isReady");
-        $operation->observe("isFinished", KeyValueObservingOptions::new, function (Operation $operation): void {
-            if ($operation->isFinished) {
+        $operation->observe("isFinished", KeyValueObservingOptions::new, function (Operation $operation, KeyValueObservedChange $change): void {
+            if ($change->newValue) {
                 $this->removeDependency($operation);
             }
         });
