@@ -2,7 +2,6 @@
 
 namespace Sabatier\Foundation;
 
-use DateTimeInterface;
 use IntlDateFormatter;
 use JetBrains\PhpStorm\Pure;
 use Locale;
