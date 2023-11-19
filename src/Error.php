@@ -140,6 +140,6 @@ class Error extends ObjectClass
 
     public function jsonSerialize(): Dictionary
     {
-        return $this->dictionaryWithValues(new ArrayClass(["domain", "code", "localizedDescription", "localizedRecoveryOptions", "localizedRecoverySuggestion", "localizedFailureReason"]));
+        return $this->dictionaryWithValues(new ArrayClass(["domain", "code", "userInfo", "localizedDescription", "localizedRecoveryOptions", "localizedRecoverySuggestion", "localizedFailureReason"]));
     }
 }
