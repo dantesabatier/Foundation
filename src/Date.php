@@ -2,7 +2,10 @@
 
 namespace Sabatier\Foundation;
 
+use DateTimeInterface;
+use IntlDateFormatter;
 use JetBrains\PhpStorm\Pure;
+use Locale;
 
 /**
  * A specific point in time, independent of any calendar or time zone.
@@ -189,17 +192,27 @@ class Date extends ObjectClass
 
     /**
      * Generates a locale-aware string representation of a date using the default date format style.
-     * @param string $format
+     * @param DateFormatStyleDateStyle $date The date format style to apply to the date.
+     * @param DateFormatStyleTimeStyle $time The time format style to apply to the date.
+     * @return string A string, formatted according to the specified date and time styles.
+     */
+    public function formatted(DateFormatStyleDateStyle $date = DateFormatStyleDateStyle::abbreviated, DateFormatStyleTimeStyle $time = DateFormatStyleTimeStyle::shortened): string
+    {
+        return (new IntlDateFormatter(Locale::getDefault(), $date->value, $time->value))->format((int)$this->timeIntervalSinceReferenceDate);
+    }
+
+    /**
+     * Generates a locale-aware string representation of a date using the ISO 8601 date format.
      * @return string
      */
-    public function formatted(string $format = "Y-m-d H:i:s"): string
+    public function ISO8601Format(): string
     {
-        return date($format, (int)$this->timeIntervalSinceReferenceDate);
+        return date(DATE_ATOM, (int)$this->timeIntervalSinceReferenceDate);
     }
 
     public function description(): string
     {
-        return $this->formatted();
+        return date("Y-m-d H:i:s", (int)$this->timeIntervalSinceReferenceDate);
     }
 
     public function debugDescription(): string
