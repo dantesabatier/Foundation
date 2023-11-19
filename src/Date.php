@@ -56,7 +56,6 @@ class Date extends ObjectClass
 
     /**
      * Creates a date value initialized relative to the current date and time by a given number of seconds.
-     *
      * @param float $timeInterval The number of seconds from the current date and time for the new date. Use a negative value to specify a date before the current date.
      * @return Date A Date object set to seconds from the current date and time.
      */
@@ -67,7 +66,6 @@ class Date extends ObjectClass
 
     /**
      * Creates a date value initialized relative to another given date by a given number of seconds.
-     *
      * @param float $timeInterval The number of seconds to add to date. A negative value means the receiver will be earlier than date.
      * @param Date $date The reference date.
      * @return Date A Date object set to seconds from date.
@@ -145,7 +143,6 @@ class Date extends ObjectClass
 
     /**
      * Returns the interval between this date and another given date.
-     *
      * @param Date $date The date with which to compare to this one.
      * @return float The interval between the receiver and the another parameter. If the receiver is earlier than date, the return value is negative. If date is nil, the results are undefined.
      */
@@ -157,7 +154,6 @@ class Date extends ObjectClass
 
     /**
      * Adds a time interval to this date.
-     *
      * @param float $timeInterval The value to add, in seconds.
      */
     public function addTimeInterval(float $timeInterval): void
@@ -167,7 +163,6 @@ class Date extends ObjectClass
 
     /**
      * Creates a new date value by adding a time interval to this date.
-     *
      * @param float $timeInterval The value to add, in seconds.
      * @return Date A new date value calculated by adding a time interval to this date.
      */
@@ -180,7 +175,6 @@ class Date extends ObjectClass
 
     /**
      * Returns a date offset the specified time interval from this date.
-     *
      * @param float $n The time interval offset.
      * @return Date A date offset the specified time interval from this date.
      */
