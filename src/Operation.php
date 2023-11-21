@@ -59,11 +59,11 @@ abstract class Operation extends ObjectClass
     {
         $this->willChangeValueForKey($name);
         $this->$name = match ($name) {
-            "isExecuting", "isFinished", "isConcurrent", "isAsynchronous", "isReady" => $value,
             "isCancelled" => (function () use ($value): bool {
                 $this->dependencies->setValueForKey($this->isCancelled, "isCancelled");
                 return $value;
             })(),
+            "isExecuting", "isFinished", "isConcurrent", "isAsynchronous", "isReady" => $value,
             default => $this->valueForUndefinedKey($name)
         };
         $this->didChangeValueForKey($name);
