@@ -61,8 +61,7 @@ class Slice extends ObjectClass implements Collection, IteratorAggregate
      */
     public function map(Closure $transform): Collection
     {
-        $baseClass = $this->base::class;
-        return (new $baseClass($this))->map($transform);
+        return (new ($this->base::class)($this))->map($transform);
     }
 
     /**
@@ -73,8 +72,7 @@ class Slice extends ObjectClass implements Collection, IteratorAggregate
      */
     public function compactMap(Closure $transform): Collection
     {
-        $baseClass = $this->base::class;
-        return (new $baseClass($this))->compactMap($transform);
+        return (new ($this->base::class)($this))->compactMap($transform);
     }
 
     /**
@@ -85,8 +83,7 @@ class Slice extends ObjectClass implements Collection, IteratorAggregate
      */
     public function flatMap(Closure $transform): Collection
     {
-        $baseClass = $this->base::class;
-        return (new $baseClass($this))->flatMap($transform);
+        return (new ($this->base::class)($this))->flatMap($transform);
     }
 
     public function startIndex(): int
