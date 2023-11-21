@@ -82,8 +82,11 @@ final class URL extends ObjectClass
             if (!$baseURL instanceof URL) {
                 return $this;
             }
-            if (!$baseURL->hasDirectoryPath) {
+            while (!$baseURL->hasDirectoryPath) {
                 $baseURL = $baseURL->deletingLastPathComponent();
+                if ($baseURL->path === "/") {
+                    break;
+                }
             }
             $relative = $this->string;
             if (str_starts_with($relative, "/")) {
