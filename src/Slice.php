@@ -143,7 +143,7 @@ class Slice extends ObjectClass implements Collection, IteratorAggregate
 
     public function sorted(iterable $descriptors): ArrayClass
     {
-        invalid_mutation();
+        unsupported($this, __FUNCTION__);
     }
 
     /**
