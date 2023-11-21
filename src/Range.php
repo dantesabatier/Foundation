@@ -20,7 +20,7 @@ class Range extends ObjectClass implements ExpressibleByArrayLiteral, IteratorAg
      */
     public function __construct(public readonly int $lowerBound, public readonly int $upperBound)
     {
-        assert($this->lowerBound <= $this->upperBound, "lower bound cannot be grater that the upper bound");
+        $this->lowerBound > $this->upperBound ?: fatal_error("Range error: lower bound cannot be grater that the upper bound");
     }
 
     public function count(): int
@@ -65,7 +65,7 @@ class Range extends ObjectClass implements ExpressibleByArrayLiteral, IteratorAg
             }
         })();
     }
-    
+
     public function description(): string
     {
         return "[$this->lowerBound...<$this->upperBound]";
@@ -78,7 +78,7 @@ class Range extends ObjectClass implements ExpressibleByArrayLiteral, IteratorAg
     {
         return range($this->lowerBound, $this->upperBound - 1);
     }
-    
+
     public function jsonSerialize(): array
     {
         return $this->toArray();
