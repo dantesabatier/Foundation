@@ -58,6 +58,7 @@ class Slice extends ObjectClass implements Collection, IteratorAggregate
      * Returns a Collection containing the results of mapping the given closure over the collection's elements.
      * @param Closure(mixed, int=): Result $transform
      * @return Collection<int, Result>
+     * @psalm-suppress LessSpecificReturnStatement, MoreSpecificReturnType
      */
     public function map(Closure $transform): Collection
     {
@@ -69,6 +70,7 @@ class Slice extends ObjectClass implements Collection, IteratorAggregate
      * Returns a Collection containing the non-nil results of calling the given transformation with each element of this collection.
      * @param Closure(mixed, int=): Result $transform
      * @return Collection<int, Result>
+     * @psalm-suppress LessSpecificReturnStatement, MoreSpecificReturnType
      */
     public function compactMap(Closure $transform): Collection
     {
@@ -80,6 +82,7 @@ class Slice extends ObjectClass implements Collection, IteratorAggregate
      * Returns a Collection containing the concatenated results of calling the given transformation with each element of this collection.
      * @param Closure(mixed, int=): iterable<Result> $transform
      * @return Collection<int, Result>
+     * @psalm-suppress LessSpecificReturnStatement, MoreSpecificReturnType
      */
     public function flatMap(Closure $transform): Collection
     {
@@ -143,9 +146,15 @@ class Slice extends ObjectClass implements Collection, IteratorAggregate
         invalid_mutation();
     }
 
+    /**
+     * Returns the elements of this sequence of sequences, concatenated.
+     * @return FlattenSequence<Element> A flattened view of the elements of this sequence of sequences.
+     * @psalm-suppress LessSpecificReturnStatement, MoreSpecificReturnType
+     */
     public function joined(): FlattenSequence
     {
-        unsupported($this, __FUNCTION__);
+        /** @psalm-suppress InvalidArgument */
+        return new FlattenSequence($this->base);
     }
 
     public function valueForKey(string $key): Collection
