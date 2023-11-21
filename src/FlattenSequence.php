@@ -52,8 +52,7 @@ class FlattenSequence extends ObjectClass implements Sequence, IteratorAggregate
      */
     public function map(Closure $transform): Sequence
     {
-        $baseClass = $this->base::class;
-        return (new $baseClass($this))->map($transform);
+        return (new ($this->base::class)($this))->map($transform);
     }
 
     /**
@@ -64,8 +63,7 @@ class FlattenSequence extends ObjectClass implements Sequence, IteratorAggregate
      */
     public function compactMap(Closure $transform): Sequence
     {
-        $baseClass = $this->base::class;
-        return (new $baseClass($this))->compactMap($transform);
+        return (new ($this->base::class)($this))->compactMap($transform);
     }
 
     /**
@@ -76,8 +74,7 @@ class FlattenSequence extends ObjectClass implements Sequence, IteratorAggregate
      */
     public function flatMap(Closure $transform): Sequence
     {
-        $baseClass = $this->base::class;
-        return (new $baseClass($this))->flatMap($transform);
+        return (new ($this->base::class)($this))->flatMap($transform);
     }
 
     public function getIterator(): Generator
