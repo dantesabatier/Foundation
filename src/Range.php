@@ -20,7 +20,7 @@ class Range extends ObjectClass implements ExpressibleByArrayLiteral, IteratorAg
      */
     public function __construct(public readonly int $lowerBound, public readonly int $upperBound)
     {
-        $this->lowerBound > $this->upperBound ?: fatal_error("Range error: lower bound cannot be grater that the upper bound");
+        $this->upperBound > $this->lowerBound ?: fatal_error("Range error: lower bound cannot be grater that the upper bound");
     }
 
     public function count(): int
