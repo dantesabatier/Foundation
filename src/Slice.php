@@ -5,6 +5,7 @@ namespace Sabatier\Foundation;
 use Closure;
 use Generator;
 use IteratorAggregate;
+use Sabatier\Foundation\Predicates\Predicate;
 use Traversable;
 
 /**
@@ -13,17 +14,18 @@ use Traversable;
  * A slice stores a base collection and the start and end indices of the view.
  * It does not copy the elements from the collection into separate storage.
  * @template Element
- * @implements Sequence<int, Element>
+ * @implements Collection<int, Element>
  * @implements IteratorAggregate<int, Element>
  */
-class Slice extends ObjectClass implements Sequence, IteratorAggregate
+class Slice extends ObjectClass implements Collection, IteratorAggregate
 {
-    use SequenceAlgorithms {
+    use CollectionAlgorithms {
         reduce as private sequenceReduce;
     }
 
     public readonly int $startIndex;
     public readonly int $endIndex;
+    public readonly Range $indices;
 
     /**
      * Creates a view into the given collection that allows access to elements within the specified range.
@@ -32,6 +34,7 @@ class Slice extends ObjectClass implements Sequence, IteratorAggregate
      */
     public function __construct(public readonly Collection $base, Range $bounds)
     {
+        $this->indices = $bounds;
         $this->startIndex = $bounds->lowerBound;
         $this->endIndex = $bounds->upperBound;
     }
@@ -54,9 +57,9 @@ class Slice extends ObjectClass implements Sequence, IteratorAggregate
      * @template Result
      * Returns a Collection containing the results of mapping the given closure over the collection's elements.
      * @param Closure(mixed, int=): Result $transform
-     * @return Sequence<int, Result>
+     * @return Collection<int, Result>
      */
-    public function map(Closure $transform): Sequence
+    public function map(Closure $transform): Collection
     {
         $baseClass = $this->base::class;
         return (new $baseClass($this))->map($transform);
@@ -66,9 +69,9 @@ class Slice extends ObjectClass implements Sequence, IteratorAggregate
      * @template Result
      * Returns a Collection containing the non-nil results of calling the given transformation with each element of this collection.
      * @param Closure(mixed, int=): Result $transform
-     * @return Sequence<int, Result>
+     * @return Collection<int, Result>
      */
-    public function compactMap(Closure $transform): Sequence
+    public function compactMap(Closure $transform): Collection
     {
         $baseClass = $this->base::class;
         return (new $baseClass($this))->compactMap($transform);
@@ -78,22 +81,82 @@ class Slice extends ObjectClass implements Sequence, IteratorAggregate
      * @template Result
      * Returns a Collection containing the concatenated results of calling the given transformation with each element of this collection.
      * @param Closure(mixed, int=): iterable<Result> $transform
-     * @return Sequence<int, Result>
+     * @return Collection<int, Result>
      */
-    public function flatMap(Closure $transform): Sequence
+    public function flatMap(Closure $transform): Collection
     {
         $baseClass = $this->base::class;
         return (new $baseClass($this))->flatMap($transform);
     }
 
-    public function count(): int
+    public function startIndex(): int
     {
-        return $this->endIndex - $this->startIndex;
+        return $this->startIndex;
     }
 
-    public function isEmpty(): bool
+    public function endIndex(): int
     {
-        return $this->endIndex === $this->startIndex;
+        return $this->endIndex;
+    }
+
+    public function indices(): Range
+    {
+        return $this->indices;
+    }
+
+    /**
+     * Returns a Collection containing, in order, the elements of the collection that satisfy the given predicate.
+     * @param Closure(Element, int=, bool=): bool $isIncluded
+     * @return ArrayClass<Element>
+     */
+    public function filter(Closure $isIncluded): ArrayClass
+    {
+        $instance = new ArrayClass();
+        foreach ($this as $i => $e) {
+            $stop = false;
+            if ($isIncluded($e, $i, $stop)) {
+                $instance[] = $e;
+            }
+            /** @psalm-suppress TypeDoesNotContainType */
+            if ($stop) {
+                break;
+            }
+        }
+        return $instance;
+    }
+
+    /**
+     * Evaluates a given predicate against each object in the receiving and returns a new collection containing the objects for which the predicate returns true.
+     * @param Predicate $predicate The predicate against which to evaluate the receiving collection's elements.
+     * @return ArrayClass<Element> A new collection containing the objects in the receiving array for which predicate returns true.
+     * Objects in the resulting array appear in the same order as they do in the receiver.
+     */
+    public function filtered(Predicate $predicate): ArrayClass
+    {
+        return $this->filter(fn(mixed $e): bool => $predicate->evaluate($e));
+    }
+
+    public function sort(?Closure $by = null): ArrayClass
+    {
+        invalid_mutation();
+    }
+
+    public function sorted(iterable $descriptors): ArrayClass
+    {
+        invalid_mutation();
+    }
+
+    public function joined(): FlattenSequence
+    {
+        unsupported($this, __FUNCTION__);
+    }
+
+    public function valueForKey(string $key): Collection
+    {
+        return $this->map(function (KeyValueCoding $e) use ($key): mixed {
+            assert($e instanceof KeyValueCoding, sprintf("Invalid argument: expecting %s, \"%s\" given", KeyValueCoding::class, typeof($e)));
+            return $e->valueForKey($key);
+        });
     }
 
     /**
