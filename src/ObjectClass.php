@@ -335,7 +335,7 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
     public function setValuesForKeys(Dictionary $keyedValues): void
     {
         foreach ($keyedValues as $key => $value) {
-            $this->setValueForKey($value, $key);
+            $this->setValueForKeyPath($value, $key);
         }
     }
 
