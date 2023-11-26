@@ -39,6 +39,16 @@ class Slice extends ObjectClass implements Collection, IteratorAggregate
         $this->endIndex = $bounds->upperBound;
     }
 
+    public function count(): int
+    {
+        return $this->endIndex - $this->startIndex;
+    }
+
+    public function isEmpty(): bool
+    {
+        return $this->endIndex === $this->startIndex;
+    }
+
     /**
      * Returns the result of combining the elements of the sequence using the given closure.
      * Use the {@see reduce()} method to produce a single value from the elements of an entire sequence.
