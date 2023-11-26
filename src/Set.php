@@ -18,6 +18,7 @@ use Sabatier\Foundation\Predicates\Predicate;
  * @template Element
  * @implements Iterator<int, Element>
  * @implements SetAlgebra<Element>
+ * @property-read int $count
  */
 class Set extends ObjectClass implements SetAlgebra, Iterator
 {
@@ -96,6 +97,14 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
         } else {
             $this->appendContentsOf($elements);
         }
+    }
+
+    public function __get(string $name)
+    {
+        return match ($name) {
+            "count" => $this->count(),
+            default => $this->valueForUndefinedKey($name)
+        };
     }
 
     /**
