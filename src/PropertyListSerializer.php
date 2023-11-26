@@ -69,7 +69,6 @@ readonly class PropertyListSerializer
         return null;
     }
 
-    /** @noinspection PhpUnhandledExceptionInspection */
     private function value(DOMElement $element): mixed
     {
         return match ($element->tagName) {
