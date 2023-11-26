@@ -22,6 +22,7 @@ use Traversable;
  * @implements IteratorAggregate<string, Element>
  * @property-read ArrayClass<string> $keys An array containing just the keys of the dictionary.
  * @property-read ArrayClass<Element> $values An array containing just the values of the dictionary.
+ * @property-read int $count
  */
 class Dictionary extends ObjectClass implements Collection, IteratorAggregate
 {
@@ -57,6 +58,7 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
     public function __get(string $name)
     {
         return match ($name) {
+            "count" => $this->count(),
             "keys" => new ArrayClass(array_keys($this->reserved)),
             "values" => new ArrayClass(array_values($this->reserved)),
             default => $this->valueForUndefinedKey($name),
