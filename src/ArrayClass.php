@@ -18,6 +18,7 @@ use Sabatier\Foundation\Predicates\Predicate;
  * @template Element
  * @implements RangeReplaceableCollection<Element>
  * @implements Iterator<int, Element>
+ * @property-read int $count
  */
 class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iterator
 {
@@ -89,6 +90,14 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
         } else {
             $this->appendContentsOf($elements);
         }
+    }
+
+    public function __get(string $name)
+    {
+        return match ($name) {
+            "count" => $this->count(),
+            default => $this->valueForUndefinedKey($name)
+        };
     }
 
     public static function arrayWithArray(array $array): ArrayClass
