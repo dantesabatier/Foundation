@@ -20,8 +20,8 @@ use Sabatier\Foundation\Predicates\Predicate;
  * @implements SetAlgebra<Element>
  * @property-read bool $isEmpty A Boolean value indicating whether the collection is empty.
  * @property-read int $count The number of elements in the collection.
- * @property-read int|null $first The first element of the collection.
- * @property-read int|null $last The last element of the collection.
+ * @property-read Element|null $first The first element of the collection.
+ * @property-read Element|null $last The last element of the collection.
  */
 class Set extends ObjectClass implements SetAlgebra, Iterator
 {

@@ -60,7 +60,7 @@ class URLResourceValuesStorage
                 $keysToFetch->append($key);
             }
         }
-        if (!$keysToFetch->isEmpty()) {
+        if (!$keysToFetch->isEmpty) {
             $found = $this->read($keysToFetch, $url)->compactMapValues(fn(mixed $value): mixed => $value);
             $this->valuesCache->merge($found);
             $result->merge($found);

@@ -100,7 +100,7 @@ class FunctionExpression extends Expression
             $format .= ", ";
             if ($selector = $this->selector) {
                 $format .= $selector;
-                if (!$this->arguments?->isEmpty()) {
+                if (!$this->arguments?->isEmpty) {
                     $format .= ", ";
                 }
             }

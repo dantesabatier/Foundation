@@ -56,7 +56,7 @@ final readonly class MultiHandle
             $handle->connect();
             return;
         }
-        $needsTimeout = $this->easyHandles->isEmpty();
+        $needsTimeout = $this->easyHandles->isEmpty;
         $this->easyHandles->append($handle);
         curl_multi_add_handle($this->rawHandle, $handle->rawHandle);
         if ($needsTimeout) {

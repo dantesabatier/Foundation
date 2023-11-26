@@ -56,10 +56,10 @@ class CompoundPredicateOperator extends PredicateOperator
 
     public function evaluatePredicates(ArrayClass $predicates, mixed $object = null, ?Dictionary $substitutionVariables = null): bool
     {
-        if (!$predicates->isEmpty()) {
+        if (!$predicates->isEmpty) {
             $evaluations = $predicates->map(fn(Predicate $predicate): bool => $predicate->evaluate($object, $substitutionVariables));
             return match ($this->compoundPredicateType()) {
-                CompoundPredicateLogicalType::not => !$evaluations->first(),
+                CompoundPredicateLogicalType::not => !$evaluations->first,
                 CompoundPredicateLogicalType::and => !$evaluations->containsElement(false),
                 CompoundPredicateLogicalType::or => $evaluations->containsElement(true),
             };

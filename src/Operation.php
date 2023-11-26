@@ -149,7 +149,7 @@ abstract class Operation extends ObjectClass
     public function removeDependency(Operation $operation): void
     {
         $this->dependencies->remove($operation);
-        $this->setValueForKey($this->dependencies->isEmpty(), "isReady");
+        $this->setValueForKey($this->dependencies->isEmpty, "isReady");
     }
 
     /**

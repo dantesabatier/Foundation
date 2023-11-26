@@ -230,7 +230,7 @@ final class URLSession implements URLSessionProtocol
     public function webSocketTaskWithURL(URL $url, ArrayClass $protocols = new ArrayClass()): URLSessionWebSocketTask
     {
         $request = new URLRequest($url);
-        if (!$protocols->isEmpty()) {
+        if (!$protocols->isEmpty) {
             $request->setValueForHttpHeaderField($protocols->join(", "), "Sec-WebSocket-Protocol");
         }
         return $this->webSocketTaskWithRequest($request);

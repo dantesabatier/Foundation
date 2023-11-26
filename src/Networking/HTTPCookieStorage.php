@@ -276,6 +276,6 @@ class HTTPCookieStorage extends ObjectClass
 
     public function description(): string
     {
-        return ($this->isEphemeral ? "Ephemeral" : "") . "<HTTPCookieStorage cookies count:({$this->allCookies->count()})>";
+        return ($this->isEphemeral ? "Ephemeral" : "") . "<HTTPCookieStorage cookies count:({$this->allCookies->count})>";
     }
 }

@@ -61,7 +61,7 @@ class CompoundPredicate extends Predicate
     {
         $type = $this->compoundPredicateType;
         $subpredicates = $this->subpredicates;
-        if ($subpredicates->isEmpty()) {
+        if ($subpredicates->isEmpty) {
             /** @noinspection PhpVoidFunctionResultUsedInspection */
             return match ($type) {
                 CompoundPredicateLogicalType::and => TruePredicate::default()->predicateFormat(),

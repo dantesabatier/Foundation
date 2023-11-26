@@ -108,7 +108,7 @@ trait MutableCollectionAlgorithms
     
     public function popFirst()
     {
-        if ($this->isEmpty()) {
+        if ($this->isEmpty) {
             return null;
         }
         return $this->removeAt(0);
@@ -116,7 +116,7 @@ trait MutableCollectionAlgorithms
     
     public function popLast()
     {
-        if ($this->isEmpty()) {
+        if ($this->isEmpty) {
             return null;
         }
         return $this->removeAt($this->indexBefore($this->endIndex()));

@@ -95,7 +95,7 @@ final class URL extends ObjectClass
                 $relative = substring_from_index($relative, 2);
             } elseif (str_starts_with($relative, "../")) {
                 $steps = substr_count($relative, "../");
-                $numberOfComponents = $baseURL->pathComponents->count();
+                $numberOfComponents = $baseURL->pathComponents->count;
                 if ($steps >= $numberOfComponents) {
                     $steps = ($numberOfComponents - 1);
                 }
@@ -154,7 +154,7 @@ final class URL extends ObjectClass
                 $components->append("/");
             }
             $components->appendContentsOf((new ArrayClass(explode("/", $path)))->filter(fn(string $component): bool => !empty($component)));
-            if ($components->count() > 1 && str_ends_with($path, "/")) {
+            if ($components->count > 1 && str_ends_with($path, "/")) {
                 $components->append("/");
             }
             return $components;
@@ -300,7 +300,7 @@ final class URL extends ObjectClass
     public function deleteLastPathComponent(): URL
     {
         $this->string = str_replace($this->lastPathComponent, "", $this->string);
-        if ($this->pathComponents->count() > 1) {
+        if ($this->pathComponents->count > 1) {
             $this->string = rtrim($this->string, "/.");
         }
         return $this;

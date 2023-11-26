@@ -329,7 +329,7 @@ final class EasyHandle
             $headerFields[trim($headerComponents[0])] = trim($headerComponents[1]);
         }
         $cookies = HTTPCookie::cookies($headerFields, $url);
-        if ($cookies->isEmpty()) {
+        if ($cookies->isEmpty) {
             return;
         }
         $storage->setCookies($cookies, $url);

@@ -45,13 +45,13 @@ class UndoManager extends ObjectClass
     public function __get(string $name)
     {
         return match ($name) {
-            "canUndo" => !$this->undoStack->isEmpty() || $this->group?->actions->isEmpty() === false,
+            "canUndo" => !$this->undoStack->isEmpty || $this->group?->actions->isEmpty === false,
             "canRedo" => (function (): bool {
                 NotificationCenter::default()->postNotificationName(UndoManagerCheckpointNotification, $this);
-                return !$this->redoStack->isEmpty();
+                return !$this->redoStack->isEmpty;
             })(),
-            "redoActionName" => $this->redoStack->last()?->actionName ?? "",
-            "undoActionName" => $this->group?->actionName ?? $this->undoStack->last()?->actionName ?? "",
+            "redoActionName" => $this->redoStack->last?->actionName ?? "",
+            "undoActionName" => $this->group?->actionName ?? $this->undoStack->last?->actionName ?? "",
             "redoMenuItemTitle" => $this->redoMenuTitle($this->redoActionName),
             "undoMenuItemTitle" => $this->undoMenuTitle($this->undoActionName),
             "levelsOfUndo", "groupingLevel", "isUndoRegistrationEnabled", "isUndoing", "isRedoing", "undoActionIsDiscardable", "redoActionIsDiscardable" => $this->$name,
@@ -63,10 +63,10 @@ class UndoManager extends ObjectClass
     {
         if ($name == "levelsOfUndo") {
             $this->$name = $value;
-            while ($this->undoStack->count() > $value) {
+            while ($this->undoStack->count > $value) {
                 $this->undoStack->removeAt(0);
             }
-            while ($this->redoStack->count() > $value) {
+            while ($this->redoStack->count > $value) {
                 $this->redoStack->removeAt(0);
             }
         } else {
@@ -152,7 +152,7 @@ class UndoManager extends ObjectClass
         if ($this->isUndoing || $this->isRedoing) {
             fatal_error("undoNestedGroup() while undoing or redoing");
         }
-        if ($this->undoStack->isEmpty()) {
+        if ($this->undoStack->isEmpty) {
             return;
         }
         NotificationCenter::default()->postNotificationName(UndoManagerWillUndoChangeNotification, $this);
@@ -172,7 +172,7 @@ class UndoManager extends ObjectClass
         $this->endUndoGrouping();
         $this->isUndoing = false;
         $this->group = $oldGroup;
-        if ($e = $this->redoStack->last()) {
+        if ($e = $this->redoStack->last) {
             $e->actionName = $groupToUndo->actionName;
         }
         NotificationCenter::default()->postNotificationName(UndoManagerDidUndoChangeNotification, $this);
@@ -201,7 +201,7 @@ class UndoManager extends ObjectClass
         $this->endUndoGrouping();
         $this->isRedoing = false;
         $this->group = $oldGroup;
-        if ($e = $this->undoStack->last()) {
+        if ($e = $this->undoStack->last) {
             $e->actionName = $group->actionName;
         }
         NotificationCenter::default()->postNotificationName(UndoManagerDidRedoChangeNotification, $this);
@@ -242,17 +242,17 @@ class UndoManager extends ObjectClass
         $group->parent = null;
         if (!$parent instanceof UndoGroup) {
             if ($this->isUndoing) {
-                if ($this->levelsOfUndo === $this->redoStack->count() && !$group->actions->isEmpty()) {
+                if ($this->levelsOfUndo === $this->redoStack->count && !$group->actions->isEmpty) {
                     $this->redoStack->removeAt(0);
                 }
-                if (!$group->actions->isEmpty()) {
+                if (!$group->actions->isEmpty) {
                     $this->redoStack->append($group);
                 }
             } else {
-                if ($this->levelsOfUndo === $this->undoStack->count() && !$group->actions->isEmpty()) {
+                if ($this->levelsOfUndo === $this->undoStack->count && !$group->actions->isEmpty) {
                     $this->undoStack->removeAt(0);
                 }
-                if (!$group->actions->isEmpty()) {
+                if (!$group->actions->isEmpty) {
                     $this->undoStack->append($group);
                 }
             }
@@ -282,7 +282,7 @@ class UndoManager extends ObjectClass
         $group = $this->group;
         $invocation->target = $nextTarget;
         $group->addInvocation($invocation);
-        if (!$this->isUndoing && !$this->isRedoing && !$group->actions->isEmpty()) {
+        if (!$this->isUndoing && !$this->isRedoing && !$group->actions->isEmpty) {
             $this->redoStack->removeAll();
         }
         $this->nextTarget = null;

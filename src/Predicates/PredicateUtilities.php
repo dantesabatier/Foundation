@@ -53,7 +53,7 @@ class PredicateUtilities
 
     public static function average(ArrayClass|Set $values): Number
     {
-        if ($values->isEmpty()) {
+        if ($values->isEmpty) {
             return new Number(0);
         }
         return new Number($values->sum() / $values->count());
@@ -100,11 +100,11 @@ class PredicateUtilities
 
     public static function median(ArrayClass|Set $values): Number
     {
-        if ($values->isEmpty()) {
+        if ($values->isEmpty) {
             return new Number(0);
         }
         $values = $values->sort(fn(Number|int|float $e1, Number|int|float $e2): int => pn($e1) <=> pn($e2));
-        $count = $values->count();
+        $count = $values->count;
         if ($count % 2 === 0) {
             return new Number((pn($values[(int)($count / 2)]) + pn($values[(int)($count / 2) - 1])) / 2);
         }
@@ -113,7 +113,7 @@ class PredicateUtilities
 
     public static function mode(ArrayClass|Set $values): Number
     {
-        if (!$values->isEmpty()) {
+        if (!$values->isEmpty) {
             /** @var Dictionary<int> $occurrences */
             $occurrences = $values->reduce(new Dictionary(), function (Dictionary $result, Number|int|float $element): Dictionary {
                 /** @psalm-suppress NullOperand */
@@ -130,10 +130,10 @@ class PredicateUtilities
 
     public static function stddev(ArrayClass|Set $values): Number
     {
-        if ($values->isEmpty()) {
+        if ($values->isEmpty) {
             return new Number(0);
         }
-        $count = $values->count();
+        $count = $values->count;
         $avg = abs($values->sum()) / $count;
         $sum = $values->map(fn(Number|int|float $element): int|float => (pn($element) - $avg) ** 2)->sum();
         return new Number(sqrt($sum / $count - 1));
@@ -388,16 +388,16 @@ class PredicateUtilities
 
     public static function indexFirst(ArrayClass $values): mixed
     {
-        return $values->first();
+        return $values->first;
     }
 
     public static function indexLast(ArrayClass $values): mixed
     {
-        return $values->last();
+        return $values->last;
     }
 
     public static function indexSize(ArrayClass $values): Number
     {
-        return new Number($values->count());
+        return new Number($values->count);
     }
 }

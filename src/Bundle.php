@@ -270,7 +270,7 @@ final class Bundle extends ObjectClass
     private static function findBundleResources(URL $baseURL, ?string $name = null, ?ArrayClass $extensions = null, ?ArrayClass $languages = null, int $limit = NotFound): ?ArrayClass
     {
         $extensions ??= new ArrayClass();
-        if ($extensions->isEmpty() && $name && ($extension = pathinfo($name, PATHINFO_EXTENSION))) {
+        if ($extensions->isEmpty && $name && ($extension = pathinfo($name, PATHINFO_EXTENSION))) {
             /** @psalm-suppress InvalidArgument */
             $extensions->append($extension);
         }
@@ -282,7 +282,7 @@ final class Bundle extends ObjectClass
             $stop = $ok && $limit > 0 && $limit >= $idx;
             return $ok;
         });
-        if ($resources->isEmpty()) {
+        if ($resources->isEmpty) {
             return null;
         }
         return $resources;
@@ -304,7 +304,7 @@ final class Bundle extends ObjectClass
     {
         $baseURL = $this->resourceURL ?? $this->bundleURL;
         /** @psalm-suppress InvalidArgument */
-        return self::findBundleResources($subpath ? $baseURL->appendingPathComponent($subpath) : $baseURL, $name, $extension ? new ArrayClass([$extension]) : null, $localization ? new ArrayClass([$localization]) : null, 1)?->first();
+        return self::findBundleResources($subpath ? $baseURL->appendingPathComponent($subpath) : $baseURL, $name, $extension ? new ArrayClass([$extension]) : null, $localization ? new ArrayClass([$localization]) : null, 1)?->first;
     }
 
     /**
@@ -358,7 +358,7 @@ final class Bundle extends ObjectClass
      */
     public function urlForImageResource(string $name): ?URL
     {
-        return self::findBundleResources($this->resourceURL ?? $this->bundleURL, $name, (new ArrayClass([MimeTypeJPEG, MimeTypePNG]))->flatMap(fn(string $mimeType): iterable => URLFileTypeMappings::shared()->extensions($mimeType) ?? []), null, 1)?->first();
+        return self::findBundleResources($this->resourceURL ?? $this->bundleURL, $name, (new ArrayClass([MimeTypeJPEG, MimeTypePNG]))->flatMap(fn(string $mimeType): iterable => URLFileTypeMappings::shared()->extensions($mimeType) ?? []), null, 1)?->first;
     }
 
     /**
@@ -395,7 +395,7 @@ final class Bundle extends ObjectClass
      */
     public function pathForSoundResource(string $name): ?string
     {
-        return self::findBundleResources($this->resourceURL ?? $this->bundleURL, $name, new ArrayClass(["mp3"]), null, 1)?->first()?->path;
+        return self::findBundleResources($this->resourceURL ?? $this->bundleURL, $name, new ArrayClass(["mp3"]), null, 1)?->first?->path;
     }
 
     /**

@@ -32,7 +32,7 @@ final class URLFileTypeMappings
 
     public function preferredExtension(string $mimeType): ?string
     {
-        return $this->extensions($mimeType)?->first();
+        return $this->extensions($mimeType)?->first;
     }
 
     public function mimeType(string $extension): ?string

@@ -13,6 +13,6 @@ class CacheEntry
     public function __construct(public readonly string $identifier, public readonly CachedURLResponse $cachedURLResponse, public readonly ?string $serializedVersion = null)
     {
         $this->date = new Date();
-        $this->cost = $serializedVersion ? strlen($serializedVersion) : (strlen($cachedURLResponse->data) + 500 * ($cachedURLResponse->userInfo?->count() ?? 0));
+        $this->cost = $serializedVersion ? strlen($serializedVersion) : (strlen($cachedURLResponse->data) + 500 * ($cachedURLResponse->userInfo?->count ?? 0));
     }
 }

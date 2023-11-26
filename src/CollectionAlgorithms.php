@@ -52,7 +52,7 @@ trait CollectionAlgorithms
 
     public function endIndex(): int
     {
-        return $this->count();
+        return $this->count;
     }
 
     public function indices(): Range

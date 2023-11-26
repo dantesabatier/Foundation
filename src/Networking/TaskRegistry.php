@@ -32,7 +32,7 @@ class TaskRegistry extends ObjectClass
     public function __get(string $name)
     {
         return match ($name) {
-            "isEmpty" => $this->tasks->isEmpty(),
+            "isEmpty" => $this->tasks->isEmpty,
             "allTask" => $this->tasks,
             default => $this->valueForUndefinedKey($name)
         };

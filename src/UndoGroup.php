@@ -29,6 +29,6 @@ class UndoGroup
     public function removeActions(?object $target): bool
     {
         $this->actions->removeAll(fn(Invocation $invocation): bool => is_equal($invocation->target, $target));
-        return !$this->actions->isEmpty();
+        return !$this->actions->isEmpty;
     }
 }

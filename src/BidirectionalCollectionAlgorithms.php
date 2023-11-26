@@ -37,7 +37,7 @@ trait BidirectionalCollectionAlgorithms
 
     public function last(Closure $where = null): mixed
     {
-        if ($this->isEmpty()) {
+        if ($this->isEmpty) {
             return null;
         }
         if ($where === null) {
@@ -51,7 +51,7 @@ trait BidirectionalCollectionAlgorithms
 
     public function randomElement(RandomNumberGenerator $generator = new SystemRandomNumberGenerator()): mixed
     {
-        if ($this->isEmpty()) {
+        if ($this->isEmpty) {
             return null;
         }
         $i = $generator->next($this->indexBefore($this->endIndex()));

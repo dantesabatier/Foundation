@@ -20,8 +20,8 @@ use Sabatier\Foundation\Predicates\Predicate;
  * @implements Iterator<int, Element>
  * @property-read bool $isEmpty A Boolean value indicating whether the collection is empty.
  * @property-read int $count The number of elements in the collection.
- * @property-read int|null $first The first element of the collection.
- * @property-read int|null $last The last element of the collection.
+ * @property-read Element|null $first The first element of the collection.
+ * @property-read Element|null $last The last element of the collection.
  */
 class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iterator
 {
@@ -98,7 +98,10 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
     public function __get(string $name)
     {
         return match ($name) {
+            "isEmpty" => $this->isEmpty(),
             "count" => $this->count(),
+            "first" => $this->first(),
+            "last" => $this->last(),
             default => $this->valueForUndefinedKey($name)
         };
     }
@@ -548,7 +551,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
             $result->append(new Slice($this, new Range($subSequenceStart, $end)));
             return true;
         });
-        if ($maxSplits === 0 || $this->isEmpty()) {
+        if ($maxSplits === 0 || $this->isEmpty) {
             $appendSubsequence($this->endIndex());
             return $result;
         }
@@ -559,7 +562,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
                 $didAppend = $appendSubsequence($subSequenceEnd);
                 $this->formIndexAfter($subSequenceEnd);
                 $subSequenceStart = $subSequenceEnd;
-                if ($didAppend && $result->count() === $maxSplits) {
+                if ($didAppend && $result->count === $maxSplits) {
                     break;
                 }
                 continue;
@@ -621,7 +624,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
         $second = $this->filter($belongsInSecondPartition);
         $this->removeAll($belongsInSecondPartition);
         $this->appendContentsOf($second);
-        return $this->count() - $second->count();
+        return $this->count - $second->count;
     }
 
     /**

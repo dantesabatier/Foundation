@@ -104,7 +104,7 @@ final class NotificationCenter
      */
     public function postNotificationName(string $name, object $object = null, Dictionary|null $userInfo = null): void
     {
-        if (!$this->observers->isEmpty()) {
+        if (!$this->observers->isEmpty) {
             $this->postNotification(new Notification($name, $object, $userInfo));
         }
     }

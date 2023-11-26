@@ -194,7 +194,7 @@ class URLSessionWebSocketTask extends URLSessionTask
         } else {
             $this->getProtocol(function (?URLProtocol $protocol): void {
                 if ($this->handshakeCompleted && $protocol instanceof WebSocketURLProtocol) {
-                    while (!$this->sendBuffer->isEmpty()) {
+                    while (!$this->sendBuffer->isEmpty) {
                         /** @var array{URLSessionWebSocketTaskMessage, Closure(Error|null): void} $element */
                         $element = $this->sendBuffer->popFirst();
                         [$message, $completionHandler] = $element;
@@ -213,7 +213,7 @@ class URLSessionWebSocketTask extends URLSessionTask
                     }
                     $this->sendCloseMessage($protocol);
                 }
-                while (!$this->receiveBuffer->isEmpty() && !$this->receiveCompletionHandlers->isEmpty()) {
+                while (!$this->receiveBuffer->isEmpty && !$this->receiveCompletionHandlers->isEmpty) {
                     /** @var URLSessionWebSocketTaskMessage $message */
                     $message = $this->receiveBuffer->popFirst();
                     /** @var Closure(URLSessionWebSocketTaskMessage|null, Error|null): void $handler */

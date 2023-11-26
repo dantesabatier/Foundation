@@ -81,7 +81,7 @@ class HTTPCookie extends ObjectClass
             if ($this->version === 1) {
                 $this->portList = $portList;
             } else {
-                $this->portList = $portList->isEmpty() ? null : new ArrayClass([$portList[0]]);
+                $this->portList = $portList->isEmpty ? null : new ArrayClass([$portList[0]]);
             }
         } else {
             $this->portList = null;

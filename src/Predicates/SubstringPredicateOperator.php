@@ -33,7 +33,7 @@ class SubstringPredicateOperator extends StringPredicateOperator
         $options = $this->compareOptions();
         $position = $this->position;
         if ($left instanceof Set || $left instanceof ArrayClass) {
-            if ($left->isEmpty()) {
+            if ($left->isEmpty) {
                 return false;
             }
             return match ($position) {

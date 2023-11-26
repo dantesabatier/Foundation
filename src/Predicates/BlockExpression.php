@@ -75,7 +75,7 @@ class BlockExpression extends Expression
     {
         $format = "BLOCK(function";
         if ($arguments = $this->arguments) {
-            if (!$arguments->isEmpty()) {
+            if (!$arguments->isEmpty) {
                 $format .= ", ";
             }
             $format .= $arguments->join(", ");

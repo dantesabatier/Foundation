@@ -58,7 +58,7 @@ class PredicateOperator extends ObjectClass
             if (!$left instanceof ArrayClass && !$left instanceof Set) {
                 fatal_error(sprintf("Invalid argument: the left hand side for an ALL or ANY modifier must be an %s or a %s, \"%s\" given", ArrayClass::class, Set::class, typeof($left)));
             }
-            if ($left->isEmpty()) {
+            if ($left->isEmpty) {
                 return false;
             }
             $predicate = fn(mixed $e): bool => $this->performPrimitiveOperation($e, $right);
