@@ -187,7 +187,7 @@ class Slice extends ObjectClass implements Collection, IteratorAggregate
      */
     public function toArray(): array
     {
-        return array_slice($this->base->toArray(), $this->startIndex, $this->count());
+        return array_slice($this->base->toArray(), $this->startIndex, $this->endIndex);
     }
 
     public function jsonSerialize(): array
