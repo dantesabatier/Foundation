@@ -20,11 +20,11 @@ use Traversable;
  * @template Element
  * @implements Collection<string, Element>
  * @implements IteratorAggregate<string, Element>
- * @property-read ArrayClass<string> $keys An array containing just the keys of the dictionary.
- * @property-read ArrayClass<Element> $values An array containing just the values of the dictionary.
  * @property-read bool $isEmpty A Boolean value indicating whether the collection is empty.
  * @property-read int $count The number of elements in the collection.
  * @property-read Element|null $first The first element of the collection.
+ * @property-read ArrayClass<string> $keys An array containing just the keys of the dictionary.
+ * @property-read ArrayClass<Element> $values An array containing just the values of the dictionary.
  */
 class Dictionary extends ObjectClass implements Collection, IteratorAggregate
 {
