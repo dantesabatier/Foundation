@@ -3,7 +3,6 @@
 namespace Sabatier\Foundation;
 
 use BackedEnum;
-use DateTime;
 use DOMDocument;
 use DOMElement;
 use DOMImplementation;
@@ -80,7 +79,7 @@ readonly class PropertyListSerializer
             "integer" => (int)$element->nodeValue,
             "real" => (float)$element->nodeValue,
             "true", "false" => filter_var($element->nodeName, FILTER_VALIDATE_BOOLEAN),
-            "date" => new Date((new DateTime($element->nodeValue ?? "now"))->getTimestamp()),
+            "date" => new Date(strtotime($element->nodeValue)),
             default => $element->nodeValue,
         };
     }
