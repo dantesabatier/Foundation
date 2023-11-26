@@ -11,6 +11,7 @@ namespace Sabatier\Foundation;
 
 use Closure;
 use Fiber;
+use Throwable;
 
 /**
  * An abstract class that represents the code and data associated with a single task.
@@ -77,21 +78,24 @@ abstract class Operation extends ObjectClass
         if ($this->isCancelled || $this->isExecuting || $this->isFinished) {
             return;
         }
-        $fiber = new Fiber(function (): void {
-            Fiber::suspend();
-            $this->queue->isCurrentQueue = true;
-            $this->setValueForKey(true, "isExecuting");
-            $this->main();
-            $this->setValueForKey(false, "isExecuting");
-            if ($completionBlock = $this->completionBlock) {
-                $completionBlock();
+        try {
+            $fiber = new Fiber(function (): void {
+                Fiber::suspend();
+                $this->queue->isCurrentQueue = true;
+                $this->setValueForKey(true, "isExecuting");
+                $this->main();
+                $this->setValueForKey(false, "isExecuting");
+                if ($completionBlock = $this->completionBlock) {
+                    $completionBlock();
+                }
+                $this->setValueForKey(true, "isFinished");
+                $this->queue->isCurrentQueue = false;
+            });
+            $fiber->start();
+            if (!$fiber->isTerminated()) {
+                $fiber->resume();
             }
-            $this->setValueForKey(true, "isFinished");
-            $this->queue->isCurrentQueue = false;
-        });
-        $fiber->start();
-        if (!$fiber->isTerminated()) {
-            $fiber->resume();
+        } catch (Throwable) {
         }
     }
 
