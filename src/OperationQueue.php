@@ -95,35 +95,38 @@ final class OperationQueue extends ObjectClass
      */
     public function addOperation(Operation $operation): void
     {
-        $fiber = new Fiber(function () use ($operation): void {
-            if ($operation->isExecuting || $operation->isFinished) {
-                fatal_error();
-            }
-            Fiber::suspend();
-            $this->operations->append($operation);
-            $this->operations->sort(fn(Operation $op0, Operation $op1): int => ComparisonResult::orderedAscending->value * ($op0->queuePriority->value <=> $op1->queuePriority->value));
-            $observation = $operation->observe("isFinished", KeyValueObservingOptions::new, function (Operation $operation, KeyValueObservedChange $change) use (&$observation): void {
-                $observation->invalidate();
-                if ($change->newValue) {
-                    $this->operations->remove($operation);
+        try {
+            $fiber = new Fiber(function () use ($operation): void {
+                if ($operation->isExecuting || $operation->isFinished) {
+                    fatal_error();
                 }
-            });
-            $operation->queue = $this;
-            if ($operation->isReady) {
-                $operation->start();
-                return;
-            }
-            $observation = $operation->observe("isReady", KeyValueObservingOptions::new, function (Operation $operation, KeyValueObservedChange $change) use (&$observation): void {
-                $observation->invalidate();
-                if ($change->newValue) {
+                Fiber::suspend();
+                $this->operations->append($operation);
+                $this->operations->sort(fn(Operation $op0, Operation $op1): int => ComparisonResult::orderedAscending->value * ($op0->queuePriority->value <=> $op1->queuePriority->value));
+                $observation = $operation->observe("isFinished", KeyValueObservingOptions::new, function (Operation $operation, KeyValueObservedChange $change) use (&$observation): void {
+                    $observation->invalidate();
+                    if ($change->newValue) {
+                        $this->operations->remove($operation);
+                    }
+                });
+                $operation->queue = $this;
+                if ($operation->isReady) {
                     $operation->start();
+                    return;
                 }
+                $observation = $operation->observe("isReady", KeyValueObservingOptions::new, function (Operation $operation, KeyValueObservedChange $change) use (&$observation): void {
+                    $observation->invalidate();
+                    if ($change->newValue) {
+                        $operation->start();
+                    }
+                });
+                $this->addOperations($operation->dependencies);
             });
-            $this->addOperations($operation->dependencies);
-        });
-        $fiber->start();
-        if (!$fiber->isTerminated()) {
-            $fiber->resume();
+            $fiber->start();
+            if (!$fiber->isTerminated()) {
+                $fiber->resume();
+            }
+        } catch (Throwable) {
         }
     }
 
