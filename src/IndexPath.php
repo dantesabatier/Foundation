@@ -15,6 +15,10 @@ use Sabatier\Foundation\Predicates\Predicate;
  * @property-read int $section An index number identifying a section in a table view or collection view.
  * @property-read int $row An index number identifying a row in a section of a table view.
  * @property-read int $item An index number identifying an item in a section of a collection view.
+ * @property-read bool $isEmpty A Boolean value indicating whether the collection is empty.
+ * @property-read int $count The number of elements in the collection.
+ * @property-read int|null $first The first element of the collection.
+ * @property-read int|null $last The last element of the collection.
  */
 class IndexPath extends ObjectClass implements MutableCollection, Iterator
 {
@@ -24,7 +28,6 @@ class IndexPath extends ObjectClass implements MutableCollection, Iterator
         contains as private sequenceContains;
         containsElement as private sequenceContainsElement;
         first as private sequenceFirst;
-        last as private sequenceLast;
         min as private sequenceMin;
         max as private sequenceMax;
         reduce as private sequenceReduce;
@@ -34,7 +37,6 @@ class IndexPath extends ObjectClass implements MutableCollection, Iterator
         offsetUnset as private collectionOffsetUnset;
         randomElement as private collectionRandomElement;
         firstIndex as private collectionFirstIndex;
-        lastIndex as private collectionLastIndex;
         indexOf as private collectionIndexOf;
         filter as private collectionFilter;
         filtered as private collectionFiltered;
@@ -42,6 +44,8 @@ class IndexPath extends ObjectClass implements MutableCollection, Iterator
         sorted as private collectionSorted;
         allSatisfy as private collectionAllSatisfy;
         joined as private collectionJoined;
+        lastIndex as private bidirectionalCollectionLastIndex;
+        last as private bidirectionalCollectionLast;
         reverse as private bidirectionalCollectionReverse;
         reversed as private bidirectionalCollectionReversed;
         append as private mutableCollectionAppend;
@@ -78,6 +82,10 @@ class IndexPath extends ObjectClass implements MutableCollection, Iterator
     public function __get(string $name)
     {
         return match ($name) {
+            "isEmpty" => $this->isEmpty(),
+            "count" => $this->count(),
+            "first" => $this->first(),
+            "last" => $this->last(),
             "section" => $this->index(0),
             "row", "item" => $this->index(1),
             default => $this->valueForUndefinedKey($name)
@@ -188,7 +196,7 @@ class IndexPath extends ObjectClass implements MutableCollection, Iterator
      */
     public function last(Closure $where = null): ?int
     {
-        return $this->sequenceLast($where);
+        return $this->bidirectionalCollectionLast($where);
     }
 
     /**
@@ -210,7 +218,7 @@ class IndexPath extends ObjectClass implements MutableCollection, Iterator
      */
     public function lastIndex(Closure $where): ?int
     {
-        return $this->collectionLastIndex($where);
+        return $this->bidirectionalCollectionLastIndex($where);
     }
 
     /**

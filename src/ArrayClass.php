@@ -18,7 +18,10 @@ use Sabatier\Foundation\Predicates\Predicate;
  * @template Element
  * @implements RangeReplaceableCollection<Element>
  * @implements Iterator<int, Element>
- * @property-read int $count
+ * @property-read bool $isEmpty A Boolean value indicating whether the collection is empty.
+ * @property-read int $count The number of elements in the collection.
+ * @property-read int|null $first The first element of the collection.
+ * @property-read int|null $last The last element of the collection.
  */
 class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iterator
 {

@@ -18,7 +18,10 @@ use Sabatier\Foundation\Predicates\Predicate;
  * @template Element
  * @implements Iterator<int, Element>
  * @implements SetAlgebra<Element>
- * @property-read int $count
+ * @property-read bool $isEmpty A Boolean value indicating whether the collection is empty.
+ * @property-read int $count The number of elements in the collection.
+ * @property-read int|null $first The first element of the collection.
+ * @property-read int|null $last The last element of the collection.
  */
 class Set extends ObjectClass implements SetAlgebra, Iterator
 {
@@ -102,7 +105,10 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
     public function __get(string $name)
     {
         return match ($name) {
+            "isEmpty" => $this->isEmpty(),
             "count" => $this->count(),
+            "first" => $this->first(),
+            "last" => $this->last(),
             default => $this->valueForUndefinedKey($name)
         };
     }

@@ -15,6 +15,9 @@ use Traversable;
  * @template Element
  * @implements Sequence<int, Element>
  * @implements IteratorAggregate<int, Element>
+ * @property-read bool $isEmpty A Boolean value indicating whether the collection is empty.
+ * @property-read int $count The number of elements in the collection.
+ * @property-read Element|null $first The first element of the collection.
  */
 class FlattenSequence extends ObjectClass implements Sequence, IteratorAggregate
 {
@@ -28,6 +31,16 @@ class FlattenSequence extends ObjectClass implements Sequence, IteratorAggregate
      */
     public function __construct(public readonly Sequence $base)
     {
+    }
+
+    public function __get(string $name)
+    {
+        return match ($name) {
+            "count" => $this->count(),
+            "isEmpty" => $this->isEmpty(),
+            "first" => $this->first(),
+            default => $this->valueForUndefinedKey($name)
+        };
     }
 
     /**

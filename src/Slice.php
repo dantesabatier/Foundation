@@ -16,6 +16,9 @@ use Traversable;
  * @template Element
  * @implements Collection<int, Element>
  * @implements IteratorAggregate<int, Element>
+ * @property-read bool $isEmpty A Boolean value indicating whether the collection is empty.
+ * @property-read int $count The number of elements in the collection.
+ * @property-read Element|null $first The first element of the collection.
  */
 class Slice extends ObjectClass implements Collection, IteratorAggregate
 {
@@ -37,6 +40,16 @@ class Slice extends ObjectClass implements Collection, IteratorAggregate
         $this->indices = $bounds;
         $this->startIndex = $bounds->lowerBound;
         $this->endIndex = $bounds->upperBound;
+    }
+
+    public function __get(string $name)
+    {
+        return match ($name) {
+            "isEmpty" => $this->isEmpty(),
+            "count" => $this->count(),
+            "first" => $this->first(),
+            default => $this->valueForUndefinedKey($name)
+        };
     }
 
     public function count(): int
