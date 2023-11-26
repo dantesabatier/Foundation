@@ -26,7 +26,6 @@ class UserDefaults
     public function __construct(?string $suiteName = null)
     {
         $suiteName ??= Bundle::main()->bundleIdentifier ?? fatal_error("Unable to infer a valid suite");
-        error_log(sprintf("%s(%s)", __METHOD__, $suiteName));
         $this->suiteName = $suiteName;
         $this->addSuite($this->suiteName);
     }
@@ -190,8 +189,6 @@ class UserDefaults
      */
     public function dictionaryRepresentation(): Dictionary
     {
-        error_log(__METHOD__ . "()");
-        error_log(human_readable_value(self::standardUserPreferences()[$this->suiteName]));
         return self::standardUserPreferences()->valueForKey($this->suiteName)?->dictionaryRepresentation ?? fatal_error("Suite \"$this->suiteName\" not found");
     }
 
@@ -287,7 +284,6 @@ class UserDefaults
      */
     public function addSuite(string $named): void
     {
-        error_log(sprintf("%s(%s)", __METHOD__, $named));
         self::standardUserPreferences()->setValueForKey(new ApplicationPreferences($named), $named);
     }
 
