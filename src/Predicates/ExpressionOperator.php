@@ -8,19 +8,22 @@ use Sabatier\Foundation\Dictionary;
 /** @internal */
 class ExpressionOperator extends Expression
 {
+    public readonly string $operatorSymbol;
+
     /**
      * @param string $name
      * @param ArrayClass<Expression>|null $arguments
      * @param ExpressionOperatorType $operatorType
      */
-    public function __construct(private readonly string $name, private readonly ?ArrayClass $arguments, private readonly ExpressionOperatorType $operatorType)
+    public function __construct(public readonly string $name, public readonly ?ArrayClass $arguments, public readonly ExpressionOperatorType $operatorType)
     {
         parent::__construct(ExpressionType::operator);
+        $this->operatorSymbol = $this->operatorType->symbol();
     }
 
     public static function operatorWithName(string $name, ?ArrayClass $arguments = null): Expression
     {
-        return new ExpressionOperator($name, $arguments, ExpressionOperatorType::operatorType($name));
+        return new ExpressionOperator($name, $arguments, ExpressionOperatorType::fromFunctionName($name));
     }
 
     public function expressionValue(mixed $object = null, ?Dictionary $context = null): mixed
@@ -30,18 +33,7 @@ class ExpressionOperator extends Expression
         return PredicateUtilities::$selector(...$arguments);
     }
 
-    public function operatorType(): ExpressionOperatorType
-    {
-        return $this->operatorType;
-    }
-
-    /** @noinspection PhpPureAttributeCanBeAddedInspection */
-    public function operatorSymbol(): ?string
-    {
-        return ExpressionOperatorType::symbol($this->operatorType());
-    }
-
-    public function function(): string
+    public function function (): string
     {
         return $this->name;
     }
@@ -66,7 +58,7 @@ class ExpressionOperator extends Expression
             }
             return $format;
         }) ?? new ArrayClass();
-        switch ($this->operatorType()) {
+        switch ($this->operatorType) {
             case ExpressionOperatorType::addTo:
             case ExpressionOperatorType::fromSubtract:
             case ExpressionOperatorType::multiplyBy:
@@ -77,7 +69,7 @@ class ExpressionOperator extends Expression
             case ExpressionOperatorType::bitwiseXorWith:
             case ExpressionOperatorType::leftshiftBy:
             case ExpressionOperatorType::rightshiftBy:
-                $format = $arguments->join(" {$this->operatorSymbol()} ");
+                $format = $arguments->join(" $this->operatorSymbol ");
                 break;
             default:
                 $format = $this->function();
