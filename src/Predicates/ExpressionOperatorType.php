@@ -61,9 +61,9 @@ enum ExpressionOperatorType: int
     case cast = 1000;
     case chs = 1001;
 
-    public static function symbol(ExpressionOperatorType $type): ?string
+    public function symbol(): string
     {
-        return match ($type) {
+        return match ($this) {
             self::addTo => ExpressionOperatorSymbol::addition,
             self::fromSubtract => ExpressionOperatorSymbol::subtraction,
             self::multiplyBy => ExpressionOperatorSymbol::multiplication,
@@ -75,11 +75,11 @@ enum ExpressionOperatorType: int
             self::bitwiseXorWith => ExpressionOperatorSymbol::bitwiseXor,
             self::leftshiftBy => ExpressionOperatorSymbol::shiftLeft,
             self::rightshiftBy => ExpressionOperatorSymbol::shiftRight,
-            default => $type->name
+            default => $this->name
         };
     }
 
-    public static function operatorType(string $functionName): ExpressionOperatorType
+    public static function fromFunctionName(string $functionName): ExpressionOperatorType
     {
         if (string_is_equal($functionName, "average:", CompareOptions::caseInsensitive) || string_is_equal($functionName, "avg:", CompareOptions::caseInsensitive)) {
             return self::average;
@@ -188,9 +188,9 @@ enum ExpressionOperatorType: int
         }
     }
 
-    public static function functionName(ExpressionOperatorType $type): string
+    public function functionName(): string
     {
-        return match ($type) {
+        return match ($this) {
             self::addTo => "add:to:",
             self::fromSubtract => "from:subtract:",
             self::multiplyBy => "multiply:by:",
@@ -205,13 +205,13 @@ enum ExpressionOperatorType: int
             self::indexFirst => "first:",
             self::indexLast => "last:",
             self::indexSize => "size:",
-            default => "$type->name:",
+            default => "$this->name:",
         };
     }
 
-    public static function isDeterministic(ExpressionOperatorType $type): bool
+    public function isDeterministic(): bool
     {
-        return match ($type) {
+        return match ($this) {
             self::average, self::sum, self::count, self::min, self::max, self::stddev, self::sqrt, self::ln, self::log, self::raiseToPower, self::exp, self::ceiling, self::abs, self::trunc, self::floor, self::uppercase, self::lowercase, self::year, self::month, self::week, self::day, self::hour, self::minute, self::second, self::concat, self::isNull, self::ifNull, self::nullIf => true,
             default => false,
         };
