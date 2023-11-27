@@ -61,9 +61,9 @@ enum ExpressionOperatorType: int
     case cast = 1000;
     case chs = 1001;
 
-    public static function symbol(ExpressionOperatorType $operator): ?string
+    public static function symbol(ExpressionOperatorType $type): ?string
     {
-        return match ($operator) {
+        return match ($type) {
             ExpressionOperatorType::addTo => ExpressionOperatorSymbol::addition,
             ExpressionOperatorType::fromSubtract => ExpressionOperatorSymbol::subtraction,
             ExpressionOperatorType::multiplyBy => ExpressionOperatorSymbol::multiplication,
@@ -75,7 +75,7 @@ enum ExpressionOperatorType: int
             ExpressionOperatorType::bitwiseXorWith => ExpressionOperatorSymbol::bitwiseXor,
             ExpressionOperatorType::leftshiftBy => ExpressionOperatorSymbol::shiftLeft,
             ExpressionOperatorType::rightshiftBy => ExpressionOperatorSymbol::shiftRight,
-            default => $operator->name
+            default => $type->name
         };
     }
 
@@ -188,9 +188,9 @@ enum ExpressionOperatorType: int
         }
     }
 
-    public static function functionName(ExpressionOperatorType $operator): string
+    public static function functionName(ExpressionOperatorType $type): string
     {
-        return match ($operator) {
+        return match ($type) {
             ExpressionOperatorType::addTo => "add:to:",
             ExpressionOperatorType::fromSubtract => "from:subtract:",
             ExpressionOperatorType::multiplyBy => "multiply:by:",
@@ -205,7 +205,15 @@ enum ExpressionOperatorType: int
             ExpressionOperatorType::indexFirst => "first:",
             ExpressionOperatorType::indexLast => "last:",
             ExpressionOperatorType::indexSize => "size:",
-            default => "$operator->name:",
+            default => "$type->name:",
+        };
+    }
+
+    public static function isDeterministic(ExpressionOperatorType $type): bool
+    {
+        return match ($type) {
+            self::average, self::sum, self::count, self::min, self::max, self::stddev, self::sqrt, self::ln, self::log, self::raiseToPower, self::exp, self::ceiling, self::abs, self::trunc, self::floor, self::uppercase, self::lowercase, self::year, self::month, self::week, self::day, self::hour, self::minute, self::second, self::concat, self::isNull, self::ifNull, self::nullIf => true,
+            default => false,
         };
     }
 }
