@@ -9,6 +9,7 @@ use Sabatier\Foundation\Dictionary;
 class ExpressionOperator extends Expression
 {
     public readonly string $operatorSymbol;
+    public readonly bool $isDeterministic;
 
     /**
      * @param string $name
@@ -18,7 +19,24 @@ class ExpressionOperator extends Expression
     public function __construct(public readonly string $name, public readonly ?ArrayClass $arguments, public readonly ExpressionOperatorType $operatorType)
     {
         parent::__construct(ExpressionType::operator);
-        $this->operatorSymbol = $this->operatorType->symbol();
+        $this->operatorSymbol = match ($this->operatorType) {
+            ExpressionOperatorType::addTo => ExpressionOperatorSymbol::addition,
+            ExpressionOperatorType::fromSubtract => ExpressionOperatorSymbol::subtraction,
+            ExpressionOperatorType::multiplyBy => ExpressionOperatorSymbol::multiplication,
+            ExpressionOperatorType::divideBy => ExpressionOperatorSymbol::division,
+            ExpressionOperatorType::modulusBy => ExpressionOperatorSymbol::modulo,
+            ExpressionOperatorType::raiseToPower => ExpressionOperatorSymbol::raiseToPower,
+            ExpressionOperatorType::bitwiseAndWith => ExpressionOperatorSymbol::bitwiseAnd,
+            ExpressionOperatorType::bitwiseOrWith => ExpressionOperatorSymbol::bitwiseOr,
+            ExpressionOperatorType::bitwiseXorWith => ExpressionOperatorSymbol::bitwiseXor,
+            ExpressionOperatorType::leftshiftBy => ExpressionOperatorSymbol::shiftLeft,
+            ExpressionOperatorType::rightshiftBy => ExpressionOperatorSymbol::shiftRight,
+            default => $this->operatorType->name
+        };
+        $this->isDeterministic = match ($this) {
+            ExpressionOperatorType::average, ExpressionOperatorType::sum, ExpressionOperatorType::count, ExpressionOperatorType::min, ExpressionOperatorType::max, ExpressionOperatorType::stddev, ExpressionOperatorType::sqrt, ExpressionOperatorType::ln, ExpressionOperatorType::log, ExpressionOperatorType::raiseToPower, ExpressionOperatorType::exp, ExpressionOperatorType::ceiling, ExpressionOperatorType::abs, ExpressionOperatorType::trunc, ExpressionOperatorType::floor, ExpressionOperatorType::uppercase, ExpressionOperatorType::lowercase, ExpressionOperatorType::year, ExpressionOperatorType::month, ExpressionOperatorType::week, ExpressionOperatorType::day, ExpressionOperatorType::hour, ExpressionOperatorType::minute, ExpressionOperatorType::second, ExpressionOperatorType::concat, ExpressionOperatorType::isNull, ExpressionOperatorType::ifNull, ExpressionOperatorType::nullIf => true,
+            default => false,
+        };
     }
 
     public static function operatorWithName(string $name, ?ArrayClass $arguments = null): Expression
