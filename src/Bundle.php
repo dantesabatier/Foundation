@@ -221,7 +221,6 @@ final class Bundle extends ObjectClass
             }
             return self::bundleWithURL($url);
         } catch (Throwable $throwable) {
-            /** @psalm-suppress UnsafeInstantiation */
             throw new ($throwable::class)($throwable->getMessage(), $throwable->getCode(), $throwable);
         }
     }

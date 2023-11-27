@@ -30,7 +30,8 @@ class SymbolicExpression extends Expression
         return $this->token;
     }
 
-    public function expressionValue(mixed $object = null, ?Dictionary $context = null): static
+    /** @noinspection PhpMixedReturnTypeCanBeReducedInspection */
+    public function expressionValue(mixed $object = null, ?Dictionary $context = null): mixed
     {
         return $this;
     }

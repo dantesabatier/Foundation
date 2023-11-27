@@ -293,6 +293,7 @@ class PredicateScanner extends Scanner
                         break;
                     case "K":
                         $this->scanLocation += 1;
+                        /** @psalm-suppress PossiblyNullArgument */
                         return Expression::expressionForKeyPath($this->arguments->popFirst());
                     case "@":
                     case "s":

@@ -22,9 +22,9 @@ class Number extends Value
 
     /**
      * Returns a Number object initialized to contain a given value.
-     * @param bool|float|int|string $value The value for the new number.
+     * @param Number|bool|float|int|string $value The value for the new number.
      */
-    public function __construct(bool|float|int|string $value)
+    public function __construct(Number|bool|float|int|string $value)
     {
         parent::__construct($value);
         assert(is_numeric($this->value) || is_bool($this->value), sprintf("Invalid argument, expecting a numeric value, (%s)%s given", typeof($this->value), human_readable_value($this->value)));

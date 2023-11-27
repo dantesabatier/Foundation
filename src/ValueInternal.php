@@ -32,7 +32,6 @@ function string_with_options(string $string, #[ExpectedValues(flagsFromClass: Co
         endif;
         if (!($options & CompareOptions::normalized) && function_exists("normalizer_normalize")) {
             $string = normalizer_normalize($string);
-            /** @psalm-suppress TypeDoesNotContainType */
             if ($string === false) {
                 fatal_error(sprintf("%s() %s", __FUNCTION__, intl_get_error_message()));
             }
