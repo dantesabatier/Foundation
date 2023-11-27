@@ -155,7 +155,7 @@ function unsafe_value(Closure $block): mixed
 }
 
 /**
- * Return the name of the given class
+ * Return the name (and namespace) of the given class
  * @param class-string $class
  * @param string|null $namespace
  * @return string
