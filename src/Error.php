@@ -145,7 +145,7 @@ class Error extends ObjectClass
         if ($userInfo = $this->userInfo) {
             $keys = new ArrayClass([LocalizedDescriptionKey, LocalizedRecoveryOptionsErrorKey, LocalizedRecoverySuggestionErrorKey, LocalizedFailureReasonErrorKey]);
             /** @psalm-suppress ArgumentTypeCoercion */
-            $userInfo->removeAll(fn(string $k): bool => $keys->containsElement($k));
+            $userInfo->removeAll(fn(mixed $value, string $key): bool => $keys->containsElement($key));
             if (!$userInfo->isEmpty) {
                 $dictionary["userInfo"] = $userInfo;
             }
