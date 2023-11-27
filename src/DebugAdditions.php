@@ -158,11 +158,15 @@ function unsafe_value(Closure $block): mixed
  * Return the name of the given class
  * @param class-string $class
  */
-function class_name(string $class): string
+function class_name(string $class, ?string &$namespace = null): string
 {
     if (str_contains($class, "\\")) {
-        $class = array_last(explode("\\", $class));
-        assert($class !== null);
+        $components = new ArrayClass(explode("\\", $class));
+        /** @var string $class */
+        $class = $components->popLast();
+        if (func_num_args() > 1) {
+            $namespace = $components->join("\\");
+        }
     }
     return $class;
 }
