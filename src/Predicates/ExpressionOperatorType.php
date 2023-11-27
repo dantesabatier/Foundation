@@ -64,17 +64,17 @@ enum ExpressionOperatorType: int
     public static function symbol(ExpressionOperatorType $type): ?string
     {
         return match ($type) {
-            ExpressionOperatorType::addTo => ExpressionOperatorSymbol::addition,
-            ExpressionOperatorType::fromSubtract => ExpressionOperatorSymbol::subtraction,
-            ExpressionOperatorType::multiplyBy => ExpressionOperatorSymbol::multiplication,
-            ExpressionOperatorType::divideBy => ExpressionOperatorSymbol::division,
-            ExpressionOperatorType::modulusBy => ExpressionOperatorSymbol::modulo,
-            ExpressionOperatorType::raiseToPower => ExpressionOperatorSymbol::raiseToPower,
-            ExpressionOperatorType::bitwiseAndWith => ExpressionOperatorSymbol::bitwiseAnd,
-            ExpressionOperatorType::bitwiseOrWith => ExpressionOperatorSymbol::bitwiseOr,
-            ExpressionOperatorType::bitwiseXorWith => ExpressionOperatorSymbol::bitwiseXor,
-            ExpressionOperatorType::leftshiftBy => ExpressionOperatorSymbol::shiftLeft,
-            ExpressionOperatorType::rightshiftBy => ExpressionOperatorSymbol::shiftRight,
+            self::addTo => ExpressionOperatorSymbol::addition,
+            self::fromSubtract => ExpressionOperatorSymbol::subtraction,
+            self::multiplyBy => ExpressionOperatorSymbol::multiplication,
+            self::divideBy => ExpressionOperatorSymbol::division,
+            self::modulusBy => ExpressionOperatorSymbol::modulo,
+            self::raiseToPower => ExpressionOperatorSymbol::raiseToPower,
+            self::bitwiseAndWith => ExpressionOperatorSymbol::bitwiseAnd,
+            self::bitwiseOrWith => ExpressionOperatorSymbol::bitwiseOr,
+            self::bitwiseXorWith => ExpressionOperatorSymbol::bitwiseXor,
+            self::leftshiftBy => ExpressionOperatorSymbol::shiftLeft,
+            self::rightshiftBy => ExpressionOperatorSymbol::shiftRight,
             default => $type->name
         };
     }
@@ -82,129 +82,129 @@ enum ExpressionOperatorType: int
     public static function operatorType(string $functionName): ExpressionOperatorType
     {
         if (string_is_equal($functionName, "average:", CompareOptions::caseInsensitive) || string_is_equal($functionName, "avg:", CompareOptions::caseInsensitive)) {
-            return ExpressionOperatorType::average;
+            return self::average;
         } elseif (string_is_equal($functionName, "sum:", CompareOptions::caseInsensitive)) {
-            return ExpressionOperatorType::sum;
+            return self::sum;
         } elseif (string_is_equal($functionName, "count:", CompareOptions::caseInsensitive)) {
-            return ExpressionOperatorType::count;
+            return self::count;
         } elseif (string_is_equal($functionName, "min:", CompareOptions::caseInsensitive)) {
-            return ExpressionOperatorType::min;
+            return self::min;
         } elseif (string_is_equal($functionName, "max:", CompareOptions::caseInsensitive)) {
-            return ExpressionOperatorType::max;
+            return self::max;
         } elseif (string_is_equal($functionName, "median:", CompareOptions::caseInsensitive)) {
-            return ExpressionOperatorType::median;
+            return self::median;
         } elseif (string_is_equal($functionName, "mode:", CompareOptions::caseInsensitive)) {
-            return ExpressionOperatorType::mode;
+            return self::mode;
         } elseif (string_is_equal($functionName, "stddev:", CompareOptions::caseInsensitive)) {
-            return ExpressionOperatorType::stddev;
+            return self::stddev;
         } elseif (string_is_equal($functionName, "add:to:", CompareOptions::caseInsensitive)) {
-            return ExpressionOperatorType::addTo;
+            return self::addTo;
         } elseif (string_is_equal($functionName, "from:subtract:", CompareOptions::caseInsensitive)) {
-            return ExpressionOperatorType::fromSubtract;
+            return self::fromSubtract;
         } elseif (string_is_equal($functionName, "multiply:by:", CompareOptions::caseInsensitive)) {
-            return ExpressionOperatorType::multiplyBy;
+            return self::multiplyBy;
         } elseif (string_is_equal($functionName, "divide:by:", CompareOptions::caseInsensitive)) {
-            return ExpressionOperatorType::divideBy;
+            return self::divideBy;
         } elseif (string_is_equal($functionName, "modulus:by:", CompareOptions::caseInsensitive)) {
-            return ExpressionOperatorType::modulusBy;
+            return self::modulusBy;
         } elseif (string_is_equal($functionName, "sqrt:", CompareOptions::caseInsensitive)) {
-            return ExpressionOperatorType::sqrt;
+            return self::sqrt;
         } elseif (string_is_equal($functionName, "ln:", CompareOptions::caseInsensitive)) {
-            return ExpressionOperatorType::ln;
+            return self::ln;
         } elseif (string_is_equal($functionName, "log:", CompareOptions::caseInsensitive)) {
-            return ExpressionOperatorType::log;
+            return self::log;
         } elseif (string_is_equal($functionName, "raise:toPower:", CompareOptions::caseInsensitive)) {
-            return ExpressionOperatorType::raiseToPower;
+            return self::raiseToPower;
         } elseif (string_is_equal($functionName, "exp:", CompareOptions::caseInsensitive)) {
-            return ExpressionOperatorType::exp;
+            return self::exp;
         } elseif (string_is_equal($functionName, "ceiling:", CompareOptions::caseInsensitive)) {
-            return ExpressionOperatorType::ceiling;
+            return self::ceiling;
         } elseif (string_is_equal($functionName, "abs:", CompareOptions::caseInsensitive)) {
-            return ExpressionOperatorType::abs;
+            return self::abs;
         } elseif (string_is_equal($functionName, "trunc:", CompareOptions::caseInsensitive)) {
-            return ExpressionOperatorType::trunc;
+            return self::trunc;
         } elseif (string_is_equal($functionName, "random:", CompareOptions::caseInsensitive)) {
-            return ExpressionOperatorType::random;
+            return self::random;
         } elseif (string_is_equal($functionName, "now:", CompareOptions::caseInsensitive)) {
-            return ExpressionOperatorType::now;
+            return self::now;
         } elseif (string_is_equal($functionName, "floor:", CompareOptions::caseInsensitive)) {
-            return ExpressionOperatorType::floor;
+            return self::floor;
         } elseif (string_is_equal($functionName, "uppercase:", CompareOptions::caseInsensitive)) {
-            return ExpressionOperatorType::uppercase;
+            return self::uppercase;
         } elseif (string_is_equal($functionName, "lowercase:", CompareOptions::caseInsensitive)) {
-            return ExpressionOperatorType::lowercase;
+            return self::lowercase;
         } elseif (string_is_equal($functionName, "canonical:", CompareOptions::caseInsensitive)) {
-            return ExpressionOperatorType::canonical;
+            return self::canonical;
         } elseif (string_is_equal($functionName, "bitwiseAnd:with:", CompareOptions::caseInsensitive)) {
-            return ExpressionOperatorType::bitwiseAndWith;
+            return self::bitwiseAndWith;
         } elseif (string_is_equal($functionName, "bitwiseOr:with:", CompareOptions::caseInsensitive)) {
-            return ExpressionOperatorType::bitwiseOrWith;
+            return self::bitwiseOrWith;
         } elseif (string_is_equal($functionName, "bitwiseXor:with:", CompareOptions::caseInsensitive)) {
-            return ExpressionOperatorType::bitwiseXorWith;
+            return self::bitwiseXorWith;
         } elseif (string_is_equal($functionName, "leftshift:by:", CompareOptions::caseInsensitive)) {
-            return ExpressionOperatorType::leftshiftBy;
+            return self::leftshiftBy;
         } elseif (string_is_equal($functionName, "rightshift:by:", CompareOptions::caseInsensitive)) {
-            return ExpressionOperatorType::rightshiftBy;
+            return self::rightshiftBy;
         } elseif (string_is_equal($functionName, "onesComplement:", CompareOptions::caseInsensitive)) {
-            return ExpressionOperatorType::onesComplement;
+            return self::onesComplement;
         } elseif (string_is_equal($functionName, "index:", CompareOptions::caseInsensitive)) {
-            return ExpressionOperatorType::index;
+            return self::index;
         } elseif (string_is_equal($functionName, "first:", CompareOptions::caseInsensitive)) {
-            return ExpressionOperatorType::indexFirst;
+            return self::indexFirst;
         } elseif (string_is_equal($functionName, "last:", CompareOptions::caseInsensitive)) {
-            return ExpressionOperatorType::indexLast;
+            return self::indexLast;
         } elseif (string_is_equal($functionName, "size:", CompareOptions::caseInsensitive)) {
-            return ExpressionOperatorType::indexSize;
+            return self::indexSize;
         } elseif (string_is_equal($functionName, "cast:", CompareOptions::caseInsensitive)) {
-            return ExpressionOperatorType::cast;
+            return self::cast;
         } elseif (string_is_equal($functionName, "chs:", CompareOptions::caseInsensitive)) {
-            return ExpressionOperatorType::chs;
+            return self::chs;
         } elseif (string_is_equal($functionName, "year:", CompareOptions::caseInsensitive)) {
-            return ExpressionOperatorType::year;
+            return self::year;
         } elseif (string_is_equal($functionName, "month:", CompareOptions::caseInsensitive)) {
-            return ExpressionOperatorType::month;
+            return self::month;
         } elseif (string_is_equal($functionName, "week:", CompareOptions::caseInsensitive)) {
-            return ExpressionOperatorType::week;
+            return self::week;
         } elseif (string_is_equal($functionName, "day:", CompareOptions::caseInsensitive)) {
-            return ExpressionOperatorType::day;
+            return self::day;
         } elseif (string_is_equal($functionName, "hour:", CompareOptions::caseInsensitive)) {
-            return ExpressionOperatorType::hour;
+            return self::hour;
         } elseif (string_is_equal($functionName, "minute:", CompareOptions::caseInsensitive)) {
-            return ExpressionOperatorType::minute;
+            return self::minute;
         } elseif (string_is_equal($functionName, "second:", CompareOptions::caseInsensitive)) {
-            return ExpressionOperatorType::second;
+            return self::second;
         } elseif (string_is_equal($functionName, "uuid:", CompareOptions::caseInsensitive)) {
-            return ExpressionOperatorType::uuid;
+            return self::uuid;
         } elseif (string_is_equal($functionName, "concat:", CompareOptions::caseInsensitive)) {
-            return ExpressionOperatorType::concat;
+            return self::concat;
         } elseif (string_is_equal($functionName, "isNull:", CompareOptions::caseInsensitive)) {
-            return ExpressionOperatorType::isNull;
+            return self::isNull;
         } elseif (string_is_equal($functionName, "ifNull:", CompareOptions::caseInsensitive)) {
-            return ExpressionOperatorType::ifNull;
+            return self::ifNull;
         } elseif (string_is_equal($functionName, "nullIf:", CompareOptions::caseInsensitive)) {
-            return ExpressionOperatorType::nullIf;
+            return self::nullIf;
         } else {
-            fatal_error(sprintf("%s unable to parse selector name \"%s\" into supported method", ExpressionOperatorType::class, $functionName));
+            fatal_error(sprintf("%s unable to parse selector name \"%s\" into supported method", self::class, $functionName));
         }
     }
 
     public static function functionName(ExpressionOperatorType $type): string
     {
         return match ($type) {
-            ExpressionOperatorType::addTo => "add:to:",
-            ExpressionOperatorType::fromSubtract => "from:subtract:",
-            ExpressionOperatorType::multiplyBy => "multiply:by:",
-            ExpressionOperatorType::divideBy => "divide:by:",
-            ExpressionOperatorType::modulusBy => "modulus:by:",
-            ExpressionOperatorType::raiseToPower => "raise:toPower:",
-            ExpressionOperatorType::bitwiseAndWith => "bitwiseAnd:with:",
-            ExpressionOperatorType::bitwiseOrWith => "bitwiseOr:with:",
-            ExpressionOperatorType::bitwiseXorWith => "bitwiseXor:with:",
-            ExpressionOperatorType::leftshiftBy => "leftshift:by:",
-            ExpressionOperatorType::rightshiftBy => "rightshift:by:",
-            ExpressionOperatorType::indexFirst => "first:",
-            ExpressionOperatorType::indexLast => "last:",
-            ExpressionOperatorType::indexSize => "size:",
+            self::addTo => "add:to:",
+            self::fromSubtract => "from:subtract:",
+            self::multiplyBy => "multiply:by:",
+            self::divideBy => "divide:by:",
+            self::modulusBy => "modulus:by:",
+            self::raiseToPower => "raise:toPower:",
+            self::bitwiseAndWith => "bitwiseAnd:with:",
+            self::bitwiseOrWith => "bitwiseOr:with:",
+            self::bitwiseXorWith => "bitwiseXor:with:",
+            self::leftshiftBy => "leftshift:by:",
+            self::rightshiftBy => "rightshift:by:",
+            self::indexFirst => "first:",
+            self::indexLast => "last:",
+            self::indexSize => "size:",
             default => "$type->name:",
         };
     }
