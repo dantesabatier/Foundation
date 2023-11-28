@@ -106,4 +106,9 @@ class Predicate extends ObjectClass
     {
         return $this->predicateFormat();
     }
+
+    public function jsonSerialize(): string
+    {
+        return $this->predicateFormat();
+    }
 }
