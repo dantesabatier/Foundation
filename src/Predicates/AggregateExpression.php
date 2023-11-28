@@ -10,7 +10,10 @@ use function Sabatier\Foundation\human_readable_value;
 /** @internal */
 class AggregateExpression extends Expression
 {
-    public function __construct(private readonly ArrayClass $collection)
+    /**
+     * @param ArrayClass<Expression> $collection
+     */
+    public function __construct(public readonly ArrayClass $collection)
     {
         parent::__construct(ExpressionType::aggregate);
     }
@@ -52,6 +55,6 @@ class AggregateExpression extends Expression
 
     public function predicateFormat(): string
     {
-        return "{" . $this->collection()->join(", ") . "}";
+        return "{" . $this->collection->join(", ") . "}";
     }
 }
