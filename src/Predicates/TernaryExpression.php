@@ -9,19 +9,19 @@ use function Sabatier\Foundation\human_readable_value;
 /** @internal */
 class TernaryExpression extends Expression
 {
-    public function __construct(private readonly Predicate $predicate, private readonly Expression $trueExpression, private readonly Expression $falseExpression)
+    public function __construct(public readonly Predicate $predicate, public readonly Expression $true, public readonly Expression $false)
     {
         parent::__construct(ExpressionType::conditional);
     }
 
     public function withSubstitutionVariables(Dictionary $variables): Expression
     {
-        return new TernaryExpression($this->predicate()->withSubstitutionVariables($variables), $this->true()->withSubstitutionVariables($variables), $this->false()->withSubstitutionVariables($variables));
+        return new TernaryExpression($this->predicate()->withSubstitutionVariables($variables), $this->true->withSubstitutionVariables($variables), $this->false->withSubstitutionVariables($variables));
     }
 
     public function expressionValue(mixed $object = null, ?Dictionary $context = null): mixed
     {
-        $expression = $this->predicate()->evaluate($object, $context) ? $this->true() : $this->false();
+        $expression = $this->predicate->evaluate($object, $context) ? $this->true : $this->false;
         $value = $expression->expressionValue($object, $context);
         if (Predicate::$debugDefault) {
             error_log(sprintf("Foundation: expression %s: %s", $this->expressionType->name, human_readable_value($value)));
@@ -37,9 +37,9 @@ class TernaryExpression extends Expression
         if ($flags & PredicateVisitorFlags::internalNodes) {
             $visitor->visitPredicateExpression($this);
         }
-        $this->predicate()->accept($visitor, $flags);
-        $this->true()->accept($visitor, $flags);
-        $this->false()->accept($visitor, $flags);
+        $this->predicate->accept($visitor, $flags);
+        $this->true->accept($visitor, $flags);
+        $this->false->accept($visitor, $flags);
         if ($flags & PredicateVisitorFlags::internalNodes) {
             $visitor->visitPredicateExpression($this);
         }
@@ -52,16 +52,16 @@ class TernaryExpression extends Expression
 
     public function true(): Expression
     {
-        return $this->trueExpression;
+        return $this->true;
     }
 
     public function false(): Expression
     {
-        return $this->falseExpression;
+        return $this->false;
     }
 
     public function predicateFormat(): string
     {
-        return sprintf("TERNARY(%s, %s, %s)", $this->predicate()->predicateFormat(), $this->true()->description(), $this->false()->description());
+        return sprintf("TERNARY(%s, %s, %s)", $this->predicate, $this->true, $this->false);
     }
 }
