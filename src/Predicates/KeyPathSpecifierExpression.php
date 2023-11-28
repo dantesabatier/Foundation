@@ -7,7 +7,7 @@ use Sabatier\Foundation\Dictionary;
 /** @internal */
 class KeyPathSpecifierExpression extends Expression
 {
-    public function __construct(private readonly string $value)
+    public function __construct(public readonly string $value)
     {
         parent::__construct(ExpressionType::keyPathSpecifierExpressionType);
     }
@@ -31,7 +31,7 @@ class KeyPathSpecifierExpression extends Expression
     {
         $format = "";
         $useDot = false;
-        $components = explode(".", $this->keyPath());
+        $components = explode(".", $this->value);
         foreach ($components as $component) {
             if ($useDot) {
                 $format .= ".";
@@ -48,7 +48,7 @@ class KeyPathSpecifierExpression extends Expression
     public function isEqual(mixed $other): bool
     {
         if ($other instanceof KeyPathSpecifierExpression) {
-            return $this->keyPath() === $other->keyPath();
+            return $this->value === $other->value;
         }
         return false;
     }
