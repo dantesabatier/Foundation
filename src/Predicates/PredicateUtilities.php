@@ -12,7 +12,6 @@ namespace Sabatier\Foundation\Predicates;
 use Countable;
 use JetBrains\PhpStorm\Pure;
 use Sabatier\Foundation\ArrayClass;
-use Sabatier\Foundation\CompareOptions;
 use Sabatier\Foundation\Date;
 use Sabatier\Foundation\Dictionary;
 use Sabatier\Foundation\Nil;
@@ -26,7 +25,6 @@ use function Sabatier\Foundation\fatal_error;
 use function Sabatier\Foundation\human_readable_value;
 use function Sabatier\Foundation\is_equal;
 use function Sabatier\Foundation\pn;
-use function Sabatier\Foundation\string_is_equal;
 use const Sabatier\Foundation\NotFound;
 
 /** @internal */
@@ -211,27 +209,16 @@ class PredicateUtilities
 
     public static function cast(mixed $value, ?string $type = null): mixed
     {
-        if ($type === null) {
-            return $value;
-        }
-        if (string_is_equal($type, "string", CompareOptions::caseInsensitive)) {
-            return human_readable_value($value);
-        } elseif (string_is_equal($type, "int", CompareOptions::caseInsensitive) || string_is_equal($type, "integer", CompareOptions::caseInsensitive)) {
-            return (new Number($value))->intValue;
-        } elseif (string_is_equal($type, "float", CompareOptions::caseInsensitive) || string_is_equal($type, "double", CompareOptions::caseInsensitive)) {
-            return (new Number($value))->floatValue;
-        } elseif (string_is_equal($type, "bool", CompareOptions::caseInsensitive) || string_is_equal($type, "boolean", CompareOptions::caseInsensitive)) {
-            return (new Number($value))->boolValue;
-        }
-        if (!class_exists($type)) {
-            fatal_error(sprintf("Cannot cast %s to invalid class %s", human_readable_value($value), $type));
-        }
-        if (is_a($type, Date::class, true)) {
-            return new Date((new Number($value))->floatValue);
-        } elseif (is_a($type, Number::class, true)) {
-            return new Number($value);
-        }
-        fatal_error(sprintf("Do not know how to cast %s to class %s", human_readable_value($value), $type));
+        return match ($type) {
+            null => $value,
+            "string" => human_readable_value($value),
+            "int", "integer" => (new Number($value))->intValue,
+            "float", "double" => (new Number($value))->floatValue,
+            "bool", "boolean" => (new Number($value))->boolValue,
+            Date::class => new Date((new Number($value))->floatValue),
+            Number::class => new Number($value),
+            default => fatal_error(sprintf("Do not know how to cast %s to class %s", human_readable_value($value), $type))
+        };
     }
 
     public static function now(): Date
