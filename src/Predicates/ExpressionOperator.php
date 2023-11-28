@@ -33,7 +33,7 @@ class ExpressionOperator extends Expression
             ExpressionOperatorType::rightshiftBy => ExpressionOperatorSymbol::shiftRight,
             default => $this->operatorType->name
         };
-        $this->isDeterministic = match ($this) {
+        $this->isDeterministic = match ($this->operatorType) {
             ExpressionOperatorType::average, ExpressionOperatorType::sum, ExpressionOperatorType::count, ExpressionOperatorType::min, ExpressionOperatorType::max, ExpressionOperatorType::stddev, ExpressionOperatorType::sqrt, ExpressionOperatorType::ln, ExpressionOperatorType::log, ExpressionOperatorType::raiseToPower, ExpressionOperatorType::exp, ExpressionOperatorType::ceiling, ExpressionOperatorType::abs, ExpressionOperatorType::trunc, ExpressionOperatorType::floor, ExpressionOperatorType::uppercase, ExpressionOperatorType::lowercase, ExpressionOperatorType::year, ExpressionOperatorType::month, ExpressionOperatorType::week, ExpressionOperatorType::day, ExpressionOperatorType::hour, ExpressionOperatorType::minute, ExpressionOperatorType::second, ExpressionOperatorType::concat, ExpressionOperatorType::isNull, ExpressionOperatorType::ifNull, ExpressionOperatorType::nullIf => true,
             default => false,
         };
