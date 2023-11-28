@@ -391,6 +391,6 @@ class Expression extends ObjectClass
 
     public function jsonSerialize(): string
     {
-        return $this->description();
+        return $this->predicateFormat();
     }
 }
