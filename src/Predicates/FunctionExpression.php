@@ -11,6 +11,12 @@ use function Sabatier\Foundation\typeof;
 /** @internal */
 class FunctionExpression extends Expression
 {
+    /**
+     * @param ExpressionType $expressionType
+     * @param Expression $operand
+     * @param string $selector
+     * @param ArrayClass<Expression>|null $arguments
+     */
     public function __construct(ExpressionType $expressionType, public readonly Expression $operand, public readonly string $selector, public readonly ?ArrayClass $arguments = null)
     {
         parent::__construct($expressionType);
