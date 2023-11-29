@@ -217,7 +217,7 @@ class PredicateUtilities
             "bool", "boolean" => (new Number($value))->boolValue,
             Date::class => new Date((new Number($value))->floatValue),
             Number::class => new Number($value),
-            default => fatal_error(sprintf("Do not know how to cast %s to class %s", human_readable_value($value), $type))
+            default => fatal_error(sprintf("Do not know how to cast %s to type %s", human_readable_value($value), $type))
         };
     }
 
