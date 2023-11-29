@@ -197,8 +197,7 @@ abstract class URLSessionTask extends ObjectClass
 
     private function updateTaskState(): void
     {
-        $calculateState = fn(): URLSessionTaskState => $this->suspendCount === 0 ? URLSessionTaskState::running : URLSessionTaskState::suspended;
-        $this->state = $calculateState();
+        $this->state = $this->suspendCount === 0 ? URLSessionTaskState::running : URLSessionTaskState::suspended;
     }
 
     /** @internal */
