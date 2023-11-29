@@ -88,6 +88,20 @@ class Error extends ObjectClass
                             $localizedFailureReason = posix_strerror($this->code);
                         }
                         break;
+                    case URLErrorDomain:
+                        $localizedFailureReason = match ($this->code) {
+                            URLErrorUnsupportedURL, URLErrorBadURL => "The specified URL type isn't supported.",
+                            URLErrorCannotFindHost => "Cannot find host.",
+                            URLErrorNetworkConnectionLost => "Network connection lost-",
+                            URLErrorBadServerResponse => "Bad server response.",
+                            URLErrorUnknown => "Unknown error",
+                            URLErrorTimedOut => "The request timed out.",
+                            URLErrorHTTPTooManyRedirects => "Too many HTTP redirects",
+                            URLErrorFileDoesNotExist => "The file doesn't exist.",
+                            URLErrorNoPermissionsToReadFile => "You don't have permission.",
+                            default => null,
+                        };
+                        break;
                     default:
                         break;
                 }
