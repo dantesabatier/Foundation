@@ -93,11 +93,8 @@ abstract class NativeProtocol extends URLProtocol implements EasyHandleDelegate
 
     private function createTransferBodyDataDrain(): DataDrain
     {
-        $task = $this->task;
-        $session = $task->session;
-        $behaviour = $session->behaviour($task);
         /** @noinspection PhpUnhandledExceptionInspection */
-        return match ($behaviour->rawValue) {
+        return match ($this->task->session->behaviour($this->task)->rawValue) {
             TaskBehaviourRawValue::noDelegate => DataDrain::ignore(),
             TaskBehaviourRawValue::taskDelegate, TaskBehaviourRawValue::dataCompletionHandler => DataDrain::inMemory(),
             TaskBehaviourRawValue::downloadCompletionHandler => DataDrain::toFile($this->tempFileURL, FileHandle::fileHandleForWritingToURL($this->tempFileURL))
