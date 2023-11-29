@@ -103,9 +103,8 @@ abstract class NativeProtocol extends URLProtocol implements EasyHandleDelegate
 
     private function createTransferState(URL $url, TaskBody $body): TransferState
     {
-        $dataDrain = $this->createTransferBodyDataDrain();
         return match ($body->rawValue) {
-            TaskBodyRawValue::none, TaskBodyRawValue::data, TaskBodyRawValue::file, TaskBodyRawValue::stream => new TransferState($url, bodyDataDrain: $dataDrain)
+            TaskBodyRawValue::none, TaskBodyRawValue::data, TaskBodyRawValue::file, TaskBodyRawValue::stream => new TransferState($url, bodyDataDrain: $this->createTransferBodyDataDrain())
         };
     }
 
