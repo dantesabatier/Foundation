@@ -2,7 +2,6 @@
 
 namespace Sabatier\Foundation\Networking;
 
-use Exception;
 use Sabatier\Foundation\Dictionary;
 use Sabatier\Foundation\Error;
 use function Sabatier\Foundation\fatal_error;
@@ -20,9 +19,6 @@ class ProtocolClient implements URLProtocolClient
     private ?URLResponse $cacheableResponse = null;
     private URLCacheStoragePolicy $cachePolicy = URLCacheStoragePolicy::notAllowed;
 
-    /**
-     * @throws Exception
-     */
     public function urlProtocolDidReceiveCacheStoragePolicy(URLProtocol $protocol, URLResponse $response, URLCacheStoragePolicy $policy): void
     {
         $task = $protocol->task;
@@ -59,9 +55,6 @@ class ProtocolClient implements URLProtocolClient
         }
     }
 
-    /**
-     * @throws Exception
-     */
     public function urlProtocolWasRedirectedToRedirectResponse(URLProtocol $protocol, URLRequest $request, URLResponse $response): void
     {
         fatal_error("The URLSession implementation doesn't currently handle redirects directly.");
@@ -71,17 +64,11 @@ class ProtocolClient implements URLProtocolClient
     {
     }
 
-    /**
-     * @throws Exception
-     */
     public function urlProtocolDidCancel(URLProtocol $protocol, URLAuthenticationChallenge $challenge): void
     {
         $this->urlProtocolTaskDidFailWithError($protocol->task, new Error(CocoaErrorDomain, UserCancelledError));
     }
 
-    /**
-     * @throws Exception
-     */
     public function urlProtocolDidReceive(URLProtocol $protocol, URLAuthenticationChallenge $authenticationChallenge): void
     {
         $task = $protocol->task;
@@ -132,17 +119,11 @@ class ProtocolClient implements URLProtocolClient
         }
     }
 
-    /**
-     * @throws Exception
-     */
     public function urlProtocolDidFailWithError(URLProtocol $protocol, Error $error): void
     {
         $this->urlProtocolTaskDidFailWithError($protocol->task, $error);
     }
 
-    /**
-     * @throws Exception
-     */
     public function urlProtocolTaskDidFailWithError(URLSessionTask $task, Error $error): void
     {
         $session = $task->session;
@@ -190,9 +171,6 @@ class ProtocolClient implements URLProtocolClient
         $task->invalidateProtocol();
     }
 
-    /**
-     * @throws Exception
-     */
     public function urlProtocolDidLoad(URLProtocol $protocol, string $data): void
     {
         $task = $protocol->task;
@@ -227,9 +205,6 @@ class ProtocolClient implements URLProtocolClient
         }
     }
 
-    /**
-     * @throws Exception
-     */
     public function urlProtocolDidFinishLoading(URLProtocol $protocol): void
     {
         $task = $protocol->task;

@@ -3,7 +3,6 @@
 namespace Sabatier\Foundation\Networking;
 
 use Closure;
-use Exception;
 use Sabatier\Foundation\ArrayClass;
 use Sabatier\Foundation\Error;
 use Sabatier\Foundation\OperationQueue;
@@ -75,9 +74,6 @@ final class URLSession implements URLSessionProtocol
         return $this->configuration->configure($request);
     }
 
-    /**
-     * @throws Exception
-     */
     private function dataTask(URLRequest $request, TaskRegistryBehaviour $behaviour): URLSessionDataTask
     {
         if ($this->invalidated) {
@@ -88,9 +84,6 @@ final class URLSession implements URLSessionProtocol
         return $task;
     }
 
-    /**
-     * @throws Exception
-     */
     private function uploadTask(URLRequest $request, TaskBody $body, TaskRegistryBehaviour $behaviour): URLSessionUploadTask
     {
         if ($this->invalidated) {
@@ -101,9 +94,6 @@ final class URLSession implements URLSessionProtocol
         return $task;
     }
 
-    /**
-     * @throws Exception
-     */
     private function downloadTask(URLRequest $request, TaskRegistryBehaviour $behaviour): URLSessionDownloadTask
     {
         if ($this->invalidated) {
@@ -114,9 +104,6 @@ final class URLSession implements URLSessionProtocol
         return $task;
     }
 
-    /**
-     * @throws Exception
-     */
     private function webSocketTask(URLRequest $request, TaskRegistryBehaviour $behaviour): URLSessionWebSocketTask
     {
         if ($this->invalidated) {
@@ -133,7 +120,6 @@ final class URLSession implements URLSessionProtocol
      * @param URL $url The URL to be retrieved.
      * @param DataCompletionHandler|null $completionHandler The completion handler to call when the load request is complete. This handler is executed on the delegate queue. If you pass nil, only the session delegate methods are called when the task completes, making this method equivalent to the {@see dataTaskWithRequest()} method.
      * @return URLSessionDataTask The new session data task.
-     * @throws Exception
      */
     public function dataTaskWithURL(URL $url, ?Closure $completionHandler = null): URLSessionDataTask
     {
@@ -146,7 +132,6 @@ final class URLSession implements URLSessionProtocol
      * @param URLRequest $request A URL request object that provides request-specific information such as the URL, cache policy, request type, and body data or body stream.
      * @param DataCompletionHandler|null $completionHandler The completion handler to call when the load request is complete.
      * @return URLSessionDataTask The new session data task.
-     * @throws Exception
      */
     public function dataTaskWithRequest(URLRequest $request, ?Closure $completionHandler = null): URLSessionDataTask
     {
@@ -159,7 +144,6 @@ final class URLSession implements URLSessionProtocol
      * @param URL $url The URL to download.
      * @param DownloadCompletionHandler|null $completionHandler The completion handler to call when the load request is complete. This handler is executed on the delegate queue.
      * @return URLSessionDownloadTask The new session download task.
-     * @throws Exception
      */
     public function downloadTaskWithURL(URL $url, ?Closure $completionHandler = null): URLSessionDownloadTask
     {
@@ -171,7 +155,6 @@ final class URLSession implements URLSessionProtocol
      * @param URLRequest $request A URL request object that provides the URL, cache policy, request type, body data or body stream, and so on.
      * @param DownloadCompletionHandler|null $completionHandler The completion handler to call when the load request is complete.
      * @return URLSessionDownloadTask The new session download task.
-     * @throws Exception
      */
     public function downloadTaskWithRequest(URLRequest $request, ?Closure $completionHandler = null): URLSessionDownloadTask
     {
@@ -183,7 +166,6 @@ final class URLSession implements URLSessionProtocol
      * @param URLRequest $request A URL request object that provides the URL, cache policy, request type, and so on. The body stream and body data in this request object are ignored.
      * @param URL $fileURL The URL of the file to upload.
      * @param DataCompletionHandler|null $completionHandler The completion handler to call when the load request is complete.
-     * @throws Exception
      */
     public function uploadTaskWithRequest(URLRequest $request, URL $fileURL, ?Closure $completionHandler = null): URLSessionUploadTask
     {
@@ -197,7 +179,6 @@ final class URLSession implements URLSessionProtocol
      * @param string $hostname The hostname of the connection endpoint.
      * @param int $port The port of the connection endpoint.
      * @return URLSessionStreamTask The new session stream task.
-     * @throws Exception
      */
     public function streamTaskWithHostName(/** @noinspection PhpUnusedParameterInspection */ string $hostname, int $port): URLSessionStreamTask
     {
@@ -211,7 +192,6 @@ final class URLSession implements URLSessionProtocol
      * To add custom protocols, add a header with the key Sec-WebSocket-Protocol, and a comma-separated list of protocols you want to negotiate with the server. The custom HTTP headers provided by the client remain unchanged for the handshake with the server.
      * @param URLRequest $request A URL request that indicates a WebSockets endpoint with which to connect.
      * @return URLSessionWebSocketTask
-     * @throws Exception
      */
     public function webSocketTaskWithRequest(URLRequest $request): URLSessionWebSocketTask
     {
@@ -225,7 +205,6 @@ final class URLSession implements URLSessionProtocol
      * @param URL $url The WebSocket URL with which to connect.
      * @param ArrayClass<string> $protocols An array of protocols to negotiate with the server.
      * @return URLSessionWebSocketTask
-     * @throws Exception
      */
     public function webSocketTaskWithURL(URL $url, ArrayClass $protocols = new ArrayClass()): URLSessionWebSocketTask
     {
@@ -236,10 +215,7 @@ final class URLSession implements URLSessionProtocol
         return $this->webSocketTaskWithRequest($request);
     }
 
-    /**
-     * @throws Exception
-     * @internal
-     */
+    /** @internal */
     public function add(EasyHandle $handle): void
     {
         $this->multiHandle->add($handle);
@@ -253,10 +229,7 @@ final class URLSession implements URLSessionProtocol
         $this->multiHandle->remove($handle);
     }
 
-    /**
-     * @throws Exception
-     * @internal
-     */
+    /** @internal */
     public function behaviour(URLSessionTask $task): TaskBehaviour
     {
         $behaviour = $this->taskRegistry->behaviour($task);

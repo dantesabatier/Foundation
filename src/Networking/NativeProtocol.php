@@ -39,9 +39,6 @@ abstract class NativeProtocol extends URLProtocol implements EasyHandleDelegate
         $this->easyHandle = new EasyHandle($this);
     }
 
-    /**
-     * @throws Exception
-     */
     public function __get(string $name)
     {
         return $this->$name = match ($name) {
@@ -78,17 +75,11 @@ abstract class NativeProtocol extends URLProtocol implements EasyHandleDelegate
         return false;
     }
 
-    /**
-     * @throws Exception
-     */
     public function startLoading(): void
     {
         $this->resume();
     }
 
-    /**
-     * @throws Exception
-     */
     public function stopLoading(): void
     {
         if ($this->task->state === URLSessionTaskState::suspended) {
@@ -100,14 +91,12 @@ abstract class NativeProtocol extends URLProtocol implements EasyHandleDelegate
         }
     }
 
-    /**
-     * @throws Exception
-     */
     private function createTransferBodyDataDrain(): DataDrain
     {
         $task = $this->task;
         $session = $task->session;
         $behaviour = $session->behaviour($task);
+        /** @noinspection PhpUnhandledExceptionInspection */
         return match ($behaviour->rawValue) {
             TaskBehaviourRawValue::noDelegate => DataDrain::ignore(),
             TaskBehaviourRawValue::taskDelegate, TaskBehaviourRawValue::dataCompletionHandler => DataDrain::inMemory(),
@@ -115,9 +104,6 @@ abstract class NativeProtocol extends URLProtocol implements EasyHandleDelegate
         };
     }
 
-    /**
-     * @throws Exception
-     */
     private function createTransferState(URL $url, TaskBody $body): TransferState
     {
         $dataDrain = $this->createTransferBodyDataDrain();
@@ -126,9 +112,6 @@ abstract class NativeProtocol extends URLProtocol implements EasyHandleDelegate
         };
     }
 
-    /**
-     * @throws Exception
-     */
     public function startNewTransfer(URLRequest $request): void
     {
         $task = $this->task;
@@ -144,9 +127,6 @@ abstract class NativeProtocol extends URLProtocol implements EasyHandleDelegate
         });
     }
 
-    /**
-     * @throws Exception
-     */
     public function resume(): void
     {
         if ($this->internalState->rawValue === InternalStateRawValue::initial) {
@@ -183,9 +163,7 @@ abstract class NativeProtocol extends URLProtocol implements EasyHandleDelegate
 
     abstract public function configureEasyHandle(URLRequest $request, TaskBody $body): void;
 
-    /**
-     * @throws Exception
-     */
+
     public function didReceiveData(string $data): EasyHandleAction
     {
         if ($this->internalState->rawValue !== InternalStateRawValue::transferInProgress) {
@@ -207,9 +185,6 @@ abstract class NativeProtocol extends URLProtocol implements EasyHandleDelegate
         return EasyHandleAction::proceed;
     }
 
-    /**
-     * @throws Exception
-     */
     public function fill(mixed $buffer): EasyHandleWriteBufferResult
     {
         if ($this->internalState->rawValue !== InternalStateRawValue::transferInProgress) {
@@ -218,9 +193,6 @@ abstract class NativeProtocol extends URLProtocol implements EasyHandleDelegate
         return EasyHandleWriteBufferResult::bytes(fgets($buffer));
     }
 
-    /**
-     * @throws Exception
-     */
     public function transferCompleted(?Error $error): void
     {
         if ($error instanceof Error) {
@@ -268,9 +240,6 @@ abstract class NativeProtocol extends URLProtocol implements EasyHandleDelegate
         $progressReporter->completedUnitCount = $progress->totalBytesReceived + $progress->totalBytesSent;
     }
 
-    /**
-     * @throws Exception
-     */
     public function validateHeaderComplete(TransferState $transferState): ?URLResponse
     {
         if (!$transferState->isHeaderComplete()) {
@@ -279,9 +248,6 @@ abstract class NativeProtocol extends URLProtocol implements EasyHandleDelegate
         return null;
     }
 
-    /**
-     * @throws Exception
-     */
     public function notifyDelegateAboutUploadedData(int $count): void
     {
         $task = $this->task;
@@ -302,9 +268,6 @@ abstract class NativeProtocol extends URLProtocol implements EasyHandleDelegate
         }
     }
 
-    /**
-     * @throws Exception
-     */
     public function completeTaskWithError(Error $error): void
     {
         $task = $this->task;
@@ -316,9 +279,6 @@ abstract class NativeProtocol extends URLProtocol implements EasyHandleDelegate
         $task->session->remove($this->easyHandle);
     }
 
-    /**
-     * @throws Exception
-     */
     public function failWithError(Error $error, URLRequest $request): void
     {
         if ($error->domain !== URLErrorDomain) {
@@ -327,9 +287,6 @@ abstract class NativeProtocol extends URLProtocol implements EasyHandleDelegate
         $this->client?->urlProtocolDidFailWithError($this, $error);
     }
 
-    /**
-     * @throws Exception
-     */
     public function askDelegateHowToProceedAfterCompleteResponse(URLResponse $response, URLSessionDataDelegate $delegate): void
     {
         if ($this->internalState->rawValue !== InternalStateRawValue::transferInProgress) {
@@ -348,9 +305,6 @@ abstract class NativeProtocol extends URLProtocol implements EasyHandleDelegate
         });
     }
 
-    /**
-     * @throws Exception
-     */
     public function didCompleteResponseCallback(URLSessionResponseDisposition $disposition): void
     {
         if ($this->internalState->rawValue !== InternalStateRawValue::waitingForResponseCompletionHandler) {
@@ -378,9 +332,6 @@ abstract class NativeProtocol extends URLProtocol implements EasyHandleDelegate
         request_concrete_implementation($this, __FUNCTION__);
     }
 
-    /**
-     * @throws Exception
-     */
     public function completeTask(): void
     {
         if ($this->internalState->rawValue !== InternalStateRawValue::transferCompleted) {

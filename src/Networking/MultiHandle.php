@@ -4,7 +4,6 @@ namespace Sabatier\Foundation\Networking;
 
 use CurlHandle;
 use CurlMultiHandle;
-use Exception;
 use Sabatier\Foundation\ArrayClass;
 use Sabatier\Foundation\Dictionary;
 use Sabatier\Foundation\Error;
@@ -47,9 +46,6 @@ final readonly class MultiHandle
         curl_multi_setopt($this->rawHandle, CURLMOPT_PIPELINING, $configuration->httpShouldUsePipelining ? 3 : 2);
     }
 
-    /**
-     * @throws Exception
-     */
     public function add(EasyHandle $handle): void
     {
         if (!$handle->rawHandle instanceof CurlHandle) {
@@ -74,9 +70,6 @@ final readonly class MultiHandle
         curl_multi_remove_handle($this->rawHandle, $handle->rawHandle);
     }
 
-    /**
-     * @throws Exception
-     */
     private function timeoutTimerFired(): void
     {
         do {
@@ -85,9 +78,6 @@ final readonly class MultiHandle
         $this->readMessages();
     }
 
-    /**
-     * @throws Exception
-     */
     public function readMessages(): void
     {
         do {
@@ -102,9 +92,6 @@ final readonly class MultiHandle
         } while ($running);
     }
 
-    /**
-     * @throws Exception
-     */
     public function completedTransfer(CurlHandle $handle, int $easyCode): void
     {
         if (!($easyHandle = $this->easyHandles->first(fn(EasyHandle $easyHandle): bool => $easyHandle->rawHandle === $handle))) {

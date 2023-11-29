@@ -122,9 +122,6 @@ class HTTPURLProtocol extends NativeProtocol
         return true;
     }
 
-    /**
-     * @throws Exception
-     */
     public function configureEasyHandle(URLRequest $request, TaskBody $body): void
     {
         if ($request->httpMethod === HTTPRequestMethod::get && $body->rawValue !== TaskBodyRawValue::none) {
@@ -209,9 +206,6 @@ class HTTPURLProtocol extends NativeProtocol
         $easyHandle->setCustomHeaders($customHeaders);
     }
 
-    /**
-     * @throws Exception
-     */
     public function completionAction(URLRequest $request, URLResponse $response): CompletionAction
     {
         $httpResponse = $response;
@@ -224,9 +218,6 @@ class HTTPURLProtocol extends NativeProtocol
         return CompletionAction::completeTask();
     }
 
-    /**
-     * @throws Exception
-     */
     public function redirectFor(URLRequest $request): void
     {
         if ($this->internalState->rawValue !== InternalStateRawValue::transferCompleted) {
@@ -268,9 +259,6 @@ class HTTPURLProtocol extends NativeProtocol
         return null;
     }
 
-    /**
-     * @throws Exception
-     */
     public function redirectRequest(URLRequest $request, HTTPURLResponse $response): ?URLRequest
     {
         if (!($location = $response->valueForHttpHeaderField("Location"))) {
@@ -295,9 +283,6 @@ class HTTPURLProtocol extends NativeProtocol
         return $request;
     }
 
-    /**
-     * @throws Exception
-     */
     public function didReceiveHeaderData(string $data, int $contentLength): EasyHandleAction
     {
         if ($this->internalState->rawValue !== InternalStateRawValue::transferInProgress) {
@@ -325,9 +310,6 @@ class HTTPURLProtocol extends NativeProtocol
         }
     }
 
-    /**
-     * @throws Exception
-     */
     public function didReceiveResponse(): void
     {
         if ($this->internalState->rawValue !== InternalStateRawValue::transferInProgress) {
@@ -362,9 +344,6 @@ class HTTPURLProtocol extends NativeProtocol
         }
     }
 
-    /**
-     * @throws Exception
-     */
     private function didCompleteRedirectCallback(?URLRequest $request): void
     {
         if ($this->internalState->rawValue !== InternalStateRawValue::waitingForRedirectCompletionHandler) {

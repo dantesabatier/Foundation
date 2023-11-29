@@ -2,7 +2,6 @@
 
 namespace Sabatier\Foundation\Networking;
 
-use Exception;
 use Sabatier\Foundation\Dictionary;
 use Sabatier\Foundation\Error;
 use function Sabatier\Foundation\fatal_error;
@@ -54,18 +53,12 @@ class WebSocketURLProtocol extends HTTPURLProtocol
         $easyHandle->setPreferredReceiveBufferSize($task->maximumMessageSize);
     }
 
-    /**
-     * @throws Exception
-     */
     public function receiveWebSocketData(): void
     {
         [$data,] = $this->easyHandle->receiveWebSocketsData();
         $this->didReceiveData($data);
     }
 
-    /**
-     * @throws Exception
-     */
     public function sendWebSocketData(string $data, URLSessionWebSocketOperation $operation): void
     {
         $this->easyHandle->sendWebSocketsData($data, $operation);
@@ -117,9 +110,6 @@ class WebSocketURLProtocol extends HTTPURLProtocol
         return EasyHandleAction::proceed;
     }
 
-    /**
-     * @throws Exception
-     */
     private function notifyTaskAboutReceivedData(string $data, URLSessionWebSocketOperation $operation): void
     {
         $task = $this->task;

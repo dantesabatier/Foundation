@@ -3,7 +3,6 @@
 namespace Sabatier\Foundation\Networking;
 
 use Closure;
-use Exception;
 use Sabatier\Foundation\ArrayClass;
 use Sabatier\Foundation\Dictionary;
 use Sabatier\Foundation\ObjectClass;
@@ -38,9 +37,6 @@ class TaskRegistry extends ObjectClass
         };
     }
 
-    /**
-     * @throws Exception
-     */
     public function add(URLSessionTask $task, TaskRegistryBehaviour $behaviour): void
     {
         $identifier = (string)$task->taskIdentifier;
@@ -55,9 +51,6 @@ class TaskRegistry extends ObjectClass
         $this->behaviours[$identifier] = $behaviour;
     }
 
-    /**
-     * @throws Exception
-     */
     public function remove(URLSessionTask $task): void
     {
         if (!($key = $this->tasks->indexOf($task))) {
@@ -84,9 +77,6 @@ class TaskRegistry extends ObjectClass
         $this->tasksFinishedCallback = $tasksCompletion;
     }
 
-    /**
-     * @throws Exception
-     */
     public function behaviour(URLSessionTask $task): TaskRegistryBehaviour
     {
         if (!($behaviour = $this->behaviours[(string)$task->taskIdentifier])) {

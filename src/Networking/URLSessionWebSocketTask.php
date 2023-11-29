@@ -115,7 +115,6 @@ class URLSessionWebSocketTask extends URLSessionTask
                 $userInfo[URLErrorFailingURLErrorKey] = $url;
             }
             $this->error = new Error(URLErrorDomain, URLErrorUnsupportedURL, $userInfo);
-            /** @noinspection PhpUnhandledExceptionInspection */
             (new ProtocolClient())->urlProtocolTaskDidFailWithError($this, $this->error);
             return;
         }
@@ -139,18 +138,14 @@ class URLSessionWebSocketTask extends URLSessionTask
         $this->close($closeCode, $reason);
     }
 
-    /**
-     * @internal
-     */
+    /** @internal */
     public function appendReceivedMessage(URLSessionWebSocketTaskMessage $message): void
     {
         $this->receiveBuffer->append($message);
         $this->doPendingWork();
     }
 
-    /**
-     * @internal
-     */
+    /** @internal */
     public function noteReceivedPong(): void
     {
         if (!($completionHandler = $this->pongCompletionHandlers->popFirst())) {
@@ -159,9 +154,7 @@ class URLSessionWebSocketTask extends URLSessionTask
         $completionHandler(null);
     }
 
-    /**
-     * @internal
-     */
+    /** @internal */
     public function close(URLSessionWebSocketTaskCloseCode $code, ?string $reason = null): void
     {
         if ($this->taskError !== null) {
@@ -239,9 +232,7 @@ class URLSessionWebSocketTask extends URLSessionTask
         }
     }
 
-    /**
-     * @internal
-     */
+    /** @internal */
     public static function supportsWebSockets(): bool
     {
         return EasyHandle::supportsWebSockets();

@@ -19,9 +19,6 @@ class FTPURLProtocol extends NativeProtocol
         return $request->url->scheme === "ftp";
     }
 
-    /**
-     * @throws Exception
-     */
     public function didReceiveHeaderData(string $data, int $contentLength): EasyHandleAction
     {
         if ($this->internalState->rawValue !== InternalStateRawValue::transferInProgress) {
@@ -43,9 +40,6 @@ class FTPURLProtocol extends NativeProtocol
         }
     }
 
-    /**
-     * @throws Exception
-     */
     public function configureEasyHandle(URLRequest $request, TaskBody $body): void
     {
         $easyHandle = $this->easyHandle;
@@ -78,9 +72,6 @@ class FTPURLProtocol extends NativeProtocol
         $easyHandle->setAutomaticBodyDecompression(true);
     }
 
-    /**
-     * @throws Exception
-     */
     public function didReceiveResponse(): void
     {
         if ($this->internalState->rawValue !== InternalStateRawValue::transferInProgress) {
