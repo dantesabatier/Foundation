@@ -8,8 +8,6 @@ const MimeTypeJPEG = "image/jpeg";
 const MimeTypePNG = "image/png";
 /** @var string */
 const MimeTypeAVIF = "image/avif";
-/** @var string */
-const TransliteratorDefault = "Any-Latin; Latin-ASCII;";
 /** @var int A value indicating that a requested item couldn't be found or doesn't exist. NotFound is typically used by various methods and functions that search for items in serial data and return indices, such as characters in a string object or id objects in an array. */
 const NotFound = -1;
 /** @var string This value transformer negates a boolean value, transforming true to false and false to true. This transformer is reversible. */
