@@ -25,7 +25,7 @@ function string_with_options(string $string, #[ExpectedValues(flagsFromClass: Co
 {
     if (($options & CompareOptions::caseInsensitive) && ($options & CompareOptions::diacriticInsensitive)) {
         if (function_exists("transliterator_transliterate")) :
-            $string = transliterator_transliterate(TransliteratorDefault, $string);
+            $string = transliterator_transliterate("Any-Latin; Latin-ASCII;", $string);
             if ($string === false) {
                 fatal_error(sprintf("%s() %s", __FUNCTION__, intl_get_error_message()));
             }
