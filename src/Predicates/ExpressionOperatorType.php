@@ -51,6 +51,7 @@ enum ExpressionOperatorType: int
     case hour = 41;
     case minute = 42;
     case second = 43;
+    case dateFormat = 44;
     case uuid = 111;
     case concat = 112;
     case isNull = 996;
@@ -85,6 +86,7 @@ enum ExpressionOperatorType: int
             "trunc:" => self::trunc,
             "random:" => self::random,
             "now:" => self::now,
+            "date:format:" => self::dateFormat,
             "floor:" => self::floor,
             "uppercase:" => self::uppercase,
             "lowercase:" => self::lowercase,

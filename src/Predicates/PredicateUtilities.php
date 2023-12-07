@@ -282,6 +282,14 @@ class PredicateUtilities
         return new Number(date("s", (int)$date->timeIntervalSinceReferenceDate));
     }
 
+    public static function dateFormat(?Date $date, string $format = "Y-m-d H:i:s"): ?string
+    {
+        if (!$date instanceof Date) {
+            return null;
+        }
+        return date($format, (int)$date->timeIntervalSinceReferenceDate);
+    }
+
     public static function floor(Number|float $value): Number
     {
         return new Number(floor(pn($value)));
