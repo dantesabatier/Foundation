@@ -103,6 +103,7 @@ final class OperationQueue extends ObjectClass
                 Fiber::suspend();
                 $this->operations->append($operation);
                 $this->operations->sort(fn(Operation $op0, Operation $op1): int => ComparisonResult::orderedAscending->value * ($op0->queuePriority->value <=> $op1->queuePriority->value));
+                /** @psalm-suppress UndefinedVariable */
                 $observation = $operation->observe("isFinished", KeyValueObservingOptions::new, function (Operation $operation, KeyValueObservedChange $change) use (&$observation): void {
                     $observation->invalidate();
                     if ($change->newValue) {
