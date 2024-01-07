@@ -293,6 +293,7 @@ final class URLSession implements URLSessionProtocol
 
     /**
      * @return array{dataTasks: ArrayClass<URLSessionDataTask>, uploadTasks: ArrayClass<URLSessionUploadTask>, downloadTasks: ArrayClass<URLSessionDownloadTask>}
+     * @psalm-suppress InvalidReturnType, InvalidReturnStatement
      */
     public function tasks(): array
     {
