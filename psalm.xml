@@ -41,5 +41,6 @@
                 <file name="src/SequenceAlgorithms.php" />
             </errorLevel>
         </ReferenceConstraintViolation>
+        <RiskyTruthyFalsyComparison errorLevel="suppress"/>
     </issueHandlers>
 </psalm>
