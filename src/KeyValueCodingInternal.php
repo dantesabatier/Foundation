@@ -40,15 +40,15 @@ function kvc_components(string $keyPath): array
         return [];
     }
     $collection = "";
-    $property = "";
+    $keyPathToProperty = "";
     /** @var string[] $components */
     $components = preg_split(sprintf("/%s/", preg_quote(".", "/")), substring_to_index($keyPath, $idx), -1, PREG_SPLIT_NO_EMPTY);
     $numberOfComponents = count($components);
     if ($numberOfComponents) {
         $collection = array_shift($components);
         if ($numberOfComponents > 1) {
-            $property = array_pop($components);
+            $keyPathToProperty = implode(".", $components);
         }
     }
-    return [$collection, substring_from_index($keyPath, $idx + 1), $property];
+    return [$collection, substring_from_index($keyPath, $idx + 1), $keyPathToProperty];
 }
