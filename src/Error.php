@@ -92,7 +92,7 @@ class Error extends ObjectClass
                         $localizedFailureReason = match ($this->code) {
                             URLErrorUnsupportedURL, URLErrorBadURL => "The specified URL type isn't supported.",
                             URLErrorCannotFindHost => "Cannot find host.",
-                            URLErrorNetworkConnectionLost => "Network connection lost-",
+                            URLErrorNetworkConnectionLost => "Network connection lost.",
                             URLErrorBadServerResponse => "Bad server response.",
                             URLErrorUnknown => "Unknown error",
                             URLErrorTimedOut => "The request timed out.",
