@@ -10,6 +10,8 @@
 namespace Sabatier\Foundation\Predicates;
 
 use Countable;
+use DateTime;
+use Exception;
 use JetBrains\PhpStorm\Pure;
 use Sabatier\Foundation\ArrayClass;
 use Sabatier\Foundation\Date;
@@ -298,6 +300,14 @@ class PredicateUtilities
             return null;
         }
         return date($format, (int)$date->timeIntervalSinceReferenceDate);
+    }
+
+    /**
+     * @throws Exception
+     */
+    public static function dateDiff(Date $d1, Date $d2, string $unit): Number
+    {
+        return new Number((new DateTime((string)$d1))->diff(new DateTime((string)$d2))->$unit);
     }
 
     public static function floor(Number|float $value): Number
