@@ -305,7 +305,7 @@ class PredicateUtilities
     /**
      * @throws Exception
      */
-    public static function dateDiff(Date $d1, Date $d2, string $unit): Number
+    public static function dateDiff(string $unit, Date $d1, Date $d2): Number
     {
         return new Number((new DateTime((string)$d1))->diff(new DateTime((string)$d2))->$unit);
     }
