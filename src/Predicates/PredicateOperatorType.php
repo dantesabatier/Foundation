@@ -38,7 +38,7 @@ enum PredicateOperatorType: int
     case in = 10;
     /** A predicate that uses a custom selector that takes a single argument and returns a BOOL value. The selector is invoked on the left hand side with the right hand side as the argument. */
     case customSelector = 11;
-    /** A predicate to determine if the left hand side contains the right hand side. Returns true if [lhs contains rhs]; the left hand side must be an NSExpression object that evaluates to a collection */
+    /** A predicate to determine if the left hand side contains the right hand side. Returns true if [lhs contains rhs]; the left hand side must be an Expression object that evaluates to a collection */
     case contains = 99;
     /** A predicate to determine if the left hand side lies at or between bounds specified by the right hand side. Returns true if [lhs between rhs]; the right hand side must be an array in which the first element sets the lower bound and the second element the upper, inclusive. Comparison is performed using {@see Comparable::compare()} or the class-appropriate equivalent. */
     case between = 100;
