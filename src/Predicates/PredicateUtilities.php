@@ -305,9 +305,9 @@ class PredicateUtilities
     /**
      * @throws Exception
      */
-    public static function dateDiff(string $unit, Date $d1, Date $d2): Number
+    public static function dateDiff(string $unit, Date|string|null $d1, Date|string|null $d2): Number
     {
-        return new Number((new DateTime((string)$d1))->diff(new DateTime((string)$d2))->$unit);
+        return new Number((new DateTime((string)$d1))->diff(new DateTime((string)$d2))->$unit ?? 0);
     }
 
     public static function floor(Number|float $value): Number
