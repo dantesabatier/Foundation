@@ -307,6 +307,16 @@ class PredicateUtilities
      */
     public static function dateDiff(string $unit, Date|string|null $d1, Date|string|null $d2): Number
     {
+        $unit = match ($unit) {
+            "YEAR" => "y",
+            "MONTH" => "m",
+            "DAY" => "d",
+            "HOUR" => "h",
+            "MINUTE" => "i",
+            "SECOND" => "s",
+            "MICROSECOND" => "f",
+            default => $unit
+        };
         return new Number((new DateTime((string)$d1))->diff(new DateTime((string)$d2))->$unit ?? 0);
     }
 
