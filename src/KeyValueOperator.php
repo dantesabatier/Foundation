@@ -8,8 +8,11 @@ class KeyValueOperator
     final const averageKeyValueOperator = "avg";
     /** @var string The @count array operator. */
     final const countKeyValueOperator = "count";
+    /** @var string The @median array operator. */
     final const medianKeyValueOperator = "median";
+    /** @var string The @mode array operator. */
     final const modeKeyValueOperator = "mode";
+    /** @var string The @stddev array operator. */
     final const standardDeviationKeyValueOperator = "stddev";
     /** @var string The @distinctUnionOfArrays array operator. */
     final const distinctUnionOfArraysKeyValueOperator = "distinctUnionOfArrays";
