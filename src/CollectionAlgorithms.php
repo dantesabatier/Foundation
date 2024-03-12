@@ -193,7 +193,7 @@ trait CollectionAlgorithms
             assert($value instanceof self);
         }
         return match ($operator) {
-            KeyValueOperator::averageKeyValueOperator, KeyValueOperator::countKeyValueOperator, KeyValueOperator::maximumKeyValueOperator, KeyValueOperator::minimumKeyValueOperator, KeyValueOperator::sumKeyValueOperator => PredicateUtilities::$operator($value),
+            KeyValueOperator::averageKeyValueOperator, KeyValueOperator::countKeyValueOperator, KeyValueOperator::maximumKeyValueOperator, KeyValueOperator::minimumKeyValueOperator, KeyValueOperator::sumKeyValueOperator, KeyValueOperator::medianKeyValueOperator, KeyValueOperator::modeKeyValueOperator, KeyValueOperator::standardDeviationKeyValueOperator => PredicateUtilities::$operator($value),
             KeyValueOperator::distinctUnionOfArraysKeyValueOperator, KeyValueOperator::distinctUnionOfObjectsKeyValueOperator => new ArrayClass(new Set($value->joined())),
             KeyValueOperator::unionOfObjectsKeyValueOperator, KeyValueOperator::unionOfArraysKeyValueOperator => new ArrayClass($value->joined()),
             KeyValueOperator::distinctUnionOfSetsKeyValueOperator, KeyValueOperator::unionOfSetsKeyValueOperator => new Set($value->joined()),
