@@ -1,5 +1,7 @@
 <?php
 
+/** @noinspection SpellCheckingInspection */
+
 /**
  * Created by PhpStorm.
  * User: dante
