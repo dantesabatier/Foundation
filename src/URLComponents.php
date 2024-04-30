@@ -85,7 +85,7 @@ class URLComponents extends ObjectClass
             return empty($string) ? null : $string;
         } elseif ($name == "queryItems") {
             return ($this->query === null) ? null : (new ArrayClass(explode("&", $this->query)))->map(function (string $pair): URLQueryItem {
-                $components = explode("=", $pair);
+                $components = preg_split(sprintf("/%s/", preg_quote("=", "/")), $pair, -1, PREG_SPLIT_NO_EMPTY);
                 $name = $components[0];
                 $value = (count($components) === 2) ? urldecode($components[1]) : null;
                 if ($value) {
