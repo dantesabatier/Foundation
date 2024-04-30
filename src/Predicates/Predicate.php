@@ -107,8 +107,8 @@ class Predicate extends ObjectClass
         return $this->predicateFormat();
     }
 
-    public function jsonSerialize(): string
+    public function jsonSerialize(): Dictionary
     {
-        return $this->predicateFormat();
+        return new Dictionary(["format" => $this->predicateFormat()]);
     }
 }
