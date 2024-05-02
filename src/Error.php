@@ -157,13 +157,14 @@ class Error extends ObjectClass
         /** @var Dictionary<mixed> $dictionary */
         $dictionary = $this->dictionaryWithValues(new ArrayClass(["domain", "code", "localizedDescription", "localizedRecoveryOptions", "localizedRecoverySuggestion", "localizedFailureReason"]));
         if ($userInfo = $this->userInfo) {
+            $copy = clone $userInfo;
             /** @psalm-suppress ArgumentTypeCoercion */
-            $userInfo->removeAll(fn(mixed $value, string $key): bool => match ($key) {
+            $copy->removeAll(fn(mixed $value, string $key): bool => match ($key) {
                 LocalizedDescriptionKey, LocalizedRecoveryOptionsErrorKey, LocalizedRecoverySuggestionErrorKey, LocalizedFailureReasonErrorKey => true,
                 default => false
             });
-            if (!$userInfo->isEmpty) {
-                $dictionary["userInfo"] = $userInfo;
+            if (!$copy->isEmpty) {
+                $dictionary["userInfo"] = $copy;
             }
         }
         return $dictionary;
