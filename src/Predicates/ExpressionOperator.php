@@ -19,24 +19,37 @@ class ExpressionOperator extends Expression
     public function __construct(public readonly string $name, public readonly ?ArrayClass $arguments, public readonly ExpressionOperatorType $operatorType)
     {
         parent::__construct(ExpressionType::operator);
-        $this->operatorSymbol = match ($this->operatorType) {
-            ExpressionOperatorType::addTo => ExpressionOperatorSymbol::addition,
-            ExpressionOperatorType::fromSubtract => ExpressionOperatorSymbol::subtraction,
-            ExpressionOperatorType::multiplyBy => ExpressionOperatorSymbol::multiplication,
-            ExpressionOperatorType::divideBy => ExpressionOperatorSymbol::division,
-            ExpressionOperatorType::modulusBy => ExpressionOperatorSymbol::modulo,
-            ExpressionOperatorType::raiseToPower => ExpressionOperatorSymbol::raiseToPower,
-            ExpressionOperatorType::bitwiseAndWith => ExpressionOperatorSymbol::bitwiseAnd,
-            ExpressionOperatorType::bitwiseOrWith => ExpressionOperatorSymbol::bitwiseOr,
-            ExpressionOperatorType::bitwiseXorWith => ExpressionOperatorSymbol::bitwiseXor,
-            ExpressionOperatorType::leftshiftBy => ExpressionOperatorSymbol::shiftLeft,
-            ExpressionOperatorType::rightshiftBy => ExpressionOperatorSymbol::shiftRight,
-            default => $this->operatorType->name
-        };
-        $this->isDeterministic = match ($this->operatorType) {
-            ExpressionOperatorType::average, ExpressionOperatorType::sum, ExpressionOperatorType::count, ExpressionOperatorType::min, ExpressionOperatorType::max, ExpressionOperatorType::stddev, ExpressionOperatorType::addTo, ExpressionOperatorType::fromSubtract, ExpressionOperatorType::multiplyBy, ExpressionOperatorType::divideBy, ExpressionOperatorType::modulusBy, ExpressionOperatorType::sqrt, ExpressionOperatorType::ln, ExpressionOperatorType::log, ExpressionOperatorType::raiseToPower, ExpressionOperatorType::exp, ExpressionOperatorType::ceiling, ExpressionOperatorType::abs, ExpressionOperatorType::trunc, ExpressionOperatorType::floor, ExpressionOperatorType::uppercase, ExpressionOperatorType::lowercase, ExpressionOperatorType::bitwiseAndWith, ExpressionOperatorType::bitwiseOrWith, ExpressionOperatorType::bitwiseXorWith, ExpressionOperatorType::leftshiftBy, ExpressionOperatorType::rightshiftBy, ExpressionOperatorType::index, ExpressionOperatorType::indexFirst, ExpressionOperatorType::indexLast, ExpressionOperatorType::indexSize, ExpressionOperatorType::year, ExpressionOperatorType::month, ExpressionOperatorType::week, ExpressionOperatorType::day, ExpressionOperatorType::hour, ExpressionOperatorType::minute, ExpressionOperatorType::second, ExpressionOperatorType::concat, ExpressionOperatorType::isNull, ExpressionOperatorType::ifNull, ExpressionOperatorType::nullIf => true,
-            default => false
-        };
+        unset($this->operatorSymbol);
+        unset($this->isDeterministic);
+    }
+
+    public function __get(string $name)
+    {
+        if ($name === "operatorSymbol") {
+            $this->$name = match ($this->operatorType) {
+                ExpressionOperatorType::addTo => ExpressionOperatorSymbol::addition,
+                ExpressionOperatorType::fromSubtract => ExpressionOperatorSymbol::subtraction,
+                ExpressionOperatorType::multiplyBy => ExpressionOperatorSymbol::multiplication,
+                ExpressionOperatorType::divideBy => ExpressionOperatorSymbol::division,
+                ExpressionOperatorType::modulusBy => ExpressionOperatorSymbol::modulo,
+                ExpressionOperatorType::raiseToPower => ExpressionOperatorSymbol::raiseToPower,
+                ExpressionOperatorType::bitwiseAndWith => ExpressionOperatorSymbol::bitwiseAnd,
+                ExpressionOperatorType::bitwiseOrWith => ExpressionOperatorSymbol::bitwiseOr,
+                ExpressionOperatorType::bitwiseXorWith => ExpressionOperatorSymbol::bitwiseXor,
+                ExpressionOperatorType::leftshiftBy => ExpressionOperatorSymbol::shiftLeft,
+                ExpressionOperatorType::rightshiftBy => ExpressionOperatorSymbol::shiftRight,
+                default => $this->operatorType->name
+            };
+            return $this->$name;
+        } elseif ($name === "isDeterministic") {
+            $this->$name = match ($this->operatorType) {
+                ExpressionOperatorType::average, ExpressionOperatorType::sum, ExpressionOperatorType::count, ExpressionOperatorType::min, ExpressionOperatorType::max, ExpressionOperatorType::stddev, ExpressionOperatorType::addTo, ExpressionOperatorType::fromSubtract, ExpressionOperatorType::multiplyBy, ExpressionOperatorType::divideBy, ExpressionOperatorType::modulusBy, ExpressionOperatorType::sqrt, ExpressionOperatorType::ln, ExpressionOperatorType::log, ExpressionOperatorType::raiseToPower, ExpressionOperatorType::exp, ExpressionOperatorType::ceiling, ExpressionOperatorType::abs, ExpressionOperatorType::trunc, ExpressionOperatorType::floor, ExpressionOperatorType::uppercase, ExpressionOperatorType::lowercase, ExpressionOperatorType::bitwiseAndWith, ExpressionOperatorType::bitwiseOrWith, ExpressionOperatorType::bitwiseXorWith, ExpressionOperatorType::leftshiftBy, ExpressionOperatorType::rightshiftBy, ExpressionOperatorType::index, ExpressionOperatorType::indexFirst, ExpressionOperatorType::indexLast, ExpressionOperatorType::indexSize, ExpressionOperatorType::year, ExpressionOperatorType::month, ExpressionOperatorType::week, ExpressionOperatorType::day, ExpressionOperatorType::hour, ExpressionOperatorType::minute, ExpressionOperatorType::second, ExpressionOperatorType::concat, ExpressionOperatorType::isNull, ExpressionOperatorType::ifNull, ExpressionOperatorType::nullIf => true,
+                default => false
+            };
+            return $this->$name;
+        } else {
+            return parent::__get($name);
+        }
     }
 
     public static function operatorWithName(string $name, ?ArrayClass $arguments = null): Expression
