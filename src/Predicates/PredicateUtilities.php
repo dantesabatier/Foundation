@@ -27,6 +27,7 @@ use function Sabatier\Foundation\fatal_error;
 use function Sabatier\Foundation\human_readable_value;
 use function Sabatier\Foundation\is_equal;
 use function Sabatier\Foundation\pn;
+use function Sabatier\Foundation\substring_to_index;
 use const Sabatier\Foundation\NotFound;
 
 /** @internal */
@@ -345,6 +346,16 @@ class PredicateUtilities
     public static function concat(string $separator = "", ArrayClass $arguments = new ArrayClass()): string
     {
         return $arguments->join($separator);
+    }
+
+    public static function substring(string $string, int $index): string
+    {
+        return substring_to_index($string, $index);
+    }
+
+    public static function length(string $string): int
+    {
+        return strlen($string);
     }
 
     public static function uuid(): UUID
