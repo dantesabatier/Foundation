@@ -57,6 +57,8 @@ enum ExpressionOperatorType: int
     case dateDiff = 47;
     case uuid = 111;
     case concat = 112;
+    case substring = 113;
+    case length = 114;
     case isNull = 996;
     case ifNull = 997;
     case nullIf = 998;
@@ -115,6 +117,8 @@ enum ExpressionOperatorType: int
             "second:" => self::second,
             "uuid:" => self::uuid,
             "concat:" => self::concat,
+            "substring:" => self::substring,
+            "length:" => self::length,
             "isNull:" => self::isNull,
             "ifNull:" => self::ifNull,
             "nullIf:" => self::nullIf,
