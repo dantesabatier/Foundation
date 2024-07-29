@@ -234,7 +234,7 @@ class PredicateUtilities
         if (!$date instanceof Date) {
             return null;
         }
-        return new Number(date("Y", (int)$date->timeIntervalSinceReferenceDate));
+        return new Number($date->format("Y"));
     }
 
     public static function month(?Date $date): ?Number
@@ -242,7 +242,7 @@ class PredicateUtilities
         if (!$date instanceof Date) {
             return null;
         }
-        return new Number(date("n", (int)$date->timeIntervalSinceReferenceDate));
+        return new Number($date->format("n"));
     }
 
     public static function week(?Date $date): ?Number
@@ -250,7 +250,7 @@ class PredicateUtilities
         if (!$date instanceof Date) {
             return null;
         }
-        return new Number(date("W", (int)$date->timeIntervalSinceReferenceDate));
+        return new Number($date->format("W"));
     }
 
     public static function day(?Date $date): ?Number
@@ -258,7 +258,7 @@ class PredicateUtilities
         if (!$date instanceof Date) {
             return null;
         }
-        return new Number(date("j", (int)$date->timeIntervalSinceReferenceDate));
+        return new Number($date->format("j"));
     }
 
     public static function hour(?Date $date): ?Number
@@ -266,7 +266,7 @@ class PredicateUtilities
         if (!$date instanceof Date) {
             return null;
         }
-        return new Number(date("G", (int)$date->timeIntervalSinceReferenceDate));
+        return new Number($date->format("G"));
     }
 
     public static function minute(?Date $date): ?Number
@@ -274,7 +274,7 @@ class PredicateUtilities
         if (!$date instanceof Date) {
             return null;
         }
-        return new Number(date("i", (int)$date->timeIntervalSinceReferenceDate));
+        return new Number($date->format("i"));
     }
 
     public static function second(?Date $date): ?Number
@@ -282,7 +282,7 @@ class PredicateUtilities
         if (!$date instanceof Date) {
             return null;
         }
-        return new Number(date("s", (int)$date->timeIntervalSinceReferenceDate));
+        return new Number($date->format("s"));
     }
 
     public static function date(?Date $date): ?string
@@ -300,7 +300,7 @@ class PredicateUtilities
         if (!$date instanceof Date) {
             return null;
         }
-        return date($format, (int)$date->timeIntervalSinceReferenceDate);
+        return $date->format($format);
     }
 
     /**
