@@ -194,18 +194,23 @@ class Date extends ObjectClass
         return (new IntlDateFormatter(Locale::getDefault(), $date->value, $time->value))->format((int)$this->timeIntervalSinceReferenceDate);
     }
 
+    public function format(string $format = "Y-m-d H:i:s"): string
+    {
+        return date($format, (int)$this->timeIntervalSinceReferenceDate);
+    }
+
     /**
      * Generates a locale-aware string representation of a date using the ISO 8601 date format.
      * @return string
      */
     public function ISO8601Format(): string
     {
-        return date(DATE_ATOM, (int)$this->timeIntervalSinceReferenceDate);
+        return $this->format(DATE_ATOM);
     }
 
     public function description(): string
     {
-        return date("Y-m-d H:i:s", (int)$this->timeIntervalSinceReferenceDate);
+        return $this->format();
     }
 
     public function debugDescription(): string
