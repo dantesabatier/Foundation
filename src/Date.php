@@ -168,7 +168,7 @@ class Date extends ObjectClass
      */
     public function addingTimeInterval(float $timeInterval): Date
     {
-        $date = new Date();
+        $date = clone $this;
         $date->addTimeInterval($timeInterval);
         return $date;
     }
