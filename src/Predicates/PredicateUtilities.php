@@ -137,7 +137,7 @@ class PredicateUtilities
         $count = $values->count;
         $avg = abs($values->sum()) / $count;
         $sum = $values->map(fn(Number|int|float $element): int|float => (pn($element) - $avg) ** 2)->sum();
-        return $sum ? new Number(sqrt($sum / $count - 1)) : new Number($sum);
+        return $sum ? new Number(sqrt($sum / ($count - 1))) : new Number($sum);
     }
 
     public static function addTo(Number|int|float $addend1, Number|int|float $addend2): Number
