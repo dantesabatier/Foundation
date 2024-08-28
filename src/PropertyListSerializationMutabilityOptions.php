@@ -8,7 +8,7 @@ namespace Sabatier\Foundation;
 class PropertyListSerializationMutabilityOptions
 {
     /** @var int Causes the returned property list to have mutable containers but immutable leaves. */
-    final const mutableContainers = 1;
+    final const int mutableContainers = 1;
     /** @var int Causes the returned property list to have mutable containers and leaves. */
-    final const mutableContainersAndLeaves = 3;
+    final const int mutableContainersAndLeaves = 3;
 }

@@ -10,9 +10,9 @@ namespace Sabatier\Foundation;
 class DirectoryEnumerationOptions
 {
     /** @var int An option to perform a shallow enumeration that doesn't descend into directories. */
-    final const skipsSubdirectoryDescendants = 1 << 0;
+    final const int skipsSubdirectoryDescendants = 1 << 0;
     /** @var int An option to treat packages like files and not descend into their contents. */
-    final const skipsPackageDescendants = 1 << 1;
+    final const int skipsPackageDescendants = 1 << 1;
     /** @var int An option to skip hidden files. */
-    final const skipsHiddenFiles = 1 << 2;
+    final const int skipsHiddenFiles = 1 << 2;
 }

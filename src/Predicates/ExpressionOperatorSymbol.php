@@ -12,17 +12,17 @@ namespace Sabatier\Foundation\Predicates;
 /** @internal */
 class ExpressionOperatorSymbol
 {
-    final const addition = "+";
-    final const subtraction = "-";
-    final const multiplication = "*";
-    final const division = "/";
-    final const modulo = "%";
-    final const raiseToPower = "**";
-    final const bitwiseAnd = "&";
-    final const bitwiseOr = "|";
-    final const bitwiseXor = "^";
-    final const shiftLeft = "<<";
-    final const shiftRight = ">>";
-    final const assignment = ":=";
-    final const bitwiseNot = "~";
+    final const string addition = "+";
+    final const string subtraction = "-";
+    final const string multiplication = "*";
+    final const string division = "/";
+    final const string modulo = "%";
+    final const string raiseToPower = "**";
+    final const string bitwiseAnd = "&";
+    final const string bitwiseOr = "|";
+    final const string bitwiseXor = "^";
+    final const string shiftLeft = "<<";
+    final const string shiftRight = ">>";
+    final const string assignment = ":=";
+    final const string bitwiseNot = "~";
 }

@@ -12,17 +12,17 @@ namespace Sabatier\Foundation\Predicates;
 /** @internal */
 class PredicateOperatorSymbol
 {
-    final const lessThan = "<";
-    final const lessThanOrEqualTo = "<=";
-    final const greaterThan = ">";
-    final const greaterThanOrEqualTo = ">=";
-    final const equalTo = "=";
-    final const notEqualTo = "!=";
-    final const matches = "MATCHES";
-    final const like = "LIKE";
-    final const beginsWith = "BEGINSWITH";
-    final const endsWith = "ENDSWITH";
-    final const in = "IN";
-    final const contains = "CONTAINS";
-    final const between = "BETWEEN";
+    final const string lessThan = "<";
+    final const string lessThanOrEqualTo = "<=";
+    final const string greaterThan = ">";
+    final const string greaterThanOrEqualTo = ">=";
+    final const string equalTo = "=";
+    final const string notEqualTo = "!=";
+    final const string matches = "MATCHES";
+    final const string like = "LIKE";
+    final const string beginsWith = "BEGINSWITH";
+    final const string endsWith = "ENDSWITH";
+    final const string in = "IN";
+    final const string contains = "CONTAINS";
+    final const string between = "BETWEEN";
 }

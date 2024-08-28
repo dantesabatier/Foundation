@@ -5,31 +5,31 @@ namespace Sabatier\Foundation;
 class KeyValueOperator
 {
     /** @var string The @avg array operator. */
-    final const averageKeyValueOperator = "avg";
+    final const string averageKeyValueOperator = "avg";
     /** @var string The @count array operator. */
-    final const countKeyValueOperator = "count";
+    final const string countKeyValueOperator = "count";
     /** @var string The @median array operator. */
-    final const medianKeyValueOperator = "median";
+    final const string medianKeyValueOperator = "median";
     /** @var string The @mode array operator. */
-    final const modeKeyValueOperator = "mode";
+    final const string modeKeyValueOperator = "mode";
     /** @var string The @stddev array operator. */
-    final const standardDeviationKeyValueOperator = "stddev";
+    final const string standardDeviationKeyValueOperator = "stddev";
     /** @var string The @distinctUnionOfArrays array operator. */
-    final const distinctUnionOfArraysKeyValueOperator = "distinctUnionOfArrays";
+    final const string distinctUnionOfArraysKeyValueOperator = "distinctUnionOfArrays";
     /** @var string The @distinctUnionOfObjects array operator. */
-    final const distinctUnionOfObjectsKeyValueOperator = "distinctUnionOfObjects";
+    final const string distinctUnionOfObjectsKeyValueOperator = "distinctUnionOfObjects";
     /** @var string The @distinctUnionOfSets array operator. */
-    final const distinctUnionOfSetsKeyValueOperator = "distinctUnionOfSets";
+    final const string distinctUnionOfSetsKeyValueOperator = "distinctUnionOfSets";
     /** @var string The @max array operator. */
-    final const maximumKeyValueOperator = "max";
+    final const string maximumKeyValueOperator = "max";
     /** @var string The @min array operator. */
-    final const minimumKeyValueOperator = "min";
+    final const string minimumKeyValueOperator = "min";
     /** @var string The @sum array operator. */
-    final const sumKeyValueOperator = "sum";
+    final const string sumKeyValueOperator = "sum";
     /** @var string The @unionOfArrays array operator. */
-    final const unionOfArraysKeyValueOperator = "unionOfArrays";
+    final const string unionOfArraysKeyValueOperator = "unionOfArrays";
     /** @var string The @unionOfObjects array operator. */
-    final const unionOfObjectsKeyValueOperator = "unionOfObjects";
+    final const string unionOfObjectsKeyValueOperator = "unionOfObjects";
     /** @var string The @unionOfSets array operator. */
-    final const unionOfSetsKeyValueOperator = "unionOfSets";
+    final const string unionOfSetsKeyValueOperator = "unionOfSets";
 }

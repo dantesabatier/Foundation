@@ -15,7 +15,7 @@ use Locale;
 class Date extends ObjectClass
 {
     /** @var float The number of seconds from 1 January 1970 to the reference date, 1 January 2001. */
-    final public const timeIntervalBetween1970AndReferenceDate = kCFAbsoluteTimeIntervalSince1970;
+    final public const float timeIntervalBetween1970AndReferenceDate = kCFAbsoluteTimeIntervalSince1970;
     private float $timeIntervalSinceReferenceDate;
 
     public function __construct(?float $time = null)

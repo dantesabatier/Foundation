@@ -8,13 +8,13 @@ namespace Sabatier\Foundation;
 class ProgressKindFile extends ProgressKind
 {
     /** @var string The progress is tracking the copying of a file from source to destination. */
-    final const copying = "copying";
+    final const string copying = "copying";
     /** @var string The progress is tracking file decompression after a download. */
-    final const decompressingAfterDownloading = "decompressingAfterDownloading";
+    final const string decompressingAfterDownloading = "decompressingAfterDownloading";
     /** @var string The progress is tracking a file download operation. */
-    final const downloading = "downloading";
+    final const string downloading = "downloading";
     /** @var string The progress is tracking a file upload operation. */
-    final const uploading = "uploading";
+    final const string uploading = "uploading";
     /** @var string The progress is tracking the receipt of a file from another source. */
-    final const receiving = "receiving";
+    final const string receiving = "receiving";
 }

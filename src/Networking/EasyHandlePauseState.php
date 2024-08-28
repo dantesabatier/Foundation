@@ -8,8 +8,8 @@ use Sabatier\Foundation\OptionSet;
 /** @internal */
 class EasyHandlePauseState extends OptionSet
 {
-    final const receivePaused = 1 << 0;
-    final const sendPaused = 1 << 1;
+    final const int receivePaused = 1 << 0;
+    final const int sendPaused = 1 << 1;
 
     public function setState(EasyHandle $handle): void
     {

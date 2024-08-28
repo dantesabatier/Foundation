@@ -23,7 +23,7 @@ use Throwable;
 final class OperationQueue extends ObjectClass
 {
     /** @var int The default maximum number of operations to invoke concurrently in a queue. */
-    public const defaultMaxConcurrentOperationCount = 1;
+    public const int defaultMaxConcurrentOperationCount = 1;
     /** @var ArrayClass<OperationQueue>|null $queues */
     private static ?ArrayClass $queues = null;
     private static ?OperationQueue $main = null;

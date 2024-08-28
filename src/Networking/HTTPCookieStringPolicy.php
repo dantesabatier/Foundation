@@ -10,8 +10,8 @@ namespace Sabatier\Foundation\Networking;
 class HTTPCookieStringPolicy
 {
     /** @var string A policy that prohibits a cross-site request from including the cookie. */
-    final const sameSiteStrict = "Strict";
+    final const string sameSiteStrict = "Strict";
 
     /** @var string A policy that allows certain cross-site requests to include the cookie. When a cookie has this policy, a request includes the cookie if the request is “top-level,”, meaning one that changes the URL in the address bar. */
-    final const sameSiteLax = "Lax";
+    final const string sameSiteLax = "Lax";
 }

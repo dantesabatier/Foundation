@@ -8,7 +8,7 @@ use Sabatier\Foundation\URL;
 /** @internal */
 class DiskEntry
 {
-    public final const pathExtension = "storedcachedurlresponse";
+    public final const string pathExtension = "storedcachedurlresponse";
     public readonly Date $date;
     public readonly string $identifier;
 

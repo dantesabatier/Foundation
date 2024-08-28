@@ -21,7 +21,7 @@ final class Bundle extends ObjectClass
 {
     /** @var Dictionary<Bundle>|null $loadedBundles */
     private static ?Dictionary $loadedBundles = null;
-    public const didLoadNotification = BundleDidLoadNotification;
+    public const string didLoadNotification = BundleDidLoadNotification;
     /** @var URL|null The file URL of the bundle's subdirectory containing resource files. */
     public readonly ?URL $resourceURL;
     /** @var URL|null The file URL of the receiver's executable file. */

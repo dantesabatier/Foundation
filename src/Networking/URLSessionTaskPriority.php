@@ -8,9 +8,9 @@ namespace Sabatier\Foundation\Networking;
 class URLSessionTaskPriority
 {
     /** @var float The default URL session task priority, used implicitly for any task you have not prioritized. */
-    final const default = 0.5;
+    final const float default = 0.5;
     /** @var float A low URL session task priority, with a floating point value above the minimum of 0 and below the default value. */
-    final const low = 0.0;
+    final const float low = 0.0;
     /** @var float A high URL session task priority, with a floating point value above the default value and below the maximum of 1.0. */
-    final const high = 1.0;
+    final const float high = 1.0;
 }

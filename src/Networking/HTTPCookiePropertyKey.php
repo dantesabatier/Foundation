@@ -8,35 +8,35 @@ namespace Sabatier\Foundation\Networking;
 class HTTPCookiePropertyKey
 {
     /** @var string A string containing the comment for the cookie. */
-    final const comment = "Comment";
+    final const string comment = "Comment";
     /** @var string A URL object or string containing the comment URL for the cookie. */
-    final const commentURL = "CommentURL";
+    final const string commentURL = "CommentURL";
     /** @var string A string stating whether the cookie should be discarded at the end of the session. */
-    final const discard = "Discard";
+    final const string discard = "Discard";
     /** @var string A string containing the domain for the cookie. */
-    final const domain = "Domain";
+    final const string domain = "Domain";
     /** @var string A Date or string specifying the expiration date for the cookie. */
-    final const expires = "Expires";
+    final const string expires = "Expires";
     /** @var string A string containing an integer value stating how long in seconds the cookie should be kept, at most. */
-    final const maximumAge = "Max-Age";
+    final const string maximumAge = "Max-Age";
     /** @var string string containing the name of the cookie (required). */
-    final const name = "Name";
+    final const string name = "Name";
     /** @var string A URL or string containing the URL that set this cookie. */
-    final const originURL = "OriginURL";
+    final const string originURL = "OriginURL";
     /** @var string A string containing the path for the cookie. */
-    final const path = "Path";
+    final const string path = "Path";
     /** @var string A string containing comma-separated integer values specifying the ports for the cookie. */
-    final const port = "Port";
+    final const string port = "Port";
     /** @var string A string indicating the same-site policy for the cookie. */
-    final const sameSitePolicy = "SameSite";
+    final const string sameSitePolicy = "SameSite";
     /** @var string A string indicating that the cookie should be transmitted only over secure channels. */
-    final const secure = "Secure";
+    final const string secure = "Secure";
     /** @var string A string containing the value of the cookie. */
-    final const value = "Value";
+    final const string value = "Value";
     /** @var string A string that specifies the version of the cookie. */
-    final const version = "Version";
+    final const string version = "Version";
     /** @internal */
-    final const created = "Created";
-    final const httpOnly = "HttpOnly";
-    final const lifetime = "lifetime";
+    final const string created = "Created";
+    final const string httpOnly = "HttpOnly";
+    final const string lifetime = "lifetime";
 }

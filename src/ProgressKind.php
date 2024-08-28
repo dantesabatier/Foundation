@@ -10,5 +10,5 @@ namespace Sabatier\Foundation;
 class ProgressKind
 {
     /** @var string The value that indicates that the progress is tracking a file operation. */
-    final const file = "file";
+    final const string file = "file";
 }
