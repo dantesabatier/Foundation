@@ -27,16 +27,16 @@ final class URLFileTypeMappings
      */
     public function extensions(string $mimeType): ?ArrayClass
     {
-        return $this->internal->MIMETypeToExtensionList[$mimeType];
+        return $this->internal->MIMETypeToExtensionList[strtolower($mimeType)];
     }
 
     public function preferredExtension(string $mimeType): ?string
     {
-        return $this->extensions($mimeType)?->first;
+        return $this->extensions(strtolower($mimeType))?->first;
     }
 
     public function mimeType(string $extension): ?string
     {
-        return $this->internal->extensionToMIMEType[$extension];
+        return $this->internal->extensionToMIMEType[strtolower($extension)];
     }
 }
