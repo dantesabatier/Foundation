@@ -136,6 +136,19 @@ class UserDefaults
     }
 
     /**
+     * Returns the array of strings associated with the specified key.
+     * @param string $key A key in the current user's defaults database.
+     * @return ArrayClass<string>|null The array of string objects, or nil if the specified default does not exist, the default does not contain an array, or the array does not contain strings.
+     */
+    public function stringArray(string $key): ?ArrayClass
+    {
+        if (($object = $this->object($key)) && $object instanceof ArrayClass && $object->allSatisfy(fn(mixed $value): bool => is_string($value))) {
+            return $object;
+        }
+        return null;
+    }
+
+    /**
      * Returns the Boolean value associated with the specified key.
      *
      * This method automatically coerces certain ”truthy” values—such as the strings "true", "YES", and "1", and the numbers 1 and 1.0 to the Boolean value true. The same is true for certain ”falsy” values—such as the strings "false", "NO", and "0", and the numbers 0 and 0.0—which are automatically coerced to the Boolean value false.
@@ -179,6 +192,21 @@ class UserDefaults
         $object = $this->object($key);
         if (is_bool($object) || is_numeric($object)) {
             return (new Number($object))->floatValue;
+        }
+        return 0.0;
+    }
+
+    /**
+     * Returns the double value associated with the specified key.
+     * @param string $key A key in the current user's defaults database.
+     * @return float The double value associated with the specified key. If the key doesn't exist, this method returns 0.
+     * This method automatically coerces certain values into equivalent double values (if one can be determined). The Boolean value true becomes 1.0 and false becomes 0.0. An integer becomes the equivalent double (for example, 2 becomes 2.0). A string that represents a floating point number becomes the equivalent double (for example “123.4“ becomes 123.4).
+     */
+    public function doble(string $key): float
+    {
+        $object = $this->object($key);
+        if (is_bool($object) || is_numeric($object)) {
+            return (new Number($object))->doubleValue;
         }
         return 0.0;
     }
