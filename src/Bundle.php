@@ -49,14 +49,12 @@ final class Bundle extends ObjectClass
     public readonly ?Dictionary $localizedInfoDictionary;
     /** @var class-string|null $principalClass The bundle's principal class. */
     public readonly ?string $principalClass;
-    /** @var URL The full URL of the receiver's bundle directory. */
-    public readonly URL $bundleURL;
 
     /**
      * Returns a Bundle object initialized to correspond to the specified file URL.
-     * @param URL $url The file URL to a directory. This must be a full URL for a directory; if it contains any symbolic links, they must be resolvable.
+     * @param URL $bundleURL The file URL to a directory. This must be a full URL for a directory; if it contains any symbolic links, they must be resolvable.
      */
-    private function __construct(URL $url)
+    private function __construct(public readonly URL $bundleURL)
     {
         unset($this->infoDictionary);
         unset($this->resourceURL);
@@ -71,10 +69,7 @@ final class Bundle extends ObjectClass
         unset($this->developmentLocalization);
         unset($this->localizedInfoDictionary);
         unset($this->principalClass);
-        if (!FileManager::default()->fileExists($url->path, $isDirectory) || !$isDirectory) {
-            fatal_error("Invalid bundle url \"$url\"");
-        }
-        $this->bundleURL = $url;
+        FileManager::default()->fileExists($this->bundleURL->path, $isDirectory) && $isDirectory ?: fatal_error("Invalid bundle url \"$this->bundleURL\"");
     }
 
     public function __destruct()
