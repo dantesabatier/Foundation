@@ -77,11 +77,6 @@ class UserDefaults
 
     /**
      * Returns the URL associated with the specified key.
-     *
-     * This method retrieves the URL associated with a key with the following behavior:
-     * If the value for the key is a Data object, the data object is used as the argument to unarchiveObject(with:). If the data object can be unarchived as a URL, the URL is returned. If the URL can't be archived as a URL, nil is returned.
-     * If the value for this key is a file reference URL, the file reference URL is created, but its bookmark data isn't resolved until the URL object is later used (for example, with init(contentsOf:)).
-     * If the value for the key is a string which begins with a tilde (~), the string is expanded using the expandingTildeInPath method, from which a URL with the file: scheme is created.
      * @param string $key A key in the current user's defaults database.
      * @return URL|null The URL associated with the specified key. If the key doesn't exist, this method returns nil.
      */
@@ -151,7 +146,7 @@ class UserDefaults
     /**
      * Returns the Boolean value associated with the specified key.
      *
-     * This method automatically coerces certain ”truthy” values—such as the strings "true", "YES", and "1", and the numbers 1 and 1.0 to the Boolean value true. The same is true for certain ”falsy” values—such as the strings "false", "NO", and "0", and the numbers 0 and 0.0—which are automatically coerced to the Boolean value false.
+     * This method automatically coerces certain "truthy" values—such as the strings "true", "YES", and "1", and the numbers 1 and 1.0 to the Boolean value true. The same is true for certain "falsy" values—such as the strings "false", "NO", and "0", and the numbers 0 and 0.0—which are automatically coerced to the Boolean value false.
      * @param string $key A key in the current user's defaults database.
      * @return bool The Boolean value associated with the specified key. If the specified key doesn't exist, this method returns false.
      */
@@ -167,7 +162,7 @@ class UserDefaults
     /**
      * Returns the integer value associated with the specified key.
      *
-     * This method automatically coerces certain values into equivalent integer values (if one can be determined). The Boolean value true becomes 1 and false becomes 0. A floating point number becomes the greatest integer that's less than that number (for example, 2.67 becomes 2). A string that represents an integer becomes the equivalent integer (for example “123“ becomes 123).
+     * This method automatically coerces certain values into equivalent integer values (if one can be determined). The Boolean value true becomes 1 and false becomes 0. A floating point number becomes the greatest integer that's less than that number (for example, 2.67 becomes 2). A string that represents an integer becomes the equivalent integer (for example "123" becomes 123).
      * @param string $key A key in the current user's defaults database.
      * @return int The integer value associated with the specified key. If the specified key doesn't exist, this method returns 0.
      */
@@ -183,7 +178,7 @@ class UserDefaults
     /**
      * Returns the float value associated with the specified key.
      *
-     * This method automatically coerces certain values into equivalent float values (if one can be determined). The Boolean value true becomes 1.0 and false becomes 0.0. An integer becomes the equivalent float (for example, 2 becomes 2.0). A string that represents a floating point number becomes the equivalent float (for example “123.4“ becomes 123.4).
+     * This method automatically coerces certain values into equivalent float values (if one can be determined). The Boolean value true becomes 1.0 and false becomes 0.0. An integer becomes the equivalent float (for example, 2 becomes 2.0). A string that represents a floating point number becomes the equivalent float (for example "123.4" becomes 123.4).
      * @param string $key A key in the current user's defaults database.
      * @return float The float value associated with the specified key. If the key doesn't exist, this method returns 0.
      */
@@ -200,7 +195,7 @@ class UserDefaults
      * Returns the double value associated with the specified key.
      * @param string $key A key in the current user's defaults database.
      * @return float The double value associated with the specified key. If the key doesn't exist, this method returns 0.
-     * This method automatically coerces certain values into equivalent double values (if one can be determined). The Boolean value true becomes 1.0 and false becomes 0.0. An integer becomes the equivalent double (for example, 2 becomes 2.0). A string that represents a floating point number becomes the equivalent double (for example “123.4“ becomes 123.4).
+     * This method automatically coerces certain values into equivalent double values (if one can be determined). The Boolean value true becomes 1.0 and false becomes 0.0. An integer becomes the equivalent double (for example, 2 becomes 2.0). A string that represents a floating point number becomes the equivalent double (for example "123.4" becomes 123.4).
      */
     public function doble(string $key): float
     {
@@ -242,6 +237,18 @@ class UserDefaults
      * @param string $key The key with which to associate the value.
      */
     public function setFloat(float $value, string $key): void
+    {
+        $this->setObject($value, $key);
+    }
+
+    /**
+     * Sets the value of the specified default key to the double value.
+     *
+     * This is a convenience method for calling {@see setObject()}.
+     * @param float $value The double value.
+     * @param string $key The key with which to associate the value.
+     */
+    public function setDouble(float $value, string $key): void
     {
         $this->setObject($value, $key);
     }
