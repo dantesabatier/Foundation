@@ -16,6 +16,11 @@ function absolute_time_get_current(): float
     return $tv["sec"] + (1.0e-6 * (float)$tv["usec"]);
 }
 
+function random_color(): string
+{
+    return sprintf("#%s", substr(str_shuffle("ABCDEF0123456789"), 0, 6));
+}
+
 #[Pure]
 function in_range(float|int|string $value, float|int|string $min, float|int|string $max): bool
 {
