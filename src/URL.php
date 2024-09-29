@@ -141,11 +141,7 @@ final class URL extends ObjectClass
         } elseif ($name == "lastPathComponent") {
             return basename($this->path);
         } elseif ($name == "path") {
-            $path = $this->parse(PHP_URL_PATH) ?? "";
-            if ($this->isFileURL) {
-                $path = rawurldecode($path);
-            }
-            return $path;
+            return $this->parse(PHP_URL_PATH) ?? "";
         } elseif ($name == "pathComponents") {
             $path = $this->path;
             /** @var ArrayClass<string> $components */
@@ -183,7 +179,7 @@ final class URL extends ObjectClass
     /** @noinspection PhpMixedReturnTypeCanBeReducedInspection */
     private function parse(int $component): mixed
     {
-        $v = parse_url($this->absoluteString, $component);
+        $v = parse_url(rawurldecode($this->absoluteString), $component);
         if (empty($v)) {
             return null;
         }
@@ -219,22 +215,13 @@ final class URL extends ObjectClass
      */
     public static function fileURL(string $path): URL
     {
-        if (empty($path)) {
-            fatal_error("Invalid argument: expecting path, empty string given");
+        if (!str_starts_with($path, "/")) {
+            $path = "/$path";
         }
         if (TARGET_OS_WINDOWS) {
-            $path = str_replace("\\", "/", parse_url($path, PHP_URL_PATH));
+            $path = str_replace("\\", "/", $path);
         }
-        $scheme = parse_url($path, PHP_URL_SCHEME);
-        if (empty($scheme)) {
-            $scheme = "file";
-        } else {
-            $path = parse_url($path, PHP_URL_PATH);
-        }
-        if ($scheme !== "file") {
-            fatal_error("Invalid url scheme \"$scheme\"");
-        }
-        return new URL("$scheme://$path");
+        return new URL("file://$path");
     }
 
     /**
