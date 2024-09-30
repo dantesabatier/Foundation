@@ -433,17 +433,20 @@ final class Bundle extends ObjectClass
             return $className;
         }
         $name = array_last(explode("\\", $className)) ?? $className;
-        if ($enumerator = FileManager::default()->enumerator($this->bundleURL->appendingPathComponent("src"), null, DirectoryEnumerationOptions::skipsHiddenFiles)) {
-            foreach ($enumerator as $url) {
-                $path = $url->path;
-                if (string_is_equal($url->pathExtension, "php", CompareOptions::caseInsensitive) && string_is_equal(pathinfo($path, PATHINFO_FILENAME), $name, CompareOptions::caseInsensitive)) {
-                    require_once $path;
-                    if (($class = array_last(get_declared_classes(), fn(string $class): bool => str_ends_with($class, $className))) && class_exists($class)) {
-                        NotificationCenter::default()->postNotificationName(self::didLoadNotification, $this, new Dictionary([LoadedClasses => new ArrayClass([$class])]));
-                        return $class;
-                    }
-                }
+        if (!($enumerator = FileManager::default()->enumerator($this->bundleURL->appendingPathComponent("src"), null, DirectoryEnumerationOptions::skipsHiddenFiles))) {
+            return null;
+        }
+        foreach ($enumerator as $url) {
+            $path = $url->path;
+            if (!string_is_equal($url->pathExtension, "php", CompareOptions::caseInsensitive) && string_is_equal(pathinfo($path, PATHINFO_FILENAME), $name, CompareOptions::caseInsensitive)) {
+                continue;
             }
+            require_once $path;
+            if (!($class = array_last(get_declared_classes(), fn(string $class): bool => str_ends_with($class, $className))) || !class_exists($class)) {
+                continue;
+            }
+            NotificationCenter::default()->postNotificationName(self::didLoadNotification, $this, new Dictionary([LoadedClasses => new ArrayClass([$class])]));
+            return $class;
         }
         return null;
     }
