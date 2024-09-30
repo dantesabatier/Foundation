@@ -2,6 +2,7 @@
 
 namespace Sabatier\Foundation\Networking;
 
+use Override;
 use Sabatier\Foundation\Dictionary;
 use Sabatier\Foundation\Error;
 use function Sabatier\Foundation\fatal_error;
@@ -19,6 +20,7 @@ class ProtocolClient implements URLProtocolClient
     private ?URLResponse $cacheableResponse = null;
     private URLCacheStoragePolicy $cachePolicy = URLCacheStoragePolicy::notAllowed;
 
+    #[Override]
     public function urlProtocolDidReceiveCacheStoragePolicy(URLProtocol $protocol, URLResponse $response, URLCacheStoragePolicy $policy): void
     {
         $task = $protocol->task;
@@ -55,20 +57,24 @@ class ProtocolClient implements URLProtocolClient
         }
     }
 
+    #[Override]
     public function urlProtocolWasRedirectedToRedirectResponse(URLProtocol $protocol, URLRequest $request, URLResponse $response): void
     {
         fatal_error("The URLSession implementation doesn't currently handle redirects directly.");
     }
 
+    #[Override]
     public function urlProtocolCachedResponseIsValid(URLProtocol $protocol, CachedURLResponse $cachedResponse): void
     {
     }
 
+    #[Override]
     public function urlProtocolDidCancel(URLProtocol $protocol, URLAuthenticationChallenge $challenge): void
     {
         $this->urlProtocolTaskDidFailWithError($protocol->task, new Error(CocoaErrorDomain, UserCancelledError));
     }
 
+    #[Override]
     public function urlProtocolDidReceive(URLProtocol $protocol, URLAuthenticationChallenge $authenticationChallenge): void
     {
         $task = $protocol->task;
@@ -119,6 +125,7 @@ class ProtocolClient implements URLProtocolClient
         }
     }
 
+    #[Override]
     public function urlProtocolDidFailWithError(URLProtocol $protocol, Error $error): void
     {
         $this->urlProtocolTaskDidFailWithError($protocol->task, $error);
@@ -171,6 +178,7 @@ class ProtocolClient implements URLProtocolClient
         $task->invalidateProtocol();
     }
 
+    #[Override]
     public function urlProtocolDidLoad(URLProtocol $protocol, string $data): void
     {
         $task = $protocol->task;
@@ -205,6 +213,7 @@ class ProtocolClient implements URLProtocolClient
         }
     }
 
+    #[Override]
     public function urlProtocolDidFinishLoading(URLProtocol $protocol): void
     {
         $task = $protocol->task;

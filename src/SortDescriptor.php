@@ -3,6 +3,7 @@
 namespace Sabatier\Foundation;
 
 use Closure;
+use Override;
 
 /**
  * An immutable description of how to order a collection of objects based on a property common to all the objects.
@@ -54,6 +55,7 @@ class SortDescriptor extends ObjectClass
     {
     }
 
+    #[Override]
     public function isEqual(mixed $other): bool
     {
         if ($other instanceof SortDescriptor) {
@@ -62,6 +64,7 @@ class SortDescriptor extends ObjectClass
         return false;
     }
 
+    #[Override]
     public function description(): string
     {
         return sprintf("%s %s", $this->key, human_readable_value($this->ascending));

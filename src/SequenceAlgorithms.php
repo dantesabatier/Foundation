@@ -3,6 +3,7 @@
 namespace Sabatier\Foundation;
 
 use Closure;
+use Override;
 
 /**
  * @psalm-require-implements Sequence
@@ -37,7 +38,7 @@ trait SequenceAlgorithms
         return $this->count() === 0;
     }
 
-    public function compare(mixed $other): ComparisonResult
+    #[Override] public function compare(mixed $other): ComparisonResult
     {
         if (!$other instanceof Sequence) {
             fatal_error(sprintf("Invalid argument: expecting %s, \"%s\" given", Sequence::class, typeof($other)));
@@ -45,7 +46,7 @@ trait SequenceAlgorithms
         return ComparisonResult::from($this->count() <=> $other->count());
     }
 
-    public function isEqual(mixed $other): bool
+    #[Override] public function isEqual(mixed $other): bool
     {
         return $this->elementsEqual($other);
     }
@@ -165,7 +166,7 @@ trait SequenceAlgorithms
     }
 
     /** @noinspection PhpMixedReturnTypeCanBeReducedInspection */
-    public function jsonSerialize(): mixed
+    #[Override] public function jsonSerialize(): mixed
     {
         return $this->toArray();
     }

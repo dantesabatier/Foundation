@@ -3,6 +3,7 @@
 namespace Sabatier\Foundation\Networking;
 
 use Closure;
+use Override;
 use Sabatier\Foundation\ArrayClass;
 use Sabatier\Foundation\Error;
 use Sabatier\Foundation\OperationQueue;
@@ -216,6 +217,7 @@ final class URLSession implements URLSessionProtocol
     }
 
     /** @internal */
+    #[Override]
     public function add(EasyHandle $handle): void
     {
         $this->multiHandle->add($handle);
@@ -224,12 +226,14 @@ final class URLSession implements URLSessionProtocol
     /**
      * @internal
      */
+    #[Override]
     public function remove(EasyHandle $handle): void
     {
         $this->multiHandle->remove($handle);
     }
 
     /** @internal */
+    #[Override]
     public function behaviour(URLSessionTask $task): TaskBehaviour
     {
         $behaviour = $this->taskRegistry->behaviour($task);
@@ -349,7 +353,7 @@ final class URLSession implements URLSessionProtocol
         if (!$sessionDelegate = $this->delegate) {
             return;
         }
-        $this->delegateQueue->addOperationWithBlock(function () use ($sessionDelegate) {
+        $this->delegateQueue->addOperationWithBlock(function () use ($sessionDelegate): void {
             $sessionDelegate->urlSessionDidBecomeInvalidWithError($this);
         });
     }

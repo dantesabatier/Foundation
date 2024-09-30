@@ -3,6 +3,7 @@
 namespace Sabatier\Foundation\Predicates;
 
 use JetBrains\PhpStorm\ExpectedValues;
+use Override;
 use Sabatier\Foundation\ArrayClass;
 use Sabatier\Foundation\Dictionary;
 use function Sabatier\Foundation\human_readable_value;
@@ -18,11 +19,13 @@ class AggregateExpression extends Expression
         parent::__construct(ExpressionType::aggregate);
     }
 
+    #[Override]
     public function withSubstitutionVariables(Dictionary $variables): Expression
     {
         return new self($this->collection->map(fn(Expression $expression): Expression => $expression->withSubstitutionVariables($variables)));
     }
 
+    #[Override]
     public function expressionValue(mixed $object = null, ?Dictionary $context = null): ArrayClass
     {
         $value = $this->collection->compactMap(fn(Expression $expression): mixed => $expression->expressionValue($object, $context));
@@ -32,6 +35,7 @@ class AggregateExpression extends Expression
         return $value;
     }
 
+    #[Override]
     public function accept(PredicateVisitor $visitor, #[ExpectedValues(flagsFromClass: PredicateVisitorFlags::class)] int $flags): void
     {
         if (!($flags & PredicateVisitorFlags::expressions)) {
@@ -48,11 +52,13 @@ class AggregateExpression extends Expression
         }
     }
 
+    #[Override]
     public function collection(): ArrayClass
     {
         return $this->collection;
     }
 
+    #[Override]
     public function predicateFormat(): string
     {
         return "{" . $this->collection->join(", ") . "}";

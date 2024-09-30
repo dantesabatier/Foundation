@@ -5,6 +5,7 @@ namespace Sabatier\Foundation;
 use Closure;
 use Generator;
 use IteratorAggregate;
+use Override;
 use Sabatier\Foundation\Predicates\Predicate;
 use Traversable;
 
@@ -52,11 +53,13 @@ class Slice extends ObjectClass implements Collection, IteratorAggregate
         };
     }
 
+    #[Override]
     public function count(): int
     {
         return $this->endIndex - $this->startIndex;
     }
 
+    #[Override]
     public function isEmpty(): bool
     {
         return $this->endIndex === $this->startIndex;
@@ -71,6 +74,7 @@ class Slice extends ObjectClass implements Collection, IteratorAggregate
      * @param Closure(Result, mixed, int=): Result $updateAccumulatingResult A closure that updates the accumulating value with an element of the sequence.
      * @return Result The final accumulated value. If the sequence has no elements, the result is initialResult.
      */
+    #[Override]
     public function reduce(mixed $initialResult, Closure $updateAccumulatingResult)
     {
         return $this->sequenceReduce($initialResult, $updateAccumulatingResult);
@@ -83,6 +87,7 @@ class Slice extends ObjectClass implements Collection, IteratorAggregate
      * @return Collection<int, Result>
      * @psalm-suppress LessSpecificReturnStatement, MoreSpecificReturnType
      */
+    #[Override]
     public function map(Closure $transform): Collection
     {
         return (new ($this->base::class)($this))->map($transform);
@@ -95,6 +100,7 @@ class Slice extends ObjectClass implements Collection, IteratorAggregate
      * @return Collection<int, Result>
      * @psalm-suppress LessSpecificReturnStatement, MoreSpecificReturnType
      */
+    #[Override]
     public function compactMap(Closure $transform): Collection
     {
         return (new ($this->base::class)($this))->compactMap($transform);
@@ -107,21 +113,25 @@ class Slice extends ObjectClass implements Collection, IteratorAggregate
      * @return Collection<int, Result>
      * @psalm-suppress LessSpecificReturnStatement, MoreSpecificReturnType
      */
+    #[Override]
     public function flatMap(Closure $transform): Collection
     {
         return (new ($this->base::class)($this))->flatMap($transform);
     }
 
+    #[Override]
     public function startIndex(): int
     {
         return $this->startIndex;
     }
 
+    #[Override]
     public function endIndex(): int
     {
         return $this->endIndex;
     }
 
+    #[Override]
     public function indices(): Range
     {
         return $this->indices;
@@ -132,6 +142,7 @@ class Slice extends ObjectClass implements Collection, IteratorAggregate
      * @param Closure(Element, int=, bool=): bool $isIncluded
      * @return ArrayClass<Element>
      */
+    #[Override]
     public function filter(Closure $isIncluded): ArrayClass
     {
         $instance = new ArrayClass();
@@ -154,16 +165,19 @@ class Slice extends ObjectClass implements Collection, IteratorAggregate
      * @return ArrayClass<Element> A new collection containing the objects in the receiving array for which predicate returns true.
      * Objects in the resulting array appear in the same order as they do in the receiver.
      */
+    #[Override]
     public function filtered(Predicate $predicate): ArrayClass
     {
         return $this->filter(fn(mixed $e): bool => $predicate->evaluate($e));
     }
 
+    #[Override]
     public function sort(?Closure $by = null): ArrayClass
     {
         invalid_mutation();
     }
 
+    #[Override]
     public function sorted(iterable $descriptors): ArrayClass
     {
         unsupported($this, __FUNCTION__);
@@ -174,12 +188,14 @@ class Slice extends ObjectClass implements Collection, IteratorAggregate
      * @return FlattenSequence<Element> A flattened view of the elements of this sequence of sequences.
      * @psalm-suppress LessSpecificReturnStatement, MoreSpecificReturnType
      */
+    #[Override]
     public function joined(): FlattenSequence
     {
         /** @psalm-suppress InvalidArgument */
         return new FlattenSequence($this->base);
     }
 
+    #[Override]
     public function valueForKey(string $key): Collection
     {
         return $this->map(function (KeyValueCoding $e) use ($key): mixed {
@@ -191,6 +207,7 @@ class Slice extends ObjectClass implements Collection, IteratorAggregate
     /**
      * @return Traversable<int, Element>
      */
+    #[Override]
     public function getIterator(): Traversable
     {
         return (function (): Generator {
@@ -200,6 +217,7 @@ class Slice extends ObjectClass implements Collection, IteratorAggregate
         })();
     }
 
+    #[Override]
     public function description(): string
     {
         return sprintf("<%s %s [%s...<%s]>", typeof($this->base), human_readable_value($this->base), $this->startIndex, $this->endIndex);
@@ -208,11 +226,13 @@ class Slice extends ObjectClass implements Collection, IteratorAggregate
     /**
      * @return Element[]
      */
+    #[Override]
     public function toArray(): array
     {
         return array_slice($this->base->toArray(), $this->startIndex, $this->endIndex);
     }
 
+    #[Override]
     public function jsonSerialize(): array
     {
         return $this->toArray();

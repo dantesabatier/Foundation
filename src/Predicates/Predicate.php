@@ -4,6 +4,7 @@ namespace Sabatier\Foundation\Predicates;
 
 use Closure;
 use JetBrains\PhpStorm\ExpectedValues;
+use Override;
 use Sabatier\Foundation\ArrayClass;
 use Sabatier\Foundation\Dictionary;
 use Sabatier\Foundation\ObjectClass;
@@ -102,11 +103,13 @@ class Predicate extends ObjectClass
     {
     }
 
+    #[Override]
     public function description(): string
     {
         return $this->predicateFormat();
     }
 
+    #[Override]
     public function jsonSerialize(): Dictionary
     {
         return new Dictionary(["format" => $this->predicateFormat()]);

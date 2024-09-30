@@ -12,6 +12,7 @@ namespace Sabatier\Foundation;
 use ArrayIterator;
 use Closure;
 use IteratorAggregate;
+use Override;
 use Sabatier\Foundation\Predicates\Predicate;
 use Traversable;
 
@@ -124,6 +125,7 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
      * @param Closure(Element, string=): bool $predicate A closure that takes an element of the sequence as its argument and returns a Boolean value that indicates whether the passed element represents a match.
      * @return bool true if the sequence contains an element that satisfies predicate; otherwise, false.
      */
+    #[Override]
     public function contains(Closure $predicate): bool
     {
         return $this->sequenceContains($predicate);
@@ -136,6 +138,7 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
      * @param Element $element The element to find in the sequence.
      * @return bool true if the element was found in the sequence; otherwise, false.
      */
+    #[Override]
     public function containsElement(mixed $element): bool
     {
         return $this->sequenceContainsElement($element);
@@ -145,6 +148,7 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
      * Returns the minimum element in the sequence.
      * @return Element|null The sequence's minimum element. If the sequence has no elements, returns nil.
      */
+    #[Override]
     public function min()
     {
         return $this->sequenceMin();
@@ -154,6 +158,7 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
      * Returns the maximum element in the sequence.
      * @return Element|null The sequence's maximum element. If the sequence has no elements, returns nil.
      */
+    #[Override]
     public function max()
     {
         return $this->sequenceMax();
@@ -169,6 +174,7 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
      * @param Closure(Result, Element, string=): Result $updateAccumulatingResult A closure that updates the accumulating value with an element of the sequence.
      * @return Result The final accumulated value. If the sequence has no elements, the result is initialResult.
      */
+    #[Override]
     public function reduce(mixed $initialResult, Closure $updateAccumulatingResult)
     {
         return $this->sequenceReduce($initialResult, $updateAccumulatingResult);
@@ -197,6 +203,7 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
      * @return ArrayClass<Result> An array containing the transformed elements of this sequence.
      * @psalm-suppress ImplementedReturnTypeMismatch
      */
+    #[Override]
     public function map(Closure $transform): ArrayClass
     {
         $array = new ArrayClass();
@@ -214,6 +221,7 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
      * @return ArrayClass<Result> An array of the non-nil results of calling transform with each element of the sequence.
      * @psalm-suppress ImplementedReturnTypeMismatch
      */
+    #[Override]
     public function compactMap(Closure $transform): ArrayClass
     {
         $array = new ArrayClass();
@@ -252,6 +260,7 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
      * @return ArrayClass<Result>
      * @psalm-suppress ImplementedReturnTypeMismatch
      */
+    #[Override]
     public function flatMap(Closure $transform): ArrayClass
     {
         $array = new ArrayClass();
@@ -267,6 +276,7 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
      * @return string|null The index of the first element for which predicate returns true.
      * If no elements in the collection satisfy the given predicate, returns nil.
      */
+    #[Override]
     public function firstIndex(Closure $where): ?string
     {
         $k = $this->keys;
@@ -287,6 +297,7 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
      * @param Element $element An element to search for in the collection.
      * @return string|null The first index where element is found. If element is not found in the collection, returns nil.
      */
+    #[Override]
     public function indexOf(mixed $element): ?string
     {
         return $this->firstIndex(fn(mixed $e): bool => is_equal($e, $element));
@@ -297,6 +308,7 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
      * @param Closure(Element, string=): bool|null $where A closure that takes an element of the collection as its argument and returns a Boolean value indicating whether the element is a match.
      * @return Element|null The first element of the collection that satisfies predicate, or nil if there is no element that satisfies predicate.
      */
+    #[Override]
     public function first(Closure $where = null)
     {
         return $this->sequenceFirst($where);
@@ -308,6 +320,7 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
      * @return Dictionary<Element>
      */
 
+    #[Override]
     public function filter(Closure $isIncluded): self
     {
         $instance = new Dictionary();
@@ -329,6 +342,7 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
      * @param Predicate $predicate
      * @return Dictionary<Element>
      */
+    #[Override]
     public function filtered(Predicate $predicate): Dictionary
     {
         return $this->collectionFiltered($predicate);
@@ -339,6 +353,7 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
      * @param Closure(Element, Element): int|null $by
      * @return Dictionary<Element>
      */
+    #[Override]
     public function sort(?Closure $by = null): Dictionary
     {
         $by ??= fn(mixed $e0, mixed $e1): int => compare($e0, $e1);
@@ -351,6 +366,7 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
      * @param iterable<SortDescriptor> $descriptors A sequence of {@see SortDescriptor} objects.
      * @return Dictionary<Element> A copy of the receiving sequence sorted as specified by descriptors.
      */
+    #[Override]
     public function sorted(iterable $descriptors): Dictionary
     {
         return $this->collectionSorted($descriptors);
@@ -362,6 +378,7 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
      * @return bool true if the sequence contains an element that satisfies predicate; otherwise, false.
      */
 
+    #[Override]
     public function allSatisfy(Closure $predicate): bool
     {
         return $this->collectionAllSatisfy($predicate);
@@ -372,6 +389,7 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
      * @return FlattenSequence<Element> A flattened view of the elements of this sequence of sequences.
      * @psalm-suppress LessSpecificReturnStatement, MoreSpecificReturnType
      */
+    #[Override]
     public function joined(): FlattenSequence
     {
         return $this->collectionJoined();
@@ -419,6 +437,7 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
      * @param string $key The key for which to return the corresponding value.
      * @return Element|null The value associated with key.
      */
+    #[Override]
     public function valueForKey(string $key): mixed
     {
         return $this->offsetGet($key);
@@ -429,6 +448,7 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
      * @param Element|null $value The value for key.
      * @param string $key The key for value.
      */
+    #[Override]
     public function setValueForKey(mixed $value, string $key): void
     {
         $this->offsetSet($key, $value);
@@ -496,6 +516,7 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
         $this->reserved = $dictionary->toArray();
     }
 
+    #[Override]
     public function isEqual(mixed $other): bool
     {
         if ($other instanceof Dictionary) {
@@ -507,11 +528,13 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
     /**
      * @return array<string, Element>
      */
+    #[Override]
     public function toArray(): array
     {
         return $this->reserved;
     }
 
+    #[Override]
     public function description(): string
     {
         return sprintf("[%s]", $this->isEmpty ? ":" : $this->mapValues(fn(mixed $value, string $key): string => sprintf("%s: %s", $key, human_readable_value($value)))->values->join(", "));
@@ -520,6 +543,7 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
     /**
      * @return Traversable<string, Element>
      */
+    #[Override]
     public function getIterator(): Traversable
     {
         return new ArrayIterator($this->reserved);
@@ -528,6 +552,7 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
     /**
      * @param string $offset
      */
+    #[Override]
     public function offsetExists(mixed $offset): bool
     {
         return array_key_exists($offset, $this->reserved);
@@ -537,6 +562,7 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
      * @param string $offset
      * @return Element|null
      */
+    #[Override]
     public function offsetGet(mixed $offset): mixed
     {
         return $this->reserved[$offset] ?? null;
@@ -546,6 +572,7 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
      * @param string $offset
      * @param Element|null $value
      */
+    #[Override]
     public function offsetSet(mixed $offset, mixed $value): void
     {
         if ($value === null) {
@@ -558,6 +585,7 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
     /**
      * @param string $offset
      */
+    #[Override]
     public function offsetUnset(mixed $offset): void
     {
         if ($this->offsetExists($offset)) {

@@ -10,6 +10,7 @@
 namespace Sabatier\Foundation;
 
 use Closure;
+use Override;
 
 /**
  * An operation that manages the concurrent execution of one or more blocks.
@@ -30,6 +31,7 @@ class BlockOperation extends Operation
         $this->executionBlocks = new ArrayClass([$block]);
     }
 
+    #[Override]
     public function main(): void
     {
         foreach ($this->executionBlocks as $executionBlock) {

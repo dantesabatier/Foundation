@@ -3,6 +3,7 @@
 namespace Sabatier\Foundation\Networking;
 
 use JetBrains\PhpStorm\ExpectedValues;
+use Override;
 use Sabatier\Foundation\CompareOptions;
 use Sabatier\Foundation\Dictionary;
 use Sabatier\Foundation\Number;
@@ -75,8 +76,8 @@ class HTTPURLResponse extends URLResponse
 
     private function suggestedFilename(?Dictionary $headerFields): string
     {
-        if (($value = $headerFields?->valueForCaseInsensitiveKey("Content-Disposition")) && str_contains($value, ";")) {
-            [, $part] = explode(";", $value);
+        if (($value = $headerFields?->valueForCaseInsensitiveKey("Content-Disposition")) && str_contains((string) $value, ";")) {
+            [, $part] = explode(";", (string) $value);
             [, $filename] = explode("=", $part);
             return $filename;
         }
@@ -88,8 +89,8 @@ class HTTPURLResponse extends URLResponse
         if ($value = $headerFields?->valueForCaseInsensitiveKey("Content-Type")) {
             /** @var string $mimeType */
             $mimeType = $value;
-            if (str_contains($value, ";")) {
-                [$mimeType, $part] = explode(";", $value);
+            if (str_contains((string) $value, ";")) {
+                [$mimeType, $part] = explode(";", (string) $value);
                 [, $textEncoding] = explode("=", $part);
                 return ["mimeType" => $mimeType, "textEncoding" => $textEncoding];
             }
@@ -161,6 +162,7 @@ class HTTPURLResponse extends URLResponse
         };
     }
 
+    #[Override]
     public function description(): string
     {
         return sprintf("<HTTPURLResponse %s> { URL: %s }{ status: %d, headers {\n%s} }", $this->hash(), $this->url->absoluteString, $this->statusCode, $this->allHeaderFields->mapValues(fn(mixed $value, string $key): string => is_string($value) ? "\"$key\" = \"$value\";\n" : sprintf("\"%s\" = %s;\n", $key, human_readable_value($value)))->values->join(""));

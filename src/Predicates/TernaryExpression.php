@@ -3,6 +3,7 @@
 namespace Sabatier\Foundation\Predicates;
 
 use JetBrains\PhpStorm\ExpectedValues;
+use Override;
 use Sabatier\Foundation\Dictionary;
 use function Sabatier\Foundation\human_readable_value;
 
@@ -14,11 +15,13 @@ class TernaryExpression extends Expression
         parent::__construct(ExpressionType::conditional);
     }
 
+    #[Override]
     public function withSubstitutionVariables(Dictionary $variables): Expression
     {
         return new TernaryExpression($this->predicate()->withSubstitutionVariables($variables), $this->true->withSubstitutionVariables($variables), $this->false->withSubstitutionVariables($variables));
     }
 
+    #[Override]
     public function expressionValue(mixed $object = null, ?Dictionary $context = null): mixed
     {
         $expression = $this->predicate->evaluate($object, $context) ? $this->true : $this->false;
@@ -29,6 +32,7 @@ class TernaryExpression extends Expression
         return $value;
     }
 
+    #[Override]
     public function accept(PredicateVisitor $visitor, #[ExpectedValues(flagsFromClass: PredicateVisitorFlags::class)] int $flags): void
     {
         if (!($flags & PredicateVisitorFlags::expressions)) {
@@ -45,21 +49,25 @@ class TernaryExpression extends Expression
         }
     }
 
+    #[Override]
     public function predicate(): Predicate
     {
         return $this->predicate;
     }
 
+    #[Override]
     public function true(): Expression
     {
         return $this->true;
     }
 
+    #[Override]
     public function false(): Expression
     {
         return $this->false;
     }
 
+    #[Override]
     public function predicateFormat(): string
     {
         return sprintf("TERNARY(%s, %s, %s)", $this->predicate, $this->true, $this->false);

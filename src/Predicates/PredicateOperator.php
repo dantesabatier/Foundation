@@ -10,6 +10,7 @@
 namespace Sabatier\Foundation\Predicates;
 
 use JetBrains\PhpStorm\ExpectedValues;
+use Override;
 use Sabatier\Foundation\ArrayClass;
 use Sabatier\Foundation\CompareOptions;
 use Sabatier\Foundation\ObjectClass;
@@ -117,6 +118,7 @@ class PredicateOperator extends ObjectClass
         return $this->symbol();
     }
 
+    #[Override]
     public function description(): string
     {
         return $this->predicateFormat();

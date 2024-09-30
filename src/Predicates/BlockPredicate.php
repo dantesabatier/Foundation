@@ -11,6 +11,7 @@ namespace Sabatier\Foundation\Predicates;
 
 use Closure;
 use JetBrains\PhpStorm\ExpectedValues;
+use Override;
 use Sabatier\Foundation\Dictionary;
 
 /** @internal */
@@ -20,21 +21,25 @@ class BlockPredicate extends Predicate
     {
     }
 
+    #[Override]
     public function withSubstitutionVariables(Dictionary $variables): Predicate
     {
         return $this;
     }
 
+    #[Override]
     public function evaluate(mixed $object = null, ?Dictionary $substitutionVariables = null): bool
     {
         return (bool)($this->block)($object, $substitutionVariables);
     }
 
+    #[Override]
     public function accept(PredicateVisitor $visitor, #[ExpectedValues(flagsFromClass: PredicateVisitorFlags::class)] int $flags): void
     {
         $visitor->visitPredicate($this);
     }
 
+    #[Override]
     public function predicateFormat(): string
     {
         return "BLOCKPREDICATE()";

@@ -3,6 +3,7 @@
 namespace Sabatier\Foundation;
 
 use Closure;
+use Override;
 
 /**
  * @property-read bool $isIndeterminate
@@ -103,6 +104,7 @@ class ProgressFraction extends ObjectClass
         }
     }
 
+    #[Override]
     public function isEqual(mixed $other): bool
     {
         return $other instanceof ProgressFraction && $this->total == $other->total && $this->completed == $other->completed;
@@ -132,6 +134,7 @@ class ProgressFraction extends ObjectClass
         return $this->math($divisor, fn(float $l, float $r): float => $l / $r, fn(): array => []);
     }
 
+    #[Override]
     public function debugDescription(): string
     {
         return "$this->completed / $this->total ($this->fractionCompleted)";

@@ -9,6 +9,8 @@
 
 namespace Sabatier\Foundation;
 
+use Override;
+
 /**
  * A container for information broadcast through a notification center to all registered observers.
  */
@@ -25,11 +27,13 @@ readonly class Notification implements CustomStringConvertible
     {
     }
 
+    #[Override]
     public function __toString(): string
     {
         return $this->description();
     }
 
+    #[Override]
     public function description(): string
     {
         return sprintf("name = %s object = %s userInfo = %s", $this->name, human_readable_value($this->object), human_readable_value($this->userInfo));

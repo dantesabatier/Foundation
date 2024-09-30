@@ -5,6 +5,7 @@ namespace Sabatier\Foundation;
 use IntlDateFormatter;
 use JetBrains\PhpStorm\Pure;
 use Locale;
+use Override;
 
 /**
  * A specific point in time, independent of any calendar or time zone.
@@ -116,6 +117,7 @@ class Date extends ObjectClass
         return Date::dateWithTimeIntervalSinceReferenceDate(-63_114_076_800.0);
     }
 
+    #[Override]
     public function compare(mixed $other): ComparisonResult
     {
         if (!$other instanceof Date) {
@@ -124,6 +126,7 @@ class Date extends ObjectClass
         return ComparisonResult::from($this->timeIntervalSinceReferenceDate <=> $other->timeIntervalSinceReferenceDate);
     }
 
+    #[Override]
     public function isEqual(mixed $other): bool
     {
         return $this->compare($other) === ComparisonResult::orderedSame;
@@ -208,16 +211,19 @@ class Date extends ObjectClass
         return $this->format(DATE_ATOM);
     }
 
+    #[Override]
     public function description(): string
     {
         return $this->format();
     }
 
+    #[Override]
     public function debugDescription(): string
     {
         return sprintf("<%s %s>", static::class, $this->description());
     }
 
+    #[Override]
     public function jsonSerialize(): string
     {
         return $this->description();

@@ -4,6 +4,7 @@ namespace Sabatier\Foundation\Networking;
 
 use Closure;
 use Exception;
+use Override;
 use Sabatier\Foundation\ArrayClass;
 use Sabatier\Foundation\Dictionary;
 use Sabatier\Foundation\Error;
@@ -106,6 +107,7 @@ class URLSessionWebSocketTask extends URLSessionTask
         });
     }
 
+    #[Override]
     public function resume(): void
     {
         if (!EasyHandle::supportsWebSockets()) {
@@ -121,6 +123,7 @@ class URLSessionWebSocketTask extends URLSessionTask
         parent::resume();
     }
 
+    #[Override]
     public function cancel(): void
     {
         $this->cancelWithReason(URLSessionWebSocketTaskCloseCode::invalid, null);

@@ -2,6 +2,8 @@
 
 namespace Sabatier\Foundation;
 
+use Override;
+
 /**
  * A general-purpose recorder of operations that enables undo and redo.
  * @property-read int $levelsOfUndo The maximum number of top-level undo groups the receiver holds. An integer specifying the number of undo groups. A limit of 0 indicates no limit, so old undo groups are never dropped. When ending an undo group results in the number of groups exceeding this limit, the oldest groups are dropped from the stack. The default is 0. If you change the limit to a level below the prior limit, old undo groups are immediately dropped.
@@ -263,6 +265,7 @@ class UndoManager extends ObjectClass
         }
     }
 
+    #[Override]
     public function forwardInvocation(Invocation $invocation): void
     {
         if (!$this->isUndoRegistrationEnabled) {

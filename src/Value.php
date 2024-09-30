@@ -4,6 +4,7 @@ namespace Sabatier\Foundation;
 
 use JetBrains\PhpStorm\ArrayShape;
 use JetBrains\PhpStorm\Pure;
+use Override;
 
 /**
  * A simple container for a single data item.
@@ -48,6 +49,7 @@ class Value extends ObjectClass
         $this->value = $data["value"];
     }
 
+    #[Override]
     public function compare(mixed $other): ComparisonResult
     {
         if (is_scalar($other) || is_null($other)) {
@@ -58,22 +60,26 @@ class Value extends ObjectClass
         return ComparisonResult::orderedDescending;
     }
 
+    #[Override]
     public function isEqual(mixed $other): bool
     {
         return $this->compare($other) === ComparisonResult::orderedSame;
     }
 
     #[Pure]
+    #[Override]
     public function jsonSerialize(): mixed
     {
         return $this->value;
     }
 
+    #[Override]
     public function description(): string
     {
         return human_readable_value($this->value);
     }
 
+    #[Override]
     public function debugDescription(): string
     {
         return sprintf("<%s %s> (%s)%s", static::class, $this->hash(), $this->type, $this->description());

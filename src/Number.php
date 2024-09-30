@@ -2,6 +2,8 @@
 
 namespace Sabatier\Foundation;
 
+use Override;
+
 /**
  * An object wrapper for primitive scalar numeric values.
  *
@@ -54,6 +56,7 @@ class Number extends Value
      * This value must not be nil.
      * @return ComparisonResult orderedAscending if the value of $other is greater than the number object's, orderedSame if they're equal, and orderedDescending if the value of $other is less than the number object's.
      */
+    #[Override]
     public function compare(mixed $other): ComparisonResult
     {
         if (is_int($other)) {
@@ -78,6 +81,7 @@ class Number extends Value
      * @param mixed $other The number to compare to the number object's value.
      * @return bool true if the number object's value and aNumber are equal, otherwise false.
      */
+    #[Override]
     public function isEqual(mixed $other): bool
     {
         return $this->compare($other) === ComparisonResult::orderedSame;

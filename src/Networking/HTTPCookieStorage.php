@@ -4,6 +4,7 @@ namespace Sabatier\Foundation\Networking;
 
 use Closure;
 use Exception;
+use Override;
 use Sabatier\Foundation\ArrayClass;
 use Sabatier\Foundation\Bundle;
 use Sabatier\Foundation\CompareOptions;
@@ -274,6 +275,7 @@ class HTTPCookieStorage extends ObjectClass
         return $this->allCookies->values->sorted($sortOrder);
     }
 
+    #[Override]
     public function description(): string
     {
         return ($this->isEphemeral ? "Ephemeral" : "") . "<HTTPCookieStorage cookies count:({$this->allCookies->count})>";

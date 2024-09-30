@@ -4,6 +4,7 @@ namespace Sabatier\Foundation\Predicates;
 
 use Closure;
 use JetBrains\PhpStorm\ExpectedValues;
+use Override;
 use Sabatier\Foundation\ArrayClass;
 use Sabatier\Foundation\Dictionary;
 use Sabatier\Foundation\ObjectClass;
@@ -384,11 +385,13 @@ class Expression extends ObjectClass
         request_concrete_implementation($this, __FUNCTION__);
     }
 
+    #[Override]
     public function description(): string
     {
         return $this->predicateFormat();
     }
 
+    #[Override]
     public function jsonSerialize(): string
     {
         return $this->predicateFormat();

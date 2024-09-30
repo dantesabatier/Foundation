@@ -11,6 +11,7 @@ namespace Sabatier\Foundation\Predicates;
 
 use JetBrains\PhpStorm\ExpectedValues;
 use JetBrains\PhpStorm\Pure;
+use Override;
 use Sabatier\Foundation\Dictionary;
 
 /** @internal */
@@ -26,17 +27,20 @@ final class TruePredicate extends Predicate
         return TruePredicate::$default;
     }
 
+    #[Override]
     public function evaluate(mixed $object = null, ?Dictionary $substitutionVariables = null): bool
     {
         return true;
     }
 
+    #[Override]
     public function accept(PredicateVisitor $visitor, #[ExpectedValues(flagsFromClass: PredicateVisitorFlags::class)] int $flags): void
     {
         $visitor->visitPredicate($this);
     }
 
     #[Pure]
+    #[Override]
     public function description(): string
     {
         return "TRUEPREDICATE";

@@ -3,6 +3,7 @@
 namespace Sabatier\Foundation\Networking;
 
 use Exception;
+use Override;
 use Sabatier\Foundation\Dictionary;
 use Sabatier\Foundation\Error;
 use function Sabatier\Foundation\fatal_error;
@@ -13,12 +14,14 @@ use const Sabatier\Foundation\URLErrorUnknown;
 /** @internal */
 class FTPURLProtocol extends NativeProtocol
 {
+    #[Override]
     public static function canInit(URLRequest $request): bool
     {
         // TODO: Implement sftp and ftps
         return $request->url->scheme === "ftp";
     }
 
+    #[Override]
     public function didReceiveHeaderData(string $data, int $contentLength): EasyHandleAction
     {
         if ($this->internalState->rawValue !== InternalStateRawValue::transferInProgress) {
@@ -40,6 +43,7 @@ class FTPURLProtocol extends NativeProtocol
         }
     }
 
+    #[Override]
     public function configureEasyHandle(URLRequest $request, TaskBody $body): void
     {
         $easyHandle = $this->easyHandle;

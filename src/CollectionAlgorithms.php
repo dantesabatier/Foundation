@@ -3,6 +3,7 @@
 namespace Sabatier\Foundation;
 
 use Closure;
+use Override;
 use Sabatier\Foundation\Predicates\Predicate;
 use Sabatier\Foundation\Predicates\PredicateUtilities;
 
@@ -157,7 +158,7 @@ trait CollectionAlgorithms
         return new FlattenSequence($this);
     }
 
-    public function valueForKey(string $key): self
+    #[Override] public function valueForKey(string $key): self
     {
         return $this->map(function (KeyValueCoding $e) use ($key): mixed {
             assert($e instanceof KeyValueCoding, sprintf("Invalid argument: expecting %s, \"%s\" given", KeyValueCoding::class, typeof($e)));
@@ -165,7 +166,7 @@ trait CollectionAlgorithms
         });
     }
 
-    public function setValueForKey(mixed $value, string $key): void
+    #[Override] public function setValueForKey(mixed $value, string $key): void
     {
         foreach (clone $this as $e) {
             assert($e instanceof KeyValueCoding, sprintf("Invalid argument: expecting %s, \"%s\" given", KeyValueCoding::class, typeof($e)));
@@ -173,7 +174,7 @@ trait CollectionAlgorithms
         }
     }
 
-    public function valueForKeyPath(string $keyPath): mixed
+    #[Override] public function valueForKeyPath(string $keyPath): mixed
     {
         if ($keyPath === "" || $keyPath[0] !== "@") {
             /** @noinspection PhpMultipleClassDeclarationsInspection */

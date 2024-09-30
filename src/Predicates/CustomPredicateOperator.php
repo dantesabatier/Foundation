@@ -9,6 +9,7 @@
 
 namespace Sabatier\Foundation\Predicates;
 
+use Override;
 use function Sabatier\Foundation\fatal_error;
 use function Sabatier\Foundation\typeof;
 
@@ -20,6 +21,7 @@ class CustomPredicateOperator extends PredicateOperator
         parent::__construct(PredicateOperatorType::customSelector);
     }
 
+    #[Override]
     public function performPrimitiveOperation(mixed $left, mixed $right): bool
     {
         if (!is_object($left)) {
@@ -30,6 +32,7 @@ class CustomPredicateOperator extends PredicateOperator
         return $left->$selector(...$arguments);
     }
 
+    #[Override]
     public function symbol(): string
     {
         return $this->selector;

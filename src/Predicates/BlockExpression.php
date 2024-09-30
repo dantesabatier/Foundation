@@ -11,6 +11,7 @@ namespace Sabatier\Foundation\Predicates;
 
 use Closure;
 use JetBrains\PhpStorm\ExpectedValues;
+use Override;
 use Sabatier\Foundation\ArrayClass;
 use Sabatier\Foundation\Dictionary;
 use function Sabatier\Foundation\human_readable_value;
@@ -28,11 +29,13 @@ class BlockExpression extends Expression
         parent::__construct(ExpressionType::block);
     }
 
+    #[Override]
     public function withSubstitutionVariables(Dictionary $variables): Expression
     {
         return new BlockExpression($this->block, $this->arguments?->map(fn(Expression $expression): Expression => $expression->withSubstitutionVariables($variables)));
     }
 
+    #[Override]
     public function expressionValue(mixed $object = null, ?Dictionary $context = null): mixed
     {
         $arguments = $this->arguments?->map(fn(Expression $expression): mixed => $expression->expressionValue($object, $context)) ?? new ArrayClass();
@@ -43,6 +46,7 @@ class BlockExpression extends Expression
         return $value;
     }
 
+    #[Override]
     public function accept(PredicateVisitor $visitor, #[ExpectedValues(flagsFromClass: PredicateVisitorFlags::class)] int $flags): void
     {
         if (!($flags & PredicateVisitorFlags::expressions)) {
@@ -61,16 +65,19 @@ class BlockExpression extends Expression
         }
     }
 
+    #[Override]
     public function expressionBlock(): Closure
     {
         return $this->block;
     }
 
+    #[Override]
     public function arguments(): ?ArrayClass
     {
         return $this->arguments;
     }
 
+    #[Override]
     public function predicateFormat(): string
     {
         $format = "BLOCK(function";

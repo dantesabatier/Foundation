@@ -4,6 +4,7 @@ namespace Sabatier\Foundation;
 
 use Closure;
 use JetBrains\PhpStorm\ExpectedValues;
+use Override;
 
 /**
  * An object that conveys ongoing progress to the user for a specified task.
@@ -57,8 +58,8 @@ class Progress extends ObjectClass
     protected bool $isOld = false;
     private ?Progress $parent = null;
     /** @var Set<Progress> */
-    private Set $children;
-    private ProgressFraction $fraction;
+    private readonly Set $children;
+    private readonly ProgressFraction $fraction;
     private ProgressFraction $childFraction;
     private float $portionOfParent = 0.0;
 
@@ -152,11 +153,13 @@ class Progress extends ObjectClass
         }
     }
 
+    #[Override]
     public function valueForKey(string $key): mixed
     {
         return $this->$key;
     }
 
+    #[Override]
     public function setValueForKey(mixed $value, string $key): void
     {
         $this->$key = $value;

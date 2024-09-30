@@ -3,6 +3,7 @@
 namespace Sabatier\Foundation\Networking;
 
 use JetBrains\PhpStorm\ExpectedValues;
+use Override;
 use Sabatier\Foundation\Dictionary;
 use Sabatier\Foundation\ObjectClass;
 use Sabatier\Foundation\URL;
@@ -100,6 +101,7 @@ class URLRequest extends ObjectClass
         return $this->allHTTPHeaderFields?->valueForCaseInsensitiveKey($field);
     }
 
+    #[Override]
     public function description(): string
     {
         return "<URLRequest {$this->hash()}> { URL: $this->url }";

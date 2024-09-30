@@ -3,6 +3,7 @@
 namespace Sabatier\Foundation\Networking;
 
 use Exception;
+use Override;
 use Sabatier\Foundation\Dictionary;
 use Sabatier\Foundation\Error;
 use Sabatier\Foundation\FileHandle;
@@ -56,6 +57,7 @@ abstract class NativeProtocol extends URLProtocol implements EasyHandleDelegate
         return ProcessInfo::processInfo()->environment["URL_SESSION_DEBUG_LIBCURL"] !== null;
     }
 
+    #[Override]
     public static function canonicalRequest(URLRequest $request): URLRequest
     {
         return $request;
@@ -75,11 +77,13 @@ abstract class NativeProtocol extends URLProtocol implements EasyHandleDelegate
         return false;
     }
 
+    #[Override]
     public function startLoading(): void
     {
         $this->resume();
     }
 
+    #[Override]
     public function stopLoading(): void
     {
         if ($this->task->state === URLSessionTaskState::suspended) {
@@ -160,6 +164,7 @@ abstract class NativeProtocol extends URLProtocol implements EasyHandleDelegate
     abstract public function configureEasyHandle(URLRequest $request, TaskBody $body): void;
 
 
+    #[Override]
     public function didReceiveData(string $data): EasyHandleAction
     {
         if ($this->internalState->rawValue !== InternalStateRawValue::transferInProgress) {
@@ -181,6 +186,7 @@ abstract class NativeProtocol extends URLProtocol implements EasyHandleDelegate
         return EasyHandleAction::proceed;
     }
 
+    #[Override]
     public function fill(mixed $buffer): EasyHandleWriteBufferResult
     {
         if ($this->internalState->rawValue !== InternalStateRawValue::transferInProgress) {
@@ -189,6 +195,7 @@ abstract class NativeProtocol extends URLProtocol implements EasyHandleDelegate
         return EasyHandleWriteBufferResult::bytes(fgets($buffer));
     }
 
+    #[Override]
     public function transferCompleted(?Error $error): void
     {
         if ($error instanceof Error) {
@@ -229,6 +236,7 @@ abstract class NativeProtocol extends URLProtocol implements EasyHandleDelegate
         }
     }
 
+    #[Override]
     public function updateProgressMeter(EasyHandleProgress $progress): void
     {
         $progressReporter = $this->task->progress;

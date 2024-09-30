@@ -2,6 +2,7 @@
 
 namespace Sabatier\Foundation;
 
+use Override;
 use Random\Engine\Secure;
 use Random\Randomizer;
 
@@ -17,6 +18,7 @@ readonly class SystemRandomNumberGenerator implements RandomNumberGenerator
         $this->randomizer = new Randomizer(new Secure());
     }
     
+    #[Override]
     public function next(int $upperBound = NotFound): int
     {
         return $this->randomizer->getInt(0, $upperBound !== NotFound ? $upperBound : PHP_INT_MAX);

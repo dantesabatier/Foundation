@@ -9,6 +9,7 @@
 
 namespace Sabatier\Foundation\Predicates;
 
+use Override;
 use Sabatier\Foundation\ArrayClass;
 use function Sabatier\Foundation\in_range;
 use function Sabatier\Foundation\typeof;
@@ -16,6 +17,7 @@ use function Sabatier\Foundation\typeof;
 /** @internal */
 class BetweenPredicateOperator extends PredicateOperator
 {
+    #[Override]
     public function performPrimitiveOperation(mixed $left, mixed $right): bool
     {
         if ($left instanceof ArrayClass) {

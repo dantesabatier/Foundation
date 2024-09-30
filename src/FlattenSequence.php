@@ -5,6 +5,7 @@ namespace Sabatier\Foundation;
 use Closure;
 use Generator;
 use IteratorAggregate;
+use Override;
 use Traversable;
 
 /**
@@ -52,6 +53,7 @@ class FlattenSequence extends ObjectClass implements Sequence, IteratorAggregate
      * @param Closure(Result, mixed, int=): Result $updateAccumulatingResult A closure that updates the accumulating value with an element of the sequence.
      * @return Result The final accumulated value. If the sequence has no elements, the result is initialResult.
      */
+    #[Override]
     public function reduce(mixed $initialResult, Closure $updateAccumulatingResult)
     {
         return $this->sequenceReduce($initialResult, $updateAccumulatingResult);
@@ -63,6 +65,7 @@ class FlattenSequence extends ObjectClass implements Sequence, IteratorAggregate
      * @param Closure(mixed, int=): Result $transform
      * @return Sequence<int, Result>
      */
+    #[Override]
     public function map(Closure $transform): Sequence
     {
         return (new ($this->base::class)($this))->map($transform);
@@ -74,6 +77,7 @@ class FlattenSequence extends ObjectClass implements Sequence, IteratorAggregate
      * @param Closure(mixed, int=): Result $transform
      * @return Sequence<int, Result>
      */
+    #[Override]
     public function compactMap(Closure $transform): Sequence
     {
         return (new ($this->base::class)($this))->compactMap($transform);
@@ -85,11 +89,13 @@ class FlattenSequence extends ObjectClass implements Sequence, IteratorAggregate
      * @param Closure(mixed, int=): iterable<Result> $transform
      * @return Sequence<int, Result>
      */
+    #[Override]
     public function flatMap(Closure $transform): Sequence
     {
         return (new ($this->base::class)($this))->flatMap($transform);
     }
 
+    #[Override]
     public function getIterator(): Generator
     {
         return (function (): Generator {
@@ -110,6 +116,7 @@ class FlattenSequence extends ObjectClass implements Sequence, IteratorAggregate
         })();
     }
 
+    #[Override]
     public function count(): int
     {
         return iterator_count($this);
@@ -118,11 +125,13 @@ class FlattenSequence extends ObjectClass implements Sequence, IteratorAggregate
     /**
      * @return Element[]
      */
+    #[Override]
     public function toArray(): array
     {
         return iterator_to_array($this);
     }
 
+    #[Override]
     public function description(): string
     {
         return sprintf("<%s %s <%s>>", static::class, $this->base::class, human_readable_value($this->base));

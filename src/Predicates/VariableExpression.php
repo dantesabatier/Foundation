@@ -3,6 +3,7 @@
 namespace Sabatier\Foundation\Predicates;
 
 use JetBrains\PhpStorm\Pure;
+use Override;
 use Sabatier\Foundation\Dictionary;
 use function Sabatier\Foundation\human_readable_value;
 
@@ -14,6 +15,7 @@ class VariableExpression extends Expression
         parent::__construct(ExpressionType::variable);
     }
 
+    #[Override]
     public function withSubstitutionVariables(Dictionary $variables): Expression
     {
         $value = $variables[$this->variable()];
@@ -23,6 +25,7 @@ class VariableExpression extends Expression
         return $value;
     }
 
+    #[Override]
     public function expressionValue(mixed $object = null, ?Dictionary $context = null): mixed
     {
         $value = $this->withSubstitutionVariables($context ?? new Dictionary())->expressionValue($object, $context);
@@ -32,22 +35,26 @@ class VariableExpression extends Expression
         return $value;
     }
 
+    #[Override]
     public function keyPath(): string
     {
         return $this->variable;
     }
 
+    #[Override]
     public function variable(): string
     {
         return $this->variable;
     }
 
+    #[Override]
     public function operand(): ?Expression
     {
         return $this;
     }
 
     #[Pure]
+    #[Override]
     public function predicateFormat(): string
     {
         return $this->variable();

@@ -162,7 +162,7 @@ class Scanner extends ObjectClass
         }
         $value = $matches[0];
         $number = filter_var($value, $isInt ? FILTER_VALIDATE_INT : FILTER_VALIDATE_FLOAT);
-        $this->scanLocation = (int)strpos($this->string, (string)$value, $this->scanLocation) + strlen($value);
+        $this->scanLocation = (int)strpos($this->string, (string)$value, $this->scanLocation) + strlen((string) $value);
         return true;
     }
 

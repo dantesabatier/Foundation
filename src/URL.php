@@ -11,6 +11,7 @@ namespace Sabatier\Foundation;
 
 use Closure;
 use JetBrains\PhpStorm\ExpectedValues;
+use Override;
 use SplFileInfo;
 
 /**
@@ -447,16 +448,19 @@ final class URL extends ObjectClass
         return $this;
     }
 
+    #[Override]
     public function description(): string
     {
         return $this->absoluteString;
     }
 
+    #[Override]
     public function jsonSerialize(): string
     {
         return $this->description();
     }
 
+    #[Override]
     public function compare(mixed $other): ComparisonResult
     {
         if (!$other instanceof URL) {
@@ -465,6 +469,7 @@ final class URL extends ObjectClass
         return ComparisonResult::from(string_compare($this->absoluteString, $other->absoluteString, CompareOptions::caseInsensitive));
     }
 
+    #[Override]
     public function isEqual(mixed $other): bool
     {
         return $this->compare($other) === ComparisonResult::orderedSame;

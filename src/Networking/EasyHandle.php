@@ -3,6 +3,7 @@
 namespace Sabatier\Foundation\Networking;
 
 use CurlHandle;
+use Exception;
 use Random\Engine\Secure;
 use Random\Randomizer;
 use Sabatier\Foundation\ArrayClass;
@@ -334,7 +335,7 @@ final class EasyHandle
         }
         $storage->setCookies($cookies, $url);
     }
-    
+
     public function connect(): void
     {
         if (!($url = $this->url)) {
@@ -372,6 +373,7 @@ final class EasyHandle
 
     /**
      * @return array{string, URLSessionWebSocketOperation}
+     * @throws Exception
      */
     public function receiveWebSocketsData(): array
     {
@@ -453,7 +455,10 @@ final class EasyHandle
         } while (!$isFinal);
         return [$payload, $operation];
     }
-    
+
+    /**
+     * @throws Exception
+     */
     public function sendWebSocketsData(string $data, URLSessionWebSocketOperation $operation): void
     {
         $parts = new ArrayClass(str_split($data, 4096) ?: [""]);
@@ -479,7 +484,7 @@ final class EasyHandle
             if ($isMasked) {
                 $mask = "";
                 for ($i = 0; $i < 4; $i++) {
-                    $mask .= chr(rand(0, 255));
+                    $mask .= chr(random_int(0, 255));
                 }
                 $data .= $mask;
                 for ($i = 0; $i < $length; $i++) {

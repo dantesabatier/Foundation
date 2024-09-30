@@ -3,6 +3,7 @@
 namespace Sabatier\Foundation\Predicates;
 
 use JetBrains\PhpStorm\ExpectedValues;
+use Override;
 use Sabatier\Foundation\Dictionary;
 use function Sabatier\Foundation\human_readable_value;
 use function Sabatier\Foundation\typeof;
@@ -25,16 +26,19 @@ class VariableAssignmentExpression extends Expression
         return $this->subexpression;
     }
 
+    #[Override]
     public function variable(): string
     {
         return $this->assignmentVariable->variable();
     }
 
+    #[Override]
     public function predicateFormat(): string
     {
         return sprintf("%s := %s", $this->assignmentVariable->predicateFormat(), $this->subexpression->predicateFormat());
     }
 
+    #[Override]
     public function accept(PredicateVisitor $visitor, #[ExpectedValues(flagsFromClass: PredicateVisitorFlags::class)] int $flags): void
     {
         if (!($flags & PredicateVisitorFlags::expressions)) {
@@ -50,6 +54,7 @@ class VariableAssignmentExpression extends Expression
         }
     }
 
+    #[Override]
     public function withSubstitutionVariables(Dictionary $variables): Expression
     {
         $assignmentVariable = $this->assignmentVariable()->withSubstitutionVariables($variables);
@@ -57,6 +62,7 @@ class VariableAssignmentExpression extends Expression
         return new VariableAssignmentExpression($assignmentVariable, $this->subexpression()->withSubstitutionVariables($variables));
     }
 
+    #[Override]
     public function expressionValue(mixed $object = null, ?Dictionary $context = null): mixed
     {
         assert($context !== null, "Cannot evaluate variable assignment with nil bindings");

@@ -6,6 +6,7 @@ use Countable;
 use Generator;
 use IteratorAggregate;
 use JetBrains\PhpStorm\Deprecated;
+use Override;
 use Traversable;
 
 /**
@@ -23,6 +24,7 @@ class Range extends ObjectClass implements ExpressibleByArrayLiteral, IteratorAg
         $this->upperBound >= $this->lowerBound ?: fatal_error("Range error: lower bound cannot be grater that the upper bound");
     }
 
+    #[Override]
     public function count(): int
     {
         return $this->upperBound - $this->lowerBound;
@@ -57,6 +59,7 @@ class Range extends ObjectClass implements ExpressibleByArrayLiteral, IteratorAg
         return $this->contains($element);
     }
 
+    #[Override]
     public function getIterator(): Traversable
     {
         return (function (): Generator {
@@ -66,6 +69,7 @@ class Range extends ObjectClass implements ExpressibleByArrayLiteral, IteratorAg
         })();
     }
 
+    #[Override]
     public function description(): string
     {
         return "[$this->lowerBound...<$this->upperBound]";
@@ -74,11 +78,13 @@ class Range extends ObjectClass implements ExpressibleByArrayLiteral, IteratorAg
     /**
      * @return int[]
      */
+    #[Override]
     public function toArray(): array
     {
         return range($this->lowerBound, $this->upperBound - 1);
     }
 
+    #[Override]
     public function jsonSerialize(): array
     {
         return $this->toArray();

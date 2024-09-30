@@ -3,6 +3,7 @@
 namespace Sabatier\Foundation\Networking;
 
 use Iterator;
+use Override;
 use function Sabatier\Foundation\in_range;
 
 /**
@@ -17,6 +18,7 @@ class PercentDecoder implements Iterator
     {
     }
 
+    #[Override]
     public function current(): PercentDecoderElement
     {
         $c = $this->string[$this->index];
@@ -36,21 +38,25 @@ class PercentDecoder implements Iterator
         return PercentDecoderElement::decodedByte("$c$h$l");
     }
 
+    #[Override]
     public function next(): void
     {
         $this->index += 1;
     }
 
+    #[Override]
     public function key(): int
     {
         return $this->index;
     }
 
+    #[Override]
     public function valid(): bool
     {
         return in_range($this->index, 0, strlen($this->string));
     }
 
+    #[Override]
     public function rewind(): void
     {
         $this->index = 0;

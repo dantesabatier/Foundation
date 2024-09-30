@@ -10,6 +10,7 @@
 namespace Sabatier\Foundation\Predicates;
 
 use JetBrains\PhpStorm\ExpectedValues;
+use Override;
 use Sabatier\Foundation\CompareOptions;
 use Sabatier\Foundation\Value;
 use Stringable;
@@ -23,6 +24,7 @@ class EqualityPredicateOperator extends PredicateOperator
         parent::__construct($operatorType, $modifier, $options);
     }
 
+    #[Override]
     public function performPrimitiveOperation(mixed $left, mixed $right): bool
     {
         if ($left instanceof Value) {

@@ -11,6 +11,7 @@ namespace Sabatier\Foundation;
 
 use Closure;
 use Fiber;
+use Override;
 use Throwable;
 
 /**
@@ -162,6 +163,7 @@ abstract class Operation extends ObjectClass
     {
     }
 
+    #[Override]
     public function description(): string
     {
         return sprintf("<%s %s>", self::class, $this->name ?? $this->hash());

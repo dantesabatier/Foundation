@@ -11,6 +11,7 @@ namespace Sabatier\Foundation;
 
 use Closure;
 use Iterator;
+use Override;
 use Sabatier\Foundation\Predicates\Predicate;
 
 /**
@@ -116,6 +117,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
      * @param Closure(Element, int): bool $predicate A closure that takes an element of the sequence as its argument and returns a Boolean value that indicates whether the passed element represents a match.
      * @return bool true if the sequence contains an element that satisfies predicate; otherwise, false.
      */
+    #[Override]
     public function contains(Closure $predicate): bool
     {
         return $this->sequenceContains($predicate);
@@ -128,6 +130,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
      * @param Element $element The element to find in the sequence.
      * @return bool true if the element was found in the sequence; otherwise, false.
      */
+    #[Override]
     public function containsElement(mixed $element): bool
     {
         return $this->sequenceContainsElement($element);
@@ -137,6 +140,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
      * Returns the minimum element in the sequence.
      * @return Element|null The sequence's minimum element. If the sequence has no elements, returns nil.
      */
+    #[Override]
     public function min()
     {
         return $this->sequenceMin();
@@ -146,6 +150,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
      * Returns the maximum element in the sequence.
      * @return Element|null The sequence's maximum element. If the sequence has no elements, returns nil.
      */
+    #[Override]
     public function max()
     {
         return $this->sequenceMax();
@@ -161,6 +166,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
      * @param Closure(Result, Element, int=): Result $updateAccumulatingResult A closure that updates the accumulating value with an element of the sequence.
      * @return Result The final accumulated value. If the sequence has no elements, the result is initialResult.
      */
+    #[Override]
     public function reduce(mixed $initialResult, Closure $updateAccumulatingResult)
     {
         return $this->sequenceReduce($initialResult, $updateAccumulatingResult);
@@ -172,6 +178,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
      * @param Closure(Element, int): Result $transform
      * @return ArrayClass<Result>
      */
+    #[Override]
     public function map(Closure $transform): ArrayClass
     {
         return $this->sequenceMap($transform);
@@ -183,6 +190,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
      * @param Closure(Element, int): Result $transform
      * @return ArrayClass<Result>
      */
+    #[Override]
     public function compactMap(Closure $transform): ArrayClass
     {
         return $this->sequenceCompactMap($transform);
@@ -194,6 +202,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
      * @param Closure(Element, int=): iterable<Result> $transform
      * @return ArrayClass<Result>
      */
+    #[Override]
     public function flatMap(Closure $transform): ArrayClass
     {
         return $this->sequenceFlatMap($transform);
@@ -204,6 +213,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
      * @param Closure(Element, int=): bool|null $where A closure that takes an element of the collection as its argument and returns a Boolean value indicating whether the element is a match.
      * @return Element|null The first element of the collection that satisfies predicate, or nil if there is no element that satisfies predicate.
      */
+    #[Override]
     public function first(Closure $where = null)
     {
         return $this->sequenceFirst($where);
@@ -214,6 +224,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
      * @param Closure(Element, int=): bool|null $where A closure that takes an element of the collection as its argument and returns a Boolean value indicating whether the element is a match.
      * @return Element|null The last element of the collection that satisfies predicate, or nil if there is no element that satisfies predicate.
      */
+    #[Override]
     public function last(Closure $where = null)
     {
         return $this->sequenceLast($where);
@@ -225,6 +236,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
      * @return int|null The index of the first element for which predicate returns true.
      * If no elements in the collection satisfy the given predicate, returns nil.
      */
+    #[Override]
     public function firstIndex(Closure $where): ?int
     {
         return $this->collectionFirstIndex($where);
@@ -236,6 +248,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
      * @return int|null The index of the last element for which predicate returns true.
      * If no elements in the collection satisfy the given predicate, returns nil.
      */
+    #[Override]
     public function lastIndex(Closure $where): ?int
     {
         return $this->collectionLastIndex($where);
@@ -246,6 +259,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
      * @param Element $element An element to search for in the collection.
      * @return int|null The first index where element is found. If element is not found in the collection, returns nil.
      */
+    #[Override]
     public function indexOf(mixed $element): ?int
     {
         return $this->collectionIndexOf($element);
@@ -256,6 +270,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
      * @param RandomNumberGenerator $generator The random number generator to use when choosing a random element.
      * @return Element|null A random element from the collection. If the collection is empty, the method returns nil.
      */
+    #[Override]
     public function randomElement(RandomNumberGenerator $generator = new SystemRandomNumberGenerator())
     {
         return $this->collectionRandomElement($generator);
@@ -266,6 +281,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
      * @param Closure(Element, int=, bool=): bool $isIncluded
      * @return ArrayClass<Element>
      */
+    #[Override]
     public function filter(Closure $isIncluded): ArrayClass
     {
         return $this->collectionFilter($isIncluded);
@@ -277,6 +293,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
      * @return ArrayClass<Element> A new collection containing the objects in the receiving array for which predicate returns true.
      * Objects in the resulting array appear in the same order as they do in the receiver.
      */
+    #[Override]
     public function filtered(Predicate $predicate): ArrayClass
     {
         return $this->collectionFiltered($predicate);
@@ -287,6 +304,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
      * @param Closure(Element, int=): bool $predicate A closure that takes an element of the sequence as its argument and returns a Boolean value that indicates whether the passed element satisfies a condition.
      * @return bool true if the sequence contains an element that satisfies predicate; otherwise, false.
      */
+    #[Override]
     public function allSatisfy(Closure $predicate): bool
     {
         return $this->collectionAllSatisfy($predicate);
@@ -297,6 +315,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
      * @param Closure(Element, Element): int|null $by
      * @return ArrayClass<Element>
      */
+    #[Override]
     public function sort(?Closure $by = null): ArrayClass
     {
         return $this->collectionSort($by);
@@ -307,6 +326,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
      * @param iterable<SortDescriptor> $descriptors A collection of {@see SortDescriptor} objects.
      * @return ArrayClass<Element> A copy of the receiving collection sorted as specified by descriptors.
      */
+    #[Override]
     public function sorted(iterable $descriptors): ArrayClass
     {
         return $this->collectionSorted($descriptors);
@@ -317,6 +337,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
      * @return FlattenSequence<Element> A flattened view of the elements of this sequence of sequences.
      * @psalm-suppress LessSpecificReturnStatement, MoreSpecificReturnType
      */
+    #[Override]
     public function joined(): FlattenSequence
     {
         return $this->collectionJoined();
@@ -327,6 +348,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
      * @param string $key The key to retrieve.
      * @return ArrayClass The value of the retrieved key.
      */
+    #[Override]
     public function valueForKey(string $key): ArrayClass
     {
         return $this->collectionValueForKey($key);
@@ -337,6 +359,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
      * @param mixed $value The object value.
      * @param string $key The key to store the value.
      */
+    #[Override]
     public function setValueForKey(mixed $value, string $key): void
     {
         $this->collectionSetValueForKey($value, $key);
@@ -355,6 +378,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
      * Returns a collection containing the elements of this sequence in reverse order.
      * @return ArrayClass<Element> A collection containing the elements of this sequence in reverse order.
      */
+    #[Override]
     public function reversed(): ArrayClass
     {
         return $this->bidirectionalCollectionReversed();
@@ -364,6 +388,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
      * Adds an element to the end of the collection.
      * @param Element $element
      */
+    #[Override]
     public function append(mixed $element): void
     {
         $this->mutableCollectionAppend($element);
@@ -373,6 +398,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
      * Adds the elements of a sequence or collection to the end of this collection.
      * @param iterable<Element> $newElements
      */
+    #[Override]
     public function appendContentsOf(iterable $newElements): void
     {
         $this->mutableCollectionAppendContentsOf($newElements);
@@ -382,6 +408,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
      * Removes the given element and any elements subsumed by the given element.
      * @param Element $element
      */
+    #[Override]
     public function remove(mixed $element): void
     {
         $this->mutableCollectionRemove($element);
@@ -394,6 +421,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
      * @param Element $newElement An element to insert into the collection.
      * @return array{inserted: boolean, elementAfterInsert: Element} (true, newElement) if newElement was not contained in the collection. If an element equal to newElement was already contained in the collection, the method returns (false, oldElement), where oldElement is the element that was equal to newElement. In some cases, oldElement may be distinguishable from newElement by identity comparison or some other means.
      */
+    #[Override]
     public function insert(mixed $newElement): array
     {
         return $this->mutableCollectionInsert($newElement);
@@ -407,6 +435,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
      * @param Element $element The new element to insert into the collection.
      * @param int $at The position at which to insert the new element. index must be a valid index into the collection.
      */
+    #[Override]
     public function insertAt(mixed $element, int $at): void
     {
         $this->mutableCollectionInsertAt($element, $at);
@@ -419,6 +448,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
      * @param iterable<int, Element> $newElements The new elements to insert into the collection.
      * @param int $at The position at which to insert the new elements. index must be a valid index of the collection.
      */
+    #[Override]
     public function insertContentsOf(iterable $newElements, int $at = NotFound): void
     {
         $this->mutableCollectionInsertContentsOf($newElements, $at);
@@ -430,6 +460,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
      * @param Element $element An element to insert into the collection.
      * @return Element|null An element equal to newElement if the collection already contained such a member; otherwise, nil.
      */
+    #[Override]
     public function update(mixed $element)
     {
         return $this->mutableCollectionUpdate($element);
@@ -439,6 +470,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
      * @param int $index The index of the member to remove, position must be a valid index of the collection, and must not be equal to the collection's end index.
      * @return Element The value that was removed.
      */
+    #[Override]
     public function removeAt(int $index)
     {
         return $this->mutableCollectionRemoveAt($index);
@@ -448,16 +480,19 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
      * Removes all the elements that satisfy the given predicate.
      * @param Closure(Element, int=): bool|null $where A closure that takes an element of the sequence as its argument and returns a Boolean value indicating whether the element should be removed from the collection.
      */
+    #[Override]
     public function removeAll(Closure $where = null): void
     {
         $this->mutableCollectionRemoveAll($where);
     }
 
+    #[Override]
     public function removeFirst(int $k): void
     {
         $this->mutableCollectionRemoveFirst($k);
     }
 
+    #[Override]
     public function removeLast(int $k): void
     {
         $this->mutableCollectionRemoveLast($k);
@@ -467,6 +502,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
      * Removes and returns the first element of the collection.
      * @return Element|null A member of the collection. If the collection is empty, returns nil.
      */
+    #[Override]
     public function popFirst()
     {
         return $this->mutableCollectionPopFirst();
@@ -478,6 +514,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
      * Calling this method may invalidate all saved indices of this collection. Do not rely on a previously stored index value after altering a collection with any operation that can change its length.
      * @return Element|null The last element of the collection if the collection is not empty; otherwise, nil.
      */
+    #[Override]
     public function popLast()
     {
         return $this->mutableCollectionPopLast();
@@ -489,6 +526,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
      * Once the predicate returns false it will not be called again.
      * @return Slice<Element>
      */
+    #[Override]
     public function drop(Closure $while): Slice
     {
         return $this->mutableCollectionDrop($while);
@@ -501,6 +539,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
      * @param int $k The number of elements to drop from the beginning of the collection. k must be greater than or equal to zero.
      * @return Slice<Element> A subsequence starting after the specified number of elements.
      */
+    #[Override]
     public function dropFirst(int $k): Slice
     {
         return $this->mutableCollectionDropFirst($k);
@@ -513,6 +552,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
      * @param int $k The number of elements to drop off the end of the collection. k must be greater than or equal to zero.
      * @return Slice<Element> A subsequence that leaves off the specified number of elements at the end.
      */
+    #[Override]
     public function dropLast(int $k): Slice
     {
         return $this->mutableCollectionDropLast($k);
@@ -525,6 +565,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
      * @param Range $subrange The subrange of the collection to replace. The start and end of a subrange must be valid indices of the collection.
      * @param Collection<int, Element> $newElements The new elements to add to the collection.
      */
+    #[Override]
     public function replaceSubrange(Range $subrange, Collection $newElements): void
     {
         /** @psalm-suppress InvalidArgument */
@@ -709,11 +750,13 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
     /**
      * @return Element[]
      */
+    #[Override]
     public function toArray(): array
     {
         return $this->sequenceToArray();
     }
 
+    #[Override]
     public function description(): string
     {
         return "[" . $this->join(", ") . "]";
@@ -722,6 +765,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
     /**
      * @return Element
      */
+    #[Override]
     public function current(): mixed
     {
         return $this->iteratorCurrent();
@@ -731,6 +775,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
      * @param int $offset
      * @return bool
      */
+    #[Override]
     public function offsetExists(mixed $offset): bool
     {
         return $this->collectionOffsetExists($offset);
@@ -740,6 +785,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
      * @param int $offset
      * @return Element
      */
+    #[Override]
     public function offsetGet(mixed $offset): mixed
     {
         return $this->collectionOffsetGet($offset);
@@ -749,6 +795,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
      * @param int|null $offset
      * @param Element $value
      */
+    #[Override]
     public function offsetSet(mixed $offset, mixed $value): void
     {
         $this->collectionOffsetSet($offset, $value);
@@ -757,6 +804,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
     /**
      * @param int $offset
      */
+    #[Override]
     public function offsetUnset(mixed $offset): void
     {
         $this->collectionOffsetUnset($offset);

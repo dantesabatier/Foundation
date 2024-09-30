@@ -3,6 +3,7 @@
 namespace Sabatier\Foundation\Predicates;
 
 use JetBrains\PhpStorm\ExpectedValues;
+use Override;
 use Sabatier\Foundation\ArrayClass;
 use Sabatier\Foundation\Dictionary;
 use function Sabatier\Foundation\fatal_error;
@@ -57,6 +58,7 @@ class CompoundPredicate extends Predicate
         return new CompoundPredicate(CompoundPredicateLogicalType::or, $subpredicates);
     }
 
+    #[Override]
     public function predicateFormat(): string
     {
         $type = $this->compoundPredicateType;
@@ -86,16 +88,19 @@ class CompoundPredicate extends Predicate
         };
     }
 
+    #[Override]
     public function withSubstitutionVariables(Dictionary $variables): Predicate
     {
         return new CompoundPredicate($this->compoundPredicateType, $this->subpredicates->map(fn(Predicate $predicate): Predicate => $predicate->withSubstitutionVariables($variables)));
     }
 
+    #[Override]
     public function evaluate(mixed $object = null, ?Dictionary $substitutionVariables = null): bool
     {
         return $this->predicateOperator()->evaluatePredicates($this->subpredicates, $object, $substitutionVariables);
     }
 
+    #[Override]
     public function accept(PredicateVisitor $visitor, #[ExpectedValues(flagsFromClass: PredicateVisitorFlags::class)] int $flags): void
     {
         $recursivelyAcceptVisitor = function () use ($visitor, $flags): void {

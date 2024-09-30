@@ -2,6 +2,7 @@
 
 namespace Sabatier\Foundation\Predicates;
 
+use Override;
 use Sabatier\Foundation\Dictionary;
 use function Sabatier\Foundation\fatal_error;
 
@@ -24,11 +25,13 @@ class AnyKeyExpression extends Expression
     }
 
     /** @noinspection PhpMixedReturnTypeCanBeReducedInspection */
+    #[Override]
     public function expressionValue(mixed $object = null, ?Dictionary $context = null): mixed
     {
         fatal_error("Cannot evaluate any key expression");
     }
 
+    #[Override]
     public function predicateFormat(): string
     {
         return "ANYKEY";

@@ -3,6 +3,7 @@
 namespace Sabatier\Foundation\Predicates;
 
 use JetBrains\PhpStorm\ExpectedValues;
+use Override;
 use Sabatier\Foundation\ArrayClass;
 use Sabatier\Foundation\Dictionary;
 use function Sabatier\Foundation\human_readable_value;
@@ -32,11 +33,13 @@ class FunctionExpression extends Expression
         return FunctionExpression::functionWithSelector(ExpressionOperator::operatorWithName($name, $arguments), $name, $arguments);
     }
 
+    #[Override]
     public function withSubstitutionVariables(Dictionary $variables): Expression
     {
         return FunctionExpression::functionWithSelector($this->operand->withSubstitutionVariables($variables), $this->selector, $this->arguments?->map(fn(Expression $expression): Expression => $expression->withSubstitutionVariables($variables)));
     }
 
+    #[Override]
     public function expressionValue(mixed $object = null, ?Dictionary $context = null): mixed
     {
         $selector = $this->selector;
@@ -59,6 +62,7 @@ class FunctionExpression extends Expression
         return $value;
     }
 
+    #[Override]
     public function accept(PredicateVisitor $visitor, #[ExpectedValues(flagsFromClass: PredicateVisitorFlags::class)] int $flags): void
     {
         if (!($flags & PredicateVisitorFlags::expressions)) {
@@ -78,21 +82,25 @@ class FunctionExpression extends Expression
         }
     }
 
+    #[Override]
     public function function (): string
     {
         return $this->selector;
     }
 
+    #[Override]
     public function arguments(): ?ArrayClass
     {
         return $this->arguments;
     }
 
+    #[Override]
     public function operand(): ?Expression
     {
         return $this->operand;
     }
 
+    #[Override]
     public function predicateFormat(): string
     {
         $format = "";

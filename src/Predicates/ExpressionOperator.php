@@ -2,6 +2,7 @@
 
 namespace Sabatier\Foundation\Predicates;
 
+use Override;
 use Sabatier\Foundation\ArrayClass;
 use Sabatier\Foundation\Dictionary;
 
@@ -23,6 +24,7 @@ class ExpressionOperator extends Expression
         unset($this->isDeterministic);
     }
 
+    #[Override]
     public function __get(string $name)
     {
         if ($name === "operatorSymbol") {
@@ -57,6 +59,7 @@ class ExpressionOperator extends Expression
         return new ExpressionOperator($name, $arguments, ExpressionOperatorType::fromFunctionName($name));
     }
 
+    #[Override]
     public function expressionValue(mixed $object = null, ?Dictionary $context = null): mixed
     {
         $selector = $this->operatorType->name;
@@ -64,16 +67,19 @@ class ExpressionOperator extends Expression
         return PredicateUtilities::$selector(...$arguments);
     }
 
+    #[Override]
     public function function (): string
     {
         return $this->name;
     }
 
+    #[Override]
     public function arguments(): ?ArrayClass
     {
         return $this->arguments;
     }
 
+    #[Override]
     public function predicateFormat(): string
     {
         $arguments = $this->arguments?->compactMap(function (Expression $expression): ?string {

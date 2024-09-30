@@ -3,6 +3,7 @@
 namespace Sabatier\Foundation\Predicates;
 
 use JetBrains\PhpStorm\ExpectedValues;
+use Override;
 use Sabatier\Foundation\Dictionary;
 
 /**
@@ -40,6 +41,7 @@ class ComparisonPredicate extends Predicate
         $this->predicateOperatorType = $this->predicateOperator->operatorType;
     }
 
+    #[Override]
     public function predicateFormat(): string
     {
         $modifierDescription = "";
@@ -55,16 +57,19 @@ class ComparisonPredicate extends Predicate
         return sprintf("%s%s %s %s", $modifierDescription, $this->leftExpression->predicateFormat(), $this->predicateOperator->predicateFormat(), $this->rightExpression->predicateFormat());
     }
 
+    #[Override]
     public function withSubstitutionVariables(Dictionary $variables): Predicate
     {
         return new ComparisonPredicate($this->leftExpression->withSubstitutionVariables($variables), $this->rightExpression->withSubstitutionVariables($variables), $this->predicateOperatorType, $this->comparisonPredicateModifier, $this->options);
     }
 
+    #[Override]
     public function evaluate(mixed $object = null, ?Dictionary $substitutionVariables = null): bool
     {
         return $this->predicateOperator->performOperation($this->leftExpression->expressionValue($object, $substitutionVariables), $this->rightExpression->expressionValue($object, $substitutionVariables));
     }
 
+    #[Override]
     public function accept(PredicateVisitor $visitor, #[ExpectedValues(flagsFromClass: PredicateVisitorFlags::class)] int $flags): void
     {
         if (!($flags & PredicateVisitorFlags::expressions)) {

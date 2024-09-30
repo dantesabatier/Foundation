@@ -10,6 +10,7 @@
 namespace Sabatier\Foundation\Predicates;
 
 use JetBrains\PhpStorm\ExpectedValues;
+use Override;
 use Sabatier\Foundation\ArrayClass;
 use Sabatier\Foundation\Dictionary;
 
@@ -67,6 +68,7 @@ class CompoundPredicateOperator extends PredicateOperator
         return true;
     }
 
+    #[Override]
     public function symbol(): string
     {
         return strtoupper($this->compoundPredicateType()->name);

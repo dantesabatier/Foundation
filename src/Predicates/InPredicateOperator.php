@@ -9,6 +9,7 @@
 
 namespace Sabatier\Foundation\Predicates;
 
+use Override;
 use Sabatier\Foundation\Sequence;
 use function Sabatier\Foundation\fatal_error;
 use function Sabatier\Foundation\in_string;
@@ -18,6 +19,7 @@ use function Sabatier\Foundation\typeof;
 /** @internal */
 class InPredicateOperator extends PredicateOperator
 {
+    #[Override]
     public function performPrimitiveOperation(mixed $left, mixed $right): bool
     {
         $options = $this->compareOptions();

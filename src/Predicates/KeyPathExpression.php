@@ -2,6 +2,7 @@
 
 namespace Sabatier\Foundation\Predicates;
 
+use Override;
 use Sabatier\Foundation\ArrayClass;
 use Sabatier\Foundation\Dictionary;
 use function Sabatier\Foundation\human_readable_value;
@@ -19,11 +20,13 @@ class KeyPathExpression extends FunctionExpression
         parent::__construct(ExpressionType::keyPath, $operand, $selector, new ArrayClass([$this->keyPath]));
     }
 
+    #[Override]
     public function withSubstitutionVariables(Dictionary $variables): Expression
     {
         return $this;
     }
 
+    #[Override]
     public function expressionValue(mixed $object = null, ?Dictionary $context = null): mixed
     {
         $operand = $this->operand;
@@ -41,16 +44,19 @@ class KeyPathExpression extends FunctionExpression
         return $obj;
     }
 
+    #[Override]
     public function keyPath(): string
     {
         return $this->keyPath;
     }
 
+    #[Override]
     public function constantValue(): mixed
     {
         return $this->keyPath;
     }
 
+    #[Override]
     public function predicateFormat(): string
     {
         $format = "";

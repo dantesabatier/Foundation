@@ -7,6 +7,7 @@ use Exception;
 use FilesystemIterator;
 use Generator;
 use JetBrains\PhpStorm\ExpectedValues;
+use Override;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use Traversable;
@@ -27,6 +28,7 @@ class URLDirectoryEnumerator extends DirectoryEnumerator
         $this->iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($this->url->path, FilesystemIterator::SKIP_DOTS | FilesystemIterator::UNIX_PATHS), RecursiveIteratorIterator::CHILD_FIRST);
     }
 
+    #[Override]
     public function directoryAttributes(): ?Dictionary
     {
         try {
@@ -36,6 +38,7 @@ class URLDirectoryEnumerator extends DirectoryEnumerator
         }
     }
 
+    #[Override]
     public function fileAttributes(): ?Dictionary
     {
         if ($currentURL = $this->currentURL) {
@@ -48,21 +51,25 @@ class URLDirectoryEnumerator extends DirectoryEnumerator
         return null;
     }
 
+    #[Override]
     public function level(): int
     {
         return $this->iterator->getDepth();
     }
 
+    #[Override]
     public function skipDescendants(): void
     {
         $this->shouldContinue = true;
     }
 
+    #[Override]
     public function isEnumeratingDirectoryPostOrder(): bool
     {
         return $this->isPostOrderDirectory;
     }
 
+    #[Override]
     public function getIterator(): Traversable
     {
         return (function (): Generator {

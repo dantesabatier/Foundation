@@ -13,6 +13,7 @@ use Closure;
 use JetBrains\PhpStorm\ExpectedValues;
 use JetBrains\PhpStorm\Pure;
 use JsonSerializable;
+use Override;
 
 /**
  * The root class of most class hierarchies, from which subclasses inherit a basic interface to the runtime system and the ability to behave as Objective-C objects.
@@ -36,50 +37,59 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
     }
 
     #[Pure]
+    #[Override]
     final public function superclass(): string
     {
         return get_parent_class($this);
     }
 
     #[Pure]
+    #[Override]
     final public function isKind(string $class): bool
     {
         return is_a($this, $class, true);
     }
 
     #[Pure]
+    #[Override]
     final public function isMember(string $class): bool
     {
         return $this->isKind($class);
     }
 
     #[Pure]
+    #[Override]
     final public function isSubclass(string $class): bool
     {
         return is_subclass_of($this, $class);
     }
 
+    #[Override]
     final public function hash(): int
     {
         return spl_object_id($this);
     }
 
+    #[Override]
     public function responds(string $selector): bool
     {
         return method_exists($this, $selector);
     }
 
+    #[Override]
     final public function conforms(string $protocol): bool
     {
         return isset(class_implements($this)[$protocol]);
     }
 
     #[Pure]
+    #[Override]
     public static function instancesRespond(string $selector): bool
     {
         return method_exists(static::class, $selector);
     }
 
+    #[Override]
     public function perform(string $selector, array $arguments = []): mixed
     {
         if ($this->responds($selector)) {
@@ -108,11 +118,13 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
         $this->doesNotRecognizeSelector($invocation->selector);
     }
 
+    #[Override]
     public function compare(mixed $other): ComparisonResult
     {
         request_concrete_implementation($this, __FUNCTION__);
     }
 
+    #[Override]
     public function isEqual(mixed $other): bool
     {
         if ($other instanceof ObjectClass) {
@@ -121,6 +133,7 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
         return false;
     }
 
+    #[Override]
     public function observe(string $keyPath, #[ExpectedValues(flagsFromClass: KeyValueObservingOptions::class)] int $options = KeyValueObservingOptions::new, Closure $handler = null): KeyValueObservation
     {
         $observation = new KeyValueObservation($this, $keyPath);
@@ -128,10 +141,12 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
         return $observation;
     }
 
+    #[Override]
     public function observeValue(string $keyPath, mixed $object, KeyValueObservedChange $change, mixed $context = null): void
     {
     }
 
+    #[Override]
     public function addObserver(object $observer, string $keyPath, #[ExpectedValues(flagsFromClass: KeyValueObservingOptions::class)] int $options = KeyValueObservingOptions::new, mixed $context = null): void
     {
         if (static::automaticallyNotifiesObserversForKey($keyPath)) {
@@ -139,6 +154,7 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
         }
     }
 
+    #[Override]
     public function removeObserver(object $observer, string $keyPath, mixed $context = null): void
     {
         if ($observance = array_first($this->observances, fn(KeyValueObservance $observance): bool => $observance->observer === $observer && $observance->keyPath === $keyPath)) {
@@ -146,6 +162,7 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
         }
     }
 
+    #[Override]
     public function willChangeValueForKey(string $key, KeyValueChange $changeKind = KeyValueChange::setting, mixed $changedValue = null): void
     {
         foreach ($this->observances as $observance) {
@@ -174,6 +191,7 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
         }
     }
 
+    #[Override]
     public function didChangeValueForKey(string $key, KeyValueChange $changeKind = KeyValueChange::setting, mixed $changedValue = null): void
     {
         foreach ($this->observances as $observance) {
@@ -203,6 +221,7 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
         }
     }
 
+    #[Override]
     public static function keyPathsForValuesAffectingValueForKey(string $key): Set
     {
         $selector = "keyPathsForValuesAffectingValueFor" . ucfirst($key);
@@ -212,6 +231,7 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
         return new Set();
     }
 
+    #[Override]
     public static function automaticallyNotifiesObserversForKey(string $key): bool
     {
         $selector = "automaticallyNotifiesObserversFor" . ucfirst($key);
@@ -221,6 +241,7 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
         return true;
     }
 
+    #[Override]
     public function validateValueForKey(mixed &$value, string $key): bool
     {
         $selector = "validate" . ucfirst($key);
@@ -230,6 +251,7 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
         return true;
     }
 
+    #[Override]
     public function validateValueForKeyPath(mixed &$value, string $keyPath): bool
     {
         $idx = strpos($keyPath, ".");
@@ -248,16 +270,19 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
         return $obj->validateValueForKeyPath($value, $keyPath);
     }
 
+    #[Override]
     public function valueForUndefinedKey(string $key): mixed
     {
         throw new UndefinedKeyException(sprintf("%s is not key value coding compliant for the key \"%s\"", $this->debugDescription(), $key));
     }
 
+    #[Override]
     public function setValueForUndefinedKey(mixed $value, string $key): void
     {
         throw new UndefinedKeyException(sprintf("%s is not key value coding compliant for the key \"%s\"", $this->debugDescription(), $key));
     }
 
+    #[Override]
     public function valueForKey(string $key): mixed
     {
         if (property_exists($this, $key)) {
@@ -266,6 +291,7 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
         return $this->valueForUndefinedKey($key);
     }
 
+    #[Override]
     public function setValueForKey(mixed $value, string $key): void
     {
         if (!$this->validateValueForKey($value, $key)) {
@@ -280,6 +306,7 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
         $this->setValueForUndefinedKey($value, $key);
     }
 
+    #[Override]
     public function valueForKeyPath(string $keyPath): mixed
     {
         $components = components_from_key_path($keyPath);
@@ -301,6 +328,7 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
         return $obj->valueForKeyPath($remainderPath);
     }
 
+    #[Override]
     public function setValueForKeyPath(mixed $value, string $keyPath): void
     {
         if (!$this->validateValueForKeyPath($value, $keyPath)) {
@@ -323,6 +351,7 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
         $obj->setValueForKeyPath($value, $keyPath);
     }
 
+    #[Override]
     public function dictionaryWithValues(ArrayClass $keys): Dictionary
     {
         $values = new Dictionary();
@@ -332,6 +361,7 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
         return $values;
     }
 
+    #[Override]
     public function setValuesForKeys(Dictionary $keyedValues): void
     {
         foreach ($keyedValues as $key => $value) {
@@ -339,16 +369,19 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
         }
     }
 
+    #[Override]
     public function setNilValueForKey(string $key): void
     {
         fatal_error(sprintf("%s attribute \"%s\" cannot be null", $this->debugDescription(), $key));
     }
 
+    #[Override]
     public function mutableArrayValueForKey(string $key): ArrayClass
     {
         request_concrete_implementation($this, __FUNCTION__);
     }
 
+    #[Override]
     public function mutableSetValueForKey(string $key): Set
     {
         request_concrete_implementation($this, __FUNCTION__);
@@ -386,11 +419,13 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
         }
     }
 
+    #[Override]
     public function jsonSerialize(): mixed
     {
         request_concrete_implementation($this, __FUNCTION__);
     }
 
+    #[Override]
     public function __toString(): string
     {
         return $this->description();

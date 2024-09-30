@@ -3,6 +3,7 @@
 namespace Sabatier\Foundation\Networking;
 
 use Exception;
+use Override;
 use Sabatier\Foundation\Error;
 use function Sabatier\Foundation\fatal_error;
 use function Sabatier\Foundation\substring_from_index;
@@ -12,6 +13,7 @@ use const Sabatier\Foundation\URLErrorDomain;
 /** @internal */
 class DataURLProtocol extends URLProtocol
 {
+    #[Override]
     public static function canInit(URLRequest $request): bool
     {
         return $request->url->scheme === "data";
@@ -20,6 +22,7 @@ class DataURLProtocol extends URLProtocol
     /**
      * @throws Exception
      */
+    #[Override]
     public function startLoading(): void
     {
         if (!($client = $this->client)) {
@@ -170,6 +173,7 @@ class DataURLProtocol extends URLProtocol
         return [new URLResponse($url, $mimeType, strlen($data), $charSet), $data];
     }
 
+    #[Override]
     public function stopLoading(): void
     {
     }

@@ -10,6 +10,7 @@
 namespace Sabatier\Foundation\Predicates;
 
 use JetBrains\PhpStorm\ExpectedValues;
+use Override;
 use function Sabatier\Foundation\fatal_error;
 
 /** @internal */
@@ -33,6 +34,7 @@ class StringPredicateOperator extends PredicateOperator
         parent::__construct($operatorType, $modifier, $op);
     }
 
+    #[Override]
     public function symbol(): string
     {
         $symbol = parent::symbol();

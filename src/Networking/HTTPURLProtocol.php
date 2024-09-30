@@ -5,6 +5,7 @@ namespace Sabatier\Foundation\Networking;
 use CURLFile;
 use Exception;
 use Locale;
+use Override;
 use Sabatier\Foundation\CompareOptions;
 use Sabatier\Foundation\ComparisonResult;
 use Sabatier\Foundation\Date;
@@ -27,6 +28,7 @@ class HTTPURLProtocol extends NativeProtocol
 {
     public int $redirectCount = 0;
 
+    #[Override]
     public static function canInit(URLRequest $request): bool
     {
         return match ($request->url->scheme) {
@@ -35,6 +37,7 @@ class HTTPURLProtocol extends NativeProtocol
         };
     }
 
+    #[Override]
     public function canCache(CachedURLResponse $cacheable): bool
     {
         $response = $cacheable->response;
@@ -57,7 +60,7 @@ class HTTPURLProtocol extends NativeProtocol
         }
         $now = new Date();
         if ($dateString = $response->allHeaderFields["Date"]) {
-            $date = new Date((float)strtotime($dateString));
+            $date = new Date((float)strtotime((string) $dateString));
             $expirationStart = $date->compare($cacheable->date) === ComparisonResult::orderedDescending ? $date : $cacheable->date;
         } else {
             $expirationStart = $cacheable->date;
@@ -106,7 +109,7 @@ class HTTPURLProtocol extends NativeProtocol
             return false;
         }
         if (!$hasMaxAge && ($expires = $response->allHeaderFields["Expires"])) {
-            $expiration = new Date((float)strtotime($expires));
+            $expiration = new Date((float)strtotime((string) $expires));
             if ($now->timeIntervalSinceReferenceDate >= $expiration->timeIntervalSinceReferenceDate) {
                 return false;
             }
@@ -114,6 +117,7 @@ class HTTPURLProtocol extends NativeProtocol
         return true;
     }
 
+    #[Override]
     public function canRespondFromCache(CachedURLResponse $cachedResponse): bool
     {
         if (!$this->canCache($cachedResponse)) {
@@ -122,6 +126,7 @@ class HTTPURLProtocol extends NativeProtocol
         return true;
     }
 
+    #[Override]
     public function configureEasyHandle(URLRequest $request, TaskBody $body): void
     {
         if ($request->httpMethod === HTTPRequestMethod::get && $body->rawValue !== TaskBodyRawValue::none) {
@@ -206,6 +211,7 @@ class HTTPURLProtocol extends NativeProtocol
         $easyHandle->setCustomHeaders($customHeaders);
     }
 
+    #[Override]
     public function completionAction(URLRequest $request, URLResponse $response): CompletionAction
     {
         $httpResponse = $response;
@@ -218,6 +224,7 @@ class HTTPURLProtocol extends NativeProtocol
         return CompletionAction::completeTask();
     }
 
+    #[Override]
     public function redirectFor(URLRequest $request): void
     {
         if ($this->internalState->rawValue !== InternalStateRawValue::transferCompleted) {
@@ -251,6 +258,7 @@ class HTTPURLProtocol extends NativeProtocol
         }
     }
 
+    #[Override]
     public function validateHeaderComplete(TransferState $transferState): ?URLResponse
     {
         if (!$transferState->isHeaderComplete()) {
@@ -283,6 +291,7 @@ class HTTPURLProtocol extends NativeProtocol
         return $request;
     }
 
+    #[Override]
     public function didReceiveHeaderData(string $data, int $contentLength): EasyHandleAction
     {
         if ($this->internalState->rawValue !== InternalStateRawValue::transferInProgress) {

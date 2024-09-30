@@ -2,6 +2,8 @@
 
 namespace Sabatier\Foundation\Networking;
 
+use Exception;
+use Override;
 use Sabatier\Foundation\Dictionary;
 use Sabatier\Foundation\Error;
 use function Sabatier\Foundation\fatal_error;
@@ -16,6 +18,7 @@ use const Sabatier\Foundation\URLErrorUnsupportedURL;
 /** @internal */
 class WebSocketURLProtocol extends HTTPURLProtocol
 {
+    #[Override]
     public static function canInit(URLRequest $request): bool
     {
         return match ($request->url->scheme) {
@@ -24,16 +27,19 @@ class WebSocketURLProtocol extends HTTPURLProtocol
         };
     }
 
+    #[Override]
     public function canCache(CachedURLResponse $cacheable): bool
     {
         return false;
     }
 
+    #[Override]
     public function canRespondFromCache(CachedURLResponse $cachedResponse): bool
     {
         return false;
     }
 
+    #[Override]
     public function configureEasyHandle(URLRequest $request, TaskBody $body): void
     {
         if ($request->httpMethod !== HTTPRequestMethod::get) {
@@ -53,17 +59,24 @@ class WebSocketURLProtocol extends HTTPURLProtocol
         $easyHandle->setPreferredReceiveBufferSize($task->maximumMessageSize);
     }
 
+    /**
+     * @throws Exception
+     */
     public function receiveWebSocketData(): void
     {
         [$data,] = $this->easyHandle->receiveWebSocketsData();
         $this->didReceiveData($data);
     }
 
+    /**
+     * @throws Exception
+     */
     public function sendWebSocketData(string $data, URLSessionWebSocketOperation $operation): void
     {
         $this->easyHandle->sendWebSocketsData($data, $operation);
     }
 
+    #[Override]
     public function didReceiveResponse(): void
     {
         if ($this->internalState->rawValue !== InternalStateRawValue::transferInProgress) {
@@ -82,6 +95,7 @@ class WebSocketURLProtocol extends HTTPURLProtocol
         $this->client?->urlProtocolDidReceiveCacheStoragePolicy($this, $response, URLCacheStoragePolicy::notAllowed);
     }
 
+    #[Override]
     public function completeTask(): void
     {
         $task = $this->task;
@@ -91,6 +105,7 @@ class WebSocketURLProtocol extends HTTPURLProtocol
         parent::completeTask();
     }
 
+    #[Override]
     public function didReceiveData(string $data): EasyHandleAction
     {
         if ($this->internalState->rawValue !== InternalStateRawValue::transferInProgress) {

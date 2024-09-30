@@ -2,6 +2,7 @@
 
 namespace Sabatier\Foundation\Predicates;
 
+use Override;
 use Sabatier\Foundation\Dictionary;
 use Sabatier\Foundation\Value;
 use function Sabatier\Foundation\human_readable_value;
@@ -17,6 +18,7 @@ class ConstantValueExpression extends Expression
         $this->constantValue = is_string($value) ? (new Value($value))->value : $value;
     }
 
+    #[Override]
     public function expressionValue(mixed $object = null, ?Dictionary $context = null): mixed
     {
         $value = $this->constantValue;
@@ -29,16 +31,19 @@ class ConstantValueExpression extends Expression
         return $value;
     }
 
+    #[Override]
     public function constantValue(): mixed
     {
         return $this->constantValue;
     }
 
+    #[Override]
     public function keyPath(): string
     {
         return $this->predicateFormat();
     }
 
+    #[Override]
     public function predicateFormat(): string
     {
         $constantValue = $this->constantValue;

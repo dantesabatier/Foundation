@@ -3,6 +3,7 @@
 namespace Sabatier\Foundation;
 
 use Closure;
+use Override;
 
 /**
  * Information about an error condition including a domain, a domain-specific error code, and application-specific information.
@@ -147,11 +148,13 @@ class Error extends ObjectClass
         return self::userInfoProviders()[$errorDomain];
     }
 
+    #[Override]
     public function description(): string
     {
         return sprintf("Error Domain=%s Code=%s %s UserInfo=%s", $this->domain, $this->code, $this->localizedDescription, human_readable_value($this->userInfo));
     }
 
+    #[Override]
     public function jsonSerialize(): Dictionary
     {
         /** @var Dictionary<mixed> $dictionary */

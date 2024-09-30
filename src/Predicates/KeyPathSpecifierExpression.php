@@ -2,6 +2,7 @@
 
 namespace Sabatier\Foundation\Predicates;
 
+use Override;
 use Sabatier\Foundation\Dictionary;
 
 /** @internal */
@@ -12,21 +13,25 @@ class KeyPathSpecifierExpression extends Expression
         parent::__construct(ExpressionType::keyPathSpecifierExpressionType);
     }
 
+    #[Override]
     public function expressionValue(mixed $object = null, ?Dictionary $context = null): string
     {
         return $this->value;
     }
 
+    #[Override]
     public function constantValue(): string
     {
         return $this->value;
     }
 
+    #[Override]
     public function keyPath(): string
     {
         return $this->value;
     }
 
+    #[Override]
     public function predicateFormat(): string
     {
         $format = "";
@@ -45,6 +50,7 @@ class KeyPathSpecifierExpression extends Expression
         return $format;
     }
 
+    #[Override]
     public function isEqual(mixed $other): bool
     {
         if ($other instanceof KeyPathSpecifierExpression) {

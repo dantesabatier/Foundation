@@ -3,6 +3,7 @@
 namespace Sabatier\Foundation\Predicates;
 
 use JetBrains\PhpStorm\ExpectedValues;
+use Override;
 use Sabatier\Foundation\ArrayClass;
 use Sabatier\Foundation\Collection;
 use Sabatier\Foundation\Dictionary;
@@ -16,6 +17,7 @@ class SubqueryExpression extends Expression
         parent::__construct(ExpressionType::subquery);
     }
 
+    #[Override]
     public function expressionValue(mixed $object = null, ?Dictionary $context = null): Collection
     {
         /** @var ArrayClass $collection */
@@ -32,6 +34,7 @@ class SubqueryExpression extends Expression
         return $value;
     }
 
+    #[Override]
     public function accept(PredicateVisitor $visitor, #[ExpectedValues(flagsFromClass: PredicateVisitorFlags::class)] int $flags): void
     {
         if (!($flags & PredicateVisitorFlags::expressions)) {
@@ -58,16 +61,19 @@ class SubqueryExpression extends Expression
         return $this->variableExpression;
     }
 
+    #[Override]
     public function variable(): string
     {
         return $this->variableExpression->variable();
     }
 
+    #[Override]
     public function predicate(): Predicate
     {
         return $this->predicate;
     }
 
+    #[Override]
     public function predicateFormat(): string
     {
         return sprintf("SUBQUERY(%s, %s, %s)", $this->collectionExpression()->description(), $this->variableExpression()->description(), $this->predicate()->description());

@@ -3,6 +3,7 @@
 namespace Sabatier\Foundation\Predicates;
 
 use JetBrains\PhpStorm\ExpectedValues;
+use Override;
 use Sabatier\Foundation\ArrayClass;
 use Sabatier\Foundation\Dictionary;
 use Sabatier\Foundation\Set;
@@ -16,6 +17,7 @@ class SetExpression extends Expression
         parent::__construct($expressionType);
     }
 
+    #[Override]
     public function expressionValue(mixed $object = null, ?Dictionary $context = null): Set
     {
         /** @var Set|ArrayClass $left */
@@ -45,6 +47,7 @@ class SetExpression extends Expression
         return $value;
     }
 
+    #[Override]
     public function accept(PredicateVisitor $visitor, #[ExpectedValues(flagsFromClass: PredicateVisitorFlags::class)] int $flags): void
     {
         if (!($flags & PredicateVisitorFlags::expressions)) {
@@ -60,16 +63,19 @@ class SetExpression extends Expression
         }
     }
 
+    #[Override]
     public function left(): Expression
     {
         return $this->leftExpression;
     }
 
+    #[Override]
     public function right(): Expression
     {
         return $this->rightExpression;
     }
 
+    #[Override]
     public function predicateFormat(): string
     {
         $leftExpression = $this->left();

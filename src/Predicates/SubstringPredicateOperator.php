@@ -10,6 +10,7 @@
 namespace Sabatier\Foundation\Predicates;
 
 use JetBrains\PhpStorm\ExpectedValues;
+use Override;
 use Sabatier\Foundation\ArrayClass;
 use Sabatier\Foundation\Set;
 use function Sabatier\Foundation\in_string;
@@ -25,6 +26,7 @@ class SubstringPredicateOperator extends StringPredicateOperator
         parent::__construct($operatorType, $modifier, $options);
     }
 
+    #[Override]
     public function performPrimitiveOperation(mixed $left, mixed $right): bool
     {
         if ($left === null || $right === null) {

@@ -2,6 +2,8 @@
 
 namespace Sabatier\Foundation;
 
+use Override;
+
 /**
  * A universally unique value that can be used to identify types, interfaces, and other items.
  */
@@ -32,6 +34,7 @@ class UUID extends ObjectClass
         $this->uuidString = $data["uuidString"];
     }
 
+    #[Override]
     public function compare(mixed $other): ComparisonResult
     {
         if (!$other instanceof UUID) {
@@ -40,6 +43,7 @@ class UUID extends ObjectClass
         return ComparisonResult::from(uuid_compare($this->uuidString, $other->uuidString));
     }
 
+    #[Override]
     public function isEqual(mixed $other): bool
     {
         return $this->compare($other) === ComparisonResult::orderedSame;
@@ -48,16 +52,19 @@ class UUID extends ObjectClass
     /**
      * A textual description of the UUID.
      */
+    #[Override]
     public function description(): string
     {
         return $this->uuidString;
     }
 
+    #[Override]
     public function debugDescription(): string
     {
         return sprintf("<%s %s %s>", static::class, self::hash(), $this->description());
     }
 
+    #[Override]
     public function jsonSerialize(): string
     {
         return $this->description();
