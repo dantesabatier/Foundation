@@ -40,9 +40,9 @@ class URLComponents extends ObjectClass
 
     public function __get(string $name)
     {
-        if ($name == "url") {
+        if ($name === "url") {
             return $this->urlRelativeTo(null);
-        } elseif ($name == "string") {
+        } elseif ($name === "string") {
             $scheme = $this->scheme;
             if ($scheme) {
                 $scheme .= "://";
@@ -83,7 +83,7 @@ class URLComponents extends ObjectClass
             }
             $string = (new ArrayClass([$scheme, $user, $password, $host, $port, $path, $query, $fragment]))->compactMap(fn(string|int|null $element): string|int|null => $element)->join("");
             return empty($string) ? null : $string;
-        } elseif ($name == "queryItems") {
+        } elseif ($name === "queryItems") {
             return ($this->query === null) ? null : (new ArrayClass(explode("&", $this->query)))->map(function (string $pair): URLQueryItem {
                 $components = preg_split(sprintf("/%s/", preg_quote("=", "/")), $pair, -1, PREG_SPLIT_NO_EMPTY);
                 $name = $components[0];
@@ -100,9 +100,9 @@ class URLComponents extends ObjectClass
 
     public function __set(string $name, mixed $value): void
     {
-        if ($name == "pass") {
+        if ($name === "pass") {
             $this->password = $value;
-        } elseif ($name == "queryItems") {
+        } elseif ($name === "queryItems") {
             if ($value === null) {
                 $this->query = null;
             } else {

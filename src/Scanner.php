@@ -35,7 +35,7 @@ class Scanner extends ObjectClass
 
     public function __set(string $name, mixed $value): void
     {
-        if ($name == "scanLocation") {
+        if ($name === "scanLocation") {
             $this->$name = min(max($value, 0), strlen($this->string));
         } else {
             $this->setValueForUndefinedKey($value, $name);

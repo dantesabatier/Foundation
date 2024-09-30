@@ -94,7 +94,7 @@ class Progress extends ObjectClass
 
     public function __set(string $name, mixed $value): void
     {
-        if ($name == "totalUnitCount") {
+        if ($name === "totalUnitCount") {
             $previous = $this->overallFraction();
             if ($this->fraction->total != $value && $this->fraction->total > 0) {
                 $this->childFraction = $this->childFraction->multiply(new ProgressFraction($this->fraction->total, $value));
@@ -103,7 +103,7 @@ class Progress extends ObjectClass
             $this->fraction->total = $value;
             $this->didChangeValueForKey($name);
             $this->updateFractionCompleted($previous, $this->overallFraction());
-        } elseif ($name == "completedUnitCount") {
+        } elseif ($name === "completedUnitCount") {
             $previous = $this->overallFraction();
             $this->willChangeValueForKey("isIndeterminate");
             $this->willChangeValueForKey("isFinished");

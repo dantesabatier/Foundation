@@ -50,7 +50,7 @@ class URLResourceValues extends ObjectClass
 
     public function __set(string $name, mixed $value): void
     {
-        if ($name == URLResourceKey::isApplicationKey || $name == URLResourceKey::isDirectoryKey || $name == URLResourceKey::parentDirectoryURLKey || $name == URLResourceKey::fileResourceTypeKey || $name == URLResourceKey::fileSizeKey || $name == URLResourceKey::isExecutableKey || $name == URLResourceKey::isRegularFileKey || $name == URLResourceKey::attributeModificationDateKey || $name == URLResourceKey::creationDateKey || $name == URLResourceKey::isAliasFileKey || $name == URLResourceKey::isHiddenKey || $name == URLResourceKey::isReadableKey || $name == URLResourceKey::isSymbolicLinkKey || $name == URLResourceKey::isWritableKey || $name == URLResourceKey::nameKey || $name == URLResourceKey::pathKey) {
+        if ($name === URLResourceKey::isApplicationKey || $name === URLResourceKey::isDirectoryKey || $name === URLResourceKey::parentDirectoryURLKey || $name === URLResourceKey::fileResourceTypeKey || $name === URLResourceKey::fileSizeKey || $name === URLResourceKey::isExecutableKey || $name === URLResourceKey::isRegularFileKey || $name === URLResourceKey::attributeModificationDateKey || $name === URLResourceKey::creationDateKey || $name === URLResourceKey::isAliasFileKey || $name === URLResourceKey::isHiddenKey || $name === URLResourceKey::isReadableKey || $name === URLResourceKey::isSymbolicLinkKey || $name === URLResourceKey::isWritableKey || $name === URLResourceKey::nameKey || $name === URLResourceKey::pathKey) {
             $this->values->setValueForKey($value, $name);
             if ($value !== null) {
                 $this->keys->append($name);

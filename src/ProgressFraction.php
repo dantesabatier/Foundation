@@ -107,7 +107,7 @@ class ProgressFraction extends ObjectClass
     #[Override]
     public function isEqual(mixed $other): bool
     {
-        return $other instanceof ProgressFraction && $this->total == $other->total && $this->completed == $other->completed;
+        return $other instanceof ProgressFraction && $this->total === $other->total && $this->completed === $other->completed;
     }
 
     public function add(ProgressFraction $addend): ProgressFraction

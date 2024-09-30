@@ -79,46 +79,46 @@ final class Bundle extends ObjectClass
 
     public function __get(string $name)
     {
-        if ($name == "resourceURL") {
+        if ($name === "resourceURL") {
             $this->$name = $this->directoryURL($this->bundleURL, "Resources");
             return $this->$name;
-        } elseif ($name == "executableURL") {
+        } elseif ($name === "executableURL") {
             $this->$name = $this->directoryURL($this->bundleURL->appendingPathComponent("OS"), $this->object(kCFBundleExecutableKey) ?? $this->object(kCFBundleNameKey));
             return $this->$name;
-        } elseif ($name == "privateFrameworksURL") {
+        } elseif ($name === "privateFrameworksURL") {
             $this->$name = $this->directoryURL($this->bundleURL, "PrivateFrameworks");
             return $this->$name;
-        } elseif ($name == "sharedFrameworksURL") {
+        } elseif ($name === "sharedFrameworksURL") {
             $this->$name = $this->directoryURL($this->bundleURL, "Frameworks");
             return $this->$name;
-        } elseif ($name == "builtInPlugInsURL") {
+        } elseif ($name === "builtInPlugInsURL") {
             $this->$name = $this->directoryURL($this->bundleURL, "Plugins");
             return $this->$name;
-        } elseif ($name == "sharedSupportURL") {
+        } elseif ($name === "sharedSupportURL") {
             $this->$name = $this->directoryURL($this->bundleURL, "SharedSupport");
             return $this->$name;
-        } elseif ($name == "bundleIdentifier") {
+        } elseif ($name === "bundleIdentifier") {
             $this->$name = $this->object(kCFBundleIdentifierKey);
             return $this->$name;
-        } elseif ($name == "infoDictionary") {
+        } elseif ($name === "infoDictionary") {
             $infoURL = $this->bundleURL->appendingPathComponent("Info")->appendingPathExtension("plist");
             $this->$name = FileManager::default()->fileExists($infoURL->path) ? PropertyListSerialization::propertyListWithURL($infoURL) : null;
             return $this->$name;
-        } elseif ($name == "localizations") {
+        } elseif ($name === "localizations") {
             $this->$name = $this->object(kCFBundleLocalizationsKey) ?? new ArrayClass();
             return $this->$name;
-        } elseif ($name == "preferredLocalizations") {
+        } elseif ($name === "preferredLocalizations") {
             $preferredLocalizations = clone $this->localizations;
             $preferredLocalizations->partition(fn(string $localization): bool => $localization !== Locale::getPrimaryLanguage(Locale::getDefault()));
             $this->$name = $preferredLocalizations;
             return $this->$name;
-        } elseif ($name == "developmentLocalization") {
+        } elseif ($name === "developmentLocalization") {
             $this->$name = $this->object(kCFBundleDevelopmentRegionKey);
             return $this->$name;
-        } elseif ($name == "localizedInfoDictionary") {
+        } elseif ($name === "localizedInfoDictionary") {
             $this->$name = $this->infoDictionary;
             return $this->$name;
-        } elseif ($name == "principalClass") {
+        } elseif ($name === "principalClass") {
             /** @var class-string|null $principalClass */
             $principalClass = $this->object(kCFBundlePrincipalClassKey);
             $this->$name = empty($principalClass) ? null : $this->classNamed($principalClass);

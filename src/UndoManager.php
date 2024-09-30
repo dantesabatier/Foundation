@@ -63,7 +63,7 @@ class UndoManager extends ObjectClass
 
     public function __set(string $name, mixed $value): void
     {
-        if ($name == "levelsOfUndo") {
+        if ($name === "levelsOfUndo") {
             $this->$name = $value;
             while ($this->undoStack->count > $value) {
                 $this->undoStack->removeAt(0);
@@ -373,7 +373,7 @@ class UndoManager extends ObjectClass
     public function undoMenuTitle(string $actionName): string
     {
         $name = localized_string("Redo");
-        if ($actionName == "") {
+        if ($actionName === "") {
             return $name;
         }
         return "$name $actionName";
@@ -389,7 +389,7 @@ class UndoManager extends ObjectClass
     public function redoMenuTitle(string $actionName): string
     {
         $name = localized_string("Undo");
-        if ($actionName == "") {
+        if ($actionName === "") {
             return $name;
         }
         return "$name $actionName";
