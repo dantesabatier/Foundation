@@ -211,9 +211,10 @@ final class URL extends ObjectClass
     /**
      * Creates a file URL that references the local file or directory at path.
      * @param string $path The path that the URL object will represent. path should be a valid system path, and must not be an empty path. If path begins with a tilde, it must first be expanded with expandingTildeInPath. If path is a relative path, it is treated as being relative to the current working directory.
+     * @param URL|null $base A URL that provides a file system location that the path extends.
      * @return URL A URL object initialized with path.
      */
-    public static function fileURL(string $path): URL
+    public static function fileURL(string $path, ?URL $base = null): URL
     {
         if (!str_starts_with($path, "/")) {
             $path = "/$path";
@@ -221,7 +222,7 @@ final class URL extends ObjectClass
         if (TARGET_OS_WINDOWS) {
             $path = str_replace("\\", "/", $path);
         }
-        return new URL("file://$path");
+        return new URL("file://$path", $base);
     }
 
     /**
