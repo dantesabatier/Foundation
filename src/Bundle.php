@@ -438,7 +438,7 @@ final class Bundle extends ObjectClass
         }
         foreach ($enumerator as $url) {
             $path = $url->path;
-            if (!string_is_equal($url->pathExtension, "php", CompareOptions::caseInsensitive) && string_is_equal(pathinfo($path, PATHINFO_FILENAME), $name, CompareOptions::caseInsensitive)) {
+            if (!string_is_equal($url->pathExtension, "php", CompareOptions::caseInsensitive) || !string_is_equal(pathinfo($path, PATHINFO_FILENAME), $name, CompareOptions::caseInsensitive)) {
                 continue;
             }
             require_once $path;
