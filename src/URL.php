@@ -41,7 +41,7 @@ use SplFileInfo;
 final class URL extends ObjectClass
 {
     private string $string;
-    private ?URLResourceValuesStorage $storage = null;
+    private URLResourceValuesStorage $storage;
 
     /**
      * Creates a URL instance from the provided string, relative to another URL.
@@ -50,6 +50,7 @@ final class URL extends ObjectClass
      */
     public function __construct(string $string, private ?URL $baseURL = null)
     {
+        unset($this->storage);
         if ($this->baseURL === null) {
             if ($string) {
                 $components = new URLComponents($string);
@@ -172,6 +173,9 @@ final class URL extends ObjectClass
             return $this->isFileURL && file_exists($path) ? is_dir($path) : $this->pathExtension === "";
         } elseif ($name == "baseURL") {
             return $this->$name;
+        } elseif ($name == "storage") {
+            $this->$name = new URLResourceValuesStorage();
+            return $this->$name;
         } else {
             return $this->valueForUndefinedKey($name);
         }
@@ -199,14 +203,6 @@ final class URL extends ObjectClass
         $components->query = $this->query;
         $components->fragment = $this->fragment;
         $this->string = $components->string ?? fatal_error();
-    }
-
-    private function storage(): URLResourceValuesStorage
-    {
-        if ($this->storage === null) {
-            $this->storage = new URLResourceValuesStorage();
-        }
-        return $this->storage;
     }
 
     /**
@@ -339,7 +335,7 @@ final class URL extends ObjectClass
      */
     public function resourceValues(Set $keys): URLResourceValues
     {
-        return new URLResourceValues($keys, $this->storage()->resourceValues($keys, $this));
+        return new URLResourceValues($keys, $this->storage->resourceValues($keys, $this));
     }
 
     /**
@@ -353,7 +349,7 @@ final class URL extends ObjectClass
      */
     public function getResourceValue(mixed &$value, #[ExpectedValues(valuesFromClass: URLResourceKey::class)] string $key): void
     {
-        $this->storage()->getResourceValue($value, $key, $this);
+        $this->storage->getResourceValue($value, $key, $this);
     }
 
     /**
@@ -364,7 +360,7 @@ final class URL extends ObjectClass
      */
     public function setResourceValues(URLResourceValues $values): void
     {
-        $this->storage()->setResourceValues($values->allValues, $this);
+        $this->storage->setResourceValues($values->allValues, $this);
     }
 
     /**
@@ -374,7 +370,7 @@ final class URL extends ObjectClass
      */
     public function removeCachedResourceValue(#[ExpectedValues(valuesFromClass: URLResourceKey::class)] string $key): void
     {
-        $this->storage()->removeCachedResourceValue($key);
+        $this->storage->removeCachedResourceValue($key);
     }
 
     /**
@@ -383,7 +379,7 @@ final class URL extends ObjectClass
      */
     public function removeAllCachedResourceValues(): void
     {
-        $this->storage()->removeAllCachedResourceValues();
+        $this->storage->removeAllCachedResourceValues();
     }
 
     /**
@@ -394,7 +390,7 @@ final class URL extends ObjectClass
      */
     public function setTemporaryResourceValue(mixed $value, #[ExpectedValues(valuesFromClass: URLResourceKey::class)] string $key): void
     {
-        $this->storage()->setTemporaryResourceValue($value, $key);
+        $this->storage->setTemporaryResourceValue($value, $key);
     }
 
     /**
