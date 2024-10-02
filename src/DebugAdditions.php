@@ -46,18 +46,24 @@ function human_readable_value(mixed $value): string
 {
     if (is_string($value)) {
         return $value;
-    } elseif (is_null($value)) {
+    }
+    if (is_null($value)) {
         return "null";
-    } elseif (is_bool($value)) {
+    }
+    if (is_bool($value)) {
         return $value ? "true" : "false";
-    } elseif (is_array($value)) {
+    }
+    if (is_array($value)) {
         return "[" . implode(", ", array_map(fn(mixed $index, mixed $element): string => sprintf("%s: %s", $index, human_readable_value($element)), array_keys($value), array_values($value))) . "]";
-    } elseif (is_scalar($value)) {
+    }
+    if (is_scalar($value)) {
         return (string)$value;
-    } elseif (is_object($value)) {
+    }
+    if (is_object($value)) {
         if ($value instanceof Stringable) {
             return (string)$value;
-        } elseif ($value instanceof BackedEnum) {
+        }
+        if ($value instanceof BackedEnum) {
             return sprintf("%s::%s", $value::class, $value->name);
         }
     }
@@ -187,7 +193,7 @@ function get_calling_class(): ?string
             $current = $backtrace[$i]["object"] ?? null;
             if ($object !== $current) {
                 if (is_object($current)) {
-                    $current = $current::class;
+                    return $current::class;
                 }
                 return $current;
             }

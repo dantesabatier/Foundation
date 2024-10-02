@@ -93,7 +93,8 @@ trait SequenceAlgorithms
         foreach (clone $this as $i => $e) {
             if ($where === null) {
                 return $e;
-            } elseif ($where($e, $i)) {
+            }
+            if ($where($e, $i)) {
                 return $e;
             }
         }

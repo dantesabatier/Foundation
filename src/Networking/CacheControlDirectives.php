@@ -20,15 +20,16 @@ class CacheControlDirectives
                 $split = explode("=", $part);
                 if (count($split) === 2) {
                     $argument = $split[1];
-                    if ($argument[0] === "\"" && $argument[strlen($argument) - 1] === "\"") {
-                        if (strlen($argument) >= 2) {
-                            return substr($argument, 1, strlen($argument) - 2);
-                        } else {
-                            return null;
-                        }
-                    } else {
+                    if ($argument[0] !== "\"") {
                         return $converter($argument);
                     }
+                    if ($argument[strlen($argument) - 1] !== "\"") {
+                        return $converter($argument);
+                    }
+                    if (strlen($argument) >= 2) {
+                        return substr($argument, 1, strlen($argument) - 2);
+                    }
+                    return null;
                 }
             }
             return null;

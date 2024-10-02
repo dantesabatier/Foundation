@@ -93,15 +93,14 @@ class ProgressFraction extends ObjectClass
         }
         if ($lcm = self::leastCommonMultiple($this->total, $fraction->total)) {
             return new ProgressFraction($whichOperator($this->completed * ($lcm / $this->total), $fraction->completed * ($lcm / $fraction->total)), $lcm);
-        } else {
-            $lhsSimplified = $this->simplified();
-            $rhsSimplified = $fraction->simplified();
-            if ($lcm = self::leastCommonMultiple($lhsSimplified->total, $rhsSimplified->total)) {
-                [$completed, $overflowed] = $whichOverflow($lhsSimplified->completed * ($lcm / $lhsSimplified->total), $rhsSimplified->completed * ($lcm / $rhsSimplified->total));
-                return new self($completed, $lcm, $overflowed);
-            }
-            return ProgressFraction::fraction($whichOperator($this->fractionCompleted, $fraction->fractionCompleted), true);
         }
+        $lhsSimplified = $this->simplified();
+        $rhsSimplified = $fraction->simplified();
+        if ($lcm = self::leastCommonMultiple($lhsSimplified->total, $rhsSimplified->total)) {
+            [$completed, $overflowed] = $whichOverflow($lhsSimplified->completed * ($lcm / $lhsSimplified->total), $rhsSimplified->completed * ($lcm / $rhsSimplified->total));
+            return new self($completed, $lcm, $overflowed);
+        }
+        return ProgressFraction::fraction($whichOperator($this->fractionCompleted, $fraction->fractionCompleted), true);
     }
 
     #[Override]

@@ -124,7 +124,8 @@ class UserDefaults
         $object = $this->object($key);
         if (is_bool($object) || is_int($object) || is_float($object)) {
             return (new Number($object))->stringValue;
-        } elseif (is_string($object)) {
+        }
+        if (is_string($object)) {
             return $object;
         }
         return null;

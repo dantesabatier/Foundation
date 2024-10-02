@@ -220,7 +220,7 @@ class PredicateScanner extends Scanner
         /** @psalm-suppress PossiblyNullArgument */
         $predicate = new ComparisonPredicate($left, $right, $operator, $modifier, $options);
         if ($negate) {
-            $predicate = CompoundPredicate::notPredicateWithSubpredicate($predicate);
+            return CompoundPredicate::notPredicateWithSubpredicate($predicate);
         }
         return $predicate;
     }
@@ -272,11 +272,14 @@ class PredicateScanner extends Scanner
         }
         if ($this->scanKeyword("TRUE") || $this->scanKeyword("YES")) {
             return Expression::expressionForConstantValue(true);
-        } elseif ($this->scanKeyword("FALSE") || $this->scanKeyword("NO")) {
+        }
+        if ($this->scanKeyword("FALSE") || $this->scanKeyword("NO")) {
             return Expression::expressionForConstantValue(false);
-        } elseif ($this->scanKeyword("NULL") || $this->scanKeyword("NIL")) {
+        }
+        if ($this->scanKeyword("NULL") || $this->scanKeyword("NIL")) {
             return Expression::expressionForConstantValue(null);
-        } elseif ($this->scanKeyword("SELF")) {
+        }
+        if ($this->scanKeyword("SELF")) {
             return Expression::expressionForEvaluatedObject();
         }
         if ($this->scanString("\$")) {

@@ -47,7 +47,8 @@ class ProcessInfo extends ObjectClass
         if ($name === "arguments") {
             $this->$name = new ArrayClass($_SERVER["argv"] ?? []);
             return $this->$name;
-        } elseif ($name === "environment") {
+        }
+        if ($name === "environment") {
             /** @var Dictionary<string> $environment */
             $environment = new Dictionary();
             $fileManager = FileManager::default();
@@ -68,13 +69,16 @@ class ProcessInfo extends ObjectClass
             }
             $this->$name = $environment;
             return $this->$name;
-        } elseif ($name === "globallyUniqueString") {
+        }
+        if ($name === "globallyUniqueString") {
             $this->$name = md5((string)$this->processIdentifier);
             return $this->$name;
-        } elseif ($name === "processIdentifier") {
+        }
+        if ($name === "processIdentifier") {
             $this->$name = getmypid();
             return $this->$name;
-        } elseif ($name === "processName") {
+        }
+        if ($name === "processName") {
             $processName = "Unknown";
             /** @psalm-suppress RedundantCondition */
             if (RUNNING_FROM_CLI) {
@@ -85,18 +89,20 @@ class ProcessInfo extends ObjectClass
             }
             $this->$name = $processName;
             return $this->$name;
-        } elseif ($name === "userName") {
+        }
+        if ($name === "userName") {
             $this->$name = get_current_user();
             return $this->$name;
-        } elseif ($name === "fullUserName") {
+        }
+        if ($name === "fullUserName") {
             $this->$name = full_user_name();
             return $this->$name;
-        } elseif ($name === "hostName") {
+        }
+        if ($name === "hostName") {
             $this->$name = gethostname();
             return $this->$name;
-        } else {
-            return $this->valueForUndefinedKey($name);
         }
+        return $this->valueForUndefinedKey($name);
     }
 
     /**

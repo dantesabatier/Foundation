@@ -43,15 +43,15 @@ class ExpressionOperator extends Expression
                 default => $this->operatorType->name
             };
             return $this->$name;
-        } elseif ($name === "isDeterministic") {
+        }
+        if ($name === "isDeterministic") {
             $this->$name = match ($this->operatorType) {
                 ExpressionOperatorType::average, ExpressionOperatorType::sum, ExpressionOperatorType::count, ExpressionOperatorType::min, ExpressionOperatorType::max, ExpressionOperatorType::stddev, ExpressionOperatorType::addTo, ExpressionOperatorType::fromSubtract, ExpressionOperatorType::multiplyBy, ExpressionOperatorType::divideBy, ExpressionOperatorType::modulusBy, ExpressionOperatorType::sqrt, ExpressionOperatorType::ln, ExpressionOperatorType::log, ExpressionOperatorType::raiseToPower, ExpressionOperatorType::exp, ExpressionOperatorType::ceiling, ExpressionOperatorType::abs, ExpressionOperatorType::trunc, ExpressionOperatorType::floor, ExpressionOperatorType::uppercase, ExpressionOperatorType::lowercase, ExpressionOperatorType::bitwiseAndWith, ExpressionOperatorType::bitwiseOrWith, ExpressionOperatorType::bitwiseXorWith, ExpressionOperatorType::leftshiftBy, ExpressionOperatorType::rightshiftBy, ExpressionOperatorType::index, ExpressionOperatorType::indexFirst, ExpressionOperatorType::indexLast, ExpressionOperatorType::indexSize, ExpressionOperatorType::year, ExpressionOperatorType::month, ExpressionOperatorType::week, ExpressionOperatorType::day, ExpressionOperatorType::hour, ExpressionOperatorType::minute, ExpressionOperatorType::second, ExpressionOperatorType::concat, ExpressionOperatorType::isNull, ExpressionOperatorType::ifNull, ExpressionOperatorType::nullIf => true,
                 default => false
             };
             return $this->$name;
-        } else {
-            return parent::__get($name);
         }
+        return parent::__get($name);
     }
 
     public static function operatorWithName(string $name, ?ArrayClass $arguments = null): Expression

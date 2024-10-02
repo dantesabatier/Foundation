@@ -13,7 +13,7 @@ function url_encode(string $url, string $endpoint, array $parameters = []): stri
         $url .= "/";
     }
     $url .= $endpoint;
-    if (!empty($parameters)) {
+    if ($parameters !== []) {
         $url .= "?" . http_build_query($parameters);
     }
     return $url;

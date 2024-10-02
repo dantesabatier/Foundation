@@ -2,13 +2,22 @@
 
 declare(strict_types=1);
 
+use Rector\CodeQuality\Rector\ClassMethod\ExplicitReturnNullRector;
+use Rector\CodeQuality\Rector\ClassMethod\LocallyCalledStaticMethodToNonStaticRector;
+use Rector\CodeQuality\Rector\Identical\FlipTypeControlToUseExclusiveTypeRector;
 use Rector\CodeQuality\Rector\If_\ExplicitBoolCompareRector;
 use Rector\Config\RectorConfig;
+use Rector\DeadCode\Rector\ClassMethod\RemoveUnusedPrivateMethodParameterRector;
+use Rector\DeadCode\Rector\ClassMethod\RemoveUnusedPrivateMethodRector;
+use Rector\DeadCode\Rector\ClassMethod\RemoveUselessParamTagRector;
+use Rector\DeadCode\Rector\ClassMethod\RemoveUselessReturnTagRector;
+use Rector\DeadCode\Rector\If_\RemoveAlwaysTrueIfConditionRector;
 use Rector\Exception\Configuration\InvalidConfigurationException;
 use Rector\Php73\Rector\ConstFetch\SensitiveConstantNameRector;
 use Rector\Php80\Rector\Class_\ClassPropertyAssignToConstructorPromotionRector;
 use Rector\Php80\Rector\FunctionLike\MixedTypeRector;
 use Rector\Php81\Rector\ClassMethod\NewInInitializerRector;
+use Rector\Strict\Rector\Empty_\DisallowedEmptyRuleFixerRector;
 
 try {
     return RectorConfig::configure()
@@ -19,8 +28,19 @@ try {
             ClassPropertyAssignToConstructorPromotionRector::class,
             NewInInitializerRector::class,
             MixedTypeRector::class,
-            ExplicitBoolCompareRector::class
-        ])->withCodeQualityLevel(30);
+            ExplicitBoolCompareRector::class,
+            FlipTypeControlToUseExclusiveTypeRector::class,
+            DisallowedEmptyRuleFixerRector::class,
+            LocallyCalledStaticMethodToNonStaticRector::class,
+            RemoveUnusedPrivateMethodRector::class,
+            RemoveUnusedPrivateMethodParameterRector::class,
+            RemoveUselessReturnTagRector::class,
+            RemoveUselessParamTagRector::class,
+            RemoveAlwaysTrueIfConditionRector::class => [
+                __DIR__ . "/src/URL.php",
+            ],
+            ExplicitReturnNullRector::class,
+        ])->withPreparedSets(deadCode: true, codeQuality: true, earlyReturn: true);
 } catch (InvalidConfigurationException $e) {
     error_log($e->getMessage());
 }

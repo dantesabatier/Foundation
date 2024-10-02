@@ -6,7 +6,6 @@ namespace Sabatier\Foundation;
 readonly class ApplicationPreferences
 {
     public URL $url;
-    /** @var Dictionary */
     public Dictionary $dictionaryRepresentation;
 
     /** @noinspection PhpUnhandledExceptionInspection */

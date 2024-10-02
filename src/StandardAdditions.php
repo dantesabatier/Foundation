@@ -341,11 +341,11 @@ function home_directory(): string
 {
     if ($path = getenv("HOME")) {
         return rtrim($path, "/");
-    } elseif (!empty($_SERVER["HOMEDRIVE"]) && !empty($_SERVER["HOMEPATH"])) {
-        return rtrim($_SERVER["HOMEDRIVE"] . $_SERVER["HOMEPATH"], "\\/");
-    } else {
-        fatal_error("failed to get current user directory");
     }
+    if (!empty($_SERVER["HOMEDRIVE"]) && !empty($_SERVER["HOMEPATH"])) {
+        return rtrim($_SERVER["HOMEDRIVE"] . $_SERVER["HOMEPATH"], "\\/");
+    }
+    fatal_error("failed to get current user directory");
 }
 
 /**
@@ -446,11 +446,11 @@ function is_equal(mixed $a, mixed $b): bool
 {
     if ($a instanceof Equatable) {
         return $a->isEqual($b);
-    } elseif ($b instanceof Equatable) {
-        return $b->isEqual($a);
-    } else {
-        return $a === $b;
     }
+    if ($b instanceof Equatable) {
+        return $b->isEqual($a);
+    }
+    return $a === $b;
 }
 
 function compare(mixed $a, mixed $b): int

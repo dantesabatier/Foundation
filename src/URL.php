@@ -111,40 +111,52 @@ final class URL extends ObjectClass
                 return $baseURL;
             }
             return $baseURL->appendingPathComponent($relative);
-        } elseif ($name === "absoluteString") {
+        }
+        if ($name === "absoluteString") {
             if ($this->baseURL === null) {
                 return $this->string;
             }
             return $this->absoluteURL->absoluteString;
-        } elseif ($name === "relativePath") {
+        }
+        if ($name === "relativePath") {
             if ($this->baseURL === null) {
                 return $this->path;
             }
             return $this->absoluteURL->path;
-        } elseif ($name === "relativeString") {
+        }
+        if ($name === "relativeString") {
             if ($this->baseURL === null) {
                 return $this->absoluteString;
             }
             return $this->absoluteURL->absoluteString;
-        } elseif ($name === "fileSystemRepresentation") {
+        }
+        if ($name === "fileSystemRepresentation") {
             return (new SplFileInfo($this->path))->getRealPath();
-        } elseif ($name === "fragment") {
+        }
+        if ($name === "fragment") {
             return $this->parse(PHP_URL_FRAGMENT);
-        } elseif ($name === "standardized") {
+        }
+        if ($name === "standardized") {
             $url = clone $this->absoluteURL;
             $url->standardize();
             return $url;
-        } elseif ($name === "standardizedFileURL") {
+        }
+        if ($name === "standardizedFileURL") {
             return $this->standardized;
-        } elseif ($name === "scheme") {
+        }
+        if ($name === "scheme") {
             return $this->parse(PHP_URL_SCHEME) ?? "";
-        } elseif ($name === "host") {
+        }
+        if ($name === "host") {
             return $this->parse(PHP_URL_HOST);
-        } elseif ($name === "lastPathComponent") {
+        }
+        if ($name === "lastPathComponent") {
             return basename($this->path);
-        } elseif ($name === "path") {
+        }
+        if ($name === "path") {
             return $this->parse(PHP_URL_PATH) ?? "";
-        } elseif ($name === "pathComponents") {
+        }
+        if ($name === "pathComponents") {
             $path = $this->path;
             /** @var ArrayClass<string> $components */
             $components = new ArrayClass();
@@ -156,29 +168,37 @@ final class URL extends ObjectClass
                 $components->append("/");
             }
             return $components;
-        } elseif ($name === "pathExtension") {
+        }
+        if ($name === "pathExtension") {
             return pathinfo($this->path, PATHINFO_EXTENSION);
-        } elseif ($name === "port") {
+        }
+        if ($name === "port") {
             return $this->parse(PHP_URL_PORT);
-        } elseif ($name === "query") {
+        }
+        if ($name === "query") {
             return $this->parse(PHP_URL_QUERY);
-        } elseif ($name === "user") {
+        }
+        if ($name === "user") {
             return $this->parse(PHP_URL_USER);
-        } elseif ($name === "password") {
+        }
+        if ($name === "password") {
             return $this->parse(PHP_URL_PASS);
-        } elseif ($name === "isFileURL") {
+        }
+        if ($name === "isFileURL") {
             return $this->scheme === "file";
-        } elseif ($name === "hasDirectoryPath") {
+        }
+        if ($name === "hasDirectoryPath") {
             $path = $this->path;
             return $this->isFileURL && file_exists($path) ? is_dir($path) : $this->pathExtension === "";
-        } elseif ($name === "baseURL") {
+        }
+        if ($name === "baseURL") {
             return $this->$name;
-        } elseif ($name === "storage") {
+        }
+        if ($name === "storage") {
             $this->$name = new URLResourceValuesStorage();
             return $this->$name;
-        } else {
-            return $this->valueForUndefinedKey($name);
         }
+        return $this->valueForUndefinedKey($name);
     }
 
     /** @noinspection PhpMixedReturnTypeCanBeReducedInspection */

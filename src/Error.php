@@ -43,13 +43,16 @@ class Error extends ObjectClass
         if ($name === "localizedDescription") {
             $this->$name = $this->userInfo?->valueForKey(LocalizedDescriptionKey) ?? "The operation couldn't be completed. " . ($this->localizedFailureReason ?? "($this->domain error $this->code.)");
             return $this->$name;
-        } elseif ($name === "localizedRecoveryOptions") {
+        }
+        if ($name === "localizedRecoveryOptions") {
             $this->$name = $this->userInfo?->valueForKey(LocalizedRecoveryOptionsErrorKey);
             return $this->$name;
-        } elseif ($name === "localizedRecoverySuggestion") {
+        }
+        if ($name === "localizedRecoverySuggestion") {
             $this->$name = $this->userInfo?->valueForKey(LocalizedRecoverySuggestionErrorKey);
             return $this->$name;
-        } elseif ($name === "localizedFailureReason") {
+        }
+        if ($name === "localizedFailureReason") {
             $localizedFailureReason = $this->userInfo?->valueForKey(LocalizedFailureReasonErrorKey);
             if (!$localizedFailureReason) {
                 switch ($this->domain) {
@@ -109,12 +112,12 @@ class Error extends ObjectClass
             }
             $this->$name = $localizedFailureReason;
             return $this->$name;
-        } elseif ($name === "recoveryAttempter") {
+        }
+        if ($name === "recoveryAttempter") {
             $this->$name = $this->userInfo?->valueForKey(RecoveryAttempterErrorKey);
             return $this->$name;
-        } else {
-            return $this->valueForUndefinedKey($name);
         }
+        return $this->valueForUndefinedKey($name);
     }
 
     /**

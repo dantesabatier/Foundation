@@ -61,13 +61,17 @@ class Number extends Value
     {
         if (is_int($other)) {
             return ComparisonResult::from($this->intValue <=> $other);
-        } elseif (is_float($other)) {
+        }
+        if (is_float($other)) {
             return ComparisonResult::from($this->floatValue <=> $other);
-        } elseif (is_bool($other)) {
+        }
+        if (is_bool($other)) {
             return ComparisonResult::from($this->boolValue <=> $other);
-        } elseif (is_string($other)) {
+        }
+        if (is_string($other)) {
             return ComparisonResult::from(string_compare($this->stringValue, $other));
-        } elseif ($other instanceof Number) {
+        }
+        if ($other instanceof Number) {
             return $this->compare($other->value);
         }
         return parent::compare($other);

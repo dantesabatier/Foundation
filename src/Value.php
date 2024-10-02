@@ -54,7 +54,8 @@ class Value extends ObjectClass
     {
         if (is_scalar($other) || is_null($other)) {
             return ComparisonResult::from(($this->type !== typeof($other)) ? -1 : $this->value <=> $other);
-        } elseif ($other instanceof Value) {
+        }
+        if ($other instanceof Value) {
             return ComparisonResult::from($this->value <=> $other->value);
         }
         return ComparisonResult::orderedDescending;

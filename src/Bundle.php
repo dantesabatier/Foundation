@@ -82,50 +82,61 @@ final class Bundle extends ObjectClass
         if ($name === "resourceURL") {
             $this->$name = $this->directoryURL($this->bundleURL, "Resources");
             return $this->$name;
-        } elseif ($name === "executableURL") {
+        }
+        if ($name === "executableURL") {
             $this->$name = $this->directoryURL($this->bundleURL->appendingPathComponent("OS"), $this->object(kCFBundleExecutableKey) ?? $this->object(kCFBundleNameKey));
             return $this->$name;
-        } elseif ($name === "privateFrameworksURL") {
+        }
+        if ($name === "privateFrameworksURL") {
             $this->$name = $this->directoryURL($this->bundleURL, "PrivateFrameworks");
             return $this->$name;
-        } elseif ($name === "sharedFrameworksURL") {
+        }
+        if ($name === "sharedFrameworksURL") {
             $this->$name = $this->directoryURL($this->bundleURL, "Frameworks");
             return $this->$name;
-        } elseif ($name === "builtInPlugInsURL") {
+        }
+        if ($name === "builtInPlugInsURL") {
             $this->$name = $this->directoryURL($this->bundleURL, "Plugins");
             return $this->$name;
-        } elseif ($name === "sharedSupportURL") {
+        }
+        if ($name === "sharedSupportURL") {
             $this->$name = $this->directoryURL($this->bundleURL, "SharedSupport");
             return $this->$name;
-        } elseif ($name === "bundleIdentifier") {
+        }
+        if ($name === "bundleIdentifier") {
             $this->$name = $this->object(kCFBundleIdentifierKey);
             return $this->$name;
-        } elseif ($name === "infoDictionary") {
+        }
+        if ($name === "infoDictionary") {
             $infoURL = $this->bundleURL->appendingPathComponent("Info")->appendingPathExtension("plist");
             $this->$name = FileManager::default()->fileExists($infoURL->path) ? PropertyListSerialization::propertyListWithURL($infoURL) : null;
             return $this->$name;
-        } elseif ($name === "localizations") {
+        }
+        if ($name === "localizations") {
             $this->$name = $this->object(kCFBundleLocalizationsKey) ?? new ArrayClass();
             return $this->$name;
-        } elseif ($name === "preferredLocalizations") {
+        }
+        if ($name === "preferredLocalizations") {
             $preferredLocalizations = clone $this->localizations;
             $preferredLocalizations->partition(fn(string $localization): bool => $localization !== Locale::getPrimaryLanguage(Locale::getDefault()));
             $this->$name = $preferredLocalizations;
             return $this->$name;
-        } elseif ($name === "developmentLocalization") {
+        }
+        if ($name === "developmentLocalization") {
             $this->$name = $this->object(kCFBundleDevelopmentRegionKey);
             return $this->$name;
-        } elseif ($name === "localizedInfoDictionary") {
+        }
+        if ($name === "localizedInfoDictionary") {
             $this->$name = $this->infoDictionary;
             return $this->$name;
-        } elseif ($name === "principalClass") {
+        }
+        if ($name === "principalClass") {
             /** @var class-string|null $principalClass */
             $principalClass = $this->object(kCFBundlePrincipalClassKey);
             $this->$name = empty($principalClass) ? null : $this->classNamed($principalClass);
             return $this->$name;
-        } else {
-            return $this->valueForUndefinedKey($name);
         }
+        return $this->valueForUndefinedKey($name);
     }
 
     private function directoryURL(URL $baseURL, string $name): ?URL
@@ -438,11 +449,17 @@ final class Bundle extends ObjectClass
         }
         foreach ($enumerator as $url) {
             $path = $url->path;
-            if (!string_is_equal($url->pathExtension, "php", CompareOptions::caseInsensitive) || !string_is_equal(pathinfo($path, PATHINFO_FILENAME), $name, CompareOptions::caseInsensitive)) {
+            if (!string_is_equal($url->pathExtension, "php", CompareOptions::caseInsensitive)) {
+                continue;
+            }
+            if (!string_is_equal(pathinfo($path, PATHINFO_FILENAME), $name, CompareOptions::caseInsensitive)) {
                 continue;
             }
             require_once $path;
-            if (!($class = array_last(get_declared_classes(), fn(string $class): bool => str_ends_with($class, $className))) || !class_exists($class)) {
+            if (!($class = array_last(get_declared_classes(), fn(string $class): bool => str_ends_with($class, $className)))) {
+                continue;
+            }
+            if (!class_exists($class)) {
                 continue;
             }
             NotificationCenter::default()->postNotificationName(self::didLoadNotification, $this, new Dictionary([LoadedClasses => new ArrayClass([$class])]));

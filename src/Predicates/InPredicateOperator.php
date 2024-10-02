@@ -25,7 +25,8 @@ class InPredicateOperator extends PredicateOperator
         $options = $this->compareOptions();
         if (is_string($left) && is_string($right)) {
             return in_string($right, $left, $options);
-        } elseif ($right instanceof Sequence) {
+        }
+        if ($right instanceof Sequence) {
             return $right->contains(fn(string $string): bool => string_is_equal($string, $left, $options));
         }
         fatal_error(sprintf("Invalid argument: expecting \"string, %s\", \"%s\" given", Sequence::class, typeof($right)));

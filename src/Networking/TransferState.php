@@ -31,9 +31,8 @@ class TransferState
                 fatal_error();
             }
             return new TransferState($this->url, $this->parsedResponseHeader, $response, $this->bodyDataDrain);
-        } else {
-            return new TransferState($this->url, $header, $this->response, $this->bodyDataDrain);
         }
+        return new TransferState($this->url, $header, $this->response, $this->bodyDataDrain);
     }
 
     public function byAppendingFTP(string $data, int $contentLength): TransferState
@@ -49,9 +48,8 @@ class TransferState
                 fatal_error();
             }
             return new TransferState($this->url, $this->parsedResponseHeader, $response, $this->bodyDataDrain);
-        } else {
-            return new TransferState($this->url, $header, $this->response, $this->bodyDataDrain);
         }
+        return new TransferState($this->url, $header, $this->response, $this->bodyDataDrain);
     }
 
     public function byAppendingBodyData(string $data): TransferState

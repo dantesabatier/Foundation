@@ -38,12 +38,11 @@ readonly class ParsedResponseHeader
                 ParsedResponseHeaderRawVale::partial => ParsedResponseHeader::complete($this->lines),
                 ParsedResponseHeaderRawVale::complete => ParsedResponseHeader::partial()
             };
-        } else {
-            $lines = match ($this->rawVale) {
-                ParsedResponseHeaderRawVale::partial => $this->lines,
-                ParsedResponseHeaderRawVale::complete => new ResponseHeaderLines()
-            };
-            return ParsedResponseHeader::partial($lines->byAppending($line));
         }
+        $lines = match ($this->rawVale) {
+            ParsedResponseHeaderRawVale::partial => $this->lines,
+            ParsedResponseHeaderRawVale::complete => new ResponseHeaderLines()
+        };
+        return ParsedResponseHeader::partial($lines->byAppending($line));
     }
 }
