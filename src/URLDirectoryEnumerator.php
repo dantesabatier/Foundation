@@ -41,14 +41,14 @@ class URLDirectoryEnumerator extends DirectoryEnumerator
     #[Override]
     public function fileAttributes(): ?Dictionary
     {
-        if ($currentURL = $this->currentURL) {
-            try {
-                return FileManager::default()->attributesOfItem($currentURL->path);
-            } catch (Exception) {
-                return null;
-            }
+        if (!($currentURL = $this->currentURL)) {
+            return null;
         }
-        return null;
+        try {
+            return FileManager::default()->attributesOfItem($currentURL->path);
+        } catch (Exception) {
+            return null;
+        }
     }
 
     #[Override]
