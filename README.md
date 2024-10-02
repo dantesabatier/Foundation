@@ -13,7 +13,7 @@ The Foundation framework defines a base layer of functionality that is required 
 
 /** @var Set<ManagedObject> $result */
 $result = new Set();
-$result = $result->sorted([new SortDescriptor('name')]);
+$result = $result->sorted([new SortDescriptor("name")]);
 ```
 
 - The (profoundly beautiful) expressions and predicates, this is somewhat similar to using the relational model to filter collections using a code-enriched pseudo language based on mathematical logic, predicate logic or first-order logic.
@@ -24,7 +24,7 @@ $result = $result->sorted([new SortDescriptor('name')]);
 /** @var Set<ManagedObject> $result */
 $result = new Set();
 //normally you don't define predicates this complex but (if you need to), you can
-if (!($predicate = Predicate::format("((%K BETWEEN \$DATES) && (SOME addresses.city.name BEGINSWITH[cd] %s) && (NONE addresses.street CONTAINS[cd] %s) && (10%3 >= 1) && (deposits.amount.value.@sum < 1.1*3.6) && (3+3.1 < 0.2**10) && (2-1.1 < 1001/11.1) && ({999.6, 1001}[1] > savings.value) && (SUBQUERY(addresses, \$address, \$address.street ENDSWITH[cd] %s).@count = %i) && (1 IN {0, 1, 2, 3, 5, 8} UNION {2, 4, 6, 10}) && (%K < TERNARY(%K MATCHES[c] %s, 30, 40)) && (FUNCTION(%s, 'validate', \$ID) != false) && (%s = %s))", new ArrayClass(['creationDate', 'Ángeles', 'Melrose', 'street', 1, 'age', 'name', 'jane', new Validator(), true, Expression::expressionForBlock(fn() => true)])))) {
+if (!($predicate = Predicate::format("((%K BETWEEN \$DATES) && (SOME addresses.city.name BEGINSWITH[cd] %s) && (NONE addresses.street CONTAINS[cd] %s) && (10%3 >= 1) && (deposits.amount.value.@sum < 1.1*3.6) && (3+3.1 < 0.2**10) && (2-1.1 < 1001/11.1) && ({999.6, 1001}[1] > savings.value) && (SUBQUERY(addresses, \$address, \$address.street ENDSWITH[cd] %s).@count = %i) && (1 IN {0, 1, 2, 3, 5, 8} UNION {2, 4, 6, 10}) && (%K < TERNARY(%K MATCHES[c] %s, 30, 40)) && (FUNCTION(%s, "validate", \$ID) != false) && (%s = %s))", new ArrayClass(["creationDate", "Ángeles", "Melrose", "street", 1, "age", "name", "jane", new Validator(), true, Expression::expressionForBlock(fn() => true)])))) {
     fatal_error("Oops, something went wrong");
 }
 $predicate = $predicate->withSubstitutionVariables(new Dictionary([
@@ -51,12 +51,12 @@ foreach ($urls as $url) {
 ```php
 <?php
 
-$url = new URL('https://...');
+$url = new URL("https://...");
 $request = new URLRequest($url);
 $request->httpMethod = HTTPRequestMethod::post;
-$request->setValueForHttpHeaderField('application/json', 'Content-Type');
-$request->setValueForHttpHeaderField('key=SECRET', 'Authorization');
-$request->httpBody = json_encode(['notification' => ['title' => 'Lorem Ipsum', 'body' => "Lorem ipsum dolor sit amet."], 'to' => 'KEY']);
+$request->setValueForHttpHeaderField("application/json", "Content-Type");
+$request->setValueForHttpHeaderField("key=SECRET", "Authorization");
+$request->httpBody = json_encode(["notification" => ["title" => "Lorem Ipsum", "body" => "Lorem ipsum dolor sit amet."], "to" => "KEY"]);
 $task = URLSession::shared()->dataTaskWithRequest($request, function (?string $data, ?URLResponse $response, ?Error $error): void {
     if ($error) {
         fatal_error("Failed to post notification: $error");
@@ -75,8 +75,8 @@ $task->resume();
 <?php
 
 $person = new Person();
-$names = $person->valueForKeyPath('addresses.city.name');
-// addresses is a to-many relationship (of Person), city is a to-one relationship (of Address) and name is an attribute (of City), then for instance the result would be ['Veracruz', 'Ciudad de México']
+$names = $person->valueForKeyPath("addresses.city.name");
+// addresses is a to-many relationship (of Person), city is a to-one relationship (of Address) and name is an attribute (of City), then for instance the result would be ["Veracruz", "Ciudad de México"]
 ```
 
 - KVO (Key-Value Observing), a mechanism that allows objects to be notified of property changes specific to other objects.
@@ -85,7 +85,7 @@ $names = $person->valueForKeyPath('addresses.city.name');
 <?php
 
 //...
-$operation->observe('isFinished', KeyValueObservingOptions::new, function (Operation $operation): void {
+$operation->observe("isFinished", KeyValueObservingOptions::new, function (Operation $operation): void {
     if ($operation->isFinished) {
         //implementation continues
     }
@@ -97,7 +97,7 @@ $operation->observe('isFinished', KeyValueObservingOptions::new, function (Opera
 ```php
 <?php
 
-NotificationCenter::default()->addObserverForName('NotificationName', $obj, function (Notification $notification): void {
+NotificationCenter::default()->addObserverForName("NotificationName", $obj, function (Notification $notification): void {
     //do something useful
 });
 ```
@@ -107,7 +107,7 @@ NotificationCenter::default()->addObserverForName('NotificationName', $obj, func
 ```php
 <?php
 
-if (string_is_equal('publicación', 'Publicacion', CompareOptions::caseInsensitive | CompareOptions::diacriticInsensitive)) {
+if (string_is_equal("publicación", "Publicacion", CompareOptions::caseInsensitive | CompareOptions::diacriticInsensitive)) {
     //implementation continues
 }
 ```
