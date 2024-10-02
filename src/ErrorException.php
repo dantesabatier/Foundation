@@ -22,7 +22,15 @@ class ErrorException extends \ErrorException
     public function __get(string $name)
     {
         return $this->$name = match ($name) {
-            "error" => new Error(CocoaErrorDomain, $this->getCode(), new Dictionary([LocalizedDescriptionKey => "An unexpected error has ocurred", LocalizedFailureReasonErrorKey => $this->getMessage()])),
+            "error" => new Error(CocoaErrorDomain, $this->getCode(), new Dictionary([LocalizedDescriptionKey => "An unexpected error has occurred", LocalizedFailureReasonErrorKey => $this->getMessage()])),
+            default => throw new UndefinedKeyException(sprintf("%s is not key value coding compliant for the key \"%s\"", $this->debugDescription(), $name))
+        };
+    }
+
+    public function __set(string $name, mixed $value): void
+    {
+        $this->$name = match ($name) {
+            "error" => $value,
             default => throw new UndefinedKeyException(sprintf("%s is not key value coding compliant for the key \"%s\"", $this->debugDescription(), $name))
         };
     }
