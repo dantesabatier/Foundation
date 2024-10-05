@@ -43,7 +43,8 @@ trait BidirectionalCollectionAlgorithms
         if ($where === null) {
             return $this[$this->indexBefore($this->endIndex())];
         }
-        if ($i = $this->lastIndex($where)) {
+        $i = $this->lastIndex($where);
+        if ($i !== null) {
             return $this[$i];
         }
         return null;
