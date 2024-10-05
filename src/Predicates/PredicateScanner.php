@@ -28,7 +28,7 @@ class PredicateScanner extends Scanner
     public function __construct(string $format, private readonly ArrayClass $arguments)
     {
         parent::__construct($format);
-        $this->charactersToBeSkipped = " \n";
+        $this->charactersToBeSkipped = " \r\n";
     }
 
     private function scanKeyword(string $keyword): bool
