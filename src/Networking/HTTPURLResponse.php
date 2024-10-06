@@ -19,6 +19,7 @@ class HTTPURLResponse extends URLResponse
 {
     public readonly string $httpVersion;
     /** @var int The response's HTTP status code. */
+    #[ExpectedValues(valuesFromClass: HTTPStatusCode::class)]
     public readonly int $statusCode;
     /** @var Dictionary All HTTP header fields of the response. */
     public readonly Dictionary $allHeaderFields;
@@ -76,8 +77,8 @@ class HTTPURLResponse extends URLResponse
 
     private function suggestedFilename(?Dictionary $headerFields): string
     {
-        if (($value = $headerFields?->valueForCaseInsensitiveKey("Content-Disposition")) && str_contains((string) $value, ";")) {
-            [, $part] = explode(";", (string) $value);
+        if (($value = $headerFields?->valueForCaseInsensitiveKey("Content-Disposition")) && str_contains((string)$value, ";")) {
+            [, $part] = explode(";", (string)$value);
             [, $filename] = explode("=", $part);
             return $filename;
         }
@@ -89,8 +90,8 @@ class HTTPURLResponse extends URLResponse
         if ($value = $headerFields?->valueForCaseInsensitiveKey("Content-Type")) {
             /** @var string $mimeType */
             $mimeType = $value;
-            if (str_contains((string) $value, ";")) {
-                [$mimeType, $part] = explode(";", (string) $value);
+            if (str_contains((string)$value, ";")) {
+                [$mimeType, $part] = explode(";", (string)$value);
                 [, $textEncoding] = explode("=", $part);
                 return ["mimeType" => $mimeType, "textEncoding" => $textEncoding];
             }
