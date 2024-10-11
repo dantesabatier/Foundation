@@ -401,7 +401,7 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
      * Use the combine closure to select a value to use in the updated dictionary, or to combine existing and new values.
      * As the key-values pairs in other are merged with this dictionary, the combine closure is called with the current and new values for any duplicate keys that are encountered.
      * @param Sequence<string, Element> $other A dictionary to merge.
-     * @param Closure(Element, Element): Element|null $combine A closure that takes the current and new values for any duplicate keys.
+     * @param Closure(Element, Element, ?string): Element|null $combine A closure that takes the current and new values for any duplicate keys.
      * The closure returns the desired value for the final dictionary.
      */
     public function merge(Sequence $other, ?Closure $combine = null): void
@@ -410,7 +410,7 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
             $new = $value;
             $current = $this[$key];
             if (($current !== null) && ($combine !== null)) {
-                $new = $combine($current, $value);
+                $new = $combine($current, $value, $key);
             }
             if ($new !== null) {
                 $this[$key] = $new;
