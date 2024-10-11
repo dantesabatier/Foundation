@@ -28,7 +28,7 @@ final class EasyHandle
     public mixed $rawHandle = null;
     private ?URL $url = null;
     private ?URLSessionConfiguration $configuration = null;
-    private EasyHandlePauseState $pauseState;
+    private readonly EasyHandlePauseState $pauseState;
     private URLSessionWebSocketOperation $operation = URLSessionWebSocketOperation::cont;
     /** @var Dictionary<string> */
     private Dictionary $allHeaderFields;
@@ -346,6 +346,7 @@ final class EasyHandle
             $path .= "?$query";
         }
         $header = "GET $path HTTP/1.1\r\n";
+        /** @psalm-suppress ArgumentTypeCoercion, ReferenceConstraintViolation */
         $header .= $this->allHeaderFields->reduce("", fn(string &$result, string $value, string $key): string => $result .= "$key: $value\r\n");
         $header .= "\r\n";
         fwrite($this->rawHandle, $header);
