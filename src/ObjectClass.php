@@ -14,6 +14,8 @@ use JetBrains\PhpStorm\ExpectedValues;
 use JetBrains\PhpStorm\Pure;
 use JsonSerializable;
 use Override;
+use ReflectionClass;
+use ReflectionProperty;
 
 /**
  * The root class of most class hierarchies, from which subclasses inherit a basic interface to the runtime system and the ability to behave as Objective-C objects.
@@ -354,9 +356,19 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
     #[Override]
     public function dictionaryWithValues(ArrayClass $keys): Dictionary
     {
+        $reflectionClass = new ReflectionClass($this);
+        $properties = array_reduce(array_filter($reflectionClass->getProperties(ReflectionProperty::IS_PUBLIC), fn(ReflectionProperty $property): bool => (bool)count($property->getAttributes(SensitiveProperty::class))), function (array $initial, ReflectionProperty $property): array {
+            $initial[$property->name] = $property;
+            return $initial;
+        }, []);
+        /** @var Dictionary<mixed> $values */
         $values = new Dictionary();
         foreach ($keys as $key) {
-            $values->setValueForKey($this->valueForKey($key), $key);
+            $value = $this->valueForKey($key);
+            if (isset($properties[$key])) {
+                $value = new SensitivePropertyValue($value);
+            }
+            $values[$key] = $value;
         }
         return $values;
     }
