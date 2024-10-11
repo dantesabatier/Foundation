@@ -38,6 +38,7 @@ try {
             RemoveUselessParamTagRector::class,
             RemoveAlwaysTrueIfConditionRector::class => [
                 __DIR__ . "/src/URL.php",
+                __DIR__ . "/src/StandardAdditions.php"
             ],
             ExplicitReturnNullRector::class,
         ])->withPreparedSets(deadCode: true, codeQuality: true, earlyReturn: true);
