@@ -56,9 +56,7 @@ class UserDefaults
      */
     public static function standard(): UserDefaults
     {
-        if (self::$standard === null) {
-            self::$standard = new UserDefaults();
-        }
+        self::$standard ??= new UserDefaults();
         return self::$standard;
     }
 
