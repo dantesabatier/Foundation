@@ -35,26 +35,7 @@ class HTTPURLResponse extends URLResponse
     {
         $this->statusCode = $statusCode;
         $this->httpVersion = $httpVersion ?? $_SERVER["SERVER_PROTOCOL"] ?? "HTTP/1.1";
-        $this->allHeaderFields = (function () use ($headerFields): Dictionary {
-            if ($headerFields === null) {
-                return new Dictionary();
-            }
-            /** @var Dictionary<mixed> $canonicalizedFields */
-            $canonicalizedFields = new Dictionary();
-            foreach ($headerFields as $key => $value) {
-                if (empty($key)) {
-                    continue;
-                }
-                if (string_has_prefix($key, "X-", CompareOptions::caseInsensitive)) {
-                    $canonicalizedFields[$key] = $value;
-                } elseif (string_is_equal($key, "WWW-Authenticate", CompareOptions::caseInsensitive)) {
-                    $canonicalizedFields["WWW-Authenticate"] = $value;
-                } else {
-                    $canonicalizedFields[ucwords($key)] = $value;
-                }
-            }
-            return $canonicalizedFields;
-        })();
+        $this->allHeaderFields = $this->canonicalizedFields($headerFields);
         $suggestedFilename = $this->suggestedFilename($headerFields);
         $expectedContentLength = $this->expectedContentLength($headerFields);
         $mimeType = null;
@@ -65,6 +46,28 @@ class HTTPURLResponse extends URLResponse
             $textEncodingName = $contentType["textEncoding"];
         }
         parent::__construct($url, $mimeType, $expectedContentLength, $textEncodingName, $suggestedFilename);
+    }
+
+    private function canonicalizedFields(?Dictionary $headerFields): Dictionary
+    {
+        if ($headerFields === null) {
+            return new Dictionary();
+        }
+        /** @var Dictionary<mixed> $canonicalizedFields */
+        $canonicalizedFields = new Dictionary();
+        foreach ($headerFields as $key => $value) {
+            if (empty($key)) {
+                continue;
+            }
+            if (string_has_prefix($key, "X-", CompareOptions::caseInsensitive)) {
+                $canonicalizedFields[$key] = $value;
+            } elseif (string_is_equal($key, "WWW-Authenticate", CompareOptions::caseInsensitive)) {
+                $canonicalizedFields["WWW-Authenticate"] = $value;
+            } else {
+                $canonicalizedFields[ucwords($key)] = $value;
+            }
+        }
+        return $canonicalizedFields;
     }
 
     private function expectedContentLength(?Dictionary $headerFields): int
