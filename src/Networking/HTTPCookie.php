@@ -74,7 +74,7 @@ class HTTPCookie extends ObjectClass
         $this->path = $path;
         $this->domain = $domain ?? fatal_error();
         $this->isSecure = !empty($properties[HTTPCookiePropertyKey::secure]);
-        $this->version = (int)($properties[HTTPCookiePropertyKey::version] == 1);
+        $this->version = (int)($properties[HTTPCookiePropertyKey::version] === 1);
         /** @var string|null $port */
         $port = $properties[HTTPCookiePropertyKey::port];
         if ($port !== null) {
@@ -106,7 +106,7 @@ class HTTPCookie extends ObjectClass
         if ($discard = $properties[HTTPCookiePropertyKey::discard]) {
             $this->isSessionOnly = $discard === "TRUE";
         } else {
-            $this->isSessionOnly = $properties[HTTPCookiePropertyKey::maximumAge] === null && $this->expiresDate == null && $this->version >= 1;
+            $this->isSessionOnly = $properties[HTTPCookiePropertyKey::maximumAge] === null && $this->expiresDate === null && $this->version >= 1;
         }
         $this->comment = $properties[HTTPCookiePropertyKey::comment];
         /** @var URL|string|null $commentURL */

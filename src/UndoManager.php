@@ -133,7 +133,7 @@ class UndoManager extends ObjectClass
      */
     public function undo(): void
     {
-        if ($this->groupingLevel == 1) {
+        if ($this->groupingLevel === 1) {
             $this->endUndoGrouping();
         }
         if ($this->group !== null) {

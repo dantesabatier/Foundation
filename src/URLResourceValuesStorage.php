@@ -91,35 +91,35 @@ class URLResourceValuesStorage
         $info = new SplFileInfo($path);
         /** @var string $key */
         foreach ($keys as $key) {
-            if ($key == URLResourceKey::isDirectoryKey) {
+            if ($key === URLResourceKey::isDirectoryKey) {
                 $result[$key] = $info->isDir();
-            } elseif ($key == URLResourceKey::parentDirectoryURLKey) {
+            } elseif ($key === URLResourceKey::parentDirectoryURLKey) {
                 if ($directory = $info->getPathInfo()?->getRealPath()) {
                     $result[$key] = URL::fileURL($directory);
                 }
-            } elseif ($key == URLResourceKey::fileResourceTypeKey) {
+            } elseif ($key === URLResourceKey::fileResourceTypeKey) {
                 $result[$key] = $info->getType();
-            } elseif ($key == URLResourceKey::isAliasFileKey) {
+            } elseif ($key === URLResourceKey::isAliasFileKey) {
                 $result[$key] = $info->isLink();
-            } elseif ($key == URLResourceKey::fileSizeKey) {
+            } elseif ($key === URLResourceKey::fileSizeKey) {
                 $result[$key] = $info->getSize();
-            } elseif ($key == URLResourceKey::isRegularFileKey) {
+            } elseif ($key === URLResourceKey::isRegularFileKey) {
                 $result[$key] = $info->isFile();
-            } elseif ($key == URLResourceKey::attributeModificationDateKey) {
+            } elseif ($key === URLResourceKey::attributeModificationDateKey) {
                 $result[$key] = new Date((float)$info->getMTime());
-            } elseif ($key == URLResourceKey::creationDateKey) {
+            } elseif ($key === URLResourceKey::creationDateKey) {
                 $result[$key] = new Date((float)$info->getCTime());
-            } elseif ($key == URLResourceKey::isExecutableKey) {
+            } elseif ($key === URLResourceKey::isExecutableKey) {
                 $result[$key] = $info->isExecutable();
-            } elseif ($key == URLResourceKey::isHiddenKey) {
+            } elseif ($key === URLResourceKey::isHiddenKey) {
                 $result[$key] = is_hidden($path);
-            } elseif ($key == URLResourceKey::isReadableKey) {
+            } elseif ($key === URLResourceKey::isReadableKey) {
                 $result[$key] = $info->isReadable();
-            } elseif ($key == URLResourceKey::isWritableKey) {
+            } elseif ($key === URLResourceKey::isWritableKey) {
                 $result[$key] = $info->isWritable();
-            } elseif ($key == URLResourceKey::nameKey) {
+            } elseif ($key === URLResourceKey::nameKey) {
                 $result[$key] = $info->getFilename();
-            } elseif ($key == URLResourceKey::pathKey) {
+            } elseif ($key === URLResourceKey::pathKey) {
                 $result[$key] = $info->getPathname();
             }
         }

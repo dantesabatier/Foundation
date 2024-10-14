@@ -151,7 +151,7 @@ class HTTPURLProtocol extends NativeProtocol
                 case TaskBodyRawValue::none:
                     /** @var DataDrain $dataDrain */
                     $dataDrain = $this->internalState->transferState?->bodyDataDrain;
-                    if ($dataDrain->rawValue == DataDrainRawValue::toFile) {
+                    if ($dataDrain->rawValue === DataDrainRawValue::toFile) {
                         $easyHandle->set($dataDrain->fileHandle?->rawHandle, CURLOPT_FILE);
                     }
                     $easyHandle->setRequestBodyLength(0);

@@ -20,9 +20,9 @@ class ProgressFraction extends ObjectClass
     public function __get(string $name)
     {
         return match ($name) {
-            "isIndeterminate" => $this->completed < 0 || $this->total < 0 || ($this->completed == 0 && $this->total == 0),
-            "isFinished" => (($this->completed >= $this->total) && $this->completed > 0 && $this->total > 0) || ($this->completed > 0 && $this->total == 0),
-            "fractionCompleted" => $this->isIndeterminate ? 0.0 : ($this->total == 0 ? 1.0 : $this->completed / $this->total),
+            "isIndeterminate" => $this->completed < 0 || $this->total < 0 || ($this->completed === 0 && $this->total === 0),
+            "isFinished" => (($this->completed >= $this->total) && $this->completed > 0 && $this->total > 0) || ($this->completed > 0 && $this->total === 0),
+            "fractionCompleted" => $this->isIndeterminate ? 0.0 : ($this->total === 0 ? 1.0 : $this->completed / $this->total),
             default => $this->valueForUndefinedKey($name),
         };
     }
@@ -81,11 +81,11 @@ class ProgressFraction extends ObjectClass
      */
     private function math(ProgressFraction $fraction, Closure $whichOperator, Closure $whichOverflow): ProgressFraction
     {
-        !($this->total == 0 && $fraction->total == 0) ?: fatal_error("Attempt to add or subtract invalid fraction");
-        if ($this->total == 0) {
+        !($this->total === 0 && $fraction->total === 0) ?: fatal_error("Attempt to add or subtract invalid fraction");
+        if ($this->total === 0) {
             return $fraction;
         }
-        if ($fraction->total == 0) {
+        if ($fraction->total === 0) {
             return $this;
         }
         if ($this->overflowed || $fraction->overflowed) {

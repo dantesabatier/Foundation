@@ -125,7 +125,7 @@ class Error extends ObjectClass
      */
     private static function userInfoProviders(): Dictionary
     {
-        if (self::$userInfoProviders == null) {
+        if (self::$userInfoProviders === null) {
             self::$userInfoProviders = new Dictionary();
         }
         return self::$userInfoProviders;
