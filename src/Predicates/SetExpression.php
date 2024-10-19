@@ -32,6 +32,7 @@ class SetExpression extends Expression
             /** @var Set $right */
             $right = new Set($right);
         }
+        /** @var Set $value */
         $value = $left;
         $expressionType = $this->expressionType;
         if ($expressionType === ExpressionType::minusSet) {
