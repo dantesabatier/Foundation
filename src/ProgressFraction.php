@@ -20,11 +20,32 @@ class ProgressFraction extends ObjectClass
     public function __get(string $name)
     {
         return match ($name) {
-            "isIndeterminate" => $this->completed < 0 || $this->total < 0 || ($this->completed === 0 && $this->total === 0),
-            "isFinished" => (($this->completed >= $this->total) && $this->completed > 0 && $this->total > 0) || ($this->completed > 0 && $this->total === 0),
-            "fractionCompleted" => $this->isIndeterminate ? 0.0 : ($this->total === 0 ? 1.0 : $this->completed / $this->total),
+            "isIndeterminate" => $this->isIndeterminate(),
+            "isFinished" => $this->isFinished(),
+            "fractionCompleted" => $this->fractionCompleted(),
             default => $this->valueForUndefinedKey($name),
         };
+    }
+
+    private function isIndeterminate(): bool
+    {
+        return $this->completed < 0 || $this->total < 0 || ($this->completed == 0 && $this->total == 0);
+    }
+
+    private function isFinished(): bool
+    {
+        return (($this->completed >= $this->total) && $this->completed > 0 && $this->total > 0) || ($this->completed > 0 && $this->total == 0);
+    }
+
+    private function fractionCompleted(): int|float
+    {
+        if ($this->isIndeterminate) {
+            return 0.0;
+        }
+        if ($this->total == 0) {
+            return 1.0;
+        }
+        return ($this->completed / $this->total);
     }
 
     private static function fromDouble(float $double): array
@@ -81,11 +102,11 @@ class ProgressFraction extends ObjectClass
      */
     private function math(ProgressFraction $fraction, Closure $whichOperator, Closure $whichOverflow): ProgressFraction
     {
-        !($this->total === 0 && $fraction->total === 0) ?: fatal_error("Attempt to add or subtract invalid fraction");
-        if ($this->total === 0) {
+        !($this->total == 0 && $fraction->total == 0) ?: fatal_error("Attempt to add or subtract invalid fraction");
+        if ($this->total == 0) {
             return $fraction;
         }
-        if ($fraction->total === 0) {
+        if ($fraction->total == 0) {
             return $this;
         }
         if ($this->overflowed || $fraction->overflowed) {
