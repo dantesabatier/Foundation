@@ -20,32 +20,28 @@ class SetExpression extends Expression
     #[Override]
     public function expressionValue(mixed $object = null, ?Dictionary $context = null): Set
     {
-        /** @var Set|ArrayClass $left */
         $left = $this->left()->expressionValue($object, $context) ?? new Set();
         if ($left instanceof ArrayClass) {
             /** @var Set $left */
             $left = new Set($left);
         }
-        /** @var Set|ArrayClass $right */
         $right = $this->right()->expressionValue($object, $context) ?? new Set();
         if ($right instanceof ArrayClass) {
             /** @var Set $right */
             $right = new Set($right);
         }
-        /** @var Set $value */
-        $value = $left;
         $expressionType = $this->expressionType;
         if ($expressionType === ExpressionType::minusSet) {
-            $value->subtract($right);
+            $left->subtract($right);
         } elseif ($expressionType === ExpressionType::intersectSet) {
-            $value->formIntersection($right);
+            $left->formIntersection($right);
         } elseif ($expressionType === ExpressionType::unionSet) {
-            $value->formUnion($right);
+            $left->formUnion($right);
         }
         if (Predicate::$debugDefault) {
-            error_log(sprintf("Foundation: expression %s %s %s => %s", human_readable_value($left), $expressionType->name, human_readable_value($right), human_readable_value($value)));
+            error_log(sprintf("Foundation: expression %s %s %s => %s", human_readable_value($left), $expressionType->name, human_readable_value($right), human_readable_value($left)));
         }
-        return $value;
+        return $left;
     }
 
     #[Override]
