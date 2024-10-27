@@ -164,7 +164,7 @@ class PredicateUtilities
 
     public static function modulusBy(Number|int|float $dividend, Number|int|float $divisor): Number
     {
-        return new Number(pn($dividend) % pn($divisor));
+        return new Number(fmod(pn($dividend), pn($divisor)));
     }
 
     public static function sqrt(Number|float $arg): Number
