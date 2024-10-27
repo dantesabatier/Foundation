@@ -184,7 +184,7 @@ class PredicateUtilities
 
     public static function raiseToPower(Number|int|float $base, Number|int|float $exp): Number
     {
-        return new Number(pn($base) ** pn($exp));
+        return new Number(pow(pn($base), pn($exp)));
     }
 
     public static function exp(Number|float $arg): Number
