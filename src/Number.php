@@ -28,6 +28,9 @@ class Number extends Value
      */
     public function __construct(Number|bool|float|int|string $value)
     {
+        if (is_string($value)) {
+            $value = str_replace(",", "", $value);
+        }
         parent::__construct($value);
         assert(is_numeric($this->value) || is_bool($this->value), sprintf("Invalid argument, expecting a numeric value, (%s)%s given", typeof($this->value), human_readable_value($this->value)));
         unset($this->boolValue);
