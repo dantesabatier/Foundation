@@ -55,7 +55,7 @@ final class FileHandle extends ObjectClass
      */
     public static function fileHandleForReadingFromURL(URL $url): ?FileHandle
     {
-        if (!($handle = unsafe_value(fn(): mixed => fopen($url->absoluteString, "r")))) {
+        if (!($handle = unsafe_value(fn(): mixed => fopen($url->path, "r")))) {
             return null;
         }
         return new FileHandle($handle);
@@ -72,7 +72,7 @@ final class FileHandle extends ObjectClass
      */
     public static function fileHandleForWritingToURL(URL $url): ?FileHandle
     {
-        if (!($handle = unsafe_value(fn(): mixed => fopen($url->absoluteString, "w")))) {
+        if (!($handle = unsafe_value(fn(): mixed => fopen($url->path, "w")))) {
             return null;
         }
         return new FileHandle($handle);
@@ -89,7 +89,7 @@ final class FileHandle extends ObjectClass
      */
     public static function fileHandleForUpdatingURL(URL $url): ?FileHandle
     {
-        if (!($handle = unsafe_value(fn(): mixed => fopen($url->absoluteString, "w+")))) {
+        if (!($handle = unsafe_value(fn(): mixed => fopen($url->path, "w+")))) {
             return null;
         }
         return new FileHandle($handle);
