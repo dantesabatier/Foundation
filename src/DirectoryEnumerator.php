@@ -16,22 +16,37 @@ abstract class DirectoryEnumerator implements IteratorAggregate
     /**
      * A dictionary with the attributes of the directory at which enumeration started.
      */
-    abstract public function directoryAttributes(): ?Dictionary;
+    public function directoryAttributes(): ?Dictionary
+    {
+        return null;
+    }
 
     /**
      * A dictionary with the attributes of the most recently returned file or subdirectory (as referenced by the pathname).
      */
-    abstract public function fileAttributes(): ?Dictionary;
+    public function fileAttributes(): ?Dictionary
+    {
+        return null;
+    }
 
     /**
      * The number of levels deep the current object is in the directory hierarchy being enumerated.
      */
-    abstract public function level(): int;
+    public function level(): int
+    {
+        return 0;
+    }
 
     /**
      * Causes the receiver to skip recursion into the most recently obtained subdirectory.
      */
-    abstract public function skipDescendants(): void;
+    public function skipDescendants(): void
+    {
 
-    abstract public function isEnumeratingDirectoryPostOrder(): bool;
+    }
+
+    public function isEnumeratingDirectoryPostOrder(): bool
+    {
+        return false;
+    }
 }
