@@ -18,7 +18,7 @@ abstract class DirectoryEnumerator implements IteratorAggregate
      */
     public function directoryAttributes(): ?Dictionary
     {
-        return null;
+        request_concrete_implementation($this, __FUNCTION__);
     }
 
     /**
@@ -26,7 +26,7 @@ abstract class DirectoryEnumerator implements IteratorAggregate
      */
     public function fileAttributes(): ?Dictionary
     {
-        return null;
+        request_concrete_implementation($this, __FUNCTION__);
     }
 
     /**
@@ -34,7 +34,7 @@ abstract class DirectoryEnumerator implements IteratorAggregate
      */
     public function level(): int
     {
-        return 0;
+        request_concrete_implementation($this, __FUNCTION__);
     }
 
     /**
@@ -42,10 +42,11 @@ abstract class DirectoryEnumerator implements IteratorAggregate
      */
     public function skipDescendants(): void
     {
+        request_concrete_implementation($this, __FUNCTION__);
     }
 
     public function isEnumeratingDirectoryPostOrder(): bool
     {
-        return false;
+        request_concrete_implementation($this, __FUNCTION__);
     }
 }
