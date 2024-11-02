@@ -42,7 +42,6 @@ abstract class DirectoryEnumerator implements IteratorAggregate
      */
     public function skipDescendants(): void
     {
-
     }
 
     public function isEnumeratingDirectoryPostOrder(): bool
