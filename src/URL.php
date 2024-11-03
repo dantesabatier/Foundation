@@ -114,7 +114,7 @@ final class URL extends ObjectClass
         }
         if ($name === "absoluteString") {
             if ($this->baseURL === null) {
-                return rawurldecode($this->string);
+                return $this->string;
             }
             return $this->absoluteURL->absoluteString;
         }
@@ -204,7 +204,7 @@ final class URL extends ObjectClass
     /** @noinspection PhpMixedReturnTypeCanBeReducedInspection */
     private function parse(int $component): mixed
     {
-        $v = parse_url($this->absoluteString, $component);
+        $v = parse_url(rawurldecode($this->absoluteString), $component);
         if (empty($v)) {
             return null;
         }
