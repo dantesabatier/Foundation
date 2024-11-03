@@ -128,11 +128,11 @@ class URLResourceValuesStorage
 
     public function write(Dictionary $keysAndValues, URL $url): void
     {
-        /** @var string|null $value */
-        $value = $keysAndValues[URLResourceKey::nameKey];
-        if ($value) {
+        /** @var string|null $name */
+        $name = $keysAndValues[URLResourceKey::nameKey];
+        if ($name) {
             try {
-                FileManager::default()->moveItem($url, $url->deletingLastPathComponent()->appendingPathComponent($value));
+                FileManager::default()->moveItem($url, $url->deletingLastPathComponent()->appendingPathComponent($name));
             } catch (Exception) {
             }
         }
