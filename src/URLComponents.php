@@ -67,7 +67,13 @@ class URLComponents extends ObjectClass
                 $tok = strtok($path, "\\/");
                 while (strlen($tok)) {
                     $tu .= match ($this->scheme) {
-                        "http", "https", "ftp", "ftps", "ws", "wss", "file" => rawurlencode(rawurldecode($tok)) . "/",
+                        "http", "https", "ftp", "ftps", "ws", "wss", "file" => (function () use ($tok): string {
+                            $tok = rawurldecode($tok);
+                            if (!string_contains($tok, "C:", CompareOptions::caseInsensitive)) {
+                                $tok = rawurlencode($tok);
+                            }
+                            return "$tok/";
+                        })(),
                         default => "$tok/"
                     };
                     $tok = strtok("\\/");
