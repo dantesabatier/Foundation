@@ -25,9 +25,9 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
     /** @var KeyValueObservance[] $observances */
     private array $observances = [];
     /** @var array<string, mixed> */
-    protected static array $staticAssociatedValues = [];
+    public static array $staticAssociatedValues = [];
     /** @var array<string, mixed> */
-    protected array $associatedValues = [];
+    public array $associatedValues = [];
     public int $hash {
         get => spl_object_id($this);
     }
