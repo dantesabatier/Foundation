@@ -28,7 +28,7 @@ class Date extends ObjectClass
         get => $this->format();
     }
     public string $debugDescription {
-        get => sprintf("<%s %s>", get_called_class(), $this->description);
+        get => sprintf("<%s %s>", get_class($this), $this->description);
     }
 
     public function __construct(?float $time = null)
