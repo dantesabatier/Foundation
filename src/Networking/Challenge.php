@@ -10,19 +10,18 @@ use function Sabatier\Foundation\substring_from_index;
 use function Sabatier\Foundation\substring_to_index;
 
 /** @internal */
-readonly class Challenge
+class Challenge
 {
+    public ?string $authenticationMethod {
+        get => array_find(URLProtectionSpace::authenticationMethods, fn(string $authenticationMethod): bool => string_has_suffix($authenticationMethod, $this->authScheme, CompareOptions::caseInsensitive));
+    }
+
     /**
      * @param string $authScheme
      * @param Dictionary<string> $authParameters
      */
     public function __construct(public string $authScheme, public Dictionary $authParameters)
     {
-    }
-
-    public function authenticationMethod(): ?string
-    {
-        return array_find(URLProtectionSpace::authenticationMethods, fn(string $authenticationMethod): bool => string_has_suffix($authenticationMethod, $this->authScheme, CompareOptions::caseInsensitive));
     }
 
     public function parameter(string $name): ?string
