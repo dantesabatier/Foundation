@@ -10,6 +10,9 @@ use function Sabatier\Foundation\fatal_error;
 class AnyKeyExpression extends Expression
 {
     private static ?AnyKeyExpression $default = null;
+    public string $predicateFormat {
+        get => "ANYKEY";
+    }
 
     public function __construct()
     {
@@ -18,9 +21,7 @@ class AnyKeyExpression extends Expression
 
     public static function default(): AnyKeyExpression
     {
-        if (AnyKeyExpression::$default === null) {
-            AnyKeyExpression::$default = new AnyKeyExpression();
-        }
+        AnyKeyExpression::$default ??= new AnyKeyExpression();
         return AnyKeyExpression::$default;
     }
 
@@ -29,11 +30,5 @@ class AnyKeyExpression extends Expression
     public function expressionValue(mixed $object = null, ?Dictionary $context = null): mixed
     {
         fatal_error("Cannot evaluate any key expression");
-    }
-
-    #[Override]
-    public function predicateFormat(): string
-    {
-        return "ANYKEY";
     }
 }

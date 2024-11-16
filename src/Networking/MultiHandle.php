@@ -12,7 +12,7 @@ use const Sabatier\Foundation\LocalizedFailureReasonErrorKey;
 use const Sabatier\Foundation\URLErrorDomain;
 
 /** @internal */
-final readonly class MultiHandle
+final class MultiHandle
 {
     private CurlMultiHandle $rawHandle;
     /** @var ArrayClass<EasyHandle> */
@@ -53,7 +53,7 @@ final readonly class MultiHandle
             return;
         }
         $needsTimeout = $this->easyHandles->isEmpty;
-        $this->easyHandles->append($handle);
+        $this->easyHandles[] = $handle;
         curl_multi_add_handle($this->rawHandle, $handle->rawHandle);
         if ($needsTimeout) {
             $this->timeoutTimerFired();

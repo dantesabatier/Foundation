@@ -19,7 +19,7 @@
     }
   ],
   "require": {
-    "php": "^8.3",
+    "php": "^8.4",
     "ext-gd": "*",
     "ext-mbstring": "*",
     "ext-curl": "*",
@@ -30,8 +30,8 @@
   },
   "config": {
     "platform": {
-      "ext-pcntl": "8.3",
-      "ext-posix": "8.3"
+      "ext-pcntl": "8.4",
+      "ext-posix": "8.4"
     }
   },
   "autoload": {

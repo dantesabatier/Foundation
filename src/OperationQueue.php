@@ -11,7 +11,6 @@ namespace Sabatier\Foundation;
 
 use Closure;
 use Fiber;
-use Override;
 use Throwable;
 
 /**
@@ -29,13 +28,16 @@ final class OperationQueue extends ObjectClass
     private static ?ArrayClass $queues = null;
     private static ?OperationQueue $main = null;
     /** @var ArrayClass<Operation> $operations The operations currently in the queue. */
-    public readonly ArrayClass $operations;
+    private(set) ArrayClass $operations;
     /** @var int The maximum number of queued operations that can run at the same time. */
     public int $maxConcurrentOperationCount;
     /** @var string|null The name of the operation queue. */
     public ?string $name = null;
     /** @internal */
     public bool $isCurrentQueue = false;
+    public string $description {
+        get => sprintf("<%s %s>", self::class, $this->name ?? $this->hash);
+    }
 
     public function __construct()
     {
@@ -58,9 +60,7 @@ final class OperationQueue extends ObjectClass
      */
     private static function allQueues(): ArrayClass
     {
-        if (self::$queues === null) {
-            self::$queues = new ArrayClass();
-        }
+        self::$queues ??= new ArrayClass();
         return self::$queues;
     }
 
@@ -70,9 +70,7 @@ final class OperationQueue extends ObjectClass
      */
     public static function main(): OperationQueue
     {
-        if (self::$main === null) {
-            self::$main = new OperationQueue();
-        }
+        self::$main ??= new OperationQueue();
         return self::$main;
     }
 
@@ -102,7 +100,7 @@ final class OperationQueue extends ObjectClass
                     fatal_error();
                 }
                 Fiber::suspend();
-                $this->operations->append($operation);
+                $this->operations[] = $operation;
                 $this->operations->sort(fn(Operation $op0, Operation $op1): int => ComparisonResult::orderedAscending->value * ($op0->queuePriority->value <=> $op1->queuePriority->value));
                 /** @psalm-suppress UndefinedVariable */
                 $observation = $operation->observe("isFinished", KeyValueObservingOptions::new, function (Operation $operation, KeyValueObservedChange $change) use (&$observation): void {
@@ -183,11 +181,5 @@ final class OperationQueue extends ObjectClass
         foreach ($this->operations as $operation) {
             $operation->waitUntilFinished();
         }
-    }
-
-    #[Override]
-    public function description(): string
-    {
-        return sprintf("<%s %s>", self::class, $this->name ?? $this->hash());
     }
 }

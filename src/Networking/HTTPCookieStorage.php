@@ -4,7 +4,6 @@ namespace Sabatier\Foundation\Networking;
 
 use Closure;
 use Exception;
-use Override;
 use Sabatier\Foundation\ArrayClass;
 use Sabatier\Foundation\Bundle;
 use Sabatier\Foundation\CompareOptions;
@@ -22,7 +21,6 @@ use const Sabatier\Foundation\kCFBundleNameKey;
 
 /**
  * A container that manages the storage of cookies.
- * @property-read ArrayClass<HTTPCookie> $cookies
  */
 class HTTPCookieStorage extends ObjectClass
 {
@@ -31,8 +29,15 @@ class HTTPCookieStorage extends ObjectClass
     /** @var HTTPCookieAcceptPolicy The cookie storage's cookie accept policy. */
     public HTTPCookieAcceptPolicy $cookieAcceptPolicy = HTTPCookieAcceptPolicy::always;
     /** @var Dictionary<HTTPCookie> */
-    private readonly Dictionary $allCookies;
+    private Dictionary $allCookies;
     private ?URL $cookieFileURL = null;
+    /** @var ArrayClass<HTTPCookie> $cookies */
+    public ArrayClass $cookies {
+        get => $this->allCookies->values;
+    }
+    public string $description {
+        get => ($this->isEphemeral ? "Ephemeral" : "") . "<HTTPCookieStorage cookies count:({$this->allCookies->count})>";
+    }
 
     final private function __construct(string $cookieStorageName, private readonly bool $isEphemeral = false)
     {
@@ -49,22 +54,12 @@ class HTTPCookieStorage extends ObjectClass
         }
     }
 
-    public function __get(string $name)
-    {
-        return match ($name) {
-            'cookies' => $this->allCookies->values,
-            default => $this->valueForUndefinedKey($name)
-        };
-    }
-
     /**
      * @return Dictionary<HTTPCookieStorage>
      */
     private static function sharedCookieStorages(): Dictionary
     {
-        if (self::$sharedCookieStorages === null) {
-            self::$sharedCookieStorages = new Dictionary();
-        }
+        self::$sharedCookieStorages ??= new Dictionary();
         return self::$sharedCookieStorages;
     }
 
@@ -134,7 +129,7 @@ class HTTPCookieStorage extends ObjectClass
         /** @var Dictionary<Dictionary> $cookies */
         $cookies = PropertyListSerialization::propertyListWithURL($cookieFileURL) ?? new Dictionary();
         foreach ($cookies as $key => $value) {
-            $this->allCookies->setValueForKey($this->createCookie($value), $key);
+            $this->allCookies[$key] = $this->createCookie($value);
         }
     }
 
@@ -190,7 +185,7 @@ class HTTPCookieStorage extends ObjectClass
         if ($this->allCookies[$key]) {
             $this->allCookies->updateValue($cookie, $key);
         } else {
-            $this->allCookies->setValueForKey($cookie, $key);
+            $this->allCookies[$key] = $cookie;
         }
         $this->allCookies->removeAll(fn(HTTPCookie $cookie): bool => ($expiresDate = $cookie->expiresDate) && $expiresDate->timeIntervalSinceNow < 0);
         $this->updatePersistentStore();
@@ -273,11 +268,5 @@ class HTTPCookieStorage extends ObjectClass
     public function sortedCookies(ArrayClass $sortOrder): ArrayClass
     {
         return $this->allCookies->values->sorted($sortOrder);
-    }
-
-    #[Override]
-    public function description(): string
-    {
-        return ($this->isEphemeral ? "Ephemeral" : "") . "<HTTPCookieStorage cookies count:({$this->allCookies->count})>";
     }
 }

@@ -12,20 +12,31 @@ use function Sabatier\Foundation\human_readable_value;
 /** @internal */
 class SetExpression extends Expression
 {
-    public function __construct(ExpressionType $expressionType, private readonly Expression $leftExpression, private readonly Expression $rightExpression)
+    public string $predicateFormat {
+        get => $this->left->predicateFormat . match ($this->expressionType) {
+                ExpressionType::minusSet => " MINUS ",
+                ExpressionType::intersectSet => " INTERSECT ",
+                ExpressionType::unionSet => " UNION ",
+                default => "",
+            } . $this->right->predicateFormat;
+    }
+
+    public function __construct(ExpressionType $expressionType, Expression $left, Expression $right)
     {
         parent::__construct($expressionType);
+        $this->left = $left;
+        $this->right = $right;
     }
 
     #[Override]
     public function expressionValue(mixed $object = null, ?Dictionary $context = null): Set
     {
-        $left = $this->left()->expressionValue($object, $context) ?? new Set();
+        $left = $this->left->expressionValue($object, $context) ?? new Set();
         if ($left instanceof ArrayClass) {
             /** @var Set $left */
             $left = new Set($left);
         }
-        $right = $this->right()->expressionValue($object, $context) ?? new Set();
+        $right = $this->right->expressionValue($object, $context) ?? new Set();
         if ($right instanceof ArrayClass) {
             /** @var Set $right */
             $right = new Set($right);
@@ -53,44 +64,10 @@ class SetExpression extends Expression
         if ($flags & PredicateVisitorFlags::internalNodes) {
             $visitor->visitPredicateExpression($this);
         }
-        $this->left()->accept($visitor, $flags);
-        $this->right()->accept($visitor, $flags);
+        $this->left->accept($visitor, $flags);
+        $this->right->accept($visitor, $flags);
         if ($flags & PredicateVisitorFlags::internalNodes) {
             $visitor->visitPredicateExpression($this);
         }
-    }
-
-    #[Override]
-    public function left(): Expression
-    {
-        return $this->leftExpression;
-    }
-
-    #[Override]
-    public function right(): Expression
-    {
-        return $this->rightExpression;
-    }
-
-    #[Override]
-    public function predicateFormat(): string
-    {
-        $leftExpression = $this->left();
-        $rightExpression = $this->right();
-        $format = $leftExpression->description();
-        switch ($this->expressionType) {
-            case ExpressionType::minusSet:
-                $format .= " MINUS ";
-                break;
-            case ExpressionType::intersectSet:
-                $format .= " INTERSECT ";
-                break;
-            case ExpressionType::unionSet:
-                $format .= " UNION ";
-                break;
-            default:
-                break;
-        }
-        return $format . $rightExpression->description();
     }
 }

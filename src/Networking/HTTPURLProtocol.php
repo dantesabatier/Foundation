@@ -26,7 +26,7 @@ use const Sabatier\Foundation\URLErrorUnknown;
 /** @internal */
 class HTTPURLProtocol extends NativeProtocol
 {
-    public int $redirectCount = 0;
+    private int $redirectCount = 0;
 
     #[Override]
     public static function canInit(URLRequest $request): bool
@@ -60,7 +60,7 @@ class HTTPURLProtocol extends NativeProtocol
         }
         $now = new Date();
         if ($dateString = $response->allHeaderFields["Date"]) {
-            $date = new Date((float)strtotime((string) $dateString));
+            $date = new Date((float)strtotime((string)$dateString));
             $expirationStart = $date->compare($cacheable->date) === ComparisonResult::orderedDescending ? $date : $cacheable->date;
         } else {
             $expirationStart = $cacheable->date;
@@ -109,7 +109,7 @@ class HTTPURLProtocol extends NativeProtocol
             return false;
         }
         if (!$hasMaxAge && ($expires = $response->allHeaderFields["Expires"])) {
-            $expiration = new Date((float)strtotime((string) $expires));
+            $expiration = new Date((float)strtotime((string)$expires));
             if ($now->timeIntervalSinceReferenceDate >= $expiration->timeIntervalSinceReferenceDate) {
                 return false;
             }
@@ -188,7 +188,7 @@ class HTTPURLProtocol extends NativeProtocol
         $names = $customHeaders->keys;
         foreach (["Connection", "User-Agent", "Accept-Language"] as $name) {
             if (!$names->contains(fn(string $e): bool => string_is_equal($name, $e, CompareOptions::caseInsensitive))) {
-                $names->append($name);
+                $names[] = $name;
                 $customHeaders[$name] = match ($name) {
                     "Connection" => "keep-alive",
                     "User-Agent" => sprintf("%s (unknown version) curl/%s %s/%s (%s)", ProcessInfo::processInfo()->processName, curl_version()["version"], php_uname("s"), php_uname("r"), php_uname("m")),
@@ -200,7 +200,7 @@ class HTTPURLProtocol extends NativeProtocol
             /** @noinspection PhpForeachOverSingleElementArrayLiteralInspection */
             foreach (["Expect"] as $name) {
                 if (!$names->contains(fn(string $e): bool => string_is_equal($name, $e, CompareOptions::caseInsensitive))) {
-                    $names->append($name);
+                    $names[] = $name;
                     $customHeaders[$name] = "";
                 }
             }

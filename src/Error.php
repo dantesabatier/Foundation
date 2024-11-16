@@ -22,6 +22,9 @@ class Error extends ObjectClass
     public readonly ?string $localizedFailureReason;
     /** @var ErrorRecoveryAttempting The object in the user info dictionary corresponding to the {@see RecoveryAttempterErrorKey} key. If userInfo doesn't contain a value for {@see RecoveryAttempterErrorKey}, this property is nil. */
     public readonly ErrorRecoveryAttempting $recoveryAttempter;
+    public string $description {
+        get => sprintf("Error Domain=%s Code=%s %s UserInfo=%s", $this->domain, $this->code, $this->localizedDescription, human_readable_value($this->userInfo));
+    }
 
     /**
      * Returns an Error object initialized for a given domain and code with a given userInfo dictionary.
@@ -125,9 +128,7 @@ class Error extends ObjectClass
      */
     private static function userInfoProviders(): Dictionary
     {
-        if (self::$userInfoProviders === null) {
-            self::$userInfoProviders = new Dictionary();
-        }
+        self::$userInfoProviders ??= new Dictionary();
         return self::$userInfoProviders;
     }
 
@@ -149,12 +150,6 @@ class Error extends ObjectClass
     public function userInfoValueProvider(string $errorDomain): ?Closure
     {
         return self::userInfoProviders()[$errorDomain];
-    }
-
-    #[Override]
-    public function description(): string
-    {
-        return sprintf("Error Domain=%s Code=%s %s UserInfo=%s", $this->domain, $this->code, $this->localizedDescription, human_readable_value($this->userInfo));
     }
 
     #[Override]

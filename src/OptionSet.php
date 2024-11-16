@@ -7,7 +7,7 @@ namespace Sabatier\Foundation;
  */
 class OptionSet
 {
-    public function __construct(public int $rawValue = 0)
+    public function __construct(private(set) int $rawValue = 0)
     {
     }
 

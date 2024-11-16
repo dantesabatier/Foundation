@@ -35,9 +35,7 @@ class UserDefaults
      */
     private function standardUserPreferences(): Dictionary
     {
-        if (self::$standardUserPreferences === null) {
-            self::$standardUserPreferences = new Dictionary();
-        }
+        self::$standardUserPreferences ??= new Dictionary();
         return self::$standardUserPreferences;
     }
 
@@ -121,7 +119,7 @@ class UserDefaults
     {
         $object = $this->object($key);
         if (is_bool($object) || is_int($object) || is_float($object)) {
-            return (new Number($object))->stringValue;
+            return new Number($object)->stringValue;
         }
         if (is_string($object)) {
             return $object;
@@ -153,7 +151,7 @@ class UserDefaults
     {
         $object = $this->object($key);
         if (is_bool($object) || is_numeric($object)) {
-            return (new Number($object))->boolValue;
+            return new Number($object)->boolValue;
         }
         return false;
     }
@@ -169,7 +167,7 @@ class UserDefaults
     {
         $object = $this->object($key);
         if (is_bool($object) || is_numeric($object)) {
-            return (new Number($object))->intValue;
+            return new Number($object)->intValue;
         }
         return 0;
     }
@@ -185,7 +183,7 @@ class UserDefaults
     {
         $object = $this->object($key);
         if (is_bool($object) || is_numeric($object)) {
-            return (new Number($object))->floatValue;
+            return new Number($object)->floatValue;
         }
         return 0.0;
     }
@@ -200,7 +198,7 @@ class UserDefaults
     {
         $object = $this->object($key);
         if (is_bool($object) || is_numeric($object)) {
-            return (new Number($object))->doubleValue;
+            return new Number($object)->doubleValue;
         }
         return 0.0;
     }
@@ -318,7 +316,7 @@ class UserDefaults
      */
     public function addSuite(string $named): void
     {
-        self::standardUserPreferences()->setValueForKey(new ApplicationPreferences($named), $named);
+        self::standardUserPreferences()[$named] = new ApplicationPreferences($named);
     }
 
     /**
@@ -339,7 +337,7 @@ class UserDefaults
      */
     public function persistentDomain(string $domainName): Dictionary
     {
-        return (new UserDefaults($domainName))->dictionaryRepresentation();
+        return new UserDefaults($domainName)->dictionaryRepresentation();
     }
 
     /**

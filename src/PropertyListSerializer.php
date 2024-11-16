@@ -114,7 +114,7 @@ readonly class PropertyListSerializer
             if (!($value = $this->element($next))) {
                 continue;
             }
-            $dictionary->setValueForKey($this->value($value), $key);
+            $dictionary[$key] = $this->value($value);
         }
         return $dictionary;
     }
@@ -131,7 +131,7 @@ readonly class PropertyListSerializer
         return (int)$this->document->save($url->path);
     }
 
-    public function propertyList(/** @noinspection PhpUnusedParameterInspection */ string $data, #[ExpectedValues(flagsFromClass: PropertyListSerializationMutabilityOptions::class)] int $options = 0, PropertyListSerializationFormat &$format = null): mixed
+    public function propertyList(/** @noinspection PhpUnusedParameterInspection */ string $data, #[ExpectedValues(flagsFromClass: PropertyListSerializationMutabilityOptions::class)] int $options = 0, ?PropertyListSerializationFormat &$format = null): mixed
     {
         /** @noinspection PhpUnhandledExceptionInspection */
         $this->document->loadXML($data) ?: fatal_error();

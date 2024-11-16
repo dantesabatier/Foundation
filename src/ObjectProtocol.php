@@ -14,11 +14,14 @@ namespace Sabatier\Foundation;
  */
 interface ObjectProtocol extends CustomDebugStringConvertible, Equatable
 {
-    /**
-     * Returns the class object for the receiver's superclass.
-     * @return class-string
-     */
-    public function superclass(): string;
+    /** @var int Returns an integer that can be used as a table address in a hash table structure. */
+    public int $hash {
+        get;
+    }
+    /** @var class-string Returns the class object for the receiver's superclass. */
+    public string $superclass {
+        get;
+    }
 
     /**
      * Returns a Boolean value that indicates whether the receiver is an instance of given class or an instance of any class that inherits from that class.
@@ -40,11 +43,6 @@ interface ObjectProtocol extends CustomDebugStringConvertible, Equatable
      * @return bool true if the receiver is a subclass of class, otherwise false.
      */
     public function isSubclass(string $class): bool;
-
-    /**
-     * Returns an integer that can be used as a table address in a hash table structure.
-     */
-    public function hash(): int;
 
     /**
      * Returns a Boolean value that indicates whether the receiver implements or inherits a method that can respond to a specified message.

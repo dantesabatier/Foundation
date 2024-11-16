@@ -3,7 +3,6 @@
 namespace Sabatier\Foundation\Networking;
 
 use JetBrains\PhpStorm\ExpectedValues;
-use Override;
 use Sabatier\Foundation\CompareOptions;
 use Sabatier\Foundation\Dictionary;
 use Sabatier\Foundation\Number;
@@ -23,6 +22,9 @@ class HTTPURLResponse extends URLResponse
     public readonly int $statusCode;
     /** @var Dictionary All HTTP header fields of the response. */
     public readonly Dictionary $allHeaderFields;
+    public string $description {
+        get => sprintf("<HTTPURLResponse %s> { URL: %s }{ status: %d, headers {\n%s} }", $this->hash, $this->url->absoluteString, $this->statusCode, $this->allHeaderFields->mapValues(fn(mixed $value, string $key): string => is_string($value) ? "\"$key\" = \"$value\";\n" : sprintf("\"%s\" = %s;\n", $key, human_readable_value($value)))->values->join(""));
+    }
 
     /**
      * Initializes an HTTP URL response object with a status code, protocol version, and response headers.
@@ -73,7 +75,7 @@ class HTTPURLResponse extends URLResponse
     private function expectedContentLength(?Dictionary $headerFields): int
     {
         if ($value = $headerFields?->valueForCaseInsensitiveKey("Content-Length")) {
-            return (new Number($value))->intValue;
+            return new Number($value)->intValue;
         }
         return URLResponseUnknownLength;
     }
@@ -164,11 +166,5 @@ class HTTPURLResponse extends URLResponse
             HTTPStatusCode::unsupportedVersion => "Unsupported version",
             default => "Server Error"
         };
-    }
-
-    #[Override]
-    public function description(): string
-    {
-        return sprintf("<HTTPURLResponse %s> { URL: %s }{ status: %d, headers {\n%s} }", $this->hash(), $this->url->absoluteString, $this->statusCode, $this->allHeaderFields->mapValues(fn(mixed $value, string $key): string => is_string($value) ? "\"$key\" = \"$value\";\n" : sprintf("\"%s\" = %s;\n", $key, human_readable_value($value)))->values->join(""));
     }
 }

@@ -18,7 +18,7 @@ readonly class AuthParameter
     public static function parameters(string $parametersView): ArrayClass
     {
         /** @var ArrayClass<AuthParameter> */
-        return (new ArrayClass(explode(",", $parametersView)))->compactMap(function (string $e): ?AuthParameter {
+        return new ArrayClass(explode(",", $parametersView))->compactMap(function (string $e): ?AuthParameter {
             $components = array_map(fn(string $e): string => trim($e), explode("=", $e));
             if (count($components) !== 2) {
                 return null;

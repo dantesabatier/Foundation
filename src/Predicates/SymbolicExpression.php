@@ -8,30 +8,23 @@ use Sabatier\Foundation\Dictionary;
 /** @internal */
 class SymbolicExpression extends Expression
 {
-    protected function __construct(private readonly string $token)
+    public string $predicateFormat {
+        get => $this->constantValue;
+    }
+
+    protected function __construct(string $token)
     {
         parent::__construct(ExpressionType::symbolic);
+        $this->constantValue = $token;
     }
 
     #[Override]
     public function isEqual(mixed $other): bool
     {
         if ($other instanceof SymbolicExpression) {
-            return $this->token === $other->token;
+            return $this->constantValue === $other->constantValue;
         }
         return false;
-    }
-
-    #[Override]
-    public function constantValue(): string
-    {
-        return $this->token;
-    }
-
-    #[Override]
-    public function predicateFormat(): string
-    {
-        return $this->token;
     }
 
     /** @noinspection PhpMixedReturnTypeCanBeReducedInspection */

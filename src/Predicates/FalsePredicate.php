@@ -10,7 +10,6 @@
 namespace Sabatier\Foundation\Predicates;
 
 use JetBrains\PhpStorm\ExpectedValues;
-use JetBrains\PhpStorm\Pure;
 use Override;
 use Sabatier\Foundation\Dictionary;
 
@@ -18,12 +17,13 @@ use Sabatier\Foundation\Dictionary;
 final class FalsePredicate extends Predicate
 {
     private static ?FalsePredicate $default = null;
+    public string $predicateFormat {
+        get => "FALSEPREDICATE";
+    }
 
     public static function default(): FalsePredicate
     {
-        if (FalsePredicate::$default === null) {
-            FalsePredicate::$default = new FalsePredicate();
-        }
+        FalsePredicate::$default ??= new FalsePredicate();
         return FalsePredicate::$default;
     }
 
@@ -37,12 +37,5 @@ final class FalsePredicate extends Predicate
     public function accept(PredicateVisitor $visitor, #[ExpectedValues(flagsFromClass: PredicateVisitorFlags::class)] int $flags): void
     {
         $visitor->visitPredicate($this);
-    }
-
-    #[Pure]
-    #[Override]
-    public function description(): string
-    {
-        return "FALSEPREDICATE";
     }
 }

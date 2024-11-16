@@ -13,7 +13,7 @@ const UUID_NULL = "00000000-0000-0000-0000-000000000000";
  */
 function read_random(int $numBytes): string
 {
-    return (new Randomizer(new Secure()))->getBytes($numBytes);
+    return new Randomizer(new Secure())->getBytes($numBytes);
 }
 
 function nanotime(): float

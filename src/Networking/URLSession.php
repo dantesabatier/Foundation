@@ -315,7 +315,7 @@ final class URLSession implements URLSessionProtocol
     public function getAllTasks(Closure $completionHandler): void
     {
         $this->delegateQueue->addOperationWithBlock(function () use ($completionHandler): void {
-            $completionHandler($this->taskRegistry->allTask->filter(fn(URLSessionTask $task): bool => $task->state === URLSessionTaskState::running || $task->isSuspendedAfterResume()));
+            $completionHandler($this->taskRegistry->allTask->filter(fn(URLSessionTask $task): bool => $task->state === URLSessionTaskState::running || $task->isSuspendedAfterResume)->values);
         });
     }
 

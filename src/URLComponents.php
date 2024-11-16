@@ -4,9 +4,6 @@ namespace Sabatier\Foundation;
 
 /**
  * A structure that parses URLs into and constructs URLs from their constituent parts.
- * @property-read URL|null $url A URL created from the components.
- * @property-read string|null $string A URL derived from the components object, in string form.
- * @property ArrayClass<URLQueryItem>|null $queryItems An array of query items for the URL in the order in which they appear in the original query string. Each URLQueryItem represents a single key-value pair, Note that a name may appear more than once in a single query string, so the name values are not guaranteed to be unique. If the URLComponents has an empty query component, returns an empty array. If the URLComponents has no query component, returns nil. The setter combines an array containing any number of URLQueryItems, each of which represents a single key-value pair, into a query string and sets the URLComponents query property. Passing an empty array sets the query component of the URLComponents to an empty string. Passing nil removes the query component of the URLComponents.
  */
 class URLComponents extends ObjectClass
 {
@@ -26,24 +23,13 @@ class URLComponents extends ObjectClass
     public ?string $scheme = null;
     /** @var string|null The user subcomponent of the URL. */
     public ?string $user = null;
-
-    public function __construct(?string $string = null)
-    {
-        if ($string && ($components = parse_url($string))) {
-            foreach ($components as $key => $value) {
-                if (!empty($value)) {
-                    $this->$key = $value;
-                }
-            }
-        }
+    /** @var URL|null A URL created from the components. */
+    public ?URL $url {
+        get => $this->urlRelativeTo(null);
     }
-
-    public function __get(string $name)
-    {
-        if ($name === "url") {
-            return $this->urlRelativeTo(null);
-        }
-        if ($name === "string") {
+    /** @var string|null A URL derived from the components object, in string form. */
+    public ?string $string {
+        get {
             $scheme = $this->scheme;
             if ($scheme) {
                 $scheme .= "://";
@@ -88,21 +74,41 @@ class URLComponents extends ObjectClass
             if ($fragment) {
                 $fragment = "#" . $fragment;
             }
-            $string = (new ArrayClass([$scheme, $user, $password, $host, $port, $path, $query, $fragment]))->compactMap(fn(string|int|null $element): string|int|null => $element)->join("");
+            $string = new ArrayClass([$scheme, $user, $password, $host, $port, $path, $query, $fragment])->compactMap(fn(string|int|null $element): string|int|null => $element)->join("");
             return empty($string) ? null : $string;
         }
-        if ($name === "queryItems") {
-            return ($this->query === null) ? null : (new ArrayClass(explode("&", $this->query)))->map(function (string $pair): URLQueryItem {
+    }
+    /** @var ArrayClass<URLQueryItem>|null $queryItems An array of query items for the URL in the order in which they appear in the original query string. Each URLQueryItem represents a single key-value pair, Note that a name may appear more than once in a single query string, so the name values are not guaranteed to be unique. If the URLComponents has an empty query component, returns an empty array. If the URLComponents has no query component, returns nil. The setter combines an array containing any number of URLQueryItems, each of which represents a single key-value pair, into a query string and sets the URLComponents query property. Passing an empty array sets the query component of the URLComponents to an empty string. Passing nil removes the query component of the URLComponents. */
+    public ?ArrayClass $queryItems {
+        get {
+            $query = $this->query;
+            if (!$query) {
+                return null;
+            }
+            $components = explode("&", $query);
+            if (!count($components)) {
+                return null;
+            }
+            return new ArrayClass($components)->map(function (string $pair): URLQueryItem {
                 $components = preg_split(sprintf("/%s/", preg_quote("=", "/")), $pair, -1, PREG_SPLIT_NO_EMPTY);
-                $name = $components[0];
-                $value = (count($components) === 2) ? urldecode($components[1]) : null;
+                [$name, $value] = $components;
                 if ($value) {
-                    $value = htmlspecialchars($value, ENT_QUOTES);
+                    $value = htmlspecialchars(urldecode($value), ENT_QUOTES);
                 }
                 return new URLQueryItem($name, $value);
             });
         }
-        return $this->valueForUndefinedKey($name);
+    }
+
+    public function __construct(?string $string = null)
+    {
+        if ($string && ($components = parse_url($string))) {
+            foreach ($components as $key => $value) {
+                if (!empty($value)) {
+                    $this->$key = $value;
+                }
+            }
+        }
     }
 
     public function __set(string $name, mixed $value): void

@@ -16,14 +16,24 @@ use Traversable;
  * @template Element
  * @implements Sequence<int, Element>
  * @implements IteratorAggregate<int, Element>
- * @property-read bool $isEmpty A Boolean value indicating whether the collection is empty.
- * @property-read int $count The number of elements in the collection.
- * @property-read Element|null $first The first element of the collection.
  */
 class FlattenSequence extends ObjectClass implements Sequence, IteratorAggregate
 {
     use SequenceAlgorithms {
         reduce as private sequenceReduce;
+    }
+
+    public string $description {
+        get => sprintf("<%s %s <%s>>", get_called_class(), $this->base::class, human_readable_value($this->base));
+    }
+    public int $count {
+        get => count($this->reserved);
+    }
+    public bool $isEmpty {
+        get => $this->count === 0;
+    }
+    public mixed $first {
+        get => $this->first();
     }
 
     /**
@@ -32,16 +42,6 @@ class FlattenSequence extends ObjectClass implements Sequence, IteratorAggregate
      */
     public function __construct(public readonly Sequence $base)
     {
-    }
-
-    public function __get(string $name)
-    {
-        return match ($name) {
-            "count" => $this->count(),
-            "isEmpty" => $this->isEmpty(),
-            "first" => $this->first(),
-            default => $this->valueForUndefinedKey($name)
-        };
     }
 
     /**
@@ -68,7 +68,7 @@ class FlattenSequence extends ObjectClass implements Sequence, IteratorAggregate
     #[Override]
     public function map(Closure $transform): Sequence
     {
-        return (new ($this->base::class)($this))->map($transform);
+        return new ($this->base::class)($this)->map($transform);
     }
 
     /**
@@ -80,7 +80,7 @@ class FlattenSequence extends ObjectClass implements Sequence, IteratorAggregate
     #[Override]
     public function compactMap(Closure $transform): Sequence
     {
-        return (new ($this->base::class)($this))->compactMap($transform);
+        return new ($this->base::class)($this)->compactMap($transform);
     }
 
     /**
@@ -92,7 +92,7 @@ class FlattenSequence extends ObjectClass implements Sequence, IteratorAggregate
     #[Override]
     public function flatMap(Closure $transform): Sequence
     {
-        return (new ($this->base::class)($this))->flatMap($transform);
+        return new ($this->base::class)($this)->flatMap($transform);
     }
 
     #[Override]
@@ -129,11 +129,5 @@ class FlattenSequence extends ObjectClass implements Sequence, IteratorAggregate
     public function toArray(): array
     {
         return iterator_to_array($this);
-    }
-
-    #[Override]
-    public function description(): string
-    {
-        return sprintf("<%s %s <%s>>", static::class, $this->base::class, human_readable_value($this->base));
     }
 }

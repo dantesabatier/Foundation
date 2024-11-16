@@ -8,6 +8,10 @@ use Override;
 /** @internal */
 class UnarchiveFromDataTransformer extends SharedValueTransformer
 {
+    public string $description {
+        get => "<shared UnarchiveFromData transformer>";
+    }
+
     /**
      * @throws Exception
      */
@@ -30,11 +34,5 @@ class UnarchiveFromDataTransformer extends SharedValueTransformer
             return KeyedUnarchiver::unarchiveTopLevelObjectWithData($value);
         }
         return $value;
-    }
-
-    #[Override]
-    public function description(): string
-    {
-        return "<shared UnarchiveFromData transformer>";
     }
 }

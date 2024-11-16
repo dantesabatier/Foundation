@@ -11,19 +11,14 @@ use Sabatier\Foundation\Predicates\Predicate;
  * A list of indexes that together represent the path to a specific location in a tree of nested arrays.
  * @implements MutableCollection<int, int>
  * @implements Iterator<int, int>
- * @property-read int $section An index number identifying a section in a table view or collection view.
- * @property-read int $row An index number identifying a row in a section of a table view.
- * @property-read int $item An index number identifying an item in a section of a collection view.
- * @property-read bool $isEmpty A Boolean value indicating whether the collection is empty.
- * @property-read int $count The number of elements in the collection.
- * @property-read int|null $first The first element of the collection.
- * @property-read int|null $last The last element of the collection.
  */
 class IndexPath extends ObjectClass implements MutableCollection, Iterator
 {
     use MutableCollectionAlgorithms {
         compare as private sequenceCompare;
         toArray as private sequenceToArray;
+        filter as private sequenceFilter;
+        allSatisfy as private sequenceAllSatisfy;
         contains as private sequenceContains;
         containsElement as private sequenceContainsElement;
         first as private sequenceFirst;
@@ -37,11 +32,9 @@ class IndexPath extends ObjectClass implements MutableCollection, Iterator
         randomElement as private collectionRandomElement;
         firstIndex as private collectionFirstIndex;
         indexOf as private collectionIndexOf;
-        filter as private collectionFilter;
         filtered as private collectionFiltered;
         sort as private collectionSort;
         sorted as private collectionSorted;
-        allSatisfy as private collectionAllSatisfy;
         joined as private collectionJoined;
         lastIndex as private bidirectionalCollectionLastIndex;
         last as private bidirectionalCollectionLast;
@@ -69,6 +62,43 @@ class IndexPath extends ObjectClass implements MutableCollection, Iterator
         current as private iteratorCurrent;
     }
 
+    public string $description {
+        get => "[" . $this->join(", ") . "]";
+    }
+    public int $count {
+        get => count($this->reserved);
+    }
+    public bool $isEmpty {
+        get => $this->count === 0;
+    }
+    public mixed $first {
+        get => $this->first();
+    }
+    public mixed $last {
+        get => $this->last();
+    }
+    public int $startIndex {
+        get => 0;
+    }
+    public int $endIndex {
+        get => $this->count;
+    }
+    public Range $indices {
+        get => new Range($this->startIndex, $this->endIndex);
+    }
+    /** @var int An index number identifying a section in a table view or collection view. */
+    public int $section {
+        get => $this->index(0);
+    }
+    /** @var int An index number identifying an item in a section of a collection view. */
+    public int $item {
+        get => $this->index(1);
+    }
+    /** @var int An index number identifying a row in a section of a table view. */
+    public int $row {
+        get => $this->item;
+    }
+
     /**
      * Initialized IndexPath object with indexes up to length.
      * @param int[] $indexes Array of indexes to make up the index path.
@@ -76,19 +106,6 @@ class IndexPath extends ObjectClass implements MutableCollection, Iterator
     public function __construct(array $indexes)
     {
         $this->reserved = $indexes;
-    }
-
-    public function __get(string $name)
-    {
-        return match ($name) {
-            "isEmpty" => $this->isEmpty(),
-            "count" => $this->count(),
-            "first" => $this->first(),
-            "last" => $this->last(),
-            "section" => $this->index(0),
-            "row", "item" => $this->index(1),
-            default => $this->valueForUndefinedKey($name)
-        };
     }
 
     /**
@@ -159,7 +176,7 @@ class IndexPath extends ObjectClass implements MutableCollection, Iterator
     #[Override]
     public function map(Closure $transform): ArrayClass
     {
-        return (new ArrayClass($this))->map($transform);
+        return new ArrayClass($this)->map($transform);
     }
 
     /**
@@ -171,7 +188,7 @@ class IndexPath extends ObjectClass implements MutableCollection, Iterator
     #[Override]
     public function compactMap(Closure $transform): ArrayClass
     {
-        return (new ArrayClass($this))->compactMap($transform);
+        return new ArrayClass($this)->compactMap($transform);
     }
 
     /**
@@ -183,7 +200,7 @@ class IndexPath extends ObjectClass implements MutableCollection, Iterator
     #[Override]
     public function flatMap(Closure $transform): ArrayClass
     {
-        return (new ArrayClass($this))->flatMap($transform);
+        return new ArrayClass($this)->flatMap($transform);
     }
 
     /**
@@ -192,7 +209,7 @@ class IndexPath extends ObjectClass implements MutableCollection, Iterator
      * @return int|null The first element of the collection that satisfies predicate, or nil if there is no element that satisfies predicate.
      */
     #[Override]
-    public function first(Closure $where = null): ?int
+    public function first(?Closure $where = null): ?int
     {
         return $this->sequenceFirst($where);
     }
@@ -203,7 +220,7 @@ class IndexPath extends ObjectClass implements MutableCollection, Iterator
      * @return int|null The last element of the collection that satisfies predicate, or nil if there is no element that satisfies predicate.
      */
     #[Override]
-    public function last(Closure $where = null): ?int
+    public function last(?Closure $where = null): ?int
     {
         return $this->bidirectionalCollectionLast($where);
     }
@@ -262,7 +279,7 @@ class IndexPath extends ObjectClass implements MutableCollection, Iterator
     #[Override]
     public function filter(Closure $isIncluded): IndexPath
     {
-        return $this->collectionFilter($isIncluded);
+        return $this->sequenceFilter($isIncluded);
     }
 
     /**
@@ -285,7 +302,7 @@ class IndexPath extends ObjectClass implements MutableCollection, Iterator
     #[Override]
     public function allSatisfy(Closure $predicate): bool
     {
-        return $this->collectionAllSatisfy($predicate);
+        return $this->sequenceAllSatisfy($predicate);
     }
 
     /**
@@ -437,7 +454,7 @@ class IndexPath extends ObjectClass implements MutableCollection, Iterator
      * @param Closure(int, int=): bool|null $where A closure that takes an element of the sequence as its argument and returns a Boolean value indicating whether the element should be removed from the collection.
      */
     #[Override]
-    public function removeAll(Closure $where = null): void
+    public function removeAll(?Closure $where = null): void
     {
         $this->mutableCollectionRemoveAll($where);
     }
@@ -554,12 +571,6 @@ class IndexPath extends ObjectClass implements MutableCollection, Iterator
     public function toArray(): array
     {
         return $this->sequenceToArray();
-    }
-
-    #[Override]
-    public function description(): string
-    {
-        return "[" . $this->join(", ") . "]";
     }
 
     /**

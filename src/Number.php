@@ -12,15 +12,25 @@ use Override;
 class Number extends Value
 {
     /** @var bool The number object's value expressed as a Boolean value. A 0 value always means false, and any nonzero value is interpreted as true. */
-    public readonly bool $boolValue;
+    public bool $boolValue {
+        get => (bool)$this->value;
+    }
     /** @var float The number object's value expressed as a float, converted as necessary. */
-    public readonly float $floatValue;
+    public float $floatValue {
+        get => (float)$this->value;
+    }
     /** @var float The number object's value expressed as a double, converted as necessary. */
-    public readonly float $doubleValue;
+    public float $doubleValue {
+        get => (float)$this->value;
+    }
     /** @var int The number object's value expressed as int, converted as necessary. */
-    public readonly int $intValue;
+    public int $intValue {
+        get => (int)$this->value;
+    }
     /** @var string The number object's value expressed as a human-readable string. */
-    public readonly string $stringValue;
+    public string $stringValue {
+        get => human_readable_value($this->value);
+    }
 
     /**
      * Returns a Number object initialized to contain a given value.
@@ -33,22 +43,6 @@ class Number extends Value
         }
         parent::__construct($value);
         assert(is_numeric($this->value) || is_bool($this->value), sprintf("Invalid argument, expecting a numeric value, (%s)%s given", typeof($this->value), human_readable_value($this->value)));
-        unset($this->boolValue);
-        unset($this->floatValue);
-        unset($this->doubleValue);
-        unset($this->intValue);
-        unset($this->stringValue);
-    }
-
-    public function __get(string $name)
-    {
-        return $this->$name = match ($name) {
-            "boolValue" => (bool)$this->value,
-            "floatValue", "doubleValue" => (float)$this->value,
-            "intValue" => (int)$this->value,
-            "stringValue" => human_readable_value($this->value),
-            default => $this->valueForUndefinedKey($name)
-        };
     }
 
     /**

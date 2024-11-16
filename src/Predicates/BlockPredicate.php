@@ -17,6 +17,10 @@ use Sabatier\Foundation\Dictionary;
 /** @internal */
 class BlockPredicate extends Predicate
 {
+    public string $predicateFormat {
+        get => "BLOCKPREDICATE()";
+    }
+
     public function __construct(private readonly Closure $block)
     {
     }
@@ -37,11 +41,5 @@ class BlockPredicate extends Predicate
     public function accept(PredicateVisitor $visitor, #[ExpectedValues(flagsFromClass: PredicateVisitorFlags::class)] int $flags): void
     {
         $visitor->visitPredicate($this);
-    }
-
-    #[Override]
-    public function predicateFormat(): string
-    {
-        return "BLOCKPREDICATE()";
     }
 }

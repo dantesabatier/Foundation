@@ -8,14 +8,6 @@ use Override;
 
 /**
  * An object that conveys ongoing progress to the user for a specified task.
- * @property float $totalUnitCount The total number of tracked units of work for the current progress.
- * @property float $completedUnitCount The number of completed units of work for the current job.
- * @property-read bool $isCancelled A Boolean value that Indicates whether the receiver is tracking canceled work. By default, Progress is KVO-compliant for this property. It sends notifications on the same thread that updates the property. If the receiver has a canceled containing progress object, the receiver reports a canceled status.
- * @property-read bool $isPaused A Boolean value that indicates whether the receiver is tracking paused work. By default, Progress is KVO-compliant for this property. It sends notifications on the same thread that updates the property. If the receiver has a paused containing progress object, the receiver reports a paused status.
- * @property-read bool $isIndeterminate A Boolean value that indicates whether the tracked progress is indeterminate. Use isIndeterminate progress only when you're unable to determine a reasonable value for either {@see $completedUnitCount} or {@see $totalUnitCount}. Progress is indeterminate when the value of the totalUnitCount or completedUnitCount is less than zero or if both values are zero. When progress is indeterminate, {@see $fractionCompleted} returns 0.0 and {@see $isFinished} returns false. By default, Progress is KVO-compliant for this property. It sends notifications on the same thread that updates the property.
- * @property-read float $fractionCompleted The fraction of the overall work that the progress object completes, including work from its suboperations.
- * @property-read bool $isFinished A Boolean value that indicates the progress object is complete. A progress object finishes when the {@see $completedUnitCount} equals or exceeds the {@see $totalUnitCount}. By default, Progress is KVO-compliant for this property. It sends notifications on the same thread that updates the property.
- * @property-read bool $isOld A Boolean value that indicates when the observed progress object invokes the publish method before you subscribe to it. The publish and subscribe mechanism is generally level-triggered, in that when you invoke {@see addSubscriber()}, the system invokes your block for every relevant published and unpublished progress object. Sometimes you need to implement edge-triggered behavior, in which you do something either exactly when new progress begins or not at all. In the example above, the Dock doesn't animate file icons when this method returns true. There's no reliable definition of before in this case, which involves multiple processes in a preemptively scheduled system. Don't use this method for anything more important than best efforts at animating. It can be inaccurate due to processes coming and going from unpredictable user actions.
  * @psalm-type UnpublishingHandler = Closure(): void
  * @psalm-type PublishingHandler = Closure(Progress): ?UnpublishingHandler
  */
@@ -27,12 +19,14 @@ class Progress extends ObjectClass
     public string $localizedAdditionalDescription = "";
     /** @var bool A Boolean value that indicates whether the receiver is tracking work that you can cancel. */
     public bool $isCancellable = false;
-    protected bool $isCancelled = false;
+    /** @var bool A Boolean value that Indicates whether the receiver is tracking canceled work. By default, Progress is KVO-compliant for this property. It sends notifications on the same thread that updates the property. If the receiver has a canceled containing progress object, the receiver reports a canceled status. */
+    private(set) bool $isCancelled = false;
     /** @var Closure(): void|null The block to invoke when canceling progress. */
     public ?Closure $cancellationHandler = null;
     /** @var bool A Boolean value that indicates whether the receiver is tracking work that you can pause. */
     public bool $isPausable = false;
-    protected bool $isPaused = false;
+    /** @var bool A Boolean value that indicates whether the receiver is tracking paused work. By default, Progress is KVO-compliant for this property. It sends notifications on the same thread that updates the property. If the receiver has a paused containing progress object, the receiver reports a paused status. */
+    private(set) bool $isPaused = false;
     /** @var Closure(): void|null The block to invoke when pausing progress. */
     public ?Closure $pausingHandler = null;
     /** @var Closure(): void|null The block to invoke when progress resumes. */
@@ -45,7 +39,7 @@ class Progress extends ObjectClass
     /** @var int|null A value that represents the speed of data processing, in bytes per second. */
     public ?int $throughput = null;
     /** @var Dictionary<mixed> A dictionary of arbitrary values for the receiver. */
-    public readonly Dictionary $userInfo;
+    private(set) Dictionary $userInfo;
     /** @var string|null The kind of file operation for the progress object. */
     #[ExpectedValues(valuesFromClass: ProgressKindFile::class)]
     public ?string $fileOperationKind = null;
@@ -55,10 +49,54 @@ class Progress extends ObjectClass
     public ?int $fileTotalCount = null;
     /** @var int|null The number of completed files for a file progress object. */
     public ?int $fileCompletedCount = null;
-    protected bool $isOld = false;
+    /** @var bool A Boolean value that indicates when the observed progress object invokes the publish method before you subscribe to it. The publish and subscribe mechanism is generally level-triggered, in that when you invoke addSubscriber(), the system invokes your block for every relevant published and unpublished progress object. Sometimes you need to implement edge-triggered behavior, in which you do something either exactly when new progress begins or not at all. In the example above, the Dock doesn't animate file icons when this method returns true. There's no reliable definition of before in this case, which involves multiple processes in a preemptively scheduled system. Don't use this method for anything more important than best efforts at animating. It can be inaccurate due to processes coming and going from unpredictable user actions. */
+    private(set) bool $isOld = false;
+    /** @var float The total number of tracked units of work for the current progress. */
+    public float $totalUnitCount {
+        get => $this->fraction->total;
+        set {
+            $previous = $this->overallFraction();
+            if ($this->fraction->total != $value && $this->fraction->total > 0) {
+                $this->childFraction = $this->childFraction->multiply(new ProgressFraction($this->fraction->total, $value));
+            }
+            $this->willChangeValueForKey("totalUnitCount");
+            $this->fraction->total = $value;
+            $this->didChangeValueForKey("totalUnitCount");
+            $this->updateFractionCompleted($previous, $this->overallFraction());
+        }
+    }
+    /** @var float The number of completed units of work for the current job. */
+    public float $completedUnitCount {
+        get => $this->fraction->completed;
+        set {
+            $previous = $this->overallFraction();
+            $this->willChangeValueForKey("isIndeterminate");
+            $this->willChangeValueForKey("isFinished");
+            $this->willChangeValueForKey("fractionCompleted");
+            $this->willChangeValueForKey("completedUnitCount");
+            $this->fraction->completed = $value;
+            $this->didChangeValueForKey("completedUnitCount");
+            $this->didChangeValueForKey("isIndeterminate");
+            $this->didChangeValueForKey("isFinished");
+            $this->didChangeValueForKey("fractionCompleted");
+            $this->updateFractionCompleted($previous, $this->overallFraction());
+        }
+    }
+    /** @var bool A Boolean value that indicates whether the tracked progress is indeterminate. Use isIndeterminate progress only when you're unable to determine a reasonable value for either {@see $completedUnitCount} or {@see $totalUnitCount}. Progress is indeterminate when the value of the totalUnitCount or completedUnitCount is less than zero or if both values are zero. When progress is indeterminate, {@see $fractionCompleted} returns 0.0 and {@see $isFinished} returns false. By default, Progress is KVO-compliant for this property. It sends notifications on the same thread that updates the property. */
+    public bool $isIndeterminate {
+        get => $this->fraction->isIndeterminate;
+    }
+    /** @var bool A Boolean value that indicates the progress object is complete. A progress object finishes when the {@see $completedUnitCount} equals or exceeds the {@see $totalUnitCount}. By default, Progress is KVO-compliant for this property. It sends notifications on the same thread that updates the property. */
+    public bool $isFinished {
+        get => $this->fraction->isFinished;
+    }
+    /** @var float The fraction of the overall work that the progress object completes, including work from its suboperations. */
+    public float $fractionCompleted {
+        get => $this->fraction->total > 0 ? $this->fraction->fractionCompleted : $this->fraction->add($this->childFraction)->fractionCompleted;
+    }
     private ?Progress $parent = null;
     /** @var Set<Progress> */
-    private readonly Set $children;
+    private Set $children;
     private readonly ProgressFraction $fraction;
     private ProgressFraction $childFraction;
     private float $portionOfParent = 0.0;
@@ -77,47 +115,6 @@ class Progress extends ObjectClass
         $this->childFraction = new ProgressFraction();
         $this->childFraction->total = 1.0;
         $parent?->addChild($this, $this->totalUnitCount);
-    }
-
-    public function __get(string $name)
-    {
-        return match ($name) {
-            "isCancelled", "isPaused", "isOld" => $this->$name,
-            "totalUnitCount" => $this->fraction->total,
-            "completedUnitCount" => $this->fraction->completed,
-            "isIndeterminate" => $this->fraction->isIndeterminate,
-            "isFinished" => $this->fraction->isFinished,
-            "fractionCompleted" => $this->fraction->total > 0 ? $this->fraction->fractionCompleted : $this->fraction->add($this->childFraction)->fractionCompleted,
-            default => $this->valueForUndefinedKey($name)
-        };
-    }
-
-    public function __set(string $name, mixed $value): void
-    {
-        if ($name === "totalUnitCount") {
-            $previous = $this->overallFraction();
-            if ($this->fraction->total != $value && $this->fraction->total > 0) {
-                $this->childFraction = $this->childFraction->multiply(new ProgressFraction($this->fraction->total, $value));
-            }
-            $this->willChangeValueForKey($name);
-            $this->fraction->total = $value;
-            $this->didChangeValueForKey($name);
-            $this->updateFractionCompleted($previous, $this->overallFraction());
-        } elseif ($name === "completedUnitCount") {
-            $previous = $this->overallFraction();
-            $this->willChangeValueForKey("isIndeterminate");
-            $this->willChangeValueForKey("isFinished");
-            $this->willChangeValueForKey("fractionCompleted");
-            $this->willChangeValueForKey($name);
-            $this->fraction->completed = $value;
-            $this->didChangeValueForKey($name);
-            $this->didChangeValueForKey("isIndeterminate");
-            $this->didChangeValueForKey("isFinished");
-            $this->didChangeValueForKey("fractionCompleted");
-            $this->updateFractionCompleted($previous, $this->overallFraction());
-        } else {
-            $this->setValueForUndefinedKey($value, $name);
-        }
     }
 
     private function overallFraction(): ProgressFraction
@@ -220,7 +217,7 @@ class Progress extends ObjectClass
     {
         $child->parent === null ?: fatal_error("The Progress was already the child of another Progress");
         $child->setParent($this, $unitCount);
-        $this->children->append($child);
+        $this->children[] = $child;
         if ($this->isCancelled) {
             $child->cancel();
         }
@@ -328,7 +325,7 @@ class Progress extends ObjectClass
      */
     public function setUserInfoObject(mixed $objectOrNil, string $key): void
     {
-        $this->userInfo->setValueForKey($objectOrNil, $key);
+        $this->userInfo[$key] = $objectOrNil;
     }
 
     /**

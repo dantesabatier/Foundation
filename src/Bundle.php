@@ -23,32 +23,66 @@ final class Bundle extends ObjectClass
     private static ?Dictionary $loadedBundles = null;
     public const string didLoadNotification = BundleDidLoadNotification;
     /** @var URL|null The file URL of the bundle's subdirectory containing resource files. */
-    public readonly ?URL $resourceURL;
+    public ?URL $resourceURL {
+        get => $this->directoryURL($this->bundleURL, "Resources");
+    }
     /** @var URL|null The file URL of the receiver's executable file. */
-    public readonly ?URL $executableURL;
+    public ?URL $executableURL {
+        get => $this->directoryURL($this->bundleURL->appendingPathComponent("OS"), $this->object(kCFBundleExecutableKey) ?? $this->object(kCFBundleNameKey));
+    }
     /** @var URL|null The file URL of the bundle's subdirectory containing private frameworks. */
-    public readonly ?URL $privateFrameworksURL;
+    public ?URL $privateFrameworksURL {
+        get => $this->directoryURL($this->bundleURL, "PrivateFrameworks");
+    }
     /** @var URL|null The file URL of the receiver's subdirectory containing shared frameworks. */
-    public readonly ?URL $sharedFrameworksURL;
+    public ?URL $sharedFrameworksURL {
+        get => $this->directoryURL($this->bundleURL, "Frameworks");
+    }
     /** @var URL|null The file URL of the receiver's subdirectory containing plug-ins. */
-    public readonly ?URL $builtInPlugInsURL;
+    public ?URL $builtInPlugInsURL {
+        get => $this->directoryURL($this->bundleURL, "Plugins");
+    }
     /** @var URL|null The file URL of the bundle's subdirectory containing shared support files. */
-    public readonly ?URL $sharedSupportURL;
+    public ?URL $sharedSupportURL {
+        get => $this->directoryURL($this->bundleURL, "SharedSupport");
+    }
     /** @var string|null The receiver's bundle identifier. */
-    public readonly ?string $bundleIdentifier;
+    public ?string $bundleIdentifier {
+        get => $this->object(kCFBundleIdentifierKey);
+    }
     /** @var Dictionary|null A dictionary, constructed from the bundle's Info.plist file, that contains information about the receiver. */
-    public readonly ?Dictionary $infoDictionary;
+    public ?Dictionary $infoDictionary {
+        get => PropertyListSerialization::propertyListWithURL($this->bundleURL->appendingPathComponent("Info")->appendingPathExtension("plist"));
+    }
     /** @var ArrayClass<string> $localizations A list of all the localizations contained in the bundle. An array of string objects containing language IDs for all the localizations contained in the bundle. */
-    public readonly ArrayClass $localizations;
+    public ArrayClass $localizations {
+        get => $this->object(kCFBundleLocalizationsKey) ?? new ArrayClass();
+    }
     /** @var ArrayClass<string> $preferredLocalizations An ordered list of preferred localizations contained in the bundle. An array of string objects containing language IDs for localizations in the bundle. The strings are ordered according to the user's language preferences and available localizations */
-    public readonly ArrayClass $preferredLocalizations;
+    public ArrayClass $preferredLocalizations {
+        get {
+            $preferredLocalizations = clone $this->localizations;
+            $preferredLocalizations->partition(fn(string $localization): bool => $localization !== Locale::getPrimaryLanguage(Locale::getDefault()));
+            return $preferredLocalizations;
+        }
+    }
     /** @var string|null The localization for the development language.
      * This property corresponds to the value in the CFBundleDevelopmentRegion key of the bundle's property list (Info.plist). */
-    public readonly ?string $developmentLocalization;
+    public ?string $developmentLocalization {
+        get => $this->object(kCFBundleDevelopmentRegionKey);
+    }
     /** @var Dictionary|null A dictionary with the keys from the bundle's localized property list. This property uses the preferred localization for the current user when determining which resources to include. If the preferred localization is not available, this property chooses the most appropriate localization found in the bundle. */
-    public readonly ?Dictionary $localizedInfoDictionary;
+    public ?Dictionary $localizedInfoDictionary {
+        get => $this->infoDictionary;
+    }
     /** @var class-string|null $principalClass The bundle's principal class. */
-    public readonly ?string $principalClass;
+    public ?string $principalClass {
+        get {
+            /** @var class-string|null $principalClass */
+            $principalClass = $this->object(kCFBundlePrincipalClassKey);
+            return empty($principalClass) ? null : $this->classNamed($principalClass);
+        }
+    }
 
     /**
      * Returns a Bundle object initialized to correspond to the specified file URL.
@@ -56,87 +90,12 @@ final class Bundle extends ObjectClass
      */
     private function __construct(public readonly URL $bundleURL)
     {
-        unset($this->infoDictionary);
-        unset($this->resourceURL);
-        unset($this->executableURL);
-        unset($this->privateFrameworksURL);
-        unset($this->sharedFrameworksURL);
-        unset($this->builtInPlugInsURL);
-        unset($this->sharedSupportURL);
-        unset($this->bundleIdentifier);
-        unset($this->localizations);
-        unset($this->preferredLocalizations);
-        unset($this->developmentLocalization);
-        unset($this->localizedInfoDictionary);
-        unset($this->principalClass);
         FileManager::default()->fileExists($this->bundleURL->path, $isDirectory) && $isDirectory ?: fatal_error("Invalid bundle url \"$this->bundleURL\"");
     }
 
     public function __destruct()
     {
         self::loadedBundles()->removeValueForKey($this->bundleURL->absoluteString);
-    }
-
-    public function __get(string $name)
-    {
-        if ($name === "resourceURL") {
-            $this->$name = $this->directoryURL($this->bundleURL, "Resources");
-            return $this->$name;
-        }
-        if ($name === "executableURL") {
-            $this->$name = $this->directoryURL($this->bundleURL->appendingPathComponent("OS"), $this->object(kCFBundleExecutableKey) ?? $this->object(kCFBundleNameKey));
-            return $this->$name;
-        }
-        if ($name === "privateFrameworksURL") {
-            $this->$name = $this->directoryURL($this->bundleURL, "PrivateFrameworks");
-            return $this->$name;
-        }
-        if ($name === "sharedFrameworksURL") {
-            $this->$name = $this->directoryURL($this->bundleURL, "Frameworks");
-            return $this->$name;
-        }
-        if ($name === "builtInPlugInsURL") {
-            $this->$name = $this->directoryURL($this->bundleURL, "Plugins");
-            return $this->$name;
-        }
-        if ($name === "sharedSupportURL") {
-            $this->$name = $this->directoryURL($this->bundleURL, "SharedSupport");
-            return $this->$name;
-        }
-        if ($name === "bundleIdentifier") {
-            $this->$name = $this->object(kCFBundleIdentifierKey);
-            return $this->$name;
-        }
-        if ($name === "infoDictionary") {
-            $infoURL = $this->bundleURL->appendingPathComponent("Info")->appendingPathExtension("plist");
-            $this->$name = FileManager::default()->fileExists($infoURL->path) ? PropertyListSerialization::propertyListWithURL($infoURL) : null;
-            return $this->$name;
-        }
-        if ($name === "localizations") {
-            $this->$name = $this->object(kCFBundleLocalizationsKey) ?? new ArrayClass();
-            return $this->$name;
-        }
-        if ($name === "preferredLocalizations") {
-            $preferredLocalizations = clone $this->localizations;
-            $preferredLocalizations->partition(fn(string $localization): bool => $localization !== Locale::getPrimaryLanguage(Locale::getDefault()));
-            $this->$name = $preferredLocalizations;
-            return $this->$name;
-        }
-        if ($name === "developmentLocalization") {
-            $this->$name = $this->object(kCFBundleDevelopmentRegionKey);
-            return $this->$name;
-        }
-        if ($name === "localizedInfoDictionary") {
-            $this->$name = $this->infoDictionary;
-            return $this->$name;
-        }
-        if ($name === "principalClass") {
-            /** @var class-string|null $principalClass */
-            $principalClass = $this->object(kCFBundlePrincipalClassKey);
-            $this->$name = empty($principalClass) ? null : $this->classNamed($principalClass);
-            return $this->$name;
-        }
-        return $this->valueForUndefinedKey($name);
     }
 
     private function directoryURL(URL $baseURL, string $name): ?URL
@@ -153,9 +112,7 @@ final class Bundle extends ObjectClass
      */
     private static function loadedBundles(): Dictionary
     {
-        if (self::$loadedBundles === null) {
-            self::$loadedBundles = new Dictionary();
-        }
+        self::$loadedBundles ??= new Dictionary();
         return self::$loadedBundles;
     }
 
@@ -214,7 +171,7 @@ final class Bundle extends ObjectClass
     public static function bundleForClass(string $class): Bundle
     {
         try {
-            if (!($path = (new ReflectionClass($class))->getFileName())) {
+            if (!($path = new ReflectionClass($class)->getFileName())) {
                 fatal_error();
             }
             $url = URL::fileURL($path);
@@ -275,9 +232,12 @@ final class Bundle extends ObjectClass
     private static function findBundleResources(URL $baseURL, ?string $name = null, ?ArrayClass $extensions = null, ?ArrayClass $languages = null, int $limit = NotFound): ?ArrayClass
     {
         $extensions ??= new ArrayClass();
-        if ($extensions->isEmpty && $name && ($extension = pathinfo($name, PATHINFO_EXTENSION))) {
-            /** @psalm-suppress InvalidArgument */
-            $extensions->append($extension);
+        if ($extensions->isEmpty && $name) {
+            /** @var string $extension */
+            $extension = pathinfo($name, PATHINFO_EXTENSION);
+            if ($extension) {
+                $extensions[] = $extension;
+            }
         }
         $languages ??= new ArrayClass([""]);
         $resources = $languages->flatMap(fn(string $language): ArrayClass => FileManager::default()->contentsOfDirectory($language ? $baseURL->appendingPathComponent($language) : $baseURL, null, DirectoryEnumerationOptions::skipsHiddenFiles))->filter(function (URL $url, int $idx, bool &$stop) use ($name, $extensions, $limit): bool {
@@ -363,7 +323,7 @@ final class Bundle extends ObjectClass
      */
     public function urlForImageResource(string $name): ?URL
     {
-        return self::findBundleResources($this->resourceURL ?? $this->bundleURL, $name, (new ArrayClass([MimeTypeJPEG, MimeTypePNG]))->flatMap(fn(string $mimeType): iterable => URLFileTypeMappings::shared()->extensions($mimeType) ?? []), null, 1)?->first;
+        return self::findBundleResources($this->resourceURL ?? $this->bundleURL, $name, new ArrayClass([MimeTypeJPEG, MimeTypePNG])->flatMap(fn(string $mimeType): iterable => URLFileTypeMappings::shared()->extensions($mimeType) ?? []), null, 1)?->first;
     }
 
     /**
@@ -410,7 +370,7 @@ final class Bundle extends ObjectClass
      * @param string|null $table The receiver's string table to search.
      * @return string A localized version of the string designated by key in table.
      */
-    public function localizedString(string $key, string $value = null, string $table = null): string
+    public function localizedString(string $key, ?string $value = null, ?string $table = null): string
     {
         $string = localized_string($key, $table ?? "Localizable", $this->resourceURL?->path ?? "");
         if ($key === $string && $value !== null) {
@@ -443,7 +403,8 @@ final class Bundle extends ObjectClass
         if (class_exists($className)) {
             return $className;
         }
-        $name = array_last(explode("\\", $className)) ?? $className;
+        $components = explode("\\", $className);
+        $name = $components[count($components) - 1] ?? $className;
         if (!($enumerator = FileManager::default()->enumerator($this->bundleURL->appendingPathComponent("src"), null, DirectoryEnumerationOptions::skipsHiddenFiles))) {
             return null;
         }
@@ -456,7 +417,7 @@ final class Bundle extends ObjectClass
                 continue;
             }
             require_once $path;
-            if (!($class = array_last(get_declared_classes(), fn(string $class): bool => str_ends_with($class, $className)))) {
+            if (!($class = array_find(array_reverse(get_declared_classes()), fn(string $class): bool => str_ends_with($class, $className)))) {
                 continue;
             }
             if (!class_exists($class)) {

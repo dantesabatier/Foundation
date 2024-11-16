@@ -8,7 +8,7 @@ use Sabatier\Foundation\Date;
 class CacheEntry
 {
     public readonly Date $date;
-    public int $cost;
+    private(set) int $cost;
 
     public function __construct(public readonly string $identifier, public readonly CachedURLResponse $cachedURLResponse, public readonly ?string $serializedVersion = null)
     {

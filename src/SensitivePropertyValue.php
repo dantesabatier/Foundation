@@ -5,8 +5,12 @@ namespace Sabatier\Foundation;
 use JsonSerializable;
 use Override;
 
-final readonly class SensitivePropertyValue implements CustomStringConvertible, JsonSerializable
+final class SensitivePropertyValue implements CustomStringConvertible, JsonSerializable
 {
+    public string $description {
+        get => sprintf("%s(%s)", typeof($this->value), class_name(self::class));
+    }
+
     public function __construct(public mixed $value)
     {
     }
@@ -14,18 +18,12 @@ final readonly class SensitivePropertyValue implements CustomStringConvertible, 
     #[Override]
     public function __toString(): string
     {
-        return $this->description();
-    }
-
-    #[Override]
-    public function description(): string
-    {
-        return sprintf("%s(%s)", typeof($this->value), class_name(SensitivePropertyValue::class));
+        return $this->description;
     }
 
     #[Override]
     public function jsonSerialize(): string
     {
-        return $this->description();
+        return $this->description;
     }
 }

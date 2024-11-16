@@ -62,7 +62,7 @@ abstract class URLProtocol extends ObjectClass
     {
         $registeredProtocolClasses = self::registeredProtocolClasses();
         if (!$registeredProtocolClasses->containsElement($protocolClass)) {
-            $registeredProtocolClasses->append($protocolClass);
+            $registeredProtocolClasses[] = $protocolClass;
         }
         return true;
     }
@@ -75,13 +75,7 @@ abstract class URLProtocol extends ObjectClass
      */
     public static function getProtocolClass(ArrayClass $protocols, URLRequest $request): ?string
     {
-        /** @var class-string<URLProtocol> $protocol */
-        foreach ($protocols as $protocol) {
-            if ($protocol::canInit($request)) {
-                return $protocol;
-            }
-        }
-        return null;
+        return $protocols->first(fn(URLProtocol $protocol) => $protocol::canInit($request));
     }
 
     /**

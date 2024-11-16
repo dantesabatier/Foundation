@@ -11,12 +11,17 @@ use function Sabatier\Foundation\human_readable_value;
 /** @internal */
 class AggregateExpression extends Expression
 {
+    public string $predicateFormat {
+        get => "{" . $this->collection->join(", ") . "}";
+    }
+
     /**
      * @param ArrayClass<Expression> $collection
      */
-    public function __construct(public readonly ArrayClass $collection)
+    public function __construct(ArrayClass $collection)
     {
         parent::__construct(ExpressionType::aggregate);
+        $this->collection = $collection;
     }
 
     #[Override]
@@ -44,23 +49,11 @@ class AggregateExpression extends Expression
         if ($flags & PredicateVisitorFlags::internalNodes) {
             $visitor->visitPredicateExpression($this);
         }
-        foreach ($this->collection() as $expression) {
+        foreach ($this->collection as $expression) {
             $expression->accept($visitor, $flags);
         }
         if ($flags & PredicateVisitorFlags::internalNodes) {
             $visitor->visitPredicateExpression($this);
         }
-    }
-
-    #[Override]
-    public function collection(): ArrayClass
-    {
-        return $this->collection;
-    }
-
-    #[Override]
-    public function predicateFormat(): string
-    {
-        return "{" . $this->collection->join(", ") . "}";
     }
 }

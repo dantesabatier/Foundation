@@ -17,6 +17,13 @@ class Predicate extends ObjectClass
 {
     /** @internal */
     public static bool $debugDefault = false;
+    /** @var string The predicate's format string. */
+    public string $predicateFormat {
+        get => request_concrete_implementation($this, __PROPERTY__);
+    }
+    public string $description {
+        get => $this->predicateFormat;
+    }
 
     /**
      * Initializes a predicate by substituting the values in a given array into a format string and parsing the result.
@@ -26,7 +33,7 @@ class Predicate extends ObjectClass
      */
     public static function format(string $format, ArrayClass $arguments = new ArrayClass()): ?Predicate
     {
-        return (new PredicateScanner($format, $arguments))->predicate();
+        return new PredicateScanner($format, $arguments)->predicate();
     }
 
     /**
@@ -85,14 +92,6 @@ class Predicate extends ObjectClass
     }
 
     /**
-     * The predicate's format string.
-     */
-    public function predicateFormat(): string
-    {
-        request_concrete_implementation($this, __FUNCTION__);
-    }
-
-    /**
      * Forces a predicate that was securely decoded to allow evaluation.
      *
      * When securely decoding Predicate objects that are encoded using SecureCoding, evaluation is disabled because it is potentially unsafe to evaluate predicates you get out of an archive.
@@ -104,14 +103,8 @@ class Predicate extends ObjectClass
     }
 
     #[Override]
-    public function description(): string
-    {
-        return $this->predicateFormat();
-    }
-
-    #[Override]
     public function jsonSerialize(): Dictionary
     {
-        return new Dictionary(["format" => $this->predicateFormat()]);
+        return new Dictionary(["format" => $this->predicateFormat]);
     }
 }

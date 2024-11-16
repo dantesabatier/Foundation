@@ -18,7 +18,7 @@ final class NotificationCenter
 {
     private static ?NotificationCenter $default = null;
     /** @var ArrayClass<NotificationObserver> $observers */
-    private readonly ArrayClass $observers;
+    private ArrayClass $observers;
 
     public function __construct()
     {
@@ -32,9 +32,7 @@ final class NotificationCenter
      */
     public static function default(): NotificationCenter
     {
-        if (self::$default === null) {
-            self::$default = new NotificationCenter();
-        }
+        self::$default ??= new NotificationCenter();
         return self::$default;
     }
 
@@ -52,7 +50,7 @@ final class NotificationCenter
     public function addObserverForName(string $name, mixed $object, Closure $block): ObjectProtocol
     {
         $observer = new NotificationObserver($name, observed: $object, callable: $block);
-        $this->observers->append($observer);
+        $this->observers[] = $observer;
         return $observer;
     }
 
@@ -65,7 +63,7 @@ final class NotificationCenter
      */
     public function addObserver(mixed $observer, string $selector, string $name, mixed $object = null): void
     {
-        $this->observers->append(new NotificationObserver($name, $observer, $object, $selector));
+        $this->observers[] = new NotificationObserver($name, $observer, $object, $selector);
     }
 
     /**
@@ -88,7 +86,6 @@ final class NotificationCenter
      */
     public function postNotification(Notification $notification): void
     {
-        /** @var NotificationObserver $observer */
         foreach ($this->observers as $observer) {
             if (($observer->name === $notification->name) && (($observer->observed && ($observer->observed === $notification->object)) || !$observer->observed)) {
                 $observer->postNotification($notification);
@@ -102,7 +99,7 @@ final class NotificationCenter
      * @param object|null $object The object posting the notification.
      * @param Dictionary|null $userInfo A user info dictionary with optional information about the notification.
      */
-    public function postNotificationName(string $name, object $object = null, Dictionary|null $userInfo = null): void
+    public function postNotificationName(string $name, ?object $object = null, Dictionary|null $userInfo = null): void
     {
         if (!$this->observers->isEmpty) {
             $this->postNotification(new Notification($name, $object, $userInfo));

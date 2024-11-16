@@ -22,27 +22,30 @@ use ReflectionProperty;
  */
 class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, Comparable, JsonSerializable
 {
-    use Debuggable;
-
     /** @var KeyValueObservance[] $observances */
     private array $observances = [];
     /** @var array<string, mixed> */
     private static array $staticAssociatedValues = [];
     /** @var array<string, mixed> */
     private array $associatedValues = [];
+    public int $hash {
+        get => spl_object_id($this);
+    }
+    public string $superclass {
+        get => get_parent_class($this);
+    }
+    public string $description {
+        get => sprintf("<%s %s>", class_name(get_called_class()), spl_object_id($this));
+    }
+    public string $debugDescription {
+        get => sprintf("<%s %s>", class_name(get_called_class()), spl_object_id($this));
+    }
 
     /**
      * Initializes the class before it receives its first message.
      */
     public static function initialize(): void
     {
-    }
-
-    #[Pure]
-    #[Override]
-    final public function superclass(): string
-    {
-        return get_parent_class($this);
     }
 
     #[Pure]
@@ -64,12 +67,6 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
     final public function isSubclass(string $class): bool
     {
         return is_subclass_of($this, $class);
-    }
-
-    #[Override]
-    final public function hash(): int
-    {
-        return spl_object_id($this);
     }
 
     #[Override]
@@ -108,7 +105,7 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
      */
     public function doesNotRecognizeSelector(string $selector): never
     {
-        fatal_error(sprintf("%s %s() unrecognized selector sent to instance", $this->debugDescription(), $selector));
+        fatal_error(sprintf("%s %s() unrecognized selector sent to instance", $this->debugDescription, $selector));
     }
 
     /**
@@ -130,13 +127,13 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
     public function isEqual(mixed $other): bool
     {
         if ($other instanceof ObjectClass) {
-            return $this->hash() === $other->hash();
+            return $this->hash === $other->hash;
         }
         return false;
     }
 
     #[Override]
-    public function observe(string $keyPath, #[ExpectedValues(flagsFromClass: KeyValueObservingOptions::class)] int $options = KeyValueObservingOptions::new, Closure $handler = null): KeyValueObservation
+    public function observe(string $keyPath, #[ExpectedValues(flagsFromClass: KeyValueObservingOptions::class)] int $options = KeyValueObservingOptions::new, ?Closure $handler = null): KeyValueObservation
     {
         $observation = new KeyValueObservation($this, $keyPath);
         $this->observances[] = new KeyValueObservance($observation, $keyPath, $options, handler: $handler);
@@ -159,7 +156,7 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
     #[Override]
     public function removeObserver(object $observer, string $keyPath, mixed $context = null): void
     {
-        if ($observance = array_first($this->observances, fn(KeyValueObservance $observance): bool => $observance->observer === $observer && $observance->keyPath === $keyPath)) {
+        if ($observance = array_find($this->observances, fn(KeyValueObservance $observance): bool => $observance->observer === $observer && $observance->keyPath === $keyPath)) {
             array_remove($this->observances, $observance);
         }
     }
@@ -267,7 +264,7 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
         }
         $keyPath = substring_from_index($keyPath, $idx + 1);
         if (!$obj instanceof KeyValueCoding) {
-            throw new UndefinedKeyException(sprintf("%s %s() \"%s\" is not key value coding compliant for the key \"%s\"", $this->debugDescription(), __FUNCTION__, typeof($value), $keyPath));
+            throw new UndefinedKeyException(sprintf("%s %s() \"%s\" is not key value coding compliant for the key \"%s\"", $this->debugDescription, __FUNCTION__, typeof($value), $keyPath));
         }
         return $obj->validateValueForKeyPath($value, $keyPath);
     }
@@ -275,13 +272,13 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
     #[Override]
     public function valueForUndefinedKey(string $key): mixed
     {
-        throw new UndefinedKeyException(sprintf("%s is not key value coding compliant for the key \"%s\"", $this->debugDescription(), $key));
+        throw new UndefinedKeyException(sprintf("%s is not key value coding compliant for the key \"%s\"", $this->debugDescription, $key));
     }
 
     #[Override]
     public function setValueForUndefinedKey(mixed $value, string $key): void
     {
-        throw new UndefinedKeyException(sprintf("%s is not key value coding compliant for the key \"%s\"", $this->debugDescription(), $key));
+        throw new UndefinedKeyException(sprintf("%s is not key value coding compliant for the key \"%s\"", $this->debugDescription, $key));
     }
 
     #[Override]
@@ -325,7 +322,7 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
             return null;
         }
         if (!$obj instanceof KeyValueCoding) {
-            throw new UndefinedKeyException(sprintf("%s %s() \"%s\" is not key value coding compliant for the key \"%s\"", $this->debugDescription(), __FUNCTION__, typeof($obj), $remainderPath));
+            throw new UndefinedKeyException(sprintf("%s %s() \"%s\" is not key value coding compliant for the key \"%s\"", $this->debugDescription, __FUNCTION__, typeof($obj), $remainderPath));
         }
         return $obj->valueForKeyPath($remainderPath);
     }
@@ -348,7 +345,7 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
         }
         $keyPath = substring_from_index($keyPath, $idx + 1);
         if (!$obj instanceof KeyValueCoding) {
-            throw new UndefinedKeyException(sprintf("%s %s() \"%s\" is not key value coding compliant for the key \"%s\"", $this->debugDescription(), __FUNCTION__, typeof($value), $keyPath));
+            throw new UndefinedKeyException(sprintf("%s %s() \"%s\" is not key value coding compliant for the key \"%s\"", $this->debugDescription, __FUNCTION__, typeof($value), $keyPath));
         }
         $obj->setValueForKeyPath($value, $keyPath);
     }
@@ -384,7 +381,7 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
     #[Override]
     public function setNilValueForKey(string $key): void
     {
-        fatal_error(sprintf("%s attribute \"%s\" cannot be null", $this->debugDescription(), $key));
+        fatal_error(sprintf("%s attribute \"%s\" cannot be null", $this->debugDescription, $key));
     }
 
     #[Override]
@@ -440,6 +437,6 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
     #[Override]
     public function __toString(): string
     {
-        return $this->description();
+        return $this->description;
     }
 }

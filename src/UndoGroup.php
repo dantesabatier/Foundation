@@ -6,7 +6,7 @@ namespace Sabatier\Foundation;
 class UndoGroup
 {
     /** @var ArrayClass<Invocation> */
-    public readonly ArrayClass $actions;
+    private(set) ArrayClass $actions;
     public string $actionName = "";
 
     public function __construct(public ?UndoGroup $parent = null)
@@ -16,7 +16,7 @@ class UndoGroup
 
     public function addInvocation(Invocation $invocation): void
     {
-        $this->actions->append($invocation);
+        $this->actions[] = $invocation;
     }
 
     public function perform(): void

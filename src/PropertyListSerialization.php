@@ -21,7 +21,7 @@ class PropertyListSerialization
      */
     public static function data(mixed $plist, PropertyListSerializationFormat $format = PropertyListSerializationFormat::xml, int $options = 0): string
     {
-        return (new PropertyListSerializer())->data($plist, $format, $options);
+        return new PropertyListSerializer()->data($plist, $format, $options);
     }
 
     /**
@@ -34,7 +34,7 @@ class PropertyListSerialization
      */
     public static function writePropertyList(mixed $plist, URL $url, PropertyListSerializationFormat $format = PropertyListSerializationFormat::xml, int $options = 0): int
     {
-        return (new PropertyListSerializer())->writePropertyList($plist, $url, $format, $options);
+        return new PropertyListSerializer()->writePropertyList($plist, $url, $format, $options);
     }
 
     /**
@@ -47,9 +47,9 @@ class PropertyListSerialization
      * @return mixed A property list object corresponding to the representation in data.
      * If data is not in a supported format, returns nil.
      */
-    public static function propertyList(string $data, #[ExpectedValues(flagsFromClass: PropertyListSerializationMutabilityOptions::class)] int $options = 0, PropertyListSerializationFormat &$format = null): mixed
+    public static function propertyList(string $data, #[ExpectedValues(flagsFromClass: PropertyListSerializationMutabilityOptions::class)] int $options = 0, ?PropertyListSerializationFormat &$format = null): mixed
     {
-        return (new PropertyListSerializer())->propertyList($data, $options, $format);
+        return new PropertyListSerializer()->propertyList($data, $options, $format);
     }
 
     /**
@@ -64,6 +64,6 @@ class PropertyListSerialization
      */
     public static function propertyListWithURL(URL $url, #[ExpectedValues(flagsFromClass: PropertyListSerializationMutabilityOptions::class)] int $options = 0, PropertyListSerializationFormat $format = PropertyListSerializationFormat::xml): mixed
     {
-        return (new PropertyListSerializer())->propertyListWithURL($url, $options, $format);
+        return new PropertyListSerializer()->propertyListWithURL($url, $options, $format);
     }
 }

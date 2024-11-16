@@ -2,9 +2,25 @@
 
 namespace Sabatier\Foundation;
 
+use Closure;
 use Collator;
 use JetBrains\PhpStorm\ExpectedValues;
 use JetBrains\PhpStorm\Pure;
+use SplStack;
+use function call_user_func;
+
+function defer(Closure $closure, ?SplStack &$context = null): void
+{
+    $context ??= new class() extends SplStack {
+        public function __destruct()
+        {
+            while ($this->count() > 0) {
+                call_user_func($this->pop());
+            }
+        }
+    };
+    $context->push($closure);
+}
 
 /**
  * Returns the current system absolute time.
@@ -32,84 +48,6 @@ function is_sequential(array $array): bool
 {
     $key = array_key_first($array);
     return is_null($key) || is_int($key);
-}
-
-/**
- * @template Index of array-key
- * @template Element
- * @param callable(mixed, mixed=, bool=): bool $predicate
- * @param array<Index, Element> $array
- * @param FilteringMethod $method
- * @return array<Index, Element>
- * @psalm-suppress InvalidReturnType, InvalidReturnStatement, TypeDoesNotContainType
- */
-function array_passing_test(callable $predicate, array $array, FilteringMethod $method = FilteringMethod::default): array
-{
-    $elements = [];
-    $sequential = is_sequential($array);
-    foreach ($array as $key => $value) {
-        $stop = false;
-        if (match ($method) {
-            FilteringMethod::useKey => $predicate($key, $stop),
-            FilteringMethod::useValue => $predicate($value, $stop),
-            default => $predicate($value, $key, $stop)
-        }) {
-            if ($sequential) {
-                $elements[] = $value;
-            } else {
-                $elements[$key] = $value;
-            }
-        }
-        if ($stop) {
-            break;
-        }
-    }
-    return $elements;
-}
-
-/**
- * @template Index of array-key
- * @template Element
- * @param array<Index, Element> $array
- * @param callable(mixed, mixed=, bool=): bool|null $predicate
- * @return Element|null
- */
-function array_first(array $array, callable $predicate = null, FilteringMethod $method = FilteringMethod::default)
-{
-    $key = array_key_first($array);
-    if ($key === null) {
-        return null;
-    }
-    if ($predicate === null) {
-        return $array[$key];
-    }
-    $array = array_passing_test(function (mixed $value, mixed $key, bool &$stop) use ($predicate, $method): bool {
-        $ok = match ($method) {
-            FilteringMethod::useKey => $predicate($key),
-            FilteringMethod::useValue => $predicate($value),
-            default => $predicate($value, $key),
-        };
-        if ($ok) {
-            $stop = true;
-        }
-        return $ok;
-    }, $array);
-    if ($array === []) {
-        return null;
-    }
-    return reset($array);
-}
-
-/**
- * @template Index of array-key
- * @template Element
- * @param array<Index, Element> $array
- * @param callable|null $where
- * @return Element|null
- */
-function array_last(array $array, callable $where = null, FilteringMethod $method = FilteringMethod::useValue)
-{
-    return array_first(array_reverse($array), $where, $method);
 }
 
 function array_remove(array &$array, mixed $element): array
@@ -240,7 +178,7 @@ function string_has_suffix(string $string, string $suffix, #[ExpectedValues(flag
  * @param array|null $matches Array of all matches
  * @return int Returns the number of matches.
  */
-function string_search(string $string, string $needle, SearchMethod $method = SearchMethod::matches, #[ExpectedValues(flagsFromClass: CompareOptions::class)] int $options = CompareOptions::none, array &$matches = null): int
+function string_search(string $string, string $needle, SearchMethod $method = SearchMethod::matches, #[ExpectedValues(flagsFromClass: CompareOptions::class)] int $options = CompareOptions::none, ?array &$matches = null): int
 {
     $string = string_with_options($string, $options);
     $needle = string_with_options($needle, $options);

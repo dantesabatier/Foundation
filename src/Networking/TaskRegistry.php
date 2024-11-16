@@ -3,60 +3,49 @@
 namespace Sabatier\Foundation\Networking;
 
 use Closure;
-use Sabatier\Foundation\ArrayClass;
 use Sabatier\Foundation\Dictionary;
 use Sabatier\Foundation\ObjectClass;
 use function Sabatier\Foundation\fatal_error;
 
-/**
- * @internal
- * @property-read bool $isEmpty
- * @property-read ArrayClass<URLSessionTask> $allTask
- */
+/** @internal */
 class TaskRegistry extends ObjectClass
 {
     /** @var Dictionary<URLSessionTask> */
-    private Dictionary $tasks;
+    private(set) Dictionary $allTask;
     /** @var Dictionary<TaskRegistryBehaviour> */
     private Dictionary $behaviours;
     /** @var Closure(): void|null */
     private ?Closure $tasksFinishedCallback = null;
+    public bool $isEmpty {
+        get => $this->allTask->isEmpty;
+    }
 
     public function __construct()
     {
-        $this->tasks = new Dictionary();
+        $this->allTask = new Dictionary();
         $this->behaviours = new Dictionary();
-    }
-
-    public function __get(string $name)
-    {
-        return match ($name) {
-            "isEmpty" => $this->tasks->isEmpty,
-            "allTask" => $this->tasks,
-            default => $this->valueForUndefinedKey($name)
-        };
     }
 
     public function add(URLSessionTask $task, TaskRegistryBehaviour $behaviour): void
     {
         $identifier = (string)$task->taskIdentifier;
         if ($this->behaviours[$identifier]) {
-            if ($this->tasks[$identifier] === $task) {
+            if ($this->allTask[$identifier] === $task) {
                 fatal_error("Trying to re-insert a task that's already in the registry.");
             } else {
                 fatal_error("Trying to insert a task, but a different task with the same identifier is already in the registry.");
             }
         }
-        $this->tasks[$identifier] = $task;
+        $this->allTask[$identifier] = $task;
         $this->behaviours[$identifier] = $behaviour;
     }
 
     public function remove(URLSessionTask $task): void
     {
-        if (!($key = $this->tasks->indexOf($task))) {
+        if (!($key = $this->allTask->indexOf($task))) {
             fatal_error("Trying to remove task, but it's not in the registry.");
         }
-        $this->tasks->removeValueForKey($key);
+        $this->allTask->removeValueForKey($key);
         if (!($key = $this->behaviours->indexOf($this->behaviour($task)))) {
             fatal_error("Trying to remove task's behaviour, but it's not in the registry.");
         }

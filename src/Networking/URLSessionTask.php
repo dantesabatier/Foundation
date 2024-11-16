@@ -19,12 +19,6 @@ use const Sabatier\Foundation\UserCancelledError;
 
 /**
  * A task, like downloading a specific resource, performed in a URL session.
- * @property float $countOfBytesExpectedToReceive The number of bytes that the task expects to receive in the response body. This value is determined based on the Content-Length header received from the server. If that header is absent, the value is {@see URLSessionTransferSizeUnknown}.
- * @property float $countOfBytesReceived The number of bytes that the task has received from the server in the response body.
- * @property float $countOfBytesExpectedToSend The number of bytes that the task has received from the server in the response body.
- * @property float $countOfBytesSent The number of bytes that the task has sent to the server in the request body.
- * @property float $countOfBytesClientExpectsToSend A best-guess upper bound on the number of bytes the client expects to send.
- * @property float $countOfBytesClientExpectsToReceive A best-guess upper bound on the number of bytes the client expects to receive.
  */
 abstract class URLSessionTask extends ObjectClass
 {
@@ -34,10 +28,34 @@ abstract class URLSessionTask extends ObjectClass
     public float $priority = URLSessionTaskPriority::default;
     /** @var Progress A representation of the overall task progress. */
     public Progress $progress;
-    protected float $countOfBytesExpectedToReceive = URLSessionTransferSizeUnknown;
-    protected float $countOfBytesReceived = 0.0;
-    protected float $countOfBytesExpectedToSend = URLSessionTransferSizeUnknown;
-    protected float $countOfBytesSent = 0.0;
+    /** @var float The number of bytes that the task expects to receive in the response body. This value is determined based on the Content-Length header received from the server. If that header is absent, the value is {@see URLSessionTransferSizeUnknown}. */
+    public float $countOfBytesExpectedToReceive = URLSessionTransferSizeUnknown {
+        set {
+            $this->countOfBytesExpectedToReceive = $value;
+            $this->updateProgress();
+        }
+    }
+    /** @var float The number of bytes that the task has received from the server in the response body. */
+    public float $countOfBytesReceived = 0.0 {
+        set {
+            $this->countOfBytesReceived = $value;
+            $this->updateProgress();
+        }
+    }
+    /** @var float The number of bytes that the task has sent to the server in the request body. */
+    public float $countOfBytesExpectedToSend = URLSessionTransferSizeUnknown {
+        set {
+            $this->countOfBytesExpectedToSend = $value;
+            $this->updateProgress();
+        }
+    }
+    /** @var float The number of bytes that the task has sent to the server in the request body. */
+    public float $countOfBytesSent = 0.0 {
+        set {
+            $this->countOfBytesSent = $value;
+            $this->updateProgress();
+        }
+    }
     /** @var URLRequest|null The URL request object currently being handled by the task. This value is typically the same as the initial request ({@see originalRequest}) except when the server has responded to the initial request with a redirect to a different URL. */
     public ?URLRequest $currentRequest = null;
     /** @var URLRequest|null The original request object passed when the task was created. This value is typically the same as the currently active request ({@see currentRequest}) except when the server has responded to the initial request with a redirect to a different URL. */
@@ -52,8 +70,20 @@ abstract class URLSessionTask extends ObjectClass
     public ?Error $error = null;
     /** @var URLSessionTaskDelegate|null A delegate specific to the task. This task-specific delegate receives messages from the task before the session's delegate receives them. This is similar to the behavior of the delegate parameter used by the asynchronous methods in URLSession like bytes(for:delegate:) and data(for:delegate:). */
     public ?URLSessionTaskDelegate $delegate = null;
-    protected float $countOfBytesClientExpectsToSend = URLSessionTransferSizeUnknown;
-    protected float $countOfBytesClientExpectsToReceive = URLSessionTransferSizeUnknown;
+    /** @var float A best-guess upper bound on the number of bytes the client expects to send. */
+    public float $countOfBytesClientExpectsToSend = URLSessionTransferSizeUnknown {
+        set {
+            $this->countOfBytesClientExpectsToSend = $value;
+            $this->updateProgress();
+        }
+    }
+    /** @var float A best-guess upper bound on the number of bytes the client expects to receive. */
+    public float $countOfBytesClientExpectsToReceive = URLSessionTransferSizeUnknown {
+        set {
+            $this->countOfBytesClientExpectsToReceive = $value;
+            $this->updateProgress();
+        }
+    }
     /** @internal */
     public readonly URLSession $session;
     /** @internal */
@@ -68,6 +98,20 @@ abstract class URLSessionTask extends ObjectClass
     public ?object $lastCredentialUsedFromStorageDuringAuthentication = null;
     private ProtocolState $protocolStorage;
     private bool $hasTriggeredResume = false;
+    /** @internal */
+    public bool $isSuspendedAfterResume {
+        get => $this->hasTriggeredResume && $this->state === URLSessionTaskState::suspended;
+    }
+    /** @var string|null class-string<URLProtocol>|null */
+    public ?string $protocolClass {
+        get {
+            /** @var URLRequest $request */
+            $request = $this->currentRequest;
+            /** @var ArrayClass<class-string<URLProtocol>> $protocolClasses */
+            $protocolClasses = $this->session->configuration->protocolClasses ?? URLProtocol::getProtocols() ?? new ArrayClass();
+            return URLProtocol::getProtocolClass($protocolClasses, $request);
+        }
+    }
 
     /** @internal */
     public function __construct(URLSession $session, URLRequest $request, int $taskIdentifier, ?TaskBody $body = null)
@@ -77,7 +121,7 @@ abstract class URLSessionTask extends ObjectClass
         $this->taskIdentifier = $taskIdentifier;
         $this->currentRequest = $request;
         $this->progress = new Progress();
-        $this->progress->cancellationHandler = function(): void {
+        $this->progress->cancellationHandler = function (): void {
             $this->cancel();
         };
         if ($body === null) {
@@ -89,47 +133,6 @@ abstract class URLSessionTask extends ObjectClass
         }
         $this->knownBody = $body;
         $this->protocolStorage = ProtocolState::toBeCreated();
-    }
-
-    public function __get(string $name)
-    {
-        return match ($name) {
-            "countOfBytesExpectedToReceive", "countOfBytesReceived", "countOfBytesExpectedToSend", "countOfBytesSent", "countOfBytesClientExpectsToSend", "countOfBytesClientExpectsToReceive" => $this->$name,
-            default => $this->valueForUndefinedKey($name)
-        };
-    }
-
-    public function __set(string $name, mixed $value): void
-    {
-        if ($name === "countOfBytesExpectedToReceive" || $name === "countOfBytesReceived" || $name === "countOfBytesExpectedToSend" || $name === "countOfBytesSent" || $name === "countOfBytesClientExpectsToSend" || $name === "countOfBytesClientExpectsToReceive") {
-            $this->willChangeValueForKey($name);
-            $this->$name = $value;
-            $this->didChangeValueForKey($name);
-            $this->updateProgress();
-        } else {
-            $this->setValueForUndefinedKey($value, $name);
-        }
-    }
-
-    /** @internal */
-    public function isSuspendedAfterResume(): bool
-    {
-        return $this->hasTriggeredResume && $this->state === URLSessionTaskState::suspended;
-    }
-
-    /**
-     * @return class-string<URLProtocol>|null
-     */
-    private function protocolClass(): ?string
-    {
-        /** @var URLRequest $request */
-        $request = $this->currentRequest;
-        /** @var ArrayClass<class-string<URLProtocol>> $protocolClasses */
-        $protocolClasses = $this->session->configuration->protocolClasses ?? URLProtocol::getProtocols() ?? new ArrayClass();
-        if ($urlProtocolClass = URLProtocol::getProtocolClass($protocolClasses, $request)) {
-            return $urlProtocolClass;
-        }
-        return null;
     }
 
     private function satisfyProtocolRequest(URLProtocol $protocol): void
@@ -162,14 +165,14 @@ abstract class URLSessionTask extends ObjectClass
         $ps = $this->protocolStorage;
         switch ($ps->rawValue) {
             case ProtocolStateRawValue::toBeCreated:
-                if (!($protocolClass = $this->protocolClass())) {
+                if (!($protocolClass = $this->protocolClass)) {
                     $callback(null);
                     return;
                 }
                 if ($this instanceof URLSessionDataTask && ($cache = $this->session->configuration->urlCache)) {
                     /** @var Bag<Closure(URLProtocol|null):void> $bag */
                     $bag = new Bag();
-                    $bag->values->append($callback);
+                    $bag->values[] = $callback;
                     $this->protocolStorage = ProtocolState::awaitingCacheReply($bag);
                     $cache->getCachedResponse($this, function (?CachedURLResponse $cachedResponse) use ($protocolClass): void {
                         $protocol = new $protocolClass($this, $cachedResponse);
@@ -184,7 +187,7 @@ abstract class URLSessionTask extends ObjectClass
             case ProtocolStateRawValue::awaitingCacheReply:
                 /** @var Bag<Closure(URLProtocol|null):void> $bag */
                 $bag = $ps->bag;
-                $bag->values->append($callback);
+                $bag->values[] = $callback;
                 break;
             case ProtocolStateRawValue::existing:
                 $callback($ps->protocol);
@@ -328,7 +331,7 @@ abstract class URLSessionTask extends ObjectClass
                 } elseif ($this->error === null) {
                     $this->error = new Error(URLErrorDomain, URLErrorUnsupportedURL, new Dictionary([LocalizedDescriptionKey => "Unsupported URL", URLErrorFailingURLErrorKey => $this->originalRequest?->url]));
                     /** @noinspection PhpUnhandledExceptionInspection */
-                    (new ProtocolClient())->urlProtocolTaskDidFailWithError($this, $this->error);
+                    new ProtocolClient()->urlProtocolTaskDidFailWithError($this, $this->error);
                 }
             });
         }

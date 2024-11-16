@@ -8,7 +8,7 @@ use Sabatier\Foundation\ArrayClass;
  * @template Element
  * @internal
  */
-readonly class Bag
+class Bag
 {
     /** @var ArrayClass<Element> */
     public ArrayClass $values;

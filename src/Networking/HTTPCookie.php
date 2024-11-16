@@ -2,7 +2,6 @@
 
 namespace Sabatier\Foundation\Networking;
 
-use Override;
 use Sabatier\Foundation\ArrayClass;
 use Sabatier\Foundation\Date;
 use Sabatier\Foundation\Dictionary;
@@ -50,6 +49,9 @@ class HTTPCookie extends ObjectClass
     public readonly ?URL $commentURL;
     /** @var Dictionary The cookie's properties. */
     public readonly Dictionary $properties;
+    public string $description {
+        get => sprintf("<HTTPCookie version:%d name:\"%s\" value:\"%s\" expires:%s sessionOnly:%s domain:\"%s\" path:\"%s\" isSecure:%s comment:%s ports:{%s}", $this->version, $this->name, $this->value, human_readable_value($this->expiresDate), human_readable_value($this->isSessionOnly), $this->domain, $this->path, human_readable_value($this->isSecure), human_readable_value($this->comment), $this->portList?->join(",") ?? 0);
+    }
 
     /**
      * Creates an HTTP cookie instance with the given cookie properties.
@@ -78,7 +80,7 @@ class HTTPCookie extends ObjectClass
         /** @var string|null $port */
         $port = $properties[HTTPCookiePropertyKey::port];
         if ($port !== null) {
-            $portList = (new ArrayClass(explode(",", $port)))->map(fn(string $e): Number => new Number($e));
+            $portList = new ArrayClass(explode(",", $port))->map(fn(string $e): Number => new Number($e));
             if ($this->version === 1) {
                 $this->portList = $portList;
             } else {
@@ -126,7 +128,7 @@ class HTTPCookie extends ObjectClass
         $this->sameSitePolicy = $sameSitePolicy;
         $this->isHTTPOnly = $properties[HTTPCookiePropertyKey::httpOnly] === "TRUE";
         $this->properties = new Dictionary([
-            HTTPCookiePropertyKey::created => (new Date())->timeIntervalSinceReferenceDate,
+            HTTPCookiePropertyKey::created => new Date()->timeIntervalSinceReferenceDate,
             HTTPCookiePropertyKey::discard => $this->isSessionOnly,
             HTTPCookiePropertyKey::domain => $domain,
             HTTPCookiePropertyKey::name => $this->name,
@@ -185,7 +187,7 @@ class HTTPCookie extends ObjectClass
             while ($scanner->scanUpCharacters(";", $pair) && $pair) {
                 if ($components = self::splitNameValue($pair)) {
                     [$name, $value] = $components;
-                    $name = ucwords((string) $name);
+                    $name = ucwords((string)$name);
                     switch ($name) {
                         case HTTPCookiePropertyKey::secure:
                         case HTTPCookiePropertyKey::discard:
@@ -224,10 +226,10 @@ class HTTPCookie extends ObjectClass
             if (!str_starts_with($domain, ".")) {
                 $properties[HTTPCookiePropertyKey::domain] = strtolower($domain);
             }
-            if (!($path = $properties[HTTPCookiePropertyKey::path]) || !str_starts_with((string) $path, "/")) {
+            if (!($path = $properties[HTTPCookiePropertyKey::path]) || !str_starts_with((string)$path, "/")) {
                 $properties[HTTPCookiePropertyKey::path] = "/";
             }
-            $httpCookies->append(new HTTPCookie($properties));
+            $httpCookies[] = new HTTPCookie($properties);
         }
         return $httpCookies;
     }
@@ -251,11 +253,5 @@ class HTTPCookie extends ObjectClass
             $headerFields["Cookie"] = $cookieString;
         }
         return $headerFields;
-    }
-
-    #[Override]
-    public function description(): string
-    {
-        return sprintf("<HTTPCookie version:%d name:\"%s\" value:\"%s\" expires:%s sessionOnly:%s domain:\"%s\" path:\"%s\" isSecure:%s comment:%s ports:{%s}", $this->version, $this->name, $this->value, human_readable_value($this->expiresDate), human_readable_value($this->isSessionOnly), $this->domain, $this->path, human_readable_value($this->isSecure), human_readable_value($this->comment), $this->portList?->join(",") ?? 0);
     }
 }

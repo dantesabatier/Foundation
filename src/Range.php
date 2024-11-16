@@ -15,6 +15,18 @@ use Traversable;
  */
 class Range extends ObjectClass implements ExpressibleByArrayLiteral, IteratorAggregate, Countable
 {
+    /** @var int The number of elements in the collection. */
+    public int $count {
+        get => $this->upperBound - $this->lowerBound;
+    }
+    /** @var bool A Boolean value indicating whether the range contains no elements. */
+    public bool $isEmpty {
+        get => $this->lowerBound === $this->upperBound;
+    }
+    public string $description {
+        get => "[$this->lowerBound...<$this->upperBound]";
+    }
+
     /**
      * @param int $lowerBound The range's lower bound.
      * @param int $upperBound The range's upper bound.
@@ -27,17 +39,7 @@ class Range extends ObjectClass implements ExpressibleByArrayLiteral, IteratorAg
     #[Override]
     public function count(): int
     {
-        return $this->upperBound - $this->lowerBound;
-    }
-
-    /**
-     * A Boolean value indicating whether the range contains no elements.
-     *
-     * An empty Range instance has equal lower and upper bounds.
-     */
-    public function isEmpty(): bool
-    {
-        return $this->lowerBound === $this->upperBound;
+        return $this->count;
     }
 
     /**
@@ -49,7 +51,7 @@ class Range extends ObjectClass implements ExpressibleByArrayLiteral, IteratorAg
      */
     public function contains(int $element): bool
     {
-        return !$this->isEmpty() && (($element >= $this->lowerBound) && ($element < $this->upperBound));
+        return !$this->isEmpty && (($element >= $this->lowerBound) && ($element < $this->upperBound));
     }
 
     #[Deprecated("since Foundation 0.1, use contains() instead", "%class%->contains(%parameter0%)")]
@@ -67,12 +69,6 @@ class Range extends ObjectClass implements ExpressibleByArrayLiteral, IteratorAg
                 yield $bound;
             }
         })();
-    }
-
-    #[Override]
-    public function description(): string
-    {
-        return "[$this->lowerBound...<$this->upperBound]";
     }
 
     /**

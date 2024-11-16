@@ -7,6 +7,10 @@ use Override;
 /** @internal */
 class NegateBooleanTransformer extends SharedValueTransformer
 {
+    public string $description {
+        get => "<shared NegateBoolean transformer>";
+    }
+
     #[Override]
     public static function transformedValueClass(): string
     {
@@ -19,11 +23,5 @@ class NegateBooleanTransformer extends SharedValueTransformer
     {
         assert($value instanceof Number);
         return new Number(!$value->boolValue);
-    }
-
-    #[Override]
-    public function description(): string
-    {
-        return "<shared NegateBoolean transformer>";
     }
 }

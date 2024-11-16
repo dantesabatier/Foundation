@@ -15,9 +15,7 @@ final class URLFileTypeMappings
 
     public static function shared(): URLFileTypeMappings
     {
-        if (self::$shared === null) {
-            self::$shared = new URLFileTypeMappings();
-        }
+        self::$shared ??= new URLFileTypeMappings();
         return self::$shared;
     }
 

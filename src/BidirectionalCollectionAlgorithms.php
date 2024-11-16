@@ -24,8 +24,8 @@ trait BidirectionalCollectionAlgorithms
     /** @noinspection PhpMixedReturnTypeCanBeReducedInspection */
     public function lastIndex(Closure $where): mixed
     {
-        $start = $this->startIndex();
-        $i = $this->endIndex();
+        $start = $this->startIndex;
+        $i = $this->endIndex;
         while ($i !== $start) {
             $this->formIndexBefore($i);
             if ($where($this[$i])) {
@@ -35,13 +35,13 @@ trait BidirectionalCollectionAlgorithms
         return null;
     }
 
-    public function last(Closure $where = null): mixed
+    public function last(?Closure $where = null): mixed
     {
         if ($this->isEmpty) {
             return null;
         }
         if ($where === null) {
-            return $this[$this->indexBefore($this->endIndex())];
+            return $this[$this->indexBefore($this->endIndex)];
         }
         $i = $this->lastIndex($where);
         if ($i !== null) {
@@ -55,7 +55,7 @@ trait BidirectionalCollectionAlgorithms
         if ($this->isEmpty) {
             return null;
         }
-        $i = $generator->next($this->indexBefore($this->endIndex()));
+        $i = $generator->next($this->indexBefore($this->endIndex));
         if ($this instanceof Dictionary) {
             return $this[$this->keys[$i]];
         }

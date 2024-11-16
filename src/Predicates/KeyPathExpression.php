@@ -11,13 +11,29 @@ use function Sabatier\Foundation\typeof;
 /** @internal */
 class KeyPathExpression extends FunctionExpression
 {
-    public function __construct(public readonly mixed $keyPath, Expression $operand)
+    public string $predicateFormat {
+        get {
+            $format = "";
+            if (($operand = $this->operand) && ($operand->expressionType !== ExpressionType::evaluatedObject)) {
+                $format .= $operand->description;
+                $format .= ".";
+            }
+            return $format . $this->keyPath;
+        }
+    }
+
+    public function __construct(mixed $keyPath, Expression $operand)
     {
         $selector = "valueForKeyPath";
-        if ($this->keyPath instanceof KeyPathSpecifierExpression && !str_contains($this->keyPath->value, ".")) {
-            $selector = "valueForKey";
+        if ($keyPath instanceof KeyPathSpecifierExpression) {
+            $keyPath = $keyPath->keyPath;
+            if (!str_contains($keyPath, ".")) {
+                $selector = "valueForKey";
+            }
         }
-        parent::__construct(ExpressionType::keyPath, $operand, $selector, new ArrayClass([$this->keyPath]));
+        parent::__construct(ExpressionType::keyPath, $operand, $selector, new ArrayClass([$keyPath]));
+        $this->keyPath = $keyPath;
+        $this->constantValue = $keyPath;
     }
 
     #[Override]
@@ -42,28 +58,5 @@ class KeyPathExpression extends FunctionExpression
             return $value;
         }
         return $obj;
-    }
-
-    #[Override]
-    public function keyPath(): string
-    {
-        return $this->keyPath;
-    }
-
-    #[Override]
-    public function constantValue(): mixed
-    {
-        return $this->keyPath;
-    }
-
-    #[Override]
-    public function predicateFormat(): string
-    {
-        $format = "";
-        if (($operand = $this->operand()) && ($operand->expressionType !== ExpressionType::evaluatedObject)) {
-            $format .= $operand->description();
-            $format .= ".";
-        }
-        return $format . $this->keyPath;
     }
 }

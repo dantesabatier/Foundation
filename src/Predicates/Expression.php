@@ -15,8 +15,44 @@ use function Sabatier\Foundation\request_concrete_implementation;
  */
 class Expression extends ObjectClass
 {
+    /** @var ArrayClass<Expression>|null The arguments for the expression. An expression's arguments is the array of expressions that will be passed as parameters during invocation of the selector on the operand of a function expression. Accessing this property raises an exception if it is not applicable to the expression. */
+    protected(set) ?ArrayClass $arguments = null;
+    /** @var mixed The collection of expressions in an aggregate expression, or the collection element of a subquery expression. Accessing this property raises an exception if it is not applicable to the expression. */
+    protected(set) mixed $collection;
+    /** @var mixed The constant value of the expression. */
+    protected(set) mixed $constantValue = null;
+    /** @var string The function for the expression. Accessing this property raises an exception if it is not applicable to the expression. */
+    protected(set) string $function;
+    protected(set) string $keyPath;
+    /** @var Expression|null The operand for the expression. Accessing this property raises an exception if it is not applicable to the expression. The operand for an expression is the object on which the expression's selector or block will be invoked. The object is the result of evaluating a key path or one of the defined functions. */
+    protected(set) ?Expression $operand = null;
+    /** @var Predicate The predicate of a subquery expression. Accessing this property raises an exception if it is not applicable to the expression. */
+    protected(set) Predicate $predicate;
+
+    /** @var Expression The left expression of an aggregate expression. Accessing this property raises an exception if it is not applicable to the expression. */
+    protected(set) Expression $left;
+    /** @var Expression The right expression of an aggregate expression. Accessing this property raises an exception if it is not applicable to the expression. */
+    protected(set) Expression $right;
+    /** @var string The variable for the expression. Accessing this property raises an exception if it is not applicable to the expression. */
+    protected(set) string $variable;
+    /** @var Closure(mixed, ArrayClass<Expression>, Dictionary|null): mixed Accessing this property raises an exception if it is not applicable to the expression. */
+    protected(set) Closure $expressionBlock;
+
+    /** @var Expression Accessing this property raises an exception if it is not applicable to the expression. */
+    protected(set) Expression $true;
+    /** @var Expression Accessing this property raises an exception if it is not applicable to the expression. */
+    protected(set) Expression $false;
     /** @internal */
-    public readonly bool $usesKVC;
+    public string $predicateFormat {
+        get => request_concrete_implementation($this, __PROPERTY__);
+    }
+    public string $description {
+        get => $this->predicateFormat;
+    }
+    /** @internal */
+    public bool $usesKVC {
+        get => str_contains((string)$this, "@");
+    }
 
     /**
      * Initializes the expression with the specified expression type.
@@ -25,15 +61,6 @@ class Expression extends ObjectClass
      */
     protected function __construct(public readonly ExpressionType $expressionType = ExpressionType::undefined)
     {
-        unset($this->usesKVC);
-    }
-
-    public function __get(string $name)
-    {
-        return $this->$name = match ($name) {
-            "usesKVC" => str_contains((string)$this, "@"),
-            default => $this->valueForUndefinedKey($name)
-        };
     }
 
     /**
@@ -212,117 +239,6 @@ class Expression extends ObjectClass
     }
 
     /**
-     * The arguments for the expression.
-     *
-     * An expression's arguments is the array of expressions that will be passed as parameters during invocation of the selector on the operand of a function expression.
-     *  Accessing this property raises an exception if it is not applicable to the expression.
-     * @return ArrayClass<Expression>|null
-     * @psalm-suppress InvalidReturnType
-     */
-    public function arguments(): ?ArrayClass
-    {
-        request_concrete_implementation($this, __FUNCTION__);
-    }
-
-    /**
-     * The collection of expressions in an aggregate expression, or the collection element of a subquery expression.
-     *
-     *  Accessing this property raises an exception if it is not applicable to the expression.
-     * @return mixed
-     */
-    public function collection(): mixed
-    {
-        request_concrete_implementation($this, __FUNCTION__);
-    }
-
-    /**
-     * The constant value of the expression.
-     */
-    public function constantValue(): mixed
-    {
-        return null;
-    }
-
-    /**
-     * The function for the expression.
-     *
-     *  Accessing this property raises an exception if it is not applicable to the expression.
-     * @return string
-     */
-    public function function (): string
-    {
-        request_concrete_implementation($this, __FUNCTION__);
-    }
-
-    /**
-     * The key path for the expression.
-     *
-     *  Accessing this property raises an exception if it is not applicable to the expression.
-     * @return string
-     */
-    public function keyPath(): string
-    {
-        request_concrete_implementation($this, __FUNCTION__);
-    }
-
-    /**
-     * The operand for the expression.
-     *
-     * Accessing this property raises an exception if it is not applicable to the expression.
-     * The operand for an expression is the object on which the expression's selector or block will be invoked.
-     * The object is the result of evaluating a key path or one of the defined functions.
-     * @return Expression|null
-     */
-    public function operand(): ?Expression
-    {
-        request_concrete_implementation($this, __FUNCTION__);
-    }
-
-    /**
-     * The predicate of a subquery expression.
-     *
-     *  Accessing this property raises an exception if it is not applicable to the expression.
-     * @return Predicate
-     */
-    public function predicate(): Predicate
-    {
-        request_concrete_implementation($this, __FUNCTION__);
-    }
-
-    /**
-     * The left expression of an aggregate expression.
-     *
-     * Accessing this property raises an exception if it is not applicable to the expression.
-     * @return Expression
-     */
-    public function left(): Expression
-    {
-        request_concrete_implementation($this, __FUNCTION__);
-    }
-
-    /**
-     * The right expression of an aggregate expression.
-     *
-     * Accessing this property raises an exception if it is not applicable to the expression.
-     * @return Expression
-     */
-    public function right(): Expression
-    {
-        request_concrete_implementation($this, __FUNCTION__);
-    }
-
-    /**
-     * The variable for the expression.
-     *
-     *  Accessing this property raises an exception if it is not applicable to the expression.
-     * @return string
-     */
-    public function variable(): string
-    {
-        request_concrete_implementation($this, __FUNCTION__);
-    }
-
-    /**
      * @internal
      */
     public function withSubstitutionVariables(Dictionary $variables): Expression
@@ -351,49 +267,9 @@ class Expression extends ObjectClass
         }
     }
 
-    /**
-     * Accessing this property raises an exception if it is not applicable to the expression.
-     * @return Closure(mixed, ArrayClass<Expression>, Dictionary|null): mixed
-     * @psalm-suppress InvalidReturnType
-     */
-    public function expressionBlock(): Closure
-    {
-        request_concrete_implementation($this, __FUNCTION__);
-    }
-
-    /**
-     *  Accessing this property raises an exception if it is not applicable to the expression.
-     * @return Expression
-     */
-    public function true(): Expression
-    {
-        request_concrete_implementation($this, __FUNCTION__);
-    }
-
-    /**
-     *  Accessing this property raises an exception if it is not applicable to the expression.
-     * @return Expression
-     */
-    public function false(): Expression
-    {
-        request_concrete_implementation($this, __FUNCTION__);
-    }
-
-    /** @internal */
-    public function predicateFormat(): string
-    {
-        request_concrete_implementation($this, __FUNCTION__);
-    }
-
-    #[Override]
-    public function description(): string
-    {
-        return $this->predicateFormat();
-    }
-
     #[Override]
     public function jsonSerialize(): string
     {
-        return $this->predicateFormat();
+        return $this->predicateFormat;
     }
 }

@@ -19,15 +19,13 @@ use Sabatier\Foundation\Predicates\Predicate;
  * @template Element
  * @implements Iterator<int, Element>
  * @implements SetAlgebra<Element>
- * @property-read bool $isEmpty A Boolean value indicating whether the collection is empty.
- * @property-read int $count The number of elements in the collection.
- * @property-read Element|null $first The first element of the collection.
- * @property-read Element|null $last The last element of the collection.
  */
 class Set extends ObjectClass implements SetAlgebra, Iterator
 {
     use SetAlgebraAlgorithms {
         toArray as private sequenceToArray;
+        filter as private sequenceFilter;
+        allSatisfy as private sequenceAllSatisfy;
         contains as private sequenceContains;
         containsElement as private sequenceContainsElement;
         first as private sequenceFirst;
@@ -49,11 +47,9 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
         firstIndex as private collectionFirstIndex;
         lastIndex as private collectionLastIndex;
         indexOf as private collectionIndexOf;
-        filter as private collectionFilter;
         filtered as private collectionFiltered;
         sort as private collectionSort;
         sorted as private collectionSorted;
-        allSatisfy as private collectionAllSatisfy;
         joined as private collectionJoined;
         reverse as private bidirectionalCollectionReverse;
         reversed as private bidirectionalCollectionReversed;
@@ -91,6 +87,31 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
         current as private iteratorCurrent;
     }
 
+    public int $count {
+        get => count($this->reserved);
+    }
+    public bool $isEmpty {
+        get => $this->count === 0;
+    }
+    public mixed $first {
+        get => $this->first();
+    }
+    public mixed $last {
+        get => $this->last();
+    }
+    public int $startIndex {
+        get => 0;
+    }
+    public int $endIndex {
+        get => $this->count;
+    }
+    public Range $indices {
+        get => new Range($this->startIndex, $this->endIndex);
+    }
+    public string $description {
+        get => "[" . $this->join(", ") . "]";
+    }
+
     /**
      * @param iterable<int, Element> $elements
      */
@@ -101,17 +122,6 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
         } else {
             $this->appendContentsOf($elements);
         }
-    }
-
-    public function __get(string $name)
-    {
-        return match ($name) {
-            "isEmpty" => $this->isEmpty(),
-            "count" => $this->count(),
-            "first" => $this->first(),
-            "last" => $this->last(),
-            default => $this->valueForUndefinedKey($name)
-        };
     }
 
     /**
@@ -214,7 +224,7 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
      * @return Element|null The first element of the collection that satisfies predicate, or nil if there is no element that satisfies predicate.
      */
     #[Override]
-    public function first(Closure $where = null)
+    public function first(?Closure $where = null)
     {
         return $this->sequenceFirst($where);
     }
@@ -225,7 +235,7 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
      * @return Element|null The last element of the collection that satisfies predicate, or nil if there is no element that satisfies predicate.
      */
     #[Override]
-    public function last(Closure $where = null)
+    public function last(?Closure $where = null)
     {
         return $this->sequenceLast($where);
     }
@@ -284,7 +294,7 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
     #[Override]
     public function filter(Closure $isIncluded): Set
     {
-        return $this->collectionFilter($isIncluded);
+        return $this->sequenceFilter($isIncluded);
     }
 
     /**
@@ -327,7 +337,7 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
      */
     public function shuffled(RandomNumberGenerator $generator): ArrayClass
     {
-        return (new ArrayClass($this))->shuffled($generator);
+        return new ArrayClass($this)->shuffled($generator);
     }
 
     /**
@@ -338,7 +348,7 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
     #[Override]
     public function allSatisfy(Closure $predicate): bool
     {
-        return $this->collectionAllSatisfy($predicate);
+        return $this->sequenceAllSatisfy($predicate);
     }
 
     /**
@@ -496,7 +506,7 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
      * @param Closure(Element, int=): bool|null $where A closure that takes an element of the sequence as its argument and returns a Boolean value indicating whether the element should be removed from the collection.
      */
     #[Override]
-    public function removeAll(Closure $where = null): void
+    public function removeAll(?Closure $where = null): void
     {
         $this->mutableCollectionRemoveAll($where);
     }
@@ -720,12 +730,6 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
     public function toArray(): array
     {
         return $this->sequenceToArray();
-    }
-
-    #[Override]
-    public function description(): string
-    {
-        return "[" . $this->join(", ") . "]";
     }
 
     /**

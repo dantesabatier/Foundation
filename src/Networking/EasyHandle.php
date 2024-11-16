@@ -25,7 +25,8 @@ use const Sabatier\Foundation\URLErrorUnsupportedURL;
 /** @internal */
 final class EasyHandle
 {
-    public mixed $rawHandle = null;
+    /** @var CurlHandle|resource|null */
+    private(set) mixed $rawHandle = null;
     private ?URL $url = null;
     private ?URLSessionConfiguration $configuration = null;
     private readonly EasyHandlePauseState $pauseState;
@@ -114,7 +115,7 @@ final class EasyHandle
                 "Host" => $authority,
                 "Upgrade" => "WebSocket",
                 "Connection" => "Upgrade",
-                "Sec-WebSocket-Key" => base64_encode((new Randomizer(new Secure()))->getBytes(16)),
+                "Sec-WebSocket-Key" => base64_encode(new Randomizer(new Secure())->getBytes(16)),
                 "Sec-WebSocket-Version" => "13"
             ]);
             $this->url = $url;
@@ -464,7 +465,7 @@ final class EasyHandle
     {
         $parts = new ArrayClass(str_split($data, 4096) ?: [""]);
         /** @var ArrayClass<array{string, URLSessionWebSocketOperation, bool, bool}> $frames */
-        $frames = $parts->map(fn(string $e, int $i): array => [$e, $i === 0 ? $operation : URLSessionWebSocketOperation::cont, $i === $parts->indexBefore($parts->endIndex()), true]);
+        $frames = $parts->map(fn(string $e, int $i): array => [$e, $i === 0 ? $operation : URLSessionWebSocketOperation::cont, $i === $parts->indexBefore($parts->endIndex), true]);
         foreach ($frames as $frame) {
             $data = "";
             [$payload, $operation, $isFinal, $isMasked] = $frame;
@@ -511,6 +512,6 @@ final class EasyHandle
 
     public static function supportsWebSockets(): bool
     {
-        return (new ArrayClass(stream_get_transports()))->contains(fn(string $e): bool => $e === "tpc" || $e === "ssl");
+        return new ArrayClass(stream_get_transports())->contains(fn(string $e): bool => $e === "tpc" || $e === "ssl");
     }
 }

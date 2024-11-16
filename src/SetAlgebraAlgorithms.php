@@ -79,12 +79,7 @@ trait SetAlgebraAlgorithms
         if ($this->compare($other) != ComparisonResult::orderedAscending) {
             return false;
         }
-        foreach ($this as $element) {
-            if (!$other->containsElement($element)) {
-                return false;
-            }
-        }
-        return true;
+        return $this->allSatisfy(fn($element) => $other->containsElement($element));
     }
 
     public function isSuperset(SetAlgebra $other): bool
@@ -92,12 +87,7 @@ trait SetAlgebraAlgorithms
         if ($this->compare($other) != ComparisonResult::orderedDescending) {
             return false;
         }
-        foreach ($this as $element) {
-            if (!$other->containsElement($element)) {
-                return false;
-            }
-        }
-        return true;
+        return $this->allSatisfy(fn($element) => $other->containsElement($element));
     }
 
     public function isDisjoint(SetAlgebra $other): bool

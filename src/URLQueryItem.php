@@ -2,20 +2,16 @@
 
 namespace Sabatier\Foundation;
 
-use Override;
-
 /**
  * A single name-value pair from the query portion of a URL.
  */
 class URLQueryItem extends ObjectClass
 {
-    public function __construct(public string $name, public ?string $value = null)
-    {
+    public string $description {
+        get => sprintf("%s=%s", $this->name, human_readable_value($this->value));
     }
 
-    #[Override]
-    public function description(): string
+    public function __construct(public string $name, public ?string $value = null)
     {
-        return sprintf("%s=%s", $this->name, human_readable_value($this->value));
     }
 }

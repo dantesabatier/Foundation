@@ -32,7 +32,7 @@ class SubstringPredicateOperator extends StringPredicateOperator
         if ($left === null || $right === null) {
             return false;
         }
-        $options = $this->compareOptions();
+        $options = $this->compareOptions;
         $position = $this->position;
         if ($left instanceof Set || $left instanceof ArrayClass) {
             if ($left->isEmpty) {
@@ -40,7 +40,7 @@ class SubstringPredicateOperator extends StringPredicateOperator
             }
             return match ($position) {
                 SubstringPredicateOperatorPosition::beginsWith => string_is_equal($left[0], $right, $options),
-                SubstringPredicateOperatorPosition::endsWith => string_is_equal($left[$left->indexBefore($left->endIndex())], $right, $options),
+                SubstringPredicateOperatorPosition::endsWith => string_is_equal($left[$left->indexBefore($left->endIndex)], $right, $options),
                 SubstringPredicateOperatorPosition::contains => $left->contains(fn(string $string): bool => string_is_equal($string, $right, $options)),
             };
         }

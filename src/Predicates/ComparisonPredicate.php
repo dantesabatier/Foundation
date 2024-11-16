@@ -23,6 +23,21 @@ class ComparisonPredicate extends Predicate
     public readonly int $options;
     /** @var PredicateOperatorType The predicate type for the receiver. */
     public readonly PredicateOperatorType $predicateOperatorType;
+    public string $predicateFormat {
+        get {
+            $modifierDescription = "";
+            $modifier = $this->comparisonPredicateModifier;
+            switch ($modifier) {
+                case ComparisonPredicateModifier::all:
+                case ComparisonPredicateModifier::any:
+                    $modifierDescription = strtoupper($modifier->name) . " ";
+                    break;
+                default:
+                    break;
+            }
+            return sprintf("%s%s %s %s", $modifierDescription, $this->leftExpression->predicateFormat, $this->predicateOperator->predicateFormat, $this->rightExpression->predicateFormat);
+        }
+    }
 
     /**
      * Initializes a predicate formed by combining given left and right expressions using a given selector.
@@ -39,22 +54,6 @@ class ComparisonPredicate extends Predicate
         $this->comparisonPredicateModifier = $this->predicateOperator->modifier;
         $this->options = $this->predicateOperator->options;
         $this->predicateOperatorType = $this->predicateOperator->operatorType;
-    }
-
-    #[Override]
-    public function predicateFormat(): string
-    {
-        $modifierDescription = "";
-        $modifier = $this->comparisonPredicateModifier;
-        switch ($modifier) {
-            case ComparisonPredicateModifier::all:
-            case ComparisonPredicateModifier::any:
-                $modifierDescription = strtoupper($modifier->name) . " ";
-                break;
-            default:
-                break;
-        }
-        return sprintf("%s%s %s %s", $modifierDescription, $this->leftExpression->predicateFormat(), $this->predicateOperator->predicateFormat(), $this->rightExpression->predicateFormat());
     }
 
     #[Override]

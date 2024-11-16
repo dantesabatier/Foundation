@@ -19,15 +19,13 @@ use Sabatier\Foundation\Predicates\Predicate;
  * @template Element
  * @implements RangeReplaceableCollection<Element>
  * @implements Iterator<int, Element>
- * @property-read bool $isEmpty A Boolean value indicating whether the collection is empty.
- * @property-read int $count The number of elements in the collection.
- * @property-read Element|null $first The first element of the collection.
- * @property-read Element|null $last The last element of the collection.
  */
 class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iterator
 {
     use RangeReplaceableCollectionAlgorithms {
         toArray as private sequenceToArray;
+        filter as private sequenceFilter;
+        allSatisfy as private sequenceAllSatisfy;
         contains as private sequenceContains;
         containsElement as private sequenceContainsElement;
         first as private sequenceFirst;
@@ -49,11 +47,9 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
         firstIndex as private collectionFirstIndex;
         lastIndex as private collectionLastIndex;
         indexOf as private collectionIndexOf;
-        filter as private collectionFilter;
         filtered as private collectionFiltered;
         sort as private collectionSort;
         sorted as private collectionSorted;
-        allSatisfy as private collectionAllSatisfy;
         joined as private collectionJoined;
         reverse as private bidirectionalCollectionReverse;
         reversed as private bidirectionalCollectionReversed;
@@ -80,6 +76,31 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
         current as private iteratorCurrent;
     }
 
+    public string $description {
+        get => "[" . $this->join(", ") . "]";
+    }
+    public int $count {
+        get => count($this->reserved);
+    }
+    public bool $isEmpty {
+        get => $this->count === 0;
+    }
+    public mixed $first {
+        get => $this->first();
+    }
+    public mixed $last {
+        get => $this->last();
+    }
+    public int $startIndex {
+        get => 0;
+    }
+    public int $endIndex {
+        get => $this->count;
+    }
+    public Range $indices {
+        get => new Range($this->startIndex, $this->endIndex);
+    }
+
     /**
      * @param iterable<Element> $elements
      */
@@ -96,20 +117,9 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
         }
     }
 
-    public function __get(string $name)
-    {
-        return match ($name) {
-            "isEmpty" => $this->isEmpty(),
-            "count" => $this->count(),
-            "first" => $this->first(),
-            "last" => $this->last(),
-            default => $this->valueForUndefinedKey($name)
-        };
-    }
-
     public static function arrayWithArray(array $array): ArrayClass
     {
-        return (new ArrayConverter($array))->array;
+        return new ArrayConverter($array)->array;
     }
 
     /**
@@ -214,7 +224,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
      * @return Element|null The first element of the collection that satisfies predicate, or nil if there is no element that satisfies predicate.
      */
     #[Override]
-    public function first(Closure $where = null)
+    public function first(?Closure $where = null)
     {
         return $this->sequenceFirst($where);
     }
@@ -225,7 +235,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
      * @return Element|null The last element of the collection that satisfies predicate, or nil if there is no element that satisfies predicate.
      */
     #[Override]
-    public function last(Closure $where = null)
+    public function last(?Closure $where = null)
     {
         return $this->sequenceLast($where);
     }
@@ -284,7 +294,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
     #[Override]
     public function filter(Closure $isIncluded): ArrayClass
     {
-        return $this->collectionFilter($isIncluded);
+        return $this->sequenceFilter($isIncluded);
     }
 
     /**
@@ -307,7 +317,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
     #[Override]
     public function allSatisfy(Closure $predicate): bool
     {
-        return $this->collectionAllSatisfy($predicate);
+        return $this->sequenceAllSatisfy($predicate);
     }
 
     /**
@@ -481,7 +491,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
      * @param Closure(Element, int=): bool|null $where A closure that takes an element of the sequence as its argument and returns a Boolean value indicating whether the element should be removed from the collection.
      */
     #[Override]
-    public function removeAll(Closure $where = null): void
+    public function removeAll(?Closure $where = null): void
     {
         $this->mutableCollectionRemoveAll($where);
     }
@@ -583,21 +593,21 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
     {
         /** @var ArrayClass<Slice<Element>> $result */
         $result = new ArrayClass();
-        $subSequenceStart = $this->startIndex();
+        $subSequenceStart = $this->startIndex;
         $appendSubsequence = (function (int $end) use ($result, &$subSequenceStart, $omittingEmptySubsequences): bool {
             if ($subSequenceStart === $end && $omittingEmptySubsequences) {
                 return false;
             }
             /** @psalm-suppress InvalidArgument */
-            $result->append(new Slice($this, new Range($subSequenceStart, $end)));
+            $result[] = new Slice($this, new Range($subSequenceStart, $end));
             return true;
         });
         if ($maxSplits === 0 || $this->isEmpty) {
-            $appendSubsequence($this->endIndex());
+            $appendSubsequence($this->endIndex);
             return $result;
         }
         $subSequenceEnd = $subSequenceStart;
-        $cachedEndIndex = $this->endIndex();
+        $cachedEndIndex = $this->endIndex;
         while ($subSequenceEnd != $cachedEndIndex) {
             if ($isSeparator($this[$subSequenceEnd])) {
                 $didAppend = $appendSubsequence($subSequenceEnd);
@@ -612,7 +622,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
         }
         if ($subSequenceStart != $cachedEndIndex || !$omittingEmptySubsequences) {
             /** @psalm-suppress InvalidArgument */
-            $result->append(new Slice($this, new Range($subSequenceStart, $cachedEndIndex)));
+            $result[] = new Slice($this, new Range($subSequenceStart, $cachedEndIndex));
         }
         return $result;
     }
@@ -637,7 +647,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
      */
     public function shuffle(RandomNumberGenerator $generator = new SystemRandomNumberGenerator()): void
     {
-        $max = $this->indexBefore($this->endIndex());
+        $max = $this->indexBefore($this->endIndex);
         for ($i = 0; $i <= $max; $i++) {
             $this->swapAt($i, $i + $generator->next($max - $i));
         }
@@ -754,12 +764,6 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
     public function toArray(): array
     {
         return $this->sequenceToArray();
-    }
-
-    #[Override]
-    public function description(): string
-    {
-        return "[" . $this->join(", ") . "]";
     }
 
     /**

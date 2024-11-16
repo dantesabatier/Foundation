@@ -15,9 +15,9 @@ class URLCredentialStorage extends ObjectClass
 {
     private static ?URLCredentialStorage $shared = null;
     /** @var Dictionary<Dictionary<URLCredential>> The dictionary has keys corresponding to the {@see URLProtectionSpace} instances. The values are dictionaries where the keys are username strings, and each value is the corresponding {@see URLCredential} instances. */
-    public readonly Dictionary $allCredentials;
+    private(set) Dictionary $allCredentials;
     /** @var Dictionary<URLCredential> */
-    private readonly Dictionary $defaultCredentials;
+    private Dictionary $defaultCredentials;
 
     public function __construct(public readonly bool $isEphemeral = false)
     {
@@ -30,9 +30,7 @@ class URLCredentialStorage extends ObjectClass
      */
     public static function shared(): URLCredentialStorage
     {
-        if (static::$shared === null) {
-            static::$shared = new URLCredentialStorage();
-        }
+        static::$shared ??= new URLCredentialStorage();
         return static::$shared;
     }
 
@@ -96,7 +94,7 @@ class URLCredentialStorage extends ObjectClass
             if ($current->isEmpty) {
                 $current = null;
             }
-            $this->allCredentials->setValueForKey($current, $key);
+            $this->allCredentials[$key] = $current;
         }
         if (($defaultCredential = $this->defaultCredentials[$key]) && $defaultCredential === $credential) {
             $this->defaultCredentials->removeValueForKey($key);
@@ -154,11 +152,11 @@ class URLCredentialStorage extends ObjectClass
             $current = $this->allCredentials[$key] ?? new Dictionary();
             $modified = $current[$user] !== $credential;
             $current[$user] = $credential;
-            $this->allCredentials->setValueForKey($current, $key);
+            $this->allCredentials[$key] = $current;
         }
         if ($isDefault || $this->defaultCredentials[$key] === null) {
             $modified = $modified || $this->defaultCredentials[$key] !== $credential;
-            $this->defaultCredentials->setValueForKey($credential, $key);
+            $this->defaultCredentials[$key] = $credential;
         }
         return $modified;
     }

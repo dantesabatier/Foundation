@@ -44,7 +44,7 @@ abstract class NativeProtocol extends URLProtocol implements EasyHandleDelegate
     {
         return $this->$name = match ($name) {
             "tempFileURL" => (function (): URL {
-                $tempFileURL = FileManager::default()->url(SearchPathDirectory::cachesDirectory, SearchPathDomainMask::local, null, true)->appendingPathComponent(uniqid((string)(new SystemRandomNumberGenerator())->next(), true))->appendPathExtension($this->task->originalRequest?->url?->pathExtension ?? "");
+                $tempFileURL = FileManager::default()->url(SearchPathDirectory::cachesDirectory, SearchPathDomainMask::local, null, true)->appendingPathComponent(uniqid((string)new SystemRandomNumberGenerator()->next(), true))->appendPathExtension($this->task->originalRequest?->url?->pathExtension ?? "");
                 FileManager::default()->createFile($tempFileURL->path, null);
                 return $tempFileURL;
             })(),

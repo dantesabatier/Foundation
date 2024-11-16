@@ -16,70 +16,22 @@ use SplFileInfo;
 
 /**
  * A value that identifies the location of a resource, such as an item on a remote server or the path to a local file.
- * @property-read string $absoluteString The absolute string for the URL.
- * @property-read URL $absoluteURL The absolute URL.
- * @property-read URL|null $baseURL The base URL.
- * @property-read string|null $fragment The fragment component of the URL if the URL conforms to RFC 1808 (the most common form of URL), otherwise nil.
- * @property-read string|null $host The host component of a URL if the URL conforms to RFC 1808 (the most common form of URL), otherwise nil.
- * @property-read string $lastPathComponent The last path component of the URL, or an empty string if the path is an empty string.
- * @property-read string $path The path component of the URL if the URL conforms to RFC 1808 (the most common form of URL), otherwise an empty string.
- * @property-read ArrayClass<string> $pathComponents The path components of the URL, or an empty array if the path is an empty string.
- * @property-read string $pathExtension The path extension of the URL, or an empty string if the path is an empty string.
- * @property-read int|null $port The port component of the URL if the URL conforms to RFC 1808 (the most common form of URL), otherwise nil.
- * @property-read string|null $query The query of the URL if the URL conforms to RFC 1808 (the most common form of URL), otherwise nil.
- * @property-read string $relativePath The relative path of the URL if the URL conforms to RFC 1808 (the most common form of URL), otherwise nil.
- * @property-read string $relativeString The relative portion of a URL.
- * @property-read string $scheme The scheme of the URL.
- * @property-read URL $standardized A version of the URL with any instances of “..” or “.” removed from its path.
- * @property-read URL $standardizedFileURL A standardized version of the path of a file URL.
- * @property-read string|null $user The user component of the URL if the URL conforms to RFC 1808 (the most common form of URL), otherwise nil.
- * @property-read string|null $password The password component of the URL if the URL conforms to RFC 1808 (the most common form of URL), otherwise nil.
- * @property-read bool $isFileURL A Boolean that is true if the scheme is "file".
- * @property-read bool $hasDirectoryPath A Boolean that is true if the URL path represents a directory.
- * @property-read string $fileSystemRepresentation A string containing the URL's file system path.
  */
 final class URL extends ObjectClass
 {
     private string $string;
-    private URLResourceValuesStorage $storage;
-
-    /**
-     * Creates a URL instance from the provided string, relative to another URL.
-     * @param string $string The URL string with which to initialize the URL object.
-     * @param URL|null $baseURL The base URL for the URL object.
-     */
-    public function __construct(string $string, private ?URL $baseURL = null)
-    {
-        unset($this->storage);
-        if ($this->baseURL === null) {
-            if ($string) {
-                $components = new URLComponents($string);
-                $proposed = $components->string;
-                if ($proposed) {
-                    $string = $proposed;
-                }
+    /** @var string The absolute string for the URL. */
+    public string $absoluteString {
+        get {
+            if ($this->baseURL === null) {
+                return $this->string;
             }
-            if (!url_validate($string)) {
-                fatal_error("Invalid argument: expecting url string, \"$string\" given");
-            }
+            return $this->absoluteURL->absoluteString;
         }
-        $this->string = $string;
     }
-
-    public function __serialize(): array
-    {
-        return ["string" => $this->string, "baseURL" => $this->baseURL];
-    }
-
-    public function __unserialize(array $data): void
-    {
-        $this->string = $data["string"];
-        $this->baseURL = $data["baseURL"];
-    }
-
-    public function __get(string $name)
-    {
-        if ($name === "absoluteURL") {
+    /** @var URL The absolute URL. */
+    public URL $absoluteURL {
+        get {
             $baseURL = $this->baseURL;
             if (!$baseURL instanceof URL) {
                 return $this;
@@ -112,93 +64,145 @@ final class URL extends ObjectClass
             }
             return $baseURL->appendingPathComponent($relative);
         }
-        if ($name === "absoluteString") {
-            if ($this->baseURL === null) {
-                return $this->string;
-            }
-            return $this->absoluteURL->absoluteString;
-        }
-        if ($name === "relativePath") {
+    }
+    /** @var string The relative path of the URL if the URL conforms to RFC 1808 (the most common form of URL), otherwise nil. */
+    public string $relativePath {
+        get {
             if ($this->baseURL === null) {
                 return $this->path;
             }
             return $this->absoluteURL->path;
         }
-        if ($name === "relativeString") {
+    }
+    /** @var string The relative portion of a URL. */
+    public string $relativeString {
+        get {
             if ($this->baseURL === null) {
                 return $this->absoluteString;
             }
             return $this->absoluteURL->absoluteString;
         }
-        if ($name === "fileSystemRepresentation") {
-            return (new SplFileInfo($this->path))->getRealPath();
-        }
-        if ($name === "fragment") {
-            return $this->parse(PHP_URL_FRAGMENT);
-        }
-        if ($name === "standardized") {
+    }
+    /** @var string A string containing the URL's file system path. */
+    public string $fileSystemRepresentation {
+        get => new SplFileInfo($this->path)->getRealPath();
+    }
+    /** @var string|null The fragment component of the URL if the URL conforms to RFC 1808 (the most common form of URL), otherwise nil. */
+    public ?string $fragment {
+        get => $this->parse(PHP_URL_FRAGMENT);
+    }
+    /** @var URL A version of the URL with any instances of “..” or “.” removed from its path. */
+    public URL $standardized {
+        get {
             $url = clone $this->absoluteURL;
             $url->standardize();
             return $url;
         }
-        if ($name === "standardizedFileURL") {
-            return $this->standardized;
-        }
-        if ($name === "scheme") {
-            return $this->parse(PHP_URL_SCHEME) ?? "";
-        }
-        if ($name === "host") {
-            return $this->parse(PHP_URL_HOST);
-        }
-        if ($name === "lastPathComponent") {
-            return basename($this->path);
-        }
-        if ($name === "path") {
-            return $this->parse(PHP_URL_PATH) ?? "";
-        }
-        if ($name === "pathComponents") {
+    }
+    /** @var URL A standardized version of the path of a file URL. */
+    public URL $standardizedFileURL {
+        get => $this->standardized;
+    }
+    /** @var string The scheme of the URL. */
+    public string $scheme {
+        get => $this->parse(PHP_URL_SCHEME) ?? "";
+    }
+    /** @var string|null The host component of a URL if the URL conforms to RFC 1808 (the most common form of URL), otherwise nil. */
+    public ?string $host {
+        get => $this->parse(PHP_URL_HOST) ?? "";
+    }
+    /** @var string The last path component of the URL, or an empty string if the path is an empty string. */
+    public string $lastPathComponent {
+        get => basename($this->path);
+    }
+    /** @var string The path component of the URL if the URL conforms to RFC 1808 (the most common form of URL), otherwise an empty string. */
+    public string $path {
+        get => $this->parse(PHP_URL_PATH) ?? "";
+    }
+    /** @var ArrayClass<string> $pathComponents The path components of the URL, or an empty array if the path is an empty string. */
+    public ArrayClass $pathComponents {
+        get {
             $path = $this->path;
             /** @var ArrayClass<string> $components */
             $components = new ArrayClass();
             if (str_starts_with($path, "/")) {
-                $components->append("/");
+                $components[] = "/";
             }
-            $components->appendContentsOf((new ArrayClass(explode("/", $path)))->filter(fn(string $component): bool => !empty($component)));
+            $components->appendContentsOf(new ArrayClass(explode("/", $path))->filter(fn(string $component): bool => !empty($component)));
             if ($components->count > 1 && str_ends_with($path, "/")) {
-                $components->append("/");
+                $components[] = "/";
             }
             return $components;
         }
-        if ($name === "pathExtension") {
-            return pathinfo($this->path, PATHINFO_EXTENSION);
-        }
-        if ($name === "port") {
-            return $this->parse(PHP_URL_PORT);
-        }
-        if ($name === "query") {
-            return $this->parse(PHP_URL_QUERY);
-        }
-        if ($name === "user") {
-            return $this->parse(PHP_URL_USER);
-        }
-        if ($name === "password") {
-            return $this->parse(PHP_URL_PASS);
-        }
-        if ($name === "isFileURL") {
-            return $this->scheme === "file";
-        }
-        if ($name === "hasDirectoryPath") {
+    }
+    /** @var string The path extension of the URL, or an empty string if the path is an empty string. */
+    public string $pathExtension {
+        get => pathinfo($this->path, PATHINFO_EXTENSION);
+    }
+    /** @var int|null The port component of the URL if the URL conforms to RFC 1808 (the most common form of URL), otherwise nil. */
+    public ?int $port {
+        get => $this->parse(PHP_URL_PORT);
+    }
+    /** @var string|null The query of the URL if the URL conforms to RFC 1808 (the most common form of URL), otherwise nil. */
+    public ?string $query {
+        get => $this->parse(PHP_URL_QUERY);
+    }
+    /** @var string|null The user component of the URL if the URL conforms to RFC 1808 (the most common form of URL), otherwise nil. */
+    public ?string $user {
+        get => $this->parse(PHP_URL_USER);
+    }
+    /** @var string|null The password component of the URL if the URL conforms to RFC 1808 (the most common form of URL), otherwise nil. */
+    public ?string $password {
+        get => $this->parse(PHP_URL_PASS);
+    }
+    /** @var bool A Boolean that is true if the scheme is "file". */
+    public bool $isFileURL {
+        get => $this->scheme === "file";
+    }
+    /** @var bool A Boolean that is true if the URL path represents a directory. */
+    public bool $hasDirectoryPath {
+        get {
             $path = $this->path;
             return $this->isFileURL && file_exists($path) ? is_dir($path) : $this->pathExtension === "";
         }
-        if ($name === "baseURL") {
-            return $this->$name;
+    }
+    private URLResourceValuesStorage $storage;
+    public string $description {
+        get => $this->absoluteString;
+    }
+
+    /**
+     * Creates a URL instance from the provided string, relative to another URL.
+     * @param string $string The URL string with which to initialize the URL object.
+     * @param URL|null $baseURL The base URL for the URL object.
+     */
+    public function __construct(string $string, private(set) ?URL $baseURL = null)
+    {
+        if ($this->baseURL === null) {
+            if ($string) {
+                $components = new URLComponents($string);
+                $proposed = $components->string;
+                if ($proposed) {
+                    $string = $proposed;
+                }
+            }
+            if (!url_validate($string)) {
+                fatal_error("Invalid argument: expecting url string, \"$string\" given");
+            }
         }
-        if ($name === "storage") {
-            $this->$name = new URLResourceValuesStorage();
-            return $this->$name;
-        }
-        return $this->valueForUndefinedKey($name);
+        $this->string = $string;
+        $this->storage = new URLResourceValuesStorage();
+    }
+
+    public function __serialize(): array
+    {
+        return ["string" => $this->string, "baseURL" => $this->baseURL];
+    }
+
+    public function __unserialize(array $data): void
+    {
+        $this->string = $data["string"];
+        $this->baseURL = $data["baseURL"];
     }
 
     /** @noinspection PhpMixedReturnTypeCanBeReducedInspection */
@@ -465,15 +469,9 @@ final class URL extends ObjectClass
     }
 
     #[Override]
-    public function description(): string
-    {
-        return $this->absoluteString;
-    }
-
-    #[Override]
     public function jsonSerialize(): string
     {
-        return $this->description();
+        return $this->description;
     }
 
     #[Override]

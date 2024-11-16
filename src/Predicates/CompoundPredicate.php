@@ -18,6 +18,43 @@ use function Sabatier\Foundation\fatal_error;
  */
 class CompoundPredicate extends Predicate
 {
+    public CompoundPredicateOperator $predicateOperator {
+        get => match ($this->compoundPredicateType) {
+            CompoundPredicateLogicalType::not => CompoundPredicateOperator::notPredicateOperator(),
+            CompoundPredicateLogicalType::and => CompoundPredicateOperator::andPredicateOperator(),
+            CompoundPredicateLogicalType::or => CompoundPredicateOperator::orPredicateOperator(),
+        };
+    }
+    public string $predicateFormat {
+        get {
+            $type = $this->compoundPredicateType;
+            $subpredicates = $this->subpredicates;
+            if ($subpredicates->isEmpty) {
+                /** @noinspection PhpVoidFunctionResultUsedInspection */
+                return match ($type) {
+                    CompoundPredicateLogicalType::and => TruePredicate::default()->predicateFormat,
+                    CompoundPredicateLogicalType::or => FalsePredicate::default()->predicateFormat,
+                    CompoundPredicateLogicalType::not => fatal_error("Not predicate must have exactly one subpredicate"),
+                };
+            }
+            $arguments = $subpredicates->compactMap(function (Predicate $subpredicate): ?string {
+                $precedence = $subpredicate->predicateFormat;
+                if ($subpredicate instanceof CompoundPredicate) {
+                    $precedence = "($precedence)";
+                }
+                if (empty($precedence)) {
+                    return null;
+                }
+                return $precedence;
+            });
+            $separator = $this->predicateOperator->predicateFormat;
+            return match ($type) {
+                CompoundPredicateLogicalType::and, CompoundPredicateLogicalType::or => $arguments->join(" $separator "),
+                CompoundPredicateLogicalType::not => "$separator $arguments[0]",
+            };
+        }
+    }
+
     /**
      * Returns the receiver initialized to a given type using predicates from a given array.
      * @param CompoundPredicateLogicalType $compoundPredicateType The type of the new predicate (see {@see CompoundPredicateLogicalType}).
@@ -59,36 +96,6 @@ class CompoundPredicate extends Predicate
     }
 
     #[Override]
-    public function predicateFormat(): string
-    {
-        $type = $this->compoundPredicateType;
-        $subpredicates = $this->subpredicates;
-        if ($subpredicates->isEmpty) {
-            /** @noinspection PhpVoidFunctionResultUsedInspection */
-            return match ($type) {
-                CompoundPredicateLogicalType::and => TruePredicate::default()->predicateFormat(),
-                CompoundPredicateLogicalType::or => FalsePredicate::default()->predicateFormat(),
-                CompoundPredicateLogicalType::not => fatal_error("Not predicate must have exactly one subpredicate"),
-            };
-        }
-        $arguments = $subpredicates->compactMap(function (Predicate $subpredicate): ?string {
-            $precedence = $subpredicate->predicateFormat();
-            if ($subpredicate instanceof CompoundPredicate) {
-                $precedence = "($precedence)";
-            }
-            if (empty($precedence)) {
-                return null;
-            }
-            return $precedence;
-        });
-        $separator = $this->predicateOperator()->predicateFormat();
-        return match ($type) {
-            CompoundPredicateLogicalType::and, CompoundPredicateLogicalType::or => $arguments->join(" $separator "),
-            CompoundPredicateLogicalType::not => "$separator $arguments[0]",
-        };
-    }
-
-    #[Override]
     public function withSubstitutionVariables(Dictionary $variables): Predicate
     {
         return new CompoundPredicate($this->compoundPredicateType, $this->subpredicates->map(fn(Predicate $predicate): Predicate => $predicate->withSubstitutionVariables($variables)));
@@ -97,7 +104,7 @@ class CompoundPredicate extends Predicate
     #[Override]
     public function evaluate(mixed $object = null, ?Dictionary $substitutionVariables = null): bool
     {
-        return $this->predicateOperator()->evaluatePredicates($this->subpredicates, $object, $substitutionVariables);
+        return $this->predicateOperator->evaluatePredicates($this->subpredicates, $object, $substitutionVariables);
     }
 
     #[Override]
@@ -116,14 +123,5 @@ class CompoundPredicate extends Predicate
             $recursivelyAcceptVisitor();
             $visitor->visitPredicate($this);
         }
-    }
-
-    private function predicateOperator(): CompoundPredicateOperator
-    {
-        return match ($this->compoundPredicateType) {
-            CompoundPredicateLogicalType::not => CompoundPredicateOperator::notPredicateOperator(),
-            CompoundPredicateLogicalType::and => CompoundPredicateOperator::andPredicateOperator(),
-            CompoundPredicateLogicalType::or => CompoundPredicateOperator::orPredicateOperator(),
-        };
     }
 }

@@ -3,7 +3,6 @@
 namespace Sabatier\Foundation\Networking;
 
 use JetBrains\PhpStorm\ExpectedValues;
-use Override;
 use Sabatier\Foundation\Dictionary;
 use Sabatier\Foundation\ObjectClass;
 use Sabatier\Foundation\URL;
@@ -20,7 +19,7 @@ class URLRequest extends ObjectClass
     public ?Dictionary $allHTTPHeaderFields = null;
     /** @var string|null The data sent as the message body of a request, such as for an HTTP POST request. */
     public ?string $httpBody = null;
-    /** @var mixed|null The stream used to deliver the HTTP body. */
+    /** @var resource|null The stream used to deliver the HTTP body. */
     public mixed $httpBodyStream = null;
     /** @var URL|null The main document URL associated with this request. This URL is used for the cookie “same domain as main document” policy. */
     public ?URL $mainDocumentURL = null;
@@ -32,6 +31,9 @@ class URLRequest extends ObjectClass
     public URLRequestAttribution $attribution = URLRequestAttribution::developer;
     /** @internal */
     public Dictionary $protocolProperties;
+    public string $description {
+        get => "<URLRequest $this->hash> { URL: $this->url }";
+    }
 
     /**
      * Creates and initializes a URL request with the given URL.
@@ -86,9 +88,7 @@ class URLRequest extends ObjectClass
      */
     public function setValueForHttpHeaderField(?string $value, string $field): void
     {
-        if ($this->allHTTPHeaderFields === null) {
-            $this->allHTTPHeaderFields = new Dictionary();
-        }
+        $this->allHTTPHeaderFields ??= new Dictionary();
         $this->allHTTPHeaderFields[$field] = $value;
     }
 
@@ -99,11 +99,5 @@ class URLRequest extends ObjectClass
     public function valueForHttpHeaderField(string $field): ?string
     {
         return $this->allHTTPHeaderFields?->valueForCaseInsensitiveKey($field);
-    }
-
-    #[Override]
-    public function description(): string
-    {
-        return "<URLRequest {$this->hash()}> { URL: $this->url }";
     }
 }

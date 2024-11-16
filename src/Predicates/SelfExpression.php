@@ -8,6 +8,10 @@ use Sabatier\Foundation\Dictionary;
 /** @internal */
 class SelfExpression extends Expression
 {
+    public string $predicateFormat {
+        get => "SELF";
+    }
+
     public function __construct()
     {
         parent::__construct(ExpressionType::evaluatedObject);
@@ -17,11 +21,5 @@ class SelfExpression extends Expression
     public function expressionValue(mixed $object = null, ?Dictionary $context = null): mixed
     {
         return $object;
-    }
-
-    #[Override]
-    public function predicateFormat(): string
-    {
-        return "SELF";
     }
 }

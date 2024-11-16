@@ -7,6 +7,7 @@ namespace Sabatier\Foundation\Networking;
  */
 readonly class URLCredential
 {
+    /** @var bool A Boolean value that indicates whether the credential has a password. */
     public bool $hasPassword;
 
     /**

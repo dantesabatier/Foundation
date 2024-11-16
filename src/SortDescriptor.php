@@ -11,7 +11,12 @@ use Override;
 class SortDescriptor extends ObjectClass
 {
     /** @var SortDescriptor Returns a sort descriptor that reverses the sort order. */
-    public readonly SortDescriptor $reversedSortDescriptor;
+    public SortDescriptor $reversedSortDescriptor {
+        get => new SortDescriptor($this->key, !$this->ascending, $this->comparator);
+    }
+    public string $description {
+        get => sprintf("%s %s", $this->key, human_readable_value($this->ascending));
+    }
 
     /**
      * Initializes a sort descriptor with a given key path and ordering, and a comparator block.
@@ -21,15 +26,6 @@ class SortDescriptor extends ObjectClass
      */
     public function __construct(public readonly string $key, public readonly bool $ascending = true, public readonly ?Closure $comparator = null)
     {
-        unset($this->reversedSortDescriptor);
-    }
-
-    public function __get(string $name)
-    {
-        return $this->$name = match ($name) {
-            "reversedSortDescriptor" => new SortDescriptor($this->key, !$this->ascending, $this->comparator),
-            default => $this->valueForUndefinedKey($name)
-        };
     }
 
     /**
@@ -62,11 +58,5 @@ class SortDescriptor extends ObjectClass
             return $this->key === $other->key && $this->ascending === $other->ascending;
         }
         return false;
-    }
-
-    #[Override]
-    public function description(): string
-    {
-        return sprintf("%s %s", $this->key, human_readable_value($this->ascending));
     }
 }

@@ -10,5 +10,7 @@ interface CustomDebugStringConvertible extends CustomStringConvertible
     /**
      * A textual representation of this instance, suitable for debugging.
      */
-    public function debugDescription(): string;
+    public string $debugDescription {
+        get;
+    }
 }

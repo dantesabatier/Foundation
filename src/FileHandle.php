@@ -8,7 +8,6 @@ use Exception;
 
 /**
  * An object-oriented wrapper for a file descriptor.
- * @property-read string $availableData The data currently available in the receiver. The data currently available through the receiver, up to the maximum size that can be represented by a string. If the receiver is a file, this method returns the data obtained by reading the file from the current file pointer to the end of the file. If the receiver is a communications channel, this method reads up to a buffer of data and returns it; if no data is available, the method blocks. Returns an empty data object if the end of file is reached. This method raises {@see fileHandleOperationException} if attempts to determine the file-handle type fail or if attempts to read from the file or channel fail.
  */
 final class FileHandle extends ObjectClass
 {
@@ -17,6 +16,10 @@ final class FileHandle extends ObjectClass
     private static ?FileHandle $standardError = null;
     private static ?FileHandle $standardInput = null;
     private static ?FileHandle $standardOutput = null;
+    /** @var string The data currently available in the receiver. The data currently available through the receiver, up to the maximum size that can be represented by a string. If the receiver is a file, this method returns the data obtained by reading the file from the current file pointer to the end of the file. If the receiver is a communications channel, this method reads up to a buffer of data and returns it; if no data is available, the method blocks. Returns an empty data object if the end of file is reached. This method raises {@see fileHandleOperationException} if attempts to determine the file-handle type fail or if attempts to read from the file or channel fail. */
+    public string $availableData {
+        get => $this->read(PHP_INT_MAX) ?? "";
+    }
 
     /**
      * @param resource $rawHandle
@@ -31,17 +34,6 @@ final class FileHandle extends ObjectClass
     public function __destruct()
     {
         $this->close();
-    }
-
-    /**
-     * @throws Exception
-     */
-    public function __get(string $name)
-    {
-        return match ($name) {
-            "availableData" => $this->read(PHP_INT_MAX) ?? "",
-            default => $this->valueForUndefinedKey($name)
-        };
     }
 
     /**
@@ -104,9 +96,7 @@ final class FileHandle extends ObjectClass
      */
     public static function standardError(): FileHandle
     {
-        if (self::$standardError === null) {
-            self::$standardError = new FileHandle(fopen("php://stderr", "w"));
-        }
+        self::$standardError ??= new FileHandle(fopen("php://stderr", "w"));
         return self::$standardError;
     }
 
@@ -119,9 +109,7 @@ final class FileHandle extends ObjectClass
      */
     public static function standardInput(): FileHandle
     {
-        if (self::$standardInput === null) {
-            self::$standardInput = new FileHandle(fopen("php://stdin", "r"));
-        }
+        self::$standardInput ??= new FileHandle(fopen("php://stdin", "r"));
         return self::$standardInput;
     }
 
@@ -134,9 +122,7 @@ final class FileHandle extends ObjectClass
      */
     public static function standardOutput(): FileHandle
     {
-        if (self::$standardOutput === null) {
-            self::$standardOutput = new FileHandle(fopen("php://stdout", "w"));
-        }
+        self::$standardOutput ??= new FileHandle(fopen("php://stdout", "w"));
         return self::$standardOutput;
     }
 

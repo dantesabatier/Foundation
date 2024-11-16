@@ -10,15 +10,22 @@ use function Sabatier\Foundation\human_readable_value;
 /** @internal */
 class TernaryExpression extends Expression
 {
-    public function __construct(public readonly Predicate $predicate, public readonly Expression $true, public readonly Expression $false)
+    public string $predicateFormat {
+        get => sprintf("TERNARY(%s, %s, %s)", $this->predicate, $this->true, $this->false);
+    }
+
+    public function __construct(Predicate $predicate, Expression $true, Expression $false)
     {
         parent::__construct(ExpressionType::conditional);
+        $this->predicate = $predicate;
+        $this->true = $true;
+        $this->false = $false;
     }
 
     #[Override]
     public function withSubstitutionVariables(Dictionary $variables): Expression
     {
-        return new TernaryExpression($this->predicate()->withSubstitutionVariables($variables), $this->true->withSubstitutionVariables($variables), $this->false->withSubstitutionVariables($variables));
+        return new TernaryExpression($this->predicate->withSubstitutionVariables($variables), $this->true->withSubstitutionVariables($variables), $this->false->withSubstitutionVariables($variables));
     }
 
     #[Override]
@@ -47,29 +54,5 @@ class TernaryExpression extends Expression
         if ($flags & PredicateVisitorFlags::internalNodes) {
             $visitor->visitPredicateExpression($this);
         }
-    }
-
-    #[Override]
-    public function predicate(): Predicate
-    {
-        return $this->predicate;
-    }
-
-    #[Override]
-    public function true(): Expression
-    {
-        return $this->true;
-    }
-
-    #[Override]
-    public function false(): Expression
-    {
-        return $this->false;
-    }
-
-    #[Override]
-    public function predicateFormat(): string
-    {
-        return sprintf("TERNARY(%s, %s, %s)", $this->predicate, $this->true, $this->false);
     }
 }

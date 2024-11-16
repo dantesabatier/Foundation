@@ -9,15 +9,27 @@ use Override;
 
 /**
  * A specific point in time, independent of any calendar or time zone.
- * @property-read float $timeIntervalSinceReferenceDate The interval between the date value and 00:00:00 UTC on 1 January 2001. This property's value is negative if the date object is earlier than the system's absolute reference date (00:00:00 UTC on 1 January 2001).
- * @property-read float $timeIntervalSinceNow The time interval between the date value and the current date and time. If the date is earlier than the current date and time, this property's value is negative.
- * @property-read float $timeIntervalSince1970 The interval between the date value and 00:00:00 UTC on 1 January 1970. This property's value is negative if the date object is earlier than 00:00:00 UTC on 1 January 1970.
  */
 class Date extends ObjectClass
 {
     /** @var float The number of seconds from 1 January 1970 to the reference date, 1 January 2001. */
     final public const float timeIntervalBetween1970AndReferenceDate = kCFAbsoluteTimeIntervalSince1970;
-    private float $timeIntervalSinceReferenceDate;
+    /** @var float The interval between the date value and 00:00:00 UTC on 1 January 2001. This property's value is negative if the date object is earlier than the system's absolute reference date (00:00:00 UTC on 1 January 2001). */
+    private(set) float $timeIntervalSinceReferenceDate;
+    /** @var float The time interval between the date value and the current date and time. If the date is earlier than the current date and time, this property's value is negative. */
+    public float $timeIntervalSinceNow {
+        get => $this->timeIntervalSinceReferenceDate - absolute_time_get_current();
+    }
+    /** @var float The interval between the date value and 00:00:00 UTC on 1 January 1970. This property's value is negative if the date object is earlier than 00:00:00 UTC on 1 January 1970. */
+    public float $timeIntervalSince1970 {
+        get => $this->timeIntervalSinceReferenceDate - self::timeIntervalBetween1970AndReferenceDate;
+    }
+    public string $description {
+        get => $this->format();
+    }
+    public string $debugDescription {
+        get => sprintf("<%s %s>", get_called_class(), $this->description);
+    }
 
     public function __construct(?float $time = null)
     {
@@ -32,16 +44,6 @@ class Date extends ObjectClass
     public function __unserialize(array $data): void
     {
         $this->timeIntervalSinceReferenceDate = $data["timeIntervalSinceReferenceDate"] ?? absolute_time_get_current();
-    }
-
-    public function __get(string $name)
-    {
-        return match ($name) {
-            "timeIntervalSinceReferenceDate" => $this->timeIntervalSinceReferenceDate,
-            "timeIntervalSinceNow" => $this->timeIntervalSinceReferenceDate - absolute_time_get_current(),
-            "timeIntervalSince1970" => $this->timeIntervalSinceReferenceDate - self::timeIntervalBetween1970AndReferenceDate,
-            default => $this->valueForUndefinedKey($name)
-        };
     }
 
     /**
@@ -194,7 +196,7 @@ class Date extends ObjectClass
      */
     public function formatted(DateFormatStyleDateStyle $date = DateFormatStyleDateStyle::abbreviated, DateFormatStyleTimeStyle $time = DateFormatStyleTimeStyle::shortened): string
     {
-        return (new IntlDateFormatter(Locale::getDefault(), $date->value, $time->value))->format((int)$this->timeIntervalSinceReferenceDate);
+        return new IntlDateFormatter(Locale::getDefault(), $date->value, $time->value)->format((int)$this->timeIntervalSinceReferenceDate);
     }
 
     public function format(string $format = "Y-m-d H:i:s"): string
@@ -212,20 +214,8 @@ class Date extends ObjectClass
     }
 
     #[Override]
-    public function description(): string
-    {
-        return $this->format();
-    }
-
-    #[Override]
-    public function debugDescription(): string
-    {
-        return sprintf("<%s %s>", static::class, $this->description());
-    }
-
-    #[Override]
     public function jsonSerialize(): string
     {
-        return $this->description();
+        return $this->description;
     }
 }

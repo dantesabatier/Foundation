@@ -23,6 +23,6 @@ class MatchingPredicateOperator extends StringPredicateOperator
             return false;
         }
         assert(is_string($left) && is_string($right), sprintf("Cannot perform substring check on non-strings %s and %s", human_readable_value($left), human_readable_value($right)));
-        return string_matches($left, $right, $this->compareOptions());
+        return string_matches($left, $right, $this->compareOptions);
     }
 }

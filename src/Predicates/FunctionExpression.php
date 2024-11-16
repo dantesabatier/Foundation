@@ -12,15 +12,44 @@ use function Sabatier\Foundation\typeof;
 /** @internal */
 class FunctionExpression extends Expression
 {
+    public string $predicateFormat {
+        get {
+            $format = "";
+            $operand = $this->operand;
+            if ($operand instanceof ExpressionOperator) {
+                $format .= $operand->function;
+                $format .= "(";
+            } else {
+                $format .= "FUNCTION";
+                $format .= "(";
+                $format .= $operand->description;
+                $format .= ", ";
+                if ($selector = $this->selector) {
+                    $format .= $selector;
+                    if (!$this->arguments?->isEmpty) {
+                        $format .= ", ";
+                    }
+                }
+            }
+            $format .= $this->arguments?->join(", ") ?? "";
+            return $format . ")";
+        }
+    }
+    public string $selector;
+
     /**
      * @param ExpressionType $expressionType
      * @param Expression $operand
      * @param string $selector
      * @param ArrayClass<Expression>|null $arguments
      */
-    public function __construct(ExpressionType $expressionType, public readonly Expression $operand, public readonly string $selector, public readonly ?ArrayClass $arguments = null)
+    public function __construct(ExpressionType $expressionType, Expression $operand, string $selector, ?ArrayClass $arguments = null)
     {
         parent::__construct($expressionType);
+        $this->arguments = $arguments;
+        $this->operand = $operand;
+        $this->selector = $selector;
+        $this->function = $selector;
     }
 
     public static function functionWithSelector(Expression $target, string $selector, ?ArrayClass $arguments = null): Expression
@@ -80,47 +109,5 @@ class FunctionExpression extends Expression
         if ($flags & PredicateVisitorFlags::internalNodes) {
             $visitor->visitPredicateExpression($this);
         }
-    }
-
-    #[Override]
-    public function function (): string
-    {
-        return $this->selector;
-    }
-
-    #[Override]
-    public function arguments(): ?ArrayClass
-    {
-        return $this->arguments;
-    }
-
-    #[Override]
-    public function operand(): ?Expression
-    {
-        return $this->operand;
-    }
-
-    #[Override]
-    public function predicateFormat(): string
-    {
-        $format = "";
-        $operand = $this->operand;
-        if ($operand instanceof ExpressionOperator) {
-            $format .= $operand->function();
-            $format .= "(";
-        } else {
-            $format .= "FUNCTION";
-            $format .= "(";
-            $format .= $operand->description();
-            $format .= ", ";
-            if ($selector = $this->selector) {
-                $format .= $selector;
-                if (!$this->arguments?->isEmpty) {
-                    $format .= ", ";
-                }
-            }
-        }
-        $format .= $this->arguments?->join(", ") ?? "";
-        return $format . ")";
     }
 }

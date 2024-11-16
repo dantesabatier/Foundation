@@ -10,12 +10,23 @@ use function Sabatier\Foundation\human_readable_value;
 /** @internal */
 class ConstantValueExpression extends Expression
 {
-    private readonly mixed $constantValue;
+    public string $predicateFormat {
+        get {
+            $constantValue = $this->constantValue;
+            if (is_string($constantValue)) {
+                return "'$constantValue'";
+            }
+            return human_readable_value($constantValue);
+        }
+    }
+    public string $keyPath {
+        get => $this->predicateFormat;
+    }
 
     public function __construct(mixed $value)
     {
         parent::__construct(ExpressionType::constantValue);
-        $this->constantValue = is_string($value) ? (new Value($value))->value : $value;
+        $this->constantValue = is_string($value) ? new Value($value)->value : $value;
     }
 
     #[Override]
@@ -29,27 +40,5 @@ class ConstantValueExpression extends Expression
             error_log(sprintf("Foundation: expression %s: %s", $this->expressionType->name, human_readable_value($value)));
         }
         return $value;
-    }
-
-    #[Override]
-    public function constantValue(): mixed
-    {
-        return $this->constantValue;
-    }
-
-    #[Override]
-    public function keyPath(): string
-    {
-        return $this->predicateFormat();
-    }
-
-    #[Override]
-    public function predicateFormat(): string
-    {
-        $constantValue = $this->constantValue;
-        if (is_string($constantValue)) {
-            return "'$constantValue'";
-        }
-        return human_readable_value($constantValue);
     }
 }

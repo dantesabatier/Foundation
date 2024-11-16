@@ -16,6 +16,10 @@ use function Sabatier\Foundation\typeof;
 /** @internal */
 class CustomPredicateOperator extends PredicateOperator
 {
+    public string $symbol {
+        get => $this->selector;
+    }
+
     public function __construct(public readonly string $selector)
     {
         parent::__construct(PredicateOperatorType::customSelector);
@@ -30,11 +34,5 @@ class CustomPredicateOperator extends PredicateOperator
         $selector = $this->selector;
         $arguments = [$right];
         return $left->$selector(...$arguments);
-    }
-
-    #[Override]
-    public function symbol(): string
-    {
-        return $this->selector;
     }
 }

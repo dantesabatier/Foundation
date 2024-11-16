@@ -21,11 +21,6 @@ use Traversable;
  * @template Element
  * @implements Collection<string, Element>
  * @implements IteratorAggregate<string, Element>
- * @property-read bool $isEmpty A Boolean value indicating whether the collection is empty.
- * @property-read int $count The number of elements in the collection.
- * @property-read Element|null $first The first element of the collection.
- * @property-read ArrayClass<string> $keys An array containing just the keys of the dictionary.
- * @property-read ArrayClass<Element> $values An array containing just the values of the dictionary.
  */
 class Dictionary extends ObjectClass implements Collection, IteratorAggregate
 {
@@ -37,11 +32,42 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
         max as private sequenceMax;
         reduce as private sequenceReduce;
         indexOf as private collectionIndexOf;
-        filter as private collectionFilter;
+        filter as private sequenceFilter;
         filtered as private collectionFiltered;
         sorted as private collectionSorted;
-        allSatisfy as private collectionAllSatisfy;
+        allSatisfy as private sequenceAllSatisfy;
         joined as private collectionJoined;
+    }
+
+    public string $description {
+        get => sprintf("[%s]", $this->isEmpty ? ":" : $this->mapValues(fn(mixed $value, string $key): string => sprintf("%s: %s", $key, human_readable_value($value)))->values->join(", "));
+    }
+    public int $count {
+        get => count($this->reserved);
+    }
+    public bool $isEmpty {
+        get => $this->count === 0;
+    }
+    public mixed $first {
+        get => $this->first();
+    }
+    public int $startIndex {
+        get => 0;
+    }
+    public int $endIndex {
+        get => $this->count;
+    }
+    public Range $indices {
+        get => new Range($this->startIndex, $this->endIndex);
+    }
+
+    /** @var ArrayClass<string> $keys An array containing just the keys of the dictionary. */
+    public ArrayClass $keys {
+        get => new ArrayClass(array_keys($this->reserved));
+    }
+    /** @var ArrayClass<Element> $values An array containing just the values of the dictionary. */
+    public ArrayClass $values {
+        get => new ArrayClass(array_values($this->reserved));
     }
 
     /**
@@ -58,21 +84,9 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
         }
     }
 
-    public function __get(string $name)
-    {
-        return match ($name) {
-            "isEmpty" => $this->isEmpty(),
-            "count" => $this->count(),
-            "first" => $this->first(),
-            "keys" => new ArrayClass(array_keys($this->reserved)),
-            "values" => new ArrayClass(array_values($this->reserved)),
-            default => $this->valueForUndefinedKey($name),
-        };
-    }
-
     public static function dictionaryWithArray(array $array): Dictionary
     {
-        return (new ArrayConverter($array))->dictionary;
+        return new ArrayConverter($array)->dictionary;
     }
 
     /**
@@ -281,8 +295,8 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
     {
         $k = $this->keys;
         $v = $this->values;
-        $i = $this->startIndex();
-        $end = $this->endIndex();
+        $i = $this->startIndex;
+        $end = $this->endIndex;
         while ($i !== $end) {
             if ($where($v[$i])) {
                 return $k[$i];
@@ -309,7 +323,7 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
      * @return Element|null The first element of the collection that satisfies predicate, or nil if there is no element that satisfies predicate.
      */
     #[Override]
-    public function first(Closure $where = null)
+    public function first(?Closure $where = null)
     {
         return $this->sequenceFirst($where);
     }
@@ -381,7 +395,7 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
     #[Override]
     public function allSatisfy(Closure $predicate): bool
     {
-        return $this->collectionAllSatisfy($predicate);
+        return $this->sequenceAllSatisfy($predicate);
     }
 
     /**
@@ -499,7 +513,7 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
      * Removes all the elements that satisfy the given predicate.
      * @param Closure(Element, string=): bool|null $where A closure that takes an element of the sequence as its argument and returns a Boolean value indicating whether the element should be removed from the collection.
      */
-    public function removeAll(Closure $where = null): void
+    public function removeAll(?Closure $where = null): void
     {
         if ($where === null) {
             $this->reserved = [];
@@ -532,12 +546,6 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
     public function toArray(): array
     {
         return $this->reserved;
-    }
-
-    #[Override]
-    public function description(): string
-    {
-        return sprintf("[%s]", $this->isEmpty ? ":" : $this->mapValues(fn(mixed $value, string $key): string => sprintf("%s: %s", $key, human_readable_value($value)))->values->join(", "));
     }
 
     /**

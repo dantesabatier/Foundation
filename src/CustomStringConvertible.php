@@ -12,5 +12,7 @@ interface CustomStringConvertible extends Stringable
     /**
      * A textual representation of this instance.
      */
-    public function description(): string;
+    public string $description {
+        get;
+    }
 }

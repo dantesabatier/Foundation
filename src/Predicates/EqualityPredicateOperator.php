@@ -58,7 +58,7 @@ class EqualityPredicateOperator extends PredicateOperator
         if (is_numeric($right)) {
             $right = (string)$right;
         }
-        $options = $this->compareOptions();
+        $options = $this->compareOptions;
         if ($options === CompareOptions::none || !is_string($left) || !is_string($right)) {
             return $isNegation xor ($left === $right);
         }

@@ -3,7 +3,6 @@
 namespace Sabatier\Foundation;
 
 use Closure;
-use Sabatier\Foundation\Predicates\Predicate;
 use Sabatier\Foundation\Predicates\PredicateUtilities;
 
 /**
@@ -24,7 +23,7 @@ trait CollectionAlgorithms
             fatal_error(sprintf("Invalid argument: expecting int, \"%s\"(%s) given", human_readable_value($offset), typeof($offset)));
         }
         if (!$this->offsetExists($offset)) {
-            fatal_error(sprintf("%s %s(%s) index \"%s\" out of bounds [%s...<%s]", $this->debugDescription(), __FUNCTION__, $offset, $offset, $this->startIndex(), $this->endIndex()));
+            fatal_error(sprintf("%s %s(%s) index \"%s\" out of bounds [%s...<%s]", $this->debugDescription, __FUNCTION__, $offset, $offset, $this->startIndex, $this->endIndex));
         }
         return $this->reserved[$offset];
     }
@@ -45,21 +44,6 @@ trait CollectionAlgorithms
         }
     }
 
-    public function startIndex(): int
-    {
-        return 0;
-    }
-
-    public function endIndex(): int
-    {
-        return $this->count;
-    }
-
-    public function indices(): Range
-    {
-        return new Range($this->startIndex(), $this->endIndex());
-    }
-
     public function indexAfter(int $i): int
     {
         return $i + 1;
@@ -72,8 +56,8 @@ trait CollectionAlgorithms
 
     public function firstIndex(Closure $where): int|null
     {
-        $i = $this->startIndex();
-        $end = $this->endIndex();
+        $i = $this->startIndex;
+        $end = $this->endIndex;
         while ($i !== $end) {
             if ($where($this[$i])) {
                 return $i;
@@ -91,32 +75,6 @@ trait CollectionAlgorithms
     public function distance(int $start, int $end): int
     {
         return $end - $start;
-    }
-
-    public function isEmpty(): bool
-    {
-        return $this->startIndex() === $this->endIndex();
-    }
-
-    public function filter(Closure $isIncluded): self
-    {
-        $instance = new self();
-        foreach (clone $this as $i => $e) {
-            $stop = false;
-            if ($isIncluded($e, $i, $stop)) {
-                $instance[] = $e;
-            }
-            /** @psalm-suppress TypeDoesNotContainType */
-            if ($stop) {
-                break;
-            }
-        }
-        return $instance;
-    }
-
-    public function filtered(Predicate $predicate): self
-    {
-        return $this->filter(fn(mixed $e): bool => $predicate->evaluate($e));
     }
 
     public function sort(?Closure $by = null): self
@@ -140,11 +98,6 @@ trait CollectionAlgorithms
             return $result->value;
         });
         return $instance;
-    }
-
-    public function allSatisfy(Closure $predicate): bool
-    {
-        return $this->filter($predicate)->compare($this) === ComparisonResult::orderedSame;
     }
 
     public function join(string $separator): string

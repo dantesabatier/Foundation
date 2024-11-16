@@ -42,9 +42,7 @@ class PredicateUtilities
      */
     private static function reservedWords(): Set
     {
-        if (self::$reservedWords === null) {
-            self::$reservedWords = new Set(["all", "and", "any", "anykey", "apply", "beginswith", "between", "cast", "contains", "endswith", "false", "falsepredicate", "first", "function", "in", "intersection", "last", "like", "matches", "minus", "nil", "no", "none", "not", "null", "or", "self", "size", "some", "subquery", "tokenmatches", "true", "truepredicate", "union", "yes"]);
-        }
+        self::$reservedWords ??= new Set(["all", "and", "any", "anykey", "apply", "beginswith", "between", "cast", "contains", "endswith", "false", "falsepredicate", "first", "function", "in", "intersection", "last", "like", "matches", "minus", "nil", "no", "none", "not", "null", "or", "self", "size", "some", "subquery", "tokenmatches", "true", "truepredicate", "union", "yes"]);
         return self::$reservedWords;
     }
 
@@ -209,7 +207,7 @@ class PredicateUtilities
 
     public static function random(Number|int $max = NotFound): Number
     {
-        return new Number((new SystemRandomNumberGenerator())->next((int)pn($max)));
+        return new Number(new SystemRandomNumberGenerator()->next((int)pn($max)));
     }
 
     public static function cast(mixed $value, ?string $type = null): mixed
@@ -217,10 +215,10 @@ class PredicateUtilities
         return match ($type) {
             null => $value,
             "string" => human_readable_value($value),
-            "int", "integer" => (new Number($value))->intValue,
-            "float", "double" => (new Number($value))->floatValue,
-            "bool", "boolean" => (new Number($value))->boolValue,
-            Date::class => new Date((new Number($value))->floatValue),
+            "int", "integer" => new Number($value)->intValue,
+            "float", "double" => new Number($value)->floatValue,
+            "bool", "boolean" => new Number($value)->boolValue,
+            Date::class => new Date(new Number($value)->floatValue),
             Number::class => new Number($value),
             default => fatal_error(sprintf("Do not know how to cast %s to type %s", human_readable_value($value), $type))
         };
@@ -320,7 +318,7 @@ class PredicateUtilities
             "MICROSECOND" => "f",
             default => $unit
         };
-        return new Number((new DateTime((string)$d1))->diff(new DateTime((string)$d2))->$unit ?? 0);
+        return new Number(new DateTime((string)$d1)->diff(new DateTime((string)$d2))->$unit ?? 0);
     }
 
     public static function floor(Number|float $value): Number

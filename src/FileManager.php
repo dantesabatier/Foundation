@@ -54,9 +54,7 @@ final class FileManager extends ObjectClass
      */
     public static function default(): FileManager
     {
-        if (self::$default === null) {
-            self::$default = new FileManager();
-        }
+        self::$default ??= new FileManager();
         return self::$default;
     }
 
@@ -92,13 +90,13 @@ final class FileManager extends ObjectClass
             case SearchPathDirectory::applicationsDirectory:
             case SearchPathDirectory::libraryDirectory:
                 if ($domainMask & SearchPathDomainMask::local) {
-                    $urls->append($this->documentRootDirectory->appendingPathComponent($dirname));
+                    $urls[] = $this->documentRootDirectory->appendingPathComponent($dirname);
                 }
                 if ($domainMask & SearchPathDomainMask::user) {
-                    $urls->append($this->homeDirectoryForCurrentUser->appendingPathComponent($dirname));
+                    $urls[] = $this->homeDirectoryForCurrentUser->appendingPathComponent($dirname);
                 }
                 if ($domainMask & SearchPathDomainMask::system) {
-                    $urls->append($this->systemRootDirectory->appendingPathComponent($dirname));
+                    $urls[] = $this->systemRootDirectory->appendingPathComponent($dirname);
                 }
                 break;
             case SearchPathDirectory::documentsDirectory:
@@ -110,10 +108,10 @@ final class FileManager extends ObjectClass
             case SearchPathDirectory::sharedPublicDirectory:
             case SearchPathDirectory::trashDirectory:
                 if ($domainMask & SearchPathDomainMask::local) {
-                    $urls->append($this->documentRootDirectory->appendingPathComponent($dirname));
+                    $urls[] = $this->documentRootDirectory->appendingPathComponent($dirname);
                 }
                 if ($domainMask & SearchPathDomainMask::user) {
-                    $urls->append($this->homeDirectoryForCurrentUser->appendingPathComponent($dirname));
+                    $urls[] = $this->homeDirectoryForCurrentUser->appendingPathComponent($dirname);
                 }
                 break;
             case SearchPathDirectory::itemReplacementDirectory:
@@ -122,7 +120,7 @@ final class FileManager extends ObjectClass
                     $urls->appendContentsOf($this->urls(SearchPathDirectory::libraryDirectory, $domainMask)->map(fn(URL $url): URL => $url->appendingPathComponent($dirname)));
                 }
                 if ($domainMask & SearchPathDomainMask::user || $domainMask & SearchPathDomainMask::system) {
-                    $urls->append($this->temporaryDirectory);
+                    $urls[] = $this->temporaryDirectory;
                 }
                 break;
             case SearchPathDirectory::applicationSupportDirectory:

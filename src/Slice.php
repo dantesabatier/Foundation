@@ -17,9 +17,6 @@ use Traversable;
  * @template Element
  * @implements Collection<int, Element>
  * @implements IteratorAggregate<int, Element>
- * @property-read bool $isEmpty A Boolean value indicating whether the collection is empty.
- * @property-read int $count The number of elements in the collection.
- * @property-read Element|null $first The first element of the collection.
  */
 class Slice extends ObjectClass implements Collection, IteratorAggregate
 {
@@ -27,42 +24,40 @@ class Slice extends ObjectClass implements Collection, IteratorAggregate
         reduce as private sequenceReduce;
     }
 
-    public readonly int $startIndex;
-    public readonly int $endIndex;
-    public readonly Range $indices;
+    public int $count {
+        get => $this->bounds->count;
+    }
+    public bool $isEmpty {
+        get => $this->bounds->isEmpty;
+    }
+    public mixed $first {
+        get => $this->first();
+    }
+    public int $startIndex {
+        get => $this->bounds->lowerBound;
+    }
+    public int $endIndex {
+        get => $this->bounds->upperBound;
+    }
+    public Range $indices {
+        get => $this->bounds;
+    }
+    public string $description {
+        get => sprintf("<%s %s [%s...<%s]>", typeof($this->base), human_readable_value($this->base), $this->startIndex, $this->endIndex);
+    }
 
     /**
      * Creates a view into the given collection that allows access to elements within the specified range.
      * @param Collection<int, Element> $base The underlying collection of the slice.
      * @param Range $bounds The range of indices to allow access to in the new slice.
      */
-    public function __construct(public readonly Collection $base, Range $bounds)
+    public function __construct(public readonly Collection $base, public readonly Range $bounds)
     {
-        $this->indices = $bounds;
-        $this->startIndex = $bounds->lowerBound;
-        $this->endIndex = $bounds->upperBound;
     }
 
-    public function __get(string $name)
-    {
-        return match ($name) {
-            "isEmpty" => $this->isEmpty(),
-            "count" => $this->count(),
-            "first" => $this->first(),
-            default => $this->valueForUndefinedKey($name)
-        };
-    }
-
-    #[Override]
     public function count(): int
     {
         return $this->endIndex - $this->startIndex;
-    }
-
-    #[Override]
-    public function isEmpty(): bool
-    {
-        return $this->endIndex === $this->startIndex;
     }
 
     /**
@@ -90,7 +85,7 @@ class Slice extends ObjectClass implements Collection, IteratorAggregate
     #[Override]
     public function map(Closure $transform): Collection
     {
-        return (new ($this->base::class)($this))->map($transform);
+        return new ($this->base::class)($this)->map($transform);
     }
 
     /**
@@ -103,7 +98,7 @@ class Slice extends ObjectClass implements Collection, IteratorAggregate
     #[Override]
     public function compactMap(Closure $transform): Collection
     {
-        return (new ($this->base::class)($this))->compactMap($transform);
+        return new ($this->base::class)($this)->compactMap($transform);
     }
 
     /**
@@ -116,25 +111,7 @@ class Slice extends ObjectClass implements Collection, IteratorAggregate
     #[Override]
     public function flatMap(Closure $transform): Collection
     {
-        return (new ($this->base::class)($this))->flatMap($transform);
-    }
-
-    #[Override]
-    public function startIndex(): int
-    {
-        return $this->startIndex;
-    }
-
-    #[Override]
-    public function endIndex(): int
-    {
-        return $this->endIndex;
-    }
-
-    #[Override]
-    public function indices(): Range
-    {
-        return $this->indices;
+        return new ($this->base::class)($this)->flatMap($transform);
     }
 
     /**
@@ -198,10 +175,7 @@ class Slice extends ObjectClass implements Collection, IteratorAggregate
     #[Override]
     public function valueForKey(string $key): Collection
     {
-        return $this->map(function (KeyValueCoding $e) use ($key): mixed {
-            assert($e instanceof KeyValueCoding, sprintf("Invalid argument: expecting %s, \"%s\" given", KeyValueCoding::class, typeof($e)));
-            return $e->valueForKey($key);
-        });
+        return $this->map(fn(KeyValueCoding $e): mixed => $e->valueForKey($key));
     }
 
     /**
@@ -211,16 +185,10 @@ class Slice extends ObjectClass implements Collection, IteratorAggregate
     public function getIterator(): Traversable
     {
         return (function (): Generator {
-            for ($index = $this->startIndex; $index < $this->endIndex; $index++) {
-                yield $index => $this->base[$index];
+            foreach ($this->bounds as $e) {
+                yield $e => $this->base[$e];
             }
         })();
-    }
-
-    #[Override]
-    public function description(): string
-    {
-        return sprintf("<%s %s [%s...<%s]>", typeof($this->base), human_readable_value($this->base), $this->startIndex, $this->endIndex);
     }
 
     /**

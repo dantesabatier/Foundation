@@ -20,7 +20,7 @@ interface KeyValueObserving
     /**
      * @param Closure(mixed, KeyValueObservedChange): void|null $handler
      */
-    public function observe(string $keyPath, #[ExpectedValues(flagsFromClass: KeyValueObservingOptions::class)] int $options = KeyValueObservingOptions::new, Closure $handler = null): KeyValueObservation;
+    public function observe(string $keyPath, #[ExpectedValues(flagsFromClass: KeyValueObservingOptions::class)] int $options = KeyValueObservingOptions::new, ?Closure $handler = null): KeyValueObservation;
 
     /**
      * Informs the observing object when the value at the specified key path relative to the observed object has changed.

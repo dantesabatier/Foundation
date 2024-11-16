@@ -4,6 +4,7 @@ namespace Sabatier\Foundation;
 
 use Closure;
 use Override;
+use Sabatier\Foundation\Predicates\Predicate;
 
 /**
  * @psalm-require-implements Sequence
@@ -30,15 +31,11 @@ trait SequenceAlgorithms
 
     public function count(): int
     {
-        return count($this->reserved);
+        return $this->count;
     }
 
-    public function isEmpty(): bool
-    {
-        return $this->count() === 0;
-    }
-
-    #[Override] public function compare(mixed $other): ComparisonResult
+    #[Override]
+    public function compare(mixed $other): ComparisonResult
     {
         if (!$other instanceof Sequence) {
             fatal_error(sprintf("Invalid argument: expecting %s, \"%s\" given", Sequence::class, typeof($other)));
@@ -46,7 +43,8 @@ trait SequenceAlgorithms
         return ComparisonResult::from($this->count() <=> $other->count());
     }
 
-    #[Override] public function isEqual(mixed $other): bool
+    #[Override]
+    public function isEqual(mixed $other): bool
     {
         return $this->elementsEqual($other);
     }
@@ -56,6 +54,28 @@ trait SequenceAlgorithms
         return $this->reserved;
     }
 
+    public function filter(Closure $isIncluded): self
+    {
+        $instance = new self();
+        foreach (clone $this as $i => $e) {
+            $stop = false;
+            if ($isIncluded($e, $i, $stop)) {
+                $instance[] = $e;
+            }
+            /** @psalm-suppress TypeDoesNotContainType */
+            if ($stop) {
+                break;
+            }
+        }
+        return $instance;
+    }
+
+    public function filtered(Predicate $predicate): self
+    {
+        return $this->filter(fn(mixed $e): bool => $predicate->evaluate($e));
+    }
+
+    /** @noinspection PhpLoopCanBeConvertedToArrayAnyInspection */
     public function contains(Closure $predicate): bool
     {
         /**
@@ -74,21 +94,21 @@ trait SequenceAlgorithms
         return $this->contains(fn(mixed $e): bool => is_equal($e, $element));
     }
 
+    public function allSatisfy(Closure $predicate): bool
+    {
+        return !$this->contains(fn(mixed $e, string|int $i): bool => !$predicate($e, $i));
+    }
+
     public function elementsEqual(Sequence $sequence, ?Closure $areEquivalent = null): bool
     {
         if ($this->compare($sequence) !== ComparisonResult::orderedSame) {
             return false;
         }
         $areEquivalent ??= fn(mixed $e0, mixed $e1): bool => is_equal($e0, $e1);
-        foreach (clone $this as $i => $e) {
-            if (!$areEquivalent($e, $sequence->first(fn(mixed $v, string|int $k): bool => $k === $i))) {
-                return false;
-            }
-        }
-        return true;
+        return $this->allSatisfy(fn(mixed $e, string|int $i) => $areEquivalent($e, $sequence->first(fn(mixed $v, string|int $k): bool => $k === $i)));
     }
 
-    public function first(Closure $where = null): mixed
+    public function first(?Closure $where = null): mixed
     {
         foreach (clone $this as $i => $e) {
             if ($where === null) {
@@ -167,7 +187,8 @@ trait SequenceAlgorithms
     }
 
     /** @noinspection PhpMixedReturnTypeCanBeReducedInspection */
-    #[Override] public function jsonSerialize(): mixed
+    #[Override]
+    public function jsonSerialize(): mixed
     {
         return $this->toArray();
     }

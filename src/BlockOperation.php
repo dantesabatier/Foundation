@@ -18,7 +18,7 @@ use Override;
 class BlockOperation extends Operation
 {
     /** @var ArrayClass<Closure(): void> The blocks associated with the receiver. */
-    public readonly ArrayClass $executionBlocks;
+    private(set) ArrayClass $executionBlocks;
 
     /**
      * Creates and returns an NSBlockOperation object and adds the specified block to it.
@@ -48,6 +48,6 @@ class BlockOperation extends Operation
      */
     public function addExecutionBlock(Closure $block): void
     {
-        $this->executionBlocks->append($block);
+        $this->executionBlocks[] = $block;
     }
 }

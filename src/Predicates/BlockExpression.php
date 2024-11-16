@@ -19,27 +19,42 @@ use function Sabatier\Foundation\human_readable_value;
 /** @internal */
 class BlockExpression extends Expression
 {
+    public string $predicateFormat {
+        get {
+            $format = "BLOCK(function";
+            if ($arguments = $this->arguments) {
+                if (!$arguments->isEmpty) {
+                    $format .= ", ";
+                }
+                $format .= $arguments->join(", ");
+            }
+            return $format . ")";
+        }
+    }
+
     /**
-     * @param Closure(mixed, ArrayClass<Expression>, Dictionary|null): mixed $block
+     * @param Closure(mixed, ArrayClass<Expression>, Dictionary|null): mixed $expressionBlock
      * @param ArrayClass<Expression>|null $arguments
      */
 
-    public function __construct(private readonly Closure $block, private readonly ?ArrayClass $arguments = null)
+    public function __construct(Closure $expressionBlock, ?ArrayClass $arguments = null)
     {
         parent::__construct(ExpressionType::block);
+        $this->arguments = $arguments;
+        $this->expressionBlock = $expressionBlock;
     }
 
     #[Override]
     public function withSubstitutionVariables(Dictionary $variables): Expression
     {
-        return new BlockExpression($this->block, $this->arguments?->map(fn(Expression $expression): Expression => $expression->withSubstitutionVariables($variables)));
+        return new BlockExpression($this->expressionBlock, $this->arguments?->map(fn(Expression $expression): Expression => $expression->withSubstitutionVariables($variables)));
     }
 
     #[Override]
     public function expressionValue(mixed $object = null, ?Dictionary $context = null): mixed
     {
         $arguments = $this->arguments?->map(fn(Expression $expression): mixed => $expression->expressionValue($object, $context)) ?? new ArrayClass();
-        $value = ($this->block)($object, $arguments, $context);
+        $value = ($this->expressionBlock)($object, $arguments, $context);
         if (Predicate::$debugDefault) {
             error_log(sprintf("Foundation: expression %s: function(%s) => %s", $this->expressionType->name, $arguments->join(", "), human_readable_value($value)));
         }
@@ -63,30 +78,5 @@ class BlockExpression extends Expression
         if ($flags & PredicateVisitorFlags::internalNodes) {
             $visitor->visitPredicateExpression($this);
         }
-    }
-
-    #[Override]
-    public function expressionBlock(): Closure
-    {
-        return $this->block;
-    }
-
-    #[Override]
-    public function arguments(): ?ArrayClass
-    {
-        return $this->arguments;
-    }
-
-    #[Override]
-    public function predicateFormat(): string
-    {
-        $format = "BLOCK(function";
-        if ($arguments = $this->arguments) {
-            if (!$arguments->isEmpty) {
-                $format .= ", ";
-            }
-            $format .= $arguments->join(", ");
-        }
-        return $format . ")";
     }
 }

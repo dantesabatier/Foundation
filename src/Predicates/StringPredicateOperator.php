@@ -10,12 +10,35 @@
 namespace Sabatier\Foundation\Predicates;
 
 use JetBrains\PhpStorm\ExpectedValues;
-use Override;
 use function Sabatier\Foundation\fatal_error;
 
 /** @internal */
 class StringPredicateOperator extends PredicateOperator
 {
+    public string $symbol {
+        get {
+            $symbol = parent::$symbol->get();
+            $options = $this->options;
+            if ($options) {
+                $symbol .= "[";
+                if ($options & ComparisonPredicateOptions::caseInsensitive) {
+                    $symbol .= "c";
+                    if ($options & ComparisonPredicateOptions::diacriticInsensitive) {
+                        $symbol .= "d";
+                        if ($options & ComparisonPredicateOptions::normalized) {
+                            $symbol .= "n";
+                        }
+                    }
+                }
+                if ($options & ComparisonPredicateOptions::localeSensitive) {
+                    $symbol .= "l";
+                }
+                $symbol .= "]";
+            }
+            return $symbol;
+        }
+    }
+
     public function __construct(PredicateOperatorType $operatorType, ComparisonPredicateModifier $modifier = ComparisonPredicateModifier::direct, #[ExpectedValues(flagsFromClass: ComparisonPredicateOptions::class)] int $options = ComparisonPredicateOptions::none)
     {
         $op = ComparisonPredicateOptions::none;
@@ -32,29 +55,5 @@ class StringPredicateOperator extends PredicateOperator
             fatal_error(sprintf("%s comparison predicate option \"ComparisonPredicateOptions::localeSensitive\" is not supported by predicate operator %s", self::class, $operatorType->name));
         }
         parent::__construct($operatorType, $modifier, $op);
-    }
-
-    #[Override]
-    public function symbol(): string
-    {
-        $symbol = parent::symbol();
-        $options = $this->options;
-        if ($options) {
-            $symbol .= "[";
-            if ($options & ComparisonPredicateOptions::caseInsensitive) {
-                $symbol .= "c";
-                if ($options & ComparisonPredicateOptions::diacriticInsensitive) {
-                    $symbol .= "d";
-                    if ($options & ComparisonPredicateOptions::normalized) {
-                        $symbol .= "n";
-                    }
-                }
-            }
-            if ($options & ComparisonPredicateOptions::localeSensitive) {
-                $symbol .= "l";
-            }
-            $symbol .= "]";
-        }
-        return $symbol;
     }
 }

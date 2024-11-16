@@ -13,6 +13,17 @@ use Closure;
  */
 interface BidirectionalCollection extends Collection
 {
+    public mixed $last {
+        get;
+    }
+
+    /**
+     * Returns the last element of the collection that satisfies the given predicate.
+     * @param Closure(Element, Index=): bool|null $where A closure that takes an element of the collection as its argument and returns a Boolean value indicating whether the element is a match.
+     * @return Element|null The last element of the collection that satisfies predicate, or nil if there is no element that satisfies predicate.
+     */
+    public function last(?Closure $where = null);
+
     /**
      * Returns the position immediately before the given index.
      * @param int $i The index value immediately before $i.
@@ -41,13 +52,6 @@ interface BidirectionalCollection extends Collection
      * If no elements in the collection satisfy the given predicate, returns nil.
      */
     public function lastIndex(Closure $where);
-
-    /**
-     * Returns the last element of the collection that satisfies the given predicate.
-     * @param Closure(Element, Index=): bool|null $where A closure that takes an element of the collection as its argument and returns a Boolean value indicating whether the element is a match.
-     * @return Element|null The last element of the collection that satisfies predicate, or nil if there is no element that satisfies predicate.
-     */
-    public function last(Closure $where = null);
 
     /**
      * Returns A collection containing the elements of this sequence in reverse order.

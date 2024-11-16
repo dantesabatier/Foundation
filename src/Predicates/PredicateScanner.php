@@ -82,12 +82,12 @@ class PredicateScanner extends Scanner
                     $left->subpredicates->appendContentsOf($right->subpredicates);
                 } else {
                     /** @psalm-suppress PossiblyNullArgument */
-                    $right->subpredicates->append($left);
+                    $right->subpredicates[] = $left;
                     $left = $right;
                 }
             } elseif ($left instanceof CompoundPredicate && ($left->compoundPredicateType === CompoundPredicateLogicalType::and)) {
                 /** @psalm-suppress PossiblyNullArgument */
-                $left->subpredicates->append($right);
+                $left->subpredicates[] = $right;
             } else {
                 /** @psalm-suppress InvalidArgument */
                 $left = CompoundPredicate::andPredicateWithSubpredicates(new ArrayClass([$left, $right]));
@@ -134,12 +134,12 @@ class PredicateScanner extends Scanner
                     $left->subpredicates->appendContentsOf($right->subpredicates);
                 } else {
                     /** @psalm-suppress PossiblyNullArgument */
-                    $right->subpredicates->append($left);
+                    $right->subpredicates[] = $left;
                     $left = $right;
                 }
             } elseif ($left instanceof CompoundPredicate && ($left->compoundPredicateType === CompoundPredicateLogicalType::or)) {
                 /** @psalm-suppress PossiblyNullArgument */
-                $left->subpredicates->append($right);
+                $left->subpredicates[] = $right;
             } else {
                 /** @psalm-suppress InvalidArgument */
                 $left = CompoundPredicate::orPredicateWithSubpredicates(new ArrayClass([$left, $right]));
@@ -283,7 +283,7 @@ class PredicateScanner extends Scanner
             return Expression::expressionForEvaluatedObject();
         }
         if ($this->scanString("\$")) {
-            if (!($keyPath = $this->parseSimpleExpression()?->keyPath())) {
+            if (!($keyPath = $this->parseSimpleExpression()->keyPath)) {
                 fatal_error("Invalid argument: expecting key path");
             }
             return Expression::expressionForVariable("\$$keyPath");
@@ -368,7 +368,7 @@ class PredicateScanner extends Scanner
             return Expression::expressionForConstantValue($value);
         }
         if ($this->scanString("@")) {
-            if (!($keyPath = $this->parseSimpleExpression()?->keyPath())) {
+            if (!($keyPath = $this->parseSimpleExpression()->keyPath)) {
                 fatal_error("Invalid argument: expecting expression at index $this->scanLocation");
             }
             return Expression::expressionForKeyPath("@$keyPath");
@@ -416,10 +416,10 @@ class PredicateScanner extends Scanner
             /** @var ArrayClass<Expression> $arguments */
             $arguments = new ArrayClass();
             $argument = $this->parseExpression() ?? fatal_error("Invalid argument: expecting expression at index $this->scanLocation");
-            $arguments->append($argument);
+            $arguments[] = $argument;
             while ($this->scanString(",")) {
                 $argument = $this->parseExpression() ?? fatal_error("Invalid argument: expecting expression at index $this->scanLocation");
-                $arguments->append($argument);
+                $arguments[] = $argument;
             }
             if (!$this->scanString(")")) {
                 fatal_error("Invalid argument: missing closing \")\" at index $this->scanLocation");
@@ -429,7 +429,7 @@ class PredicateScanner extends Scanner
             if ($expression->expressionType !== ExpressionType::constantValue && $expression->expressionType !== ExpressionType::keyPath) {
                 fatal_error(sprintf("Invalid argument: expecting constant expression, %s expression given at index %s", $expression->expressionType->name, $this->scanLocation));
             }
-            return Expression::expressionForSelector($operand, $expression->constantValue(), new ArrayClass($arguments->dropFirst(2)));
+            return Expression::expressionForSelector($operand, $expression->constantValue, new ArrayClass($arguments->dropFirst(2)));
         }
         $this->scanString("#");
         $value = "";
@@ -461,7 +461,7 @@ class PredicateScanner extends Scanner
                     /** @psalm-suppress PossiblyNullArgument */
                     $left = Expression::expressionForSelector($left, "valueForKey", new ArrayClass([$right]));
                 } else {
-                    fatal_error(sprintf("%s %s() unhandled expression type \"%s\"", $this->debugDescription(), __FUNCTION__, $expressionType->name));
+                    fatal_error(sprintf("%s %s() unhandled expression type \"%s\"", $this->debugDescription, __FUNCTION__, $expressionType->name));
                 }
             } elseif ($this->scanString("[")) {
                 if ($this->scanKeyword("FIRST")) {
@@ -481,7 +481,7 @@ class PredicateScanner extends Scanner
                     fatal_error("Invalid argument: missing closing \"]\" at index $this->scanLocation");
                 }
             } elseif ($left instanceof KeyPathExpression && $this->scanString(":")) {
-                if (!($keyPath = $left->keyPath())) {
+                if (!($keyPath = $left->keyPath)) {
                     fatal_error("Invalid argument: expecting key path at index $this->scanLocation");
                 }
                 $function = "$keyPath:";

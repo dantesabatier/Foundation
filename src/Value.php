@@ -15,6 +15,12 @@ class Value extends ObjectClass
     public readonly mixed $value;
     /** @var string The type of the value */
     public readonly string $type;
+    public string $description {
+        get => human_readable_value($this->value);
+    }
+    public string $debugDescription {
+        get => sprintf("<%s %s> (%s)%s", get_called_class(), $this->hash, $this->type, $this->description);
+    }
 
     /**
      * Initializes a value object to contain the specified value.
@@ -72,17 +78,5 @@ class Value extends ObjectClass
     public function jsonSerialize(): mixed
     {
         return $this->value;
-    }
-
-    #[Override]
-    public function description(): string
-    {
-        return human_readable_value($this->value);
-    }
-
-    #[Override]
-    public function debugDescription(): string
-    {
-        return sprintf("<%s %s> (%s)%s", static::class, $this->hash(), $this->type, $this->description());
     }
 }

@@ -6,74 +6,73 @@ use Override;
 
 /**
  * A general-purpose recorder of operations that enables undo and redo.
- * @property-read int $levelsOfUndo The maximum number of top-level undo groups the receiver holds. An integer specifying the number of undo groups. A limit of 0 indicates no limit, so old undo groups are never dropped. When ending an undo group results in the number of groups exceeding this limit, the oldest groups are dropped from the stack. The default is 0. If you change the limit to a level below the prior limit, old undo groups are immediately dropped.
- * @property-read bool $canUndo A Boolean value that indicates whether the receiver has any actions to undo.
- * @property-read bool $canRedo A Boolean value that indicates whether the receiver has any actions to redo. true if the receiver has any actions to redo, otherwise false. Because any undo operation registered clears the redo stack, this method posts an {@see UndoManagerCheckpointNotification} to allow clients to apply their pending operations before testing the redo stack.
- * @property-read int $groupingLevel The number of nested undo groups (or redo groups, if Redo was invoked last) in the current event loop. An integer indicating the number of nested groups. If 0 is returned, there is no open undo or redo group.
- * @property-read bool $isUndoRegistrationEnabled A Boolean value that indicates whether the recording of undo operations is enabled.
- * @property-read bool $isUndoing Returns a Boolean value that indicates whether the receiver is in the process of performing its {@see undo()} or {@see undoNestedGroup()} method.
- * @property-read bool $isRedoing Returns a Boolean value that indicates whether the receiver is in the process of performing its {@see redo()} method.
- * @property-read string $undoActionName The name identifying the undo action.
- * @property-read string $redoActionName The name identifying the redo action.
- * @property-read string $undoMenuItemTitle The complete title of the Undo menu command, for example, “Undo Paste.”
- * @property-read string $redoMenuItemTitle The complete title of the Redo menu command, for example, “Redo Paste.”
- * @property-read bool $undoActionIsDiscardable Boolean value that indicates whether the next undo action is discardable.
- * @property-read bool $redoActionIsDiscardable Boolean value that indicates whether the next redo action is discardable.
  */
 class UndoManager extends ObjectClass
 {
-    protected int $levelsOfUndo = 0;
-    /** @var bool A Boolean value that indicates whether the receiver automatically creates undo groups around each pass of the run loop. true if the receiver automatically creates undo groups around each pass of the run loop, otherwise false. The default is true. If you turn automatic grouping off, you must close groups explicitly before invoking either {@see undo()} or {@see undoNestedGroup()}. */
-    public bool $groupsByEvent = true;
-    protected int $groupingLevel = 0;
-    protected bool $isUndoRegistrationEnabled = true;
-    protected bool $isUndoing = false;
-    protected bool $isRedoing = false;
-    protected bool $undoActionIsDiscardable = false;
-    protected bool $redoActionIsDiscardable = false;
-    /** @var ArrayClass<UndoGroup> */
-    private readonly ArrayClass $undoStack;
-    /** @var ArrayClass<UndoGroup> */
-    private readonly ArrayClass $redoStack;
-    private ?object $nextTarget = null;
-    private ?UndoGroup $group = null;
-
-    public function __construct()
-    {
-        $this->undoStack = new ArrayClass();
-        $this->redoStack = new ArrayClass();
-    }
-
-    public function __get(string $name)
-    {
-        return match ($name) {
-            "canUndo" => !$this->undoStack->isEmpty || $this->group?->actions->isEmpty === false,
-            "canRedo" => (function (): bool {
-                NotificationCenter::default()->postNotificationName(UndoManagerCheckpointNotification, $this);
-                return !$this->redoStack->isEmpty;
-            })(),
-            "redoActionName" => $this->redoStack->last?->actionName ?? "",
-            "undoActionName" => $this->group?->actionName ?? $this->undoStack->last?->actionName ?? "",
-            "redoMenuItemTitle" => $this->redoMenuTitle($this->redoActionName),
-            "undoMenuItemTitle" => $this->undoMenuTitle($this->undoActionName),
-            "levelsOfUndo", "groupingLevel", "isUndoRegistrationEnabled", "isUndoing", "isRedoing", "undoActionIsDiscardable", "redoActionIsDiscardable" => $this->$name,
-            default => $this->valueForUndefinedKey($name)
-        };
-    }
-
-    public function __set(string $name, mixed $value): void
-    {
-        if ($name === "levelsOfUndo") {
-            $this->$name = $value;
+    /** @var int The maximum number of top-level undo groups the receiver holds. An integer specifying the number of undo groups. A limit of 0 indicates no limit, so old undo groups are never dropped. When ending an undo group results in the number of groups exceeding this limit, the oldest groups are dropped from the stack. The default is 0. If you change the limit to a level below the prior limit, old undo groups are immediately dropped. */
+    private(set) int $levelsOfUndo = 0 {
+        set {
+            $this->levelsOfUndo = $value;
             while ($this->undoStack->count > $value) {
                 $this->undoStack->removeAt(0);
             }
             while ($this->redoStack->count > $value) {
                 $this->redoStack->removeAt(0);
             }
-        } else {
-            $this->setValueForUndefinedKey($value, $name);
         }
+    }
+    /** @var bool A Boolean value that indicates whether the receiver automatically creates undo groups around each pass of the run loop. true if the receiver automatically creates undo groups around each pass of the run loop, otherwise false. The default is true. If you turn automatic grouping off, you must close groups explicitly before invoking either {@see undo()} or {@see undoNestedGroup()}. */
+    public bool $groupsByEvent = true;
+    /** @var int The number of nested undo groups (or redo groups, if Redo was invoked last) in the current event loop. An integer indicating the number of nested groups. If 0 is returned, there is no open undo or redo group. */
+    private(set) int $groupingLevel = 0;
+    /** @var bool A Boolean value that indicates whether the recording of undo operations is enabled. */
+    private(set) bool $isUndoRegistrationEnabled = true;
+    /** @var bool Returns a Boolean value that indicates whether the receiver is in the process of performing its {@see undo()} or {@see undoNestedGroup()} method. */
+    private(set) bool $isUndoing = false;
+    /** @var bool Returns a Boolean value that indicates whether the receiver is in the process of performing its {@see redo()} method. */
+    private(set) bool $isRedoing = false;
+    /** @var bool Boolean value that indicates whether the next undo action is discardable. */
+    private(set) bool $undoActionIsDiscardable = false;
+    /** @var bool Boolean value that indicates whether the next redo action is discardable. */
+    private(set) bool $redoActionIsDiscardable = false;
+    /** @var ArrayClass<UndoGroup> */
+    private ArrayClass $undoStack;
+    /** @var ArrayClass<UndoGroup> */
+    private ArrayClass $redoStack;
+    private ?object $nextTarget = null;
+    private ?UndoGroup $group = null;
+    /** @var bool A Boolean value that indicates whether the receiver has any actions to undo. */
+    public bool $canUndo {
+        get => !$this->undoStack->isEmpty || $this->group?->actions->isEmpty === false;
+    }
+    /** @var bool A Boolean value that indicates whether the receiver has any actions to redo. true if the receiver has any actions to redo, otherwise false. Because any undo operation registered clears the redo stack, this method posts an {@see UndoManagerCheckpointNotification} to allow clients to apply their pending operations before testing the redo stack. */
+    public bool $canRedo {
+        get {
+            NotificationCenter::default()->postNotificationName(UndoManagerCheckpointNotification, $this);
+            return !$this->redoStack->isEmpty;
+        }
+    }
+    /** @var string The name identifying the redo action. */
+    public string $redoActionName {
+        get => $this->redoStack->last?->actionName ?? "";
+    }
+    /** @var string The name identifying the undo action. */
+    public string $undoActionName {
+        get => $this->group?->actionName ?? $this->undoStack->last?->actionName ?? "";
+    }
+    /** @var string $redoMenuItemTitle The complete title of the Redo menu command, for example, “Redo Paste.” */
+    public string $redoMenuItemTitle {
+        get => $this->redoMenuTitle($this->redoActionName);
+    }
+    /** @var string The complete title of the Undo menu command, for example, “Undo Paste.” */
+    public string $undoMenuItemTitle {
+        get => $this->undoMenuTitle($this->undoActionName);
+    }
+
+    public function __construct()
+    {
+        $this->undoStack = new ArrayClass();
+        $this->redoStack = new ArrayClass();
     }
 
     private function begin(): void
@@ -107,7 +106,7 @@ class UndoManager extends ObjectClass
         $invocation = new Invocation();
         $invocation->target = $target;
         $invocation->selector = $selector;
-        $invocation->arguments->append($object);
+        $invocation->arguments[] = $object;
         $group->addInvocation($invocation);
         if (!$this->isUndoing && !$this->isRedoing) {
             $this->redoStack->removeAll();
@@ -164,7 +163,7 @@ class UndoManager extends ObjectClass
             $groupToUndo = $oldGroup;
             $oldGroup = $groupToUndo->parent;
             $groupToUndo->parent = null;
-            $this->redoStack->append($groupToUndo);
+            $this->redoStack[] = $groupToUndo;
         } else {
             $groupToUndo = $this->undoStack->popLast();
         }
@@ -248,14 +247,14 @@ class UndoManager extends ObjectClass
                     $this->redoStack->removeAt(0);
                 }
                 if (!$group->actions->isEmpty) {
-                    $this->redoStack->append($group);
+                    $this->redoStack[] = $group;
                 }
             } else {
                 if ($this->levelsOfUndo === $this->undoStack->count && !$group->actions->isEmpty) {
                     $this->undoStack->removeAt(0);
                 }
                 if (!$group->actions->isEmpty) {
-                    $this->undoStack->append($group);
+                    $this->undoStack[] = $group;
                 }
             }
         } else {
@@ -331,14 +330,14 @@ class UndoManager extends ObjectClass
             $redoStack->removeAll();
             $undoStack->removeAll();
         }
-        $i = $redoStack->endIndex();
+        $i = $redoStack->endIndex;
         while ($i-- > 0) {
             $g = $redoStack[$i];
             if (!$g->removeActions($target)) {
                 $redoStack->removeAt($i);
             }
         }
-        $i = $undoStack->endIndex();
+        $i = $undoStack->endIndex;
         while ($i-- > 0) {
             $g = $undoStack[$i];
             if (!$g->removeActions($target)) {

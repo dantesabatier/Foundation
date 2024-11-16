@@ -11,7 +11,6 @@ namespace Sabatier\Foundation;
 
 use ArrayAccess;
 use Closure;
-use Sabatier\Foundation\Predicates\Predicate;
 
 /**
  * A collection whose elements can be traversed multiple times, nondestructively, and accessed by an indexed subscript.
@@ -22,20 +21,18 @@ use Sabatier\Foundation\Predicates\Predicate;
  */
 interface Collection extends Sequence, ArrayAccess
 {
-    /**
-     * The position of the first element in a nonempty collection.
-     */
-    public function startIndex(): int;
-
-    /**
-     * The collection's “past the end” position—that is, the position one greater than the last valid subscript argument.
-     */
-    public function endIndex(): int;
-
-    /**
-     * The indices that are valid for subscripting the collection, in ascending order.
-     */
-    public function indices(): Range;
+    /** @var int The position of the first element in a nonempty collection. */
+    public int $startIndex {
+        get;
+    }
+    /** @var int The collection's “past the end” position—that is, the position one greater than the last valid subscript argument. */
+    public int $endIndex {
+        get;
+    }
+    /** @var Range The indices that are valid for subscripting the collection, in ascending order. */
+    public Range $indices {
+        get;
+    }
 
     /**
      * Returns the position immediately after the given index.
@@ -75,21 +72,6 @@ interface Collection extends Sequence, ArrayAccess
     public function distance(int $start, int $end): int;
 
     /**
-     * Returns a Collection containing, in order, the elements of the collection that satisfy the given predicate.
-     * @param Closure(Element, Index=, bool=): bool $isIncluded
-     * @return Collection<Index, Element>
-     */
-    public function filter(Closure $isIncluded): Collection;
-
-    /**
-     * Evaluates a given predicate against each object in the receiving and returns a new collection containing the objects for which the predicate returns true.
-     * @param Predicate $predicate The predicate against which to evaluate the receiving collection's elements.
-     * @return Collection<Index, Element> A new collection containing the objects in the receiving array for which predicate returns true.
-     * Objects in the resulting array appear in the same order as they do in the receiver.
-     */
-    public function filtered(Predicate $predicate): Collection;
-
-    /**
      * Sorts the collection in place.
      * @param Closure(Element, Element): int|null $by
      * @return Collection<Index, Element>
@@ -102,13 +84,6 @@ interface Collection extends Sequence, ArrayAccess
      * @return Collection<Index, Element> A copy of the receiving sequence sorted as specified by descriptors.
      */
     public function sorted(iterable $descriptors): Collection;
-
-    /**
-     * Returns a Boolean value indicating whether every element of a sequence satisfies a given predicate.
-     * @param Closure(Element, Index=): bool $predicate A closure that takes an element of the sequence as its argument and returns a Boolean value that indicates whether the passed element satisfies a condition.
-     * @return bool true if the sequence contains an element that satisfies predicate; otherwise, false.
-     */
-    public function allSatisfy(Closure $predicate): bool;
 
     /**
      * Returns a new string by concatenating the elements of the sequence, adding the given separator between each element.

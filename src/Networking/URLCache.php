@@ -152,7 +152,7 @@ class URLCache extends ObjectClass
         /** @var ArrayClass<DiskEntry> $entries */
         $entries = new ArrayClass();
         $this->enumerateDiskEntries(function (DiskEntry $entry) use ($entries): void {
-            $entries->append($entry);
+            $entries[] = $entry;
         }, $keys);
         return $entries;
     }
@@ -160,7 +160,7 @@ class URLCache extends ObjectClass
     /**
      * @param URLRequest $request
      * @param Date|null $date
-     * @return object|null
+     * @return object{identifier: string, url: URL}|null
      */
     private function diskContentLocators(URLRequest $request, ?Date $date = null): ?object
     {
@@ -204,9 +204,7 @@ class URLCache extends ObjectClass
      */
     public static function shared(): URLCache
     {
-        if (static::$shared === null) {
-            static::$shared = new static(4 * 1024 * 1024, 20 * 1024 * 1024);
-        }
+        static::$shared ??= new static(4 * 1024 * 1024, 20 * 1024 * 1024);
         return static::$shared;
     }
 
@@ -263,8 +261,8 @@ class URLCache extends ObjectClass
         $entry = new CacheEntry($identifier, $cachedResponse, $serialized);
         if ($inMemory && $entry->cost < $this->memoryCapacity) {
             $this->evictFromMemoryCacheAssumingLockHeld($this->memoryCapacity - $entry->cost);
-            $this->inMemoryCacheOrder->append($identifier);
-            $this->inMemoryCacheContents->setValueForKey($entry, $identifier);
+            $this->inMemoryCacheOrder[] = $identifier;
+            $this->inMemoryCacheContents[$identifier] = $entry;
         }
         if ($onDisk && $serialized && $entry->cost < $this->diskCapacity) {
             try {
@@ -362,7 +360,7 @@ class URLCache extends ObjectClass
         /** @var CacheEntry $entry */
         foreach ($this->inMemoryCacheContents as $identifier => $entry) {
             if ($entry->date->timeIntervalSinceReferenceDate > $date->timeIntervalSinceReferenceDate) {
-                $identifiersToRemove->append($identifier);
+                $identifiersToRemove[] = $identifier;
             }
         }
         foreach ($identifiersToRemove as $identifier) {

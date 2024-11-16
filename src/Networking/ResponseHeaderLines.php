@@ -7,9 +7,9 @@ use Sabatier\Foundation\Dictionary;
 use Sabatier\Foundation\URL;
 
 /** @internal */
-readonly class ResponseHeaderLines
+class ResponseHeaderLines
 {
-    public function __construct(public ArrayClass $lines = new ArrayClass())
+    public function __construct(private(set) ArrayClass $lines = new ArrayClass())
     {
     }
 
@@ -24,7 +24,7 @@ readonly class ResponseHeaderLines
             return null;
         }
         [$head, $tail] = $components;
-        [$version, $statusCode] = explode(" ", (string) $head);
+        [$version, $statusCode] = explode(" ", (string)$head);
         return new HTTPURLResponse($url, (int)$statusCode, $version, $tail->reduce(new Dictionary(), function (Dictionary $headerFields, string $header): Dictionary {
             $components = explode(":", $header);
             if (count($components) === 2) {
@@ -37,7 +37,7 @@ readonly class ResponseHeaderLines
 
     public function byAppending(string $line): ResponseHeaderLines
     {
-        $this->lines->append($line);
+        $this->lines[] = $line;
         return new ResponseHeaderLines($this->lines);
     }
 

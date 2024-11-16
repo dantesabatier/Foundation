@@ -32,7 +32,7 @@ class ComparisonPredicateOperator extends PredicateOperator
         if ($left === null || $right === null) {
             return false;
         }
-        $options = $this->compareOptions();
+        $options = $this->options;
         if ($options !== CompareOptions::none && is_string($left) && is_string($right)) {
             $comparison = ComparisonResult::from(string_compare($left, $right, $options));
             return match ($variant) {
@@ -44,10 +44,10 @@ class ComparisonPredicateOperator extends PredicateOperator
             };
         }
         if ($left instanceof ObjectClass) {
-            $left = $left->description();
+            $left = $left->description;
         }
         if ($right instanceof ObjectClass) {
-            $right = $right->description();
+            $right = $right->description;
         }
         return match ($variant) {
             PredicateOperatorType::lessThan => $left < $right,

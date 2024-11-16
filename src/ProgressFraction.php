@@ -5,47 +5,32 @@ namespace Sabatier\Foundation;
 use Closure;
 use Override;
 
-/**
- * @property-read bool $isIndeterminate
- * @property-read bool $isFinished
- * @property-read float $fractionCompleted
- * @internal
- */
+/** @internal */
 class ProgressFraction extends ObjectClass
 {
+    public bool $isIndeterminate {
+        get => $this->completed < 0 || $this->total < 0 || ($this->completed == 0 && $this->total == 0);
+    }
+    public bool $isFinished {
+        get => (($this->completed >= $this->total) && $this->completed > 0 && $this->total > 0) || ($this->completed > 0 && $this->total == 0);
+    }
+    public bool $fractionCompleted {
+        get {
+            if ($this->isIndeterminate) {
+                return 0.0;
+            }
+            if ($this->total == 0) {
+                return 1.0;
+            }
+            return ($this->completed / $this->total);
+        }
+    }
+    public string $debugDescription {
+        get => "$this->completed / $this->total ($this->fractionCompleted)";
+    }
+
     public function __construct(public float $completed = 0.0, public float $total = 0.0, public readonly bool $overflowed = false)
     {
-    }
-
-    public function __get(string $name)
-    {
-        return match ($name) {
-            "isIndeterminate" => $this->isIndeterminate(),
-            "isFinished" => $this->isFinished(),
-            "fractionCompleted" => $this->fractionCompleted(),
-            default => $this->valueForUndefinedKey($name),
-        };
-    }
-
-    private function isIndeterminate(): bool
-    {
-        return $this->completed < 0 || $this->total < 0 || ($this->completed == 0 && $this->total == 0);
-    }
-
-    private function isFinished(): bool
-    {
-        return (($this->completed >= $this->total) && $this->completed > 0 && $this->total > 0) || ($this->completed > 0 && $this->total == 0);
-    }
-
-    private function fractionCompleted(): int|float
-    {
-        if ($this->isIndeterminate) {
-            return 0.0;
-        }
-        if ($this->total == 0) {
-            return 1.0;
-        }
-        return ($this->completed / $this->total);
     }
 
     private static function fromDouble(float $double): array
@@ -152,11 +137,5 @@ class ProgressFraction extends ObjectClass
     {
         /** @psalm-suppress ArgumentTypeCoercion */
         return $this->math($divisor, fn(float $l, float $r): float => $l / $r, fn(): array => []);
-    }
-
-    #[Override]
-    public function debugDescription(): string
-    {
-        return "$this->completed / $this->total ($this->fractionCompleted)";
     }
 }

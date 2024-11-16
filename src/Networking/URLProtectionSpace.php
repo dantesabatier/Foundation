@@ -2,7 +2,6 @@
 
 namespace Sabatier\Foundation\Networking;
 
-use Override;
 use Sabatier\Foundation\ObjectClass;
 use function Sabatier\Foundation\human_readable_value;
 
@@ -22,10 +21,23 @@ class URLProtectionSpace extends ObjectClass
         URLAuthenticationMethodServerTrust,
     ];
     /** @var bool A Boolean value that indicates whether the credentials for the protection space can be sent securely. This value is true if the credentials for the protection space represented by the receiver can be sent securely, false otherwise. */
-    public bool $receivesCredentialSecurely = false;
+    public bool $receivesCredentialSecurely {
+        get => match ($this->protocol) {
+            URLProtectionSpaceHTTPS, "https", "ftps" => true,
+            default => match ($this->authenticationMethod) {
+                URLAuthenticationMethodNTLM, URLAuthenticationMethodNegotiate, URLAuthenticationMethodClientCertificate, URLAuthenticationMethodServerTrust => true,
+                default => false
+            }
+        };
+    }
     /** @var mixed A representation of the server's SSL transaction state. This value is nil if the authentication method of the protection space is not server trust. */
     public mixed $serverTrust = null;
-    private readonly bool $isProxy;
+    public bool $isProxy {
+        get => $this->proxyType !== null;
+    }
+    public string $description {
+        get => sprintf("<URLProtectionSpace %s>: Host:%s, Server:%s, Auth-Scheme:%s, Realm:%s, Port:%d, Proxy:%s, Proxy-Type:%s", $this->hash, $this->host, human_readable_value($this->protocol), in_array($this->authenticationMethod, self::authenticationMethods) ? $this->authenticationMethod : URLAuthenticationMethodDefault, human_readable_value($this->realm), $this->port, strtoupper(human_readable_value($this->isProxy)), human_readable_value($this->proxyType));
+    }
 
     /**
      * Creates a protection space object from the given host, port, protocol, realm, and authentication method.
@@ -38,8 +50,6 @@ class URLProtectionSpace extends ObjectClass
      */
     public function __construct(public readonly string $host, public readonly int $port = 0, public readonly ?string $proxyType = null, public readonly ?string $protocol = null, public readonly ?string $realm = null, public readonly string $authenticationMethod = URLAuthenticationMethodDefault)
     {
-        unset($this->receivesCredentialSecurely);
-        unset($this->isProxy);
     }
 
     public function __serialize(): array
@@ -57,21 +67,6 @@ class URLProtectionSpace extends ObjectClass
         $this->authenticationMethod = $data["authenticationMethod"];
     }
 
-    public function __get(string $name)
-    {
-        return $this->$name = match ($name) {
-            "receivesCredentialSecurely" => match ($this->protocol) {
-                URLProtectionSpaceHTTPS, "https", "ftps" => true,
-                default => match ($this->authenticationMethod) {
-                    URLAuthenticationMethodNTLM, URLAuthenticationMethodNegotiate, URLAuthenticationMethodClientCertificate, URLAuthenticationMethodServerTrust => true,
-                    default => false
-                }
-            },
-            "isProxy" => $this->proxyType !== null,
-            default => $this->valueForUndefinedKey($name)
-        };
-    }
-
     /** @internal */
     public static function create(HTTPURLResponse $response): ?URLProtectionSpace
     {
@@ -81,11 +76,5 @@ class URLProtectionSpace extends ObjectClass
         $space = new URLProtectionSpace($host, $response->url->port ?? ($protocol === "http" ? 80 : 443), protocol: $protocol, realm: $challenge->parameter("realm"), authenticationMethod: $challenge->authenticationMethod() ?? URLAuthenticationMethodDefault);
         $space->setAssociatedValueForKey($challenge, "challenge");
         return $space;
-    }
-
-    #[Override]
-    public function description(): string
-    {
-        return sprintf("<URLProtectionSpace %s>: Host:%s, Server:%s, Auth-Scheme:%s, Realm:%s, Port:%d, Proxy:%s, Proxy-Type:%s", $this->hash(), $this->host, human_readable_value($this->protocol), in_array($this->authenticationMethod, self::authenticationMethods) ? $this->authenticationMethod : URLAuthenticationMethodDefault, human_readable_value($this->realm), $this->port, strtoupper(human_readable_value($this->isProxy)), human_readable_value($this->proxyType));
     }
 }
