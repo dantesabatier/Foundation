@@ -77,7 +77,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
     }
 
     public string $description {
-        get => "[" . $this->join(", ") . "]";
+        get => "[{$this->join(", ")}]";
     }
     public int $count {
         get => count($this->reserved);
