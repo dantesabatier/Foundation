@@ -396,7 +396,6 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
         request_concrete_implementation($this, __FUNCTION__);
     }
 
-    #[Deprecated]
     public function associatedValueForKey(string $key): mixed
     {
         return $this->associatedValues[$key] ?? null;
@@ -417,8 +416,7 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
     {
         return static::$staticAssociatedValues[static::class][$key] ?? null;
     }
-
-    #[Deprecated]
+    
     public static function setStaticAssociatedValueForKey(mixed $value, string $key): void
     {
         if ($value === null) {
