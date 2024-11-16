@@ -19,7 +19,7 @@ class Value extends ObjectClass
         get => human_readable_value($this->value);
     }
     public string $debugDescription {
-        get => sprintf("<%s %s> (%s)%s", get_called_class(), $this->hash, $this->type, $this->description);
+        get => sprintf("<%s %s> (%s)%s", get_class($this), $this->hash, $this->type, $this->description);
     }
 
     /**
