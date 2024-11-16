@@ -70,11 +70,11 @@ class URLProtectionSpace extends ObjectClass
     /** @internal */
     public static function create(HTTPURLResponse $response): ?URLProtectionSpace
     {
-        if (!($host = $response->url->host) || !($protocol = $response->url->scheme) || ($protocol !== "http" && $protocol !== "https") || !($challenge = Challenge::challenges($response)->first())) {
+        if (!($host = $response->url->host) || !($protocol = $response->url->scheme) || ($protocol !== "http" && $protocol !== "https") || !($challenge = Challenge::challenges($response)->first)) {
             return null;
         }
-        $space = new URLProtectionSpace($host, $response->url->port ?? ($protocol === "http" ? 80 : 443), protocol: $protocol, realm: $challenge->parameter("realm"), authenticationMethod: $challenge->authenticationMethod() ?? URLAuthenticationMethodDefault);
-        $space->setAssociatedValueForKey($challenge, "challenge");
+        $space = new URLProtectionSpace($host, $response->url->port ?? ($protocol === "http" ? 80 : 443), protocol: $protocol, realm: $challenge->parameter("realm"), authenticationMethod: $challenge->authenticationMethod ?? URLAuthenticationMethodDefault);
+        $space->associatedValues["challenge"] = $challenge;
         return $space;
     }
 }
