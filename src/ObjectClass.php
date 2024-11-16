@@ -10,7 +10,6 @@
 namespace Sabatier\Foundation;
 
 use Closure;
-use JetBrains\PhpStorm\Deprecated;
 use JetBrains\PhpStorm\ExpectedValues;
 use JetBrains\PhpStorm\Pure;
 use JsonSerializable;
