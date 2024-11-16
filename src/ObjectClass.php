@@ -10,6 +10,7 @@
 namespace Sabatier\Foundation;
 
 use Closure;
+use JetBrains\PhpStorm\Deprecated;
 use JetBrains\PhpStorm\ExpectedValues;
 use JetBrains\PhpStorm\Pure;
 use JsonSerializable;
@@ -25,9 +26,9 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
     /** @var KeyValueObservance[] $observances */
     private array $observances = [];
     /** @var array<string, mixed> */
-    private static array $staticAssociatedValues = [];
+    protected static array $staticAssociatedValues = [];
     /** @var array<string, mixed> */
-    private array $associatedValues = [];
+    protected array $associatedValues = [];
     public int $hash {
         get => spl_object_id($this);
     }
@@ -390,12 +391,12 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
         request_concrete_implementation($this, __FUNCTION__);
     }
 
-    #[Override]
     public function mutableSetValueForKey(string $key): Set
     {
         request_concrete_implementation($this, __FUNCTION__);
     }
 
+    #[Deprecated]
     public function associatedValueForKey(string $key): mixed
     {
         return $this->associatedValues[$key] ?? null;
@@ -417,6 +418,7 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
         return static::$staticAssociatedValues[static::class][$key] ?? null;
     }
 
+    #[Deprecated]
     public static function setStaticAssociatedValueForKey(mixed $value, string $key): void
     {
         if ($value === null) {
