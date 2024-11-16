@@ -109,7 +109,7 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
         get => new Range($this->startIndex, $this->endIndex);
     }
     public string $description {
-        get => "[" . $this->join(", ") . "]";
+        get => "[{$this->join(", ")}]";
     }
 
     /**
