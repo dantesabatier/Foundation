@@ -84,7 +84,7 @@ class ProtocolClient implements URLProtocolClient
             $protectionSpace = $authenticationChallenge->protectionSpace;
             $authenticationMethod = $protectionSpace->authenticationMethod;
             /** @var Challenge $challenge */
-            $challenge = $protectionSpace->associatedValueForKey("challenge");
+            $challenge = $protectionSpace->associatedValues["challenge"];
             $handler = $task->authHandler($authenticationMethod, $challenge);
             $handler($task, URLSessionAuthChallengeDisposition::useCredential, $credential);
             if ($credential) {
