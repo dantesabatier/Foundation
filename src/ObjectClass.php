@@ -416,7 +416,7 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
     {
         return static::$staticAssociatedValues[static::class][$key] ?? null;
     }
-    
+
     public static function setStaticAssociatedValueForKey(mixed $value, string $key): void
     {
         if ($value === null) {
