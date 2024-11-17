@@ -52,7 +52,7 @@ class HTTPURLResponse extends URLResponse
 
     private function canonicalizedFields(?Dictionary $headerFields): Dictionary
     {
-        if ($headerFields === null) {
+        if (!$headerFields instanceof Dictionary) {
             return new Dictionary();
         }
         /** @var Dictionary<mixed> $canonicalizedFields */
