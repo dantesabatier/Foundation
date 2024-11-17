@@ -32,7 +32,7 @@ class ComparisonPredicateOperator extends PredicateOperator
         if ($left === null || $right === null) {
             return false;
         }
-        $options = $this->options;
+        $options = $this->compareOptions;
         if ($options !== CompareOptions::none && is_string($left) && is_string($right)) {
             $comparison = ComparisonResult::from(string_compare($left, $right, $options));
             return match ($variant) {
