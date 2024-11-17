@@ -22,31 +22,20 @@ final class FileManager extends ObjectClass
     /** @var FileManagerDelegate|null The delegate of the file manager object. It is recommended that you assign a delegate to the file manager object only if you allocated and initialized the object yourself. Avoid assigning a delegate to the shared file manager obtained from the default method. */
     public ?FileManagerDelegate $delegate = null;
     /** @var URL The system root directory. */
-    public readonly URL $systemRootDirectory;
-    /** @var URL The home directory for the current user. */
-    public readonly URL $homeDirectoryForCurrentUser;
-    /** @var URL The temporary directory for the current user. */
-    public readonly URL $temporaryDirectory;
-    /** @var URL The document root directory. */
-    public readonly URL $documentRootDirectory;
-
-    public function __construct()
-    {
-        unset($this->systemRootDirectory);
-        unset($this->homeDirectoryForCurrentUser);
-        unset($this->temporaryDirectory);
-        unset($this->documentRootDirectory);
+    public URL $systemRootDirectory {
+        get => $this->associatedValues[__PROPERTY__] ??= URL::fileURL("/");
     }
-
-    public function __get(string $name)
-    {
-        return $this->$name = match ($name) {
-            "systemRootDirectory" => URL::fileURL("/"),
-            "homeDirectoryForCurrentUser" => URL::fileURL(home_directory()),
-            "temporaryDirectory" => URL::fileURL(temporary_directory()),
-            "documentRootDirectory" => URL::fileURL(document_root_directory()),
-            default => $this->valueForUndefinedKey($name)
-        };
+    /** @var URL The home directory for the current user. */
+    public URL $homeDirectoryForCurrentUser {
+        get => $this->associatedValues[__PROPERTY__] ??= URL::fileURL(home_directory());
+    }
+    /** @var URL The temporary directory for the current user. */
+    public URL $temporaryDirectory {
+        get => $this->associatedValues[__PROPERTY__] ??= URL::fileURL(temporary_directory());
+    }
+    /** @var URL The document root directory. */
+    public URL $documentRootDirectory {
+        get => $this->associatedValues[__PROPERTY__] ??= URL::fileURL(document_root_directory());
     }
 
     /**
