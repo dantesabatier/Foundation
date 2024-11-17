@@ -12,7 +12,7 @@ use function Sabatier\Foundation\human_readable_value;
 class AggregateExpression extends Expression
 {
     public string $predicateFormat {
-        get => "{" . $this->collection->join(", ") . "}";
+        get => "{{$this->collection->join(", ")}}";
     }
 
     /**
