@@ -109,9 +109,9 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
     public function __construct(iterable $elements = [])
     {
         if ($elements instanceof ArrayClass || $elements instanceof Set) {
-            $this->reserved = $elements->reserved;
+            $this->reserved = $elements->array;
         } elseif ($elements instanceof Dictionary) {
-            $this->reserved = $elements->values->reserved;
+            $this->reserved = $elements->values->array;
         } elseif (is_array($elements)) {
             $this->reserved = is_sequential($elements) ? $elements : array_values($elements);
         } else {
@@ -756,7 +756,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
      */
     public function setArray(ArrayClass $array): void
     {
-        $this->reserved = $array->reserved;
+        $this->reserved = $array->array;
     }
 
     /**
