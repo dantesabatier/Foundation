@@ -12,8 +12,5 @@ abstract class Formatter
      * @param mixed $object The object for which a textual representation is returned.
      * @return string|null A string that textually represents object for display. Returns nil if object is not of the correct class.
      */
-    public function string(/** @noinspection PhpUnusedParameterInspection */ mixed $object): ?string
-    {
-        request_concrete_implementation($this, __FUNCTION__);
-    }
+    abstract public function string(mixed $object): ?string;
 }
