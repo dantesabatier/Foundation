@@ -13,49 +13,20 @@ class Error extends ObjectClass
     /** @var Dictionary<Closure(Error, string): mixed>|null */
     private static ?Dictionary $userInfoProviders = null;
     /** @var string A string containing the localized description of the error. The object in the user info dictionary for the key {@see LocalizedDescriptionKey}. If the user info dictionary doesn't contain a value for {@see LocalizedDescriptionKey}, a default string is constructed from the domain and code. */
-    public readonly string $localizedDescription;
+    public string $localizedDescription {
+        get => $this->userInfo?->valueForKey(LocalizedDescriptionKey) ?? "The operation couldn't be completed. " . ($this->localizedFailureReason ?? "($this->domain error $this->code.)");
+    }
     /** @var ArrayClass<string>|null An array containing the localized titles of buttons appropriate for displaying in an alert panel. The object in the user info dictionary for the key {@see LocalizedRecoveryOptionsErrorKey}. If the user info dictionary doesn't contain a value for {@see LocalizedRecoveryOptionsErrorKey}, this property is nil. The first string is the title of the right-most and default button, the second the one to the left of that, and so on. The recovery options should be appropriate for the localizedRecoverySuggestion property. If the user info dictionary doesn't contain a value for {@see LocalizedRecoveryOptionsErrorKey}, only an OK button is displayed. */
-    public readonly ?ArrayClass $localizedRecoveryOptions;
+    public ?ArrayClass $localizedRecoveryOptions {
+        get => $this->userInfo?->valueForKey(LocalizedRecoveryOptionsErrorKey);
+    }
     /** @var string|null A string containing the localized recovery suggestion for the error. The object in the user info dictionary for the key {@see LocalizedRecoverySuggestionErrorKey}. If the user info dictionary doesn't contain a value for {@see LocalizedRecoverySuggestionErrorKey}, this property is nil. The returned string is suitable for displaying as the secondary message in an alert panel. */
-    public readonly ?string $localizedRecoverySuggestion;
+    public ?string $localizedRecoverySuggestion {
+        get => $this->userInfo?->valueForKey(LocalizedRecoverySuggestionErrorKey);
+    }
     /** @var string|null A string containing the localized explanation of the reason for the error. The object in the user info dictionary for the key {@see LocalizedFailureReasonErrorKey}. */
-    public readonly ?string $localizedFailureReason;
-    /** @var ErrorRecoveryAttempting The object in the user info dictionary corresponding to the {@see RecoveryAttempterErrorKey} key. If userInfo doesn't contain a value for {@see RecoveryAttempterErrorKey}, this property is nil. */
-    public readonly ErrorRecoveryAttempting $recoveryAttempter;
-    public string $description {
-        get => sprintf("Error Domain=%s Code=%s %s UserInfo=%s", $this->domain, $this->code, $this->localizedDescription, human_readable_value($this->userInfo));
-    }
-
-    /**
-     * Returns an Error object initialized for a given domain and code with a given userInfo dictionary.
-     * @param string $domain The error domain—this can be one of the predefined Error domains, or an arbitrary string describing a custom domain. domain must not be nil. See Error Domains for a list of predefined domains.
-     * @param int $code The error code for the error.
-     * @param Dictionary|null $userInfo The userInfo dictionary for the error. userInfo may be nil.
-     */
-    public function __construct(public readonly string $domain, public readonly int $code, public readonly ?Dictionary $userInfo = null)
-    {
-        unset($this->localizedDescription);
-        unset($this->localizedRecoveryOptions);
-        unset($this->localizedRecoverySuggestion);
-        unset($this->localizedFailureReason);
-        unset($this->recoveryAttempter);
-    }
-
-    public function __get(string $name)
-    {
-        if ($name === "localizedDescription") {
-            $this->$name = $this->userInfo?->valueForKey(LocalizedDescriptionKey) ?? "The operation couldn't be completed. " . ($this->localizedFailureReason ?? "($this->domain error $this->code.)");
-            return $this->$name;
-        }
-        if ($name === "localizedRecoveryOptions") {
-            $this->$name = $this->userInfo?->valueForKey(LocalizedRecoveryOptionsErrorKey);
-            return $this->$name;
-        }
-        if ($name === "localizedRecoverySuggestion") {
-            $this->$name = $this->userInfo?->valueForKey(LocalizedRecoverySuggestionErrorKey);
-            return $this->$name;
-        }
-        if ($name === "localizedFailureReason") {
+    public ?string $localizedFailureReason {
+        get {
             $localizedFailureReason = $this->userInfo?->valueForKey(LocalizedFailureReasonErrorKey);
             if (!$localizedFailureReason) {
                 switch ($this->domain) {
@@ -113,14 +84,25 @@ class Error extends ObjectClass
                         break;
                 }
             }
-            $this->$name = $localizedFailureReason;
-            return $this->$name;
+            return $localizedFailureReason;
         }
-        if ($name === "recoveryAttempter") {
-            $this->$name = $this->userInfo?->valueForKey(RecoveryAttempterErrorKey);
-            return $this->$name;
-        }
-        return $this->valueForUndefinedKey($name);
+    }
+    /** @var ErrorRecoveryAttempting|null The object in the user info dictionary corresponding to the {@see RecoveryAttempterErrorKey} key. If userInfo doesn't contain a value for {@see RecoveryAttempterErrorKey}, this property is nil. */
+    public ?ErrorRecoveryAttempting $recoveryAttempter {
+        get => $this->userInfo?->valueForKey(RecoveryAttempterErrorKey);
+    }
+    public string $description {
+        get => sprintf("Error Domain=%s Code=%s %s UserInfo=%s", $this->domain, $this->code, $this->localizedDescription, human_readable_value($this->userInfo));
+    }
+
+    /**
+     * Returns an Error object initialized for a given domain and code with a given userInfo dictionary.
+     * @param string $domain The error domain—this can be one of the predefined Error domains, or an arbitrary string describing a custom domain. domain must not be nil. See Error Domains for a list of predefined domains.
+     * @param int $code The error code for the error.
+     * @param Dictionary|null $userInfo The userInfo dictionary for the error. userInfo may be nil.
+     */
+    public function __construct(public readonly string $domain, public readonly int $code, public readonly ?Dictionary $userInfo = null)
+    {
     }
 
     /**
