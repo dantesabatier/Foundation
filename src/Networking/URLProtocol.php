@@ -5,7 +5,6 @@ namespace Sabatier\Foundation\Networking;
 use Sabatier\Foundation\ArrayClass;
 use Sabatier\Foundation\ObjectClass;
 use function Sabatier\Foundation\fatal_error;
-use function Sabatier\Foundation\request_concrete_implementation;
 
 /**
  * An abstract class that handles the loading of protocol-specific URL data.
@@ -44,9 +43,7 @@ abstract class URLProtocol extends ObjectClass
      */
     private static function registeredProtocolClasses(): ArrayClass
     {
-        if (self::$registeredProtocolClasses === null) {
-            self::$registeredProtocolClasses = new ArrayClass();
-        }
+        self::$registeredProtocolClasses ??= new ArrayClass();
         return self::$registeredProtocolClasses;
     }
 
@@ -107,10 +104,7 @@ abstract class URLProtocol extends ObjectClass
      * @param URLRequest $request The request to be handled.
      * @return bool true if the protocol subclass can handle request, otherwise false.
      */
-    public static function canInit(URLRequest $request): bool
-    {
-        request_concrete_implementation(static::class, __FUNCTION__);
-    }
+    abstract public static function canInit(URLRequest $request): bool;
 
     /**
      * Fetches the property associated with the specified key in the specified request.
@@ -159,10 +153,7 @@ abstract class URLProtocol extends ObjectClass
      * @param URLRequest $request The request whose canonical version is desired.
      * @return URLRequest The canonical form of request.
      */
-    public static function canonicalRequest(URLRequest $request): URLRequest
-    {
-        request_concrete_implementation(static::class, __FUNCTION__);
-    }
+    abstract public static function canonicalRequest(URLRequest $request): URLRequest;
 
     /**
      * A Boolean value indicating whether two requests are equivalent for cache purposes.
@@ -184,10 +175,7 @@ abstract class URLProtocol extends ObjectClass
      * When this method is called, the subclass implementation should start loading the request, providing feedback to the URL loading system via the {@see URLProtocolClient} protocol.
      * Subclasses must implement this method.
      */
-    public function startLoading(): void
-    {
-        request_concrete_implementation($this, __FUNCTION__);
-    }
+    abstract public function startLoading(): void;
 
     /**
      * Stops protocol-specific loading of the request.
@@ -195,8 +183,5 @@ abstract class URLProtocol extends ObjectClass
      * When this method is called, the subclass implementation should stop loading a request. This could be in response to a cancel operation, so protocol implementations must be able to handle this call while a load is in progress. When your protocol receives a call to this method, it should also stop sending notifications to the client.
      * Subclasses must implement this method.
      */
-    public function stopLoading(): void
-    {
-        request_concrete_implementation($this, __FUNCTION__);
-    }
+    abstract public function stopLoading(): void;
 }
