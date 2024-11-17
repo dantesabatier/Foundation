@@ -79,7 +79,7 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
     public function __construct(iterable $uniqueKeysWithValues = [])
     {
         if ($uniqueKeysWithValues instanceof Dictionary) {
-            $this->reserved = $uniqueKeysWithValues->reserved;
+            $this->reserved = $uniqueKeysWithValues->array;
         } else {
             foreach ($uniqueKeysWithValues as $key => $value) {
                 $this[$key] = $value;
@@ -530,7 +530,7 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
      */
     public function setDictionary(Dictionary $dictionary): void
     {
-        $this->reserved = $dictionary->reserved;
+        $this->reserved = $dictionary->array;
     }
 
     #[Override]
