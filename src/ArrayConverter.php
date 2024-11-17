@@ -5,27 +5,20 @@ namespace Sabatier\Foundation;
 /**
  * @internal
  */
-readonly class ArrayConverter
+class ArrayConverter
 {
-    public ArrayClass $array;
-    public Dictionary $dictionary;
+    public ArrayClass $array {
+        get => $this->newCollection($this->reserved, ArrayClass::class);
+    }
+    public Dictionary $dictionary {
+        get => $this->newCollection(is_sequential($this->reserved) ? array_combine(array_map(fn(int $i): string => human_readable_value($i), array_keys($this->reserved)), array_values($this->reserved)) : $this->reserved, Dictionary::class);
+    }
 
     /**
      * @param array<array-key, mixed> $reserved
      */
-    public function __construct(private array $reserved)
+    public function __construct(private readonly array $reserved)
     {
-        unset($this->array);
-        unset($this->dictionary);
-    }
-
-    public function __get(string $name)
-    {
-        return $this->$name = match ($name) {
-            "array" => $this->newCollection($this->reserved, ArrayClass::class),
-            "dictionary" => $this->newCollection(is_sequential($this->reserved) ? array_combine(array_map(fn(int $i): string => human_readable_value($i), array_keys($this->reserved)), array_values($this->reserved)) : $this->reserved, Dictionary::class),
-            default => throw new UndefinedKeyException()
-        };
     }
 
     /**
