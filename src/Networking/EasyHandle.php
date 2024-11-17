@@ -29,7 +29,7 @@ final class EasyHandle
     private(set) mixed $rawHandle = null;
     private ?URL $url = null;
     private ?URLSessionConfiguration $configuration = null;
-    private readonly EasyHandlePauseState $pauseState;
+    private EasyHandlePauseState $pauseState;
     private URLSessionWebSocketOperation $operation = URLSessionWebSocketOperation::cont;
     /** @var Dictionary<string> */
     private Dictionary $allHeaderFields;
