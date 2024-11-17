@@ -24,7 +24,7 @@ final class Bundle extends ObjectClass
     public const string didLoadNotification = BundleDidLoadNotification;
     /** @var URL|null The file URL of the bundle's subdirectory containing resource files. */
     public ?URL $resourceURL {
-        get => $this->directoryURL($this->bundleURL, "Resources");
+        get => $this->associatedValues[__PROPERTY__] ??= $this->directoryURL($this->bundleURL, "Resources");
     }
     /** @var URL|null The file URL of the receiver's executable file. */
     public ?URL $executableURL {
@@ -52,7 +52,7 @@ final class Bundle extends ObjectClass
     }
     /** @var Dictionary|null A dictionary, constructed from the bundle's Info.plist file, that contains information about the receiver. */
     public ?Dictionary $infoDictionary {
-        get => PropertyListSerialization::propertyListWithURL($this->bundleURL->appendingPathComponent("Info")->appendingPathExtension("plist"));
+        get => $this->associatedValues[__PROPERTY__] ??= PropertyListSerialization::propertyListWithURL($this->bundleURL->appendingPathComponent("Info")->appendingPathExtension("plist"));
     }
     /** @var ArrayClass<string> $localizations A list of all the localizations contained in the bundle. An array of string objects containing language IDs for all the localizations contained in the bundle. */
     public ArrayClass $localizations {
