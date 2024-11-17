@@ -102,7 +102,7 @@ trait CollectionAlgorithms
 
     public function join(string $separator): string
     {
-        return implode($separator, $this->map(fn(mixed $e): string => human_readable_value($e))->toArray());
+        return implode($separator, $this->map(fn(mixed $e): string => human_readable_value($e))->array);
     }
 
     public function joined(): FlattenSequence

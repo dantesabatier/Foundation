@@ -166,7 +166,7 @@ final class EasyHandle
     {
         $this->allHeaderFields->merge($headerFields);
         if ($this->rawHandle instanceof CurlHandle) {
-            $this->set($headerFields->mapValues(fn(string $value, string $key): string => "$key: $value")->values->toArray(), CURLOPT_HTTPHEADER);
+            $this->set($headerFields->mapValues(fn(string $value, string $key): string => "$key: $value")->values->array, CURLOPT_HTTPHEADER);
         }
     }
 

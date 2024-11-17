@@ -16,7 +16,6 @@ class IndexPath extends ObjectClass implements MutableCollection, Iterator
 {
     use MutableCollectionAlgorithms {
         compare as private sequenceCompare;
-        toArray as private sequenceToArray;
         filter as private sequenceFilter;
         allSatisfy as private sequenceAllSatisfy;
         contains as private sequenceContains;
@@ -63,7 +62,7 @@ class IndexPath extends ObjectClass implements MutableCollection, Iterator
     }
 
     public string $description {
-        get => "[" . $this->join(", ") . "]";
+        get => "[{$this->join(", ")}]";
     }
     public int $count {
         get => count($this->reserved);
@@ -85,6 +84,9 @@ class IndexPath extends ObjectClass implements MutableCollection, Iterator
     }
     public Range $indices {
         get => new Range($this->startIndex, $this->endIndex);
+    }
+    public array $array {
+        get => $this->reserved;
     }
     /** @var int An index number identifying a section in a table view or collection view. */
     public int $section {
@@ -561,16 +563,7 @@ class IndexPath extends ObjectClass implements MutableCollection, Iterator
      */
     public function getIndexes(?array &$indexes, Range $range): void
     {
-        $indexes = $this->filter(fn(int $e): bool => $range->contains($e))->toArray();
-    }
-
-    /**
-     * @return int[]
-     */
-    #[Override]
-    public function toArray(): array
-    {
-        return $this->sequenceToArray();
+        $indexes = $this->filter(fn(int $e): bool => $range->contains($e))->array;
     }
 
     /**

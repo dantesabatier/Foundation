@@ -23,7 +23,6 @@ use Sabatier\Foundation\Predicates\Predicate;
 class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iterator
 {
     use RangeReplaceableCollectionAlgorithms {
-        toArray as private sequenceToArray;
         filter as private sequenceFilter;
         allSatisfy as private sequenceAllSatisfy;
         contains as private sequenceContains;
@@ -100,6 +99,9 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
     public Range $indices {
         get => new Range($this->startIndex, $this->endIndex);
     }
+    public array $array {
+        get => $this->reserved;
+    }
 
     /**
      * @param iterable<Element> $elements
@@ -107,9 +109,9 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
     public function __construct(iterable $elements = [])
     {
         if ($elements instanceof ArrayClass || $elements instanceof Set) {
-            $this->reserved = $elements->toArray();
+            $this->reserved = $elements->reserved;
         } elseif ($elements instanceof Dictionary) {
-            $this->reserved = $elements->values->toArray();
+            $this->reserved = $elements->values->reserved;
         } elseif (is_array($elements)) {
             $this->reserved = is_sequential($elements) ? $elements : array_values($elements);
         } else {
@@ -754,16 +756,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
      */
     public function setArray(ArrayClass $array): void
     {
-        $this->reserved = $array->toArray();
-    }
-
-    /**
-     * @return Element[]
-     */
-    #[Override]
-    public function toArray(): array
-    {
-        return $this->sequenceToArray();
+        $this->reserved = $array->reserved;
     }
 
     /**

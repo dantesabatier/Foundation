@@ -39,9 +39,6 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
         joined as private collectionJoined;
     }
 
-    public string $description {
-        get => sprintf("[%s]", $this->isEmpty ? ":" : $this->mapValues(fn(mixed $value, string $key): string => sprintf("%s: %s", $key, human_readable_value($value)))->values->join(", "));
-    }
     public int $count {
         get => count($this->reserved);
     }
@@ -60,6 +57,12 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
     public Range $indices {
         get => new Range($this->startIndex, $this->endIndex);
     }
+    public array $array {
+        get => $this->reserved;
+    }
+    public string $description {
+        get => sprintf("[%s]", $this->isEmpty ? ":" : $this->mapValues(fn(mixed $value, string $key): string => sprintf("%s: %s", $key, human_readable_value($value)))->values->join(", "));
+    }
 
     /** @var ArrayClass<string> $keys An array containing just the keys of the dictionary. */
     public ArrayClass $keys {
@@ -76,7 +79,7 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
     public function __construct(iterable $uniqueKeysWithValues = [])
     {
         if ($uniqueKeysWithValues instanceof Dictionary) {
-            $this->reserved = $uniqueKeysWithValues->toArray();
+            $this->reserved = $uniqueKeysWithValues->reserved;
         } else {
             foreach ($uniqueKeysWithValues as $key => $value) {
                 $this[$key] = $value;
@@ -527,7 +530,7 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
      */
     public function setDictionary(Dictionary $dictionary): void
     {
-        $this->reserved = $dictionary->toArray();
+        $this->reserved = $dictionary->reserved;
     }
 
     #[Override]
@@ -537,15 +540,6 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
             return $this->keys->isEqual($other->keys) && $this->values->isEqual($other->values);
         }
         return false;
-    }
-
-    /**
-     * @return array<string, Element>
-     */
-    #[Override]
-    public function toArray(): array
-    {
-        return $this->reserved;
     }
 
     /**

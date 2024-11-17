@@ -16,7 +16,7 @@ trait SequenceAlgorithms
 
     public function __clone()
     {
-        $this->reserved = $this->toArray();
+        $this->reserved = $this->array;
     }
 
     public function __serialize(): array
@@ -47,11 +47,6 @@ trait SequenceAlgorithms
     public function isEqual(mixed $other): bool
     {
         return $this->elementsEqual($other);
-    }
-
-    public function toArray(): array
-    {
-        return $this->reserved;
     }
 
     public function filter(Closure $isIncluded): self
@@ -190,6 +185,6 @@ trait SequenceAlgorithms
     #[Override]
     public function jsonSerialize(): mixed
     {
-        return $this->toArray();
+        return $this->array;
     }
 }

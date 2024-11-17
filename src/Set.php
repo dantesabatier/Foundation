@@ -23,7 +23,6 @@ use Sabatier\Foundation\Predicates\Predicate;
 class Set extends ObjectClass implements SetAlgebra, Iterator
 {
     use SetAlgebraAlgorithms {
-        toArray as private sequenceToArray;
         filter as private sequenceFilter;
         allSatisfy as private sequenceAllSatisfy;
         contains as private sequenceContains;
@@ -108,6 +107,9 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
     public Range $indices {
         get => new Range($this->startIndex, $this->endIndex);
     }
+    public array $array {
+        get => $this->reserved;
+    }
     public string $description {
         get => "[{$this->join(", ")}]";
     }
@@ -118,7 +120,7 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
     public function __construct(iterable $elements = [])
     {
         if ($elements instanceof Set) {
-            $this->reserved = $elements->toArray();
+            $this->reserved = $elements->reserved;
         } else {
             $this->appendContentsOf($elements);
         }
@@ -720,16 +722,7 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
      */
     public function setSet(Set $set): void
     {
-        $this->reserved = $set->toArray();
-    }
-
-    /**
-     * @return Element[]
-     */
-    #[Override]
-    public function toArray(): array
-    {
-        return $this->sequenceToArray();
+        $this->reserved = $set->reserved;
     }
 
     /**

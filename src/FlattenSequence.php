@@ -35,6 +35,9 @@ class FlattenSequence extends ObjectClass implements Sequence, IteratorAggregate
     public mixed $first {
         get => $this->first();
     }
+    public array $array {
+        get => iterator_to_array($this);
+    }
 
     /**
      * Creates a view into the given collection that allows access to elements within the specified range.
@@ -120,14 +123,5 @@ class FlattenSequence extends ObjectClass implements Sequence, IteratorAggregate
     public function count(): int
     {
         return iterator_count($this);
-    }
-
-    /**
-     * @return Element[]
-     */
-    #[Override]
-    public function toArray(): array
-    {
-        return iterator_to_array($this);
     }
 }

@@ -42,6 +42,9 @@ class Slice extends ObjectClass implements Collection, IteratorAggregate
     public Range $indices {
         get => $this->bounds;
     }
+    public array $array {
+        get => array_slice($this->base->array, $this->startIndex, $this->endIndex);
+    }
     public string $description {
         get => sprintf("<%s %s [%s...<%s]>", typeof($this->base), human_readable_value($this->base), $this->startIndex, $this->endIndex);
     }
@@ -191,18 +194,9 @@ class Slice extends ObjectClass implements Collection, IteratorAggregate
         })();
     }
 
-    /**
-     * @return Element[]
-     */
-    #[Override]
-    public function toArray(): array
-    {
-        return array_slice($this->base->toArray(), $this->startIndex, $this->endIndex);
-    }
-
     #[Override]
     public function jsonSerialize(): array
     {
-        return $this->toArray();
+        return $this->array;
     }
 }

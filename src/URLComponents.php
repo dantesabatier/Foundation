@@ -119,7 +119,7 @@ class URLComponents extends ObjectClass
             if ($value === null) {
                 $this->query = null;
             } else {
-                $this->query = http_build_query($value->flatMap(fn(URLQueryItem $queryItem): array => [$queryItem->name => $queryItem->value])->toArray());
+                $this->query = http_build_query($value->flatMap(fn(URLQueryItem $queryItem): array => [$queryItem->name => $queryItem->value])->array);
             }
         } else {
             $this->setValueForUndefinedKey($value, $name);

@@ -26,6 +26,9 @@ class Range extends ObjectClass implements ExpressibleByArrayLiteral, IteratorAg
     public string $description {
         get => "[$this->lowerBound...<$this->upperBound]";
     }
+    public array $array {
+        get => range($this->lowerBound, $this->upperBound - 1);
+    }
 
     /**
      * @param int $lowerBound The range's lower bound.
@@ -71,18 +74,9 @@ class Range extends ObjectClass implements ExpressibleByArrayLiteral, IteratorAg
         })();
     }
 
-    /**
-     * @return int[]
-     */
-    #[Override]
-    public function toArray(): array
-    {
-        return range($this->lowerBound, $this->upperBound - 1);
-    }
-
     #[Override]
     public function jsonSerialize(): array
     {
-        return $this->toArray();
+        return $this->array;
     }
 }
