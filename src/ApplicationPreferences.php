@@ -3,10 +3,10 @@
 namespace Sabatier\Foundation;
 
 /** @internal */
-class ApplicationPreferences
+readonly class ApplicationPreferences
 {
-    private(set) URL $url;
-    private(set) Dictionary $dictionaryRepresentation;
+    public URL $url;
+    public Dictionary $dictionaryRepresentation;
 
     /** @noinspection PhpUnhandledExceptionInspection */
     public function __construct(public string $domainName)
