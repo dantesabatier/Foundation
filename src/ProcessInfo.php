@@ -11,98 +11,76 @@ class ProcessInfo extends ObjectClass
 {
     private static ?ProcessInfo $processInfo = null;
     /** @var ArrayClass<string> Array of strings with the command-line arguments for the process. This array contains all the information passed in the argv array, including the executable name in the first element. */
-    public readonly ArrayClass $arguments;
+    public ArrayClass $arguments {
+        get => $this->associatedValues[__PROPERTY__] ??= new ArrayClass($_SERVER["argv"] ?? []);
+    }
     /** @var Dictionary<string> The variable names (keys) and their values in the environment from which the process was launched. */
-    public readonly Dictionary $environment;
+    public Dictionary $environment {
+        get => $this->associatedValues[__PROPERTY__] ??= $this->environment();
+    }
     /** @var string Global unique identifier for the process. */
-    public readonly string $globallyUniqueString;
+    public string $globallyUniqueString {
+        get => $this->associatedValues[__PROPERTY__] ??= md5((string)$this->processIdentifier);
+    }
     /** @var int The identifier of the process (often called process ID). */
-    public readonly int $processIdentifier;
+    public int $processIdentifier {
+        get => getmypid();
+    }
     /** @var string The process name is used to register application defaults and is used in error messages. It does not uniquely identify the process. */
-    public string $processName;
+    public string $processName {
+        get => $this->associatedValues[__PROPERTY__] ??= $this->processName();
+        set => $this->associatedValues[__PROPERTY__] = $value;
+    }
     /** @var string Returns the account name of the current user. */
-    public readonly string $userName;
+    public string $userName {
+        get => get_current_user();
+    }
     /** @var string Returns the full name of the current user. */
-    public readonly string $fullUserName;
+    public string $fullUserName {
+        get => get_current_user();
+    }
     /** @var string The name of the host computer on which the process is executing. */
-    public readonly string $hostName;
-
-    public function __construct()
-    {
-        unset($this->arguments);
-        unset($this->environment);
-        unset($this->globallyUniqueString);
-        unset($this->processIdentifier);
-        unset($this->processName);
-        unset($this->userName);
-        unset($this->fullUserName);
-        unset($this->hostName);
+    public string $hostName {
+        get => gethostname();
     }
 
     /**
      * @throws Exception
      */
-    public function __get(string $name)
+    private function environment(): Dictionary
     {
-        if ($name === "arguments") {
-            $this->$name = new ArrayClass($_SERVER["argv"] ?? []);
-            return $this->$name;
-        }
-        if ($name === "environment") {
-            /** @var Dictionary<string> $environment */
-            $environment = new Dictionary();
-            $fileManager = FileManager::default();
-            $url = $fileManager->documentRootDirectory->appendingPathComponent(".env");
-            $path = $url->path;
-            if ($fileManager->fileExists($path) && ($string = $fileManager->contents($path))) {
-                $scanner = new Scanner($string);
-                $scanner->charactersToBeSkipped = PHP_EOL;
-                while ($scanner->scanUpCharacters(PHP_EOL, $line) && $line) {
-                    /** @psalm-suppress RedundantCast */
-                    $components = explode("=", (string)$line, 2);
-                    if (count($components) === 2) {
-                        [$key, $value] = $components;
-                        $environment[trim($key)] = trim($value, "\"' ");
-                        $scanner->scanLocation += 1;
-                    }
+        /** @var Dictionary<string> $environment */
+        $environment = new Dictionary();
+        $fileManager = FileManager::default();
+        $url = $fileManager->documentRootDirectory->appendingPathComponent(".env");
+        $path = $url->path;
+        if ($fileManager->fileExists($path) && ($string = $fileManager->contents($path))) {
+            $scanner = new Scanner($string);
+            $scanner->charactersToBeSkipped = PHP_EOL;
+            while ($scanner->scanUpCharacters(PHP_EOL, $line) && $line) {
+                /** @psalm-suppress RedundantCast */
+                $components = explode("=", (string)$line, 2);
+                if (count($components) === 2) {
+                    [$key, $value] = $components;
+                    $environment[trim($key)] = trim($value, "\"' ");
+                    $scanner->scanLocation += 1;
                 }
             }
-            $this->$name = $environment;
-            return $this->$name;
         }
-        if ($name === "globallyUniqueString") {
-            $this->$name = md5((string)$this->processIdentifier);
-            return $this->$name;
-        }
-        if ($name === "processIdentifier") {
-            $this->$name = getmypid();
-            return $this->$name;
-        }
-        if ($name === "processName") {
-            $processName = "Unknown";
-            /** @psalm-suppress RedundantCondition */
-            if (RUNNING_FROM_CLI) {
-                $processTitle = cli_get_process_title();
-                if ($processTitle !== null) {
-                    $processName = $processTitle;
-                }
+        return $environment;
+    }
+
+    private function processName(): string
+    {
+        $processName = "Unknown";
+        /** @psalm-suppress RedundantCondition */
+        if (RUNNING_FROM_CLI) {
+            $processTitle = cli_get_process_title();
+            if ($processTitle !== null) {
+                $processName = $processTitle;
             }
-            $this->$name = $processName;
-            return $this->$name;
         }
-        if ($name === "userName") {
-            $this->$name = get_current_user();
-            return $this->$name;
-        }
-        if ($name === "fullUserName") {
-            $this->$name = full_user_name();
-            return $this->$name;
-        }
-        if ($name === "hostName") {
-            $this->$name = gethostname();
-            return $this->$name;
-        }
-        return $this->valueForUndefinedKey($name);
+        return $processName;
     }
 
     /**
@@ -110,9 +88,7 @@ class ProcessInfo extends ObjectClass
      */
     public static function processInfo(): ProcessInfo
     {
-        if (self::$processInfo === null) {
-            self::$processInfo = new ProcessInfo();
-        }
+        self::$processInfo ??= new ProcessInfo();
         return self::$processInfo;
     }
 }
