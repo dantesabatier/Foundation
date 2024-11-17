@@ -120,7 +120,7 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
     public function __construct(iterable $elements = [])
     {
         if ($elements instanceof Set) {
-            $this->reserved = $elements->reserved;
+            $this->reserved = $elements->array;
         } else {
             $this->appendContentsOf($elements);
         }
@@ -722,7 +722,7 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
      */
     public function setSet(Set $set): void
     {
-        $this->reserved = $set->reserved;
+        $this->reserved = $set->array;
     }
 
     /**
