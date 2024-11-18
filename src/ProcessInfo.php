@@ -11,19 +11,19 @@ class ProcessInfo extends ObjectClass
 {
     private static ?ProcessInfo $processInfo = null;
     /** @var ArrayClass<string> Array of strings with the command-line arguments for the process. This array contains all the information passed in the argv array, including the executable name in the first element. */
-    public ArrayClass $arguments {
+    private(set) ArrayClass $arguments {
         get => $this->arguments ??= new ArrayClass($_SERVER["argv"] ?? []);
     }
     /** @var Dictionary<string> The variable names (keys) and their values in the environment from which the process was launched. */
-    public Dictionary $environment {
+    private(set) Dictionary $environment {
         get => $this->environment ??= $this->environment();
     }
     /** @var string Global unique identifier for the process. */
-    public string $globallyUniqueString {
+    private(set) string $globallyUniqueString {
         get => $this->globallyUniqueString ??= md5((string)$this->processIdentifier);
     }
     /** @var int The identifier of the process (often called process ID). */
-    public int $processIdentifier {
+    private(set) int $processIdentifier {
         get => $this->processIdentifier ??= getmypid();
     }
     /** @var string The process name is used to register application defaults and is used in error messages. It does not uniquely identify the process. */
@@ -31,15 +31,15 @@ class ProcessInfo extends ObjectClass
         get => $this->processName ??= $this->processName();
     }
     /** @var string Returns the account name of the current user. */
-    public string $userName {
+    private(set) string $userName {
         get => $this->userName ??= get_current_user();
     }
     /** @var string Returns the full name of the current user. */
-    public string $fullUserName {
+    private(set) string $fullUserName {
         get => $this->fullUserName ??= get_current_user();
     }
     /** @var string The name of the host computer on which the process is executing. */
-    public string $hostName {
+    private(set) string $hostName {
         get => $this->hostName ??= gethostname();
     }
 
