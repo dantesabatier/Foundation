@@ -24,7 +24,7 @@ class ProcessInfo extends ObjectClass
     }
     /** @var int The identifier of the process (often called process ID). */
     public int $processIdentifier {
-        get => getmypid();
+        get => $this->associatedValues[__PROPERTY__] ??= getmypid();
     }
     /** @var string The process name is used to register application defaults and is used in error messages. It does not uniquely identify the process. */
     public string $processName {
@@ -33,15 +33,15 @@ class ProcessInfo extends ObjectClass
     }
     /** @var string Returns the account name of the current user. */
     public string $userName {
-        get => get_current_user();
+        get => $this->associatedValues[__PROPERTY__] ??= get_current_user();
     }
     /** @var string Returns the full name of the current user. */
     public string $fullUserName {
-        get => get_current_user();
+        get => $this->associatedValues[__PROPERTY__] ??= get_current_user();
     }
     /** @var string The name of the host computer on which the process is executing. */
     public string $hostName {
-        get => gethostname();
+        get => $this->associatedValues[__PROPERTY__] ??= gethostname();
     }
 
     /**
