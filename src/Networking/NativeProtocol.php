@@ -28,28 +28,24 @@ use const Sabatier\Foundation\UserCancelledError;
 abstract class NativeProtocol extends URLProtocol implements EasyHandleDelegate
 {
     public ?string $lastRedirectBody = null;
-    public InternalState $internalState;
-    public readonly EasyHandle $easyHandle;
-    public readonly URL $tempFileURL;
-
-    public function __construct(URLSessionTask $task, ?CachedURLResponse $cachedResponse = null, ?URLProtocolClient $client = null)
-    {
-        unset($this->tempFileURL);
-        parent::__construct($task, $cachedResponse, $client);
-        $this->internalState = InternalState::initial();
-        $this->easyHandle = new EasyHandle($this);
+    public InternalState $internalState {
+        get => $this->internalState ??= InternalState::initial();
+    }
+    private(set) EasyHandle $easyHandle {
+        get => $this->easyHandle ??= new EasyHandle($this);
+    }
+    private(set) URL $tempFileURL {
+        get => $this->tempFileURL ??= $this->tempFileURL();
     }
 
-    public function __get(string $name)
+    /**
+     * @throws Exception
+     */
+    private function tempFileURL(): URL
     {
-        return $this->$name = match ($name) {
-            "tempFileURL" => (function (): URL {
-                $tempFileURL = FileManager::default()->url(SearchPathDirectory::cachesDirectory, SearchPathDomainMask::local, null, true)->appendingPathComponent(uniqid((string)new SystemRandomNumberGenerator()->next(), true))->appendPathExtension($this->task->originalRequest?->url?->pathExtension ?? "");
-                FileManager::default()->createFile($tempFileURL->path, null);
-                return $tempFileURL;
-            })(),
-            default => $this->valueForUndefinedKey($name)
-        };
+        $tempFileURL = FileManager::default()->url(SearchPathDirectory::cachesDirectory, SearchPathDomainMask::local, null, true)->appendingPathComponent(uniqid((string)new SystemRandomNumberGenerator()->next(), true))->appendPathExtension($this->task->originalRequest?->url?->pathExtension ?? "");
+        FileManager::default()->createFile($tempFileURL->path, null);
+        return $tempFileURL;
     }
 
     public static function enableLibcurlDebugOutput(): bool
