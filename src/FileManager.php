@@ -23,19 +23,19 @@ final class FileManager extends ObjectClass
     public ?FileManagerDelegate $delegate = null;
     /** @var URL The system root directory. */
     public URL $systemRootDirectory {
-        get => $this->associatedValues[__PROPERTY__] ??= URL::fileURL("/");
+        get => $this->systemRootDirectory ??= URL::fileURL("/");
     }
     /** @var URL The home directory for the current user. */
     public URL $homeDirectoryForCurrentUser {
-        get => $this->associatedValues[__PROPERTY__] ??= URL::fileURL(home_directory());
+        get => $this->homeDirectoryForCurrentUser ??= URL::fileURL(home_directory());
     }
     /** @var URL The temporary directory for the current user. */
     public URL $temporaryDirectory {
-        get => $this->associatedValues[__PROPERTY__] ??= URL::fileURL(temporary_directory());
+        get => $this->temporaryDirectory ??= URL::fileURL(temporary_directory());
     }
     /** @var URL The document root directory. */
     public URL $documentRootDirectory {
-        get => $this->associatedValues[__PROPERTY__] ??= URL::fileURL(document_root_directory());
+        get => $this->documentRootDirectory ??= URL::fileURL(document_root_directory());
     }
 
     /**

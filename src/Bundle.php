@@ -24,27 +24,27 @@ final class Bundle extends ObjectClass
     public const string didLoadNotification = BundleDidLoadNotification;
     /** @var URL|null The file URL of the bundle's subdirectory containing resource files. */
     public ?URL $resourceURL {
-        get => $this->associatedValues[__PROPERTY__] ??= $this->directoryURL($this->bundleURL, "Resources");
+        get => $this->resourceURL ??= $this->directoryURL($this->bundleURL, "Resources");
     }
     /** @var URL|null The file URL of the receiver's executable file. */
     public ?URL $executableURL {
-        get => $this->directoryURL($this->bundleURL->appendingPathComponent("OS"), $this->object(kCFBundleExecutableKey) ?? $this->object(kCFBundleNameKey));
+        get => $this->executableURL ??= $this->directoryURL($this->bundleURL->appendingPathComponent("OS"), $this->object(kCFBundleExecutableKey) ?? $this->object(kCFBundleNameKey));
     }
     /** @var URL|null The file URL of the bundle's subdirectory containing private frameworks. */
     public ?URL $privateFrameworksURL {
-        get => $this->directoryURL($this->bundleURL, "PrivateFrameworks");
+        get => $this->privateFrameworksURL ??= $this->directoryURL($this->bundleURL, "PrivateFrameworks");
     }
     /** @var URL|null The file URL of the receiver's subdirectory containing shared frameworks. */
     public ?URL $sharedFrameworksURL {
-        get => $this->directoryURL($this->bundleURL, "Frameworks");
+        get => $this->sharedFrameworksURL ??= $this->directoryURL($this->bundleURL, "Frameworks");
     }
     /** @var URL|null The file URL of the receiver's subdirectory containing plug-ins. */
     public ?URL $builtInPlugInsURL {
-        get => $this->directoryURL($this->bundleURL, "Plugins");
+        get => $this->builtInPlugInsURL ??= $this->directoryURL($this->bundleURL, "Plugins");
     }
     /** @var URL|null The file URL of the bundle's subdirectory containing shared support files. */
     public ?URL $sharedSupportURL {
-        get => $this->directoryURL($this->bundleURL, "SharedSupport");
+        get => $this->sharedSupportURL ??= $this->directoryURL($this->bundleURL, "SharedSupport");
     }
     /** @var string|null The receiver's bundle identifier. */
     public ?string $bundleIdentifier {
@@ -52,7 +52,7 @@ final class Bundle extends ObjectClass
     }
     /** @var Dictionary|null A dictionary, constructed from the bundle's Info.plist file, that contains information about the receiver. */
     public ?Dictionary $infoDictionary {
-        get => $this->associatedValues[__PROPERTY__] ??= PropertyListSerialization::propertyListWithURL($this->bundleURL->appendingPathComponent("Info")->appendingPathExtension("plist"));
+        get => $this->infoDictionary ??= PropertyListSerialization::propertyListWithURL($this->bundleURL->appendingPathComponent("Info")->appendingPathExtension("plist"));
     }
     /** @var ArrayClass<string> $localizations A list of all the localizations contained in the bundle. An array of string objects containing language IDs for all the localizations contained in the bundle. */
     public ArrayClass $localizations {

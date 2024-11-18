@@ -12,36 +12,35 @@ class ProcessInfo extends ObjectClass
     private static ?ProcessInfo $processInfo = null;
     /** @var ArrayClass<string> Array of strings with the command-line arguments for the process. This array contains all the information passed in the argv array, including the executable name in the first element. */
     public ArrayClass $arguments {
-        get => $this->associatedValues[__PROPERTY__] ??= new ArrayClass($_SERVER["argv"] ?? []);
+        get => $this->arguments ??= new ArrayClass($_SERVER["argv"] ?? []);
     }
     /** @var Dictionary<string> The variable names (keys) and their values in the environment from which the process was launched. */
     public Dictionary $environment {
-        get => $this->associatedValues[__PROPERTY__] ??= $this->environment();
+        get => $this->environment ??= $this->environment();
     }
     /** @var string Global unique identifier for the process. */
     public string $globallyUniqueString {
-        get => $this->associatedValues[__PROPERTY__] ??= md5((string)$this->processIdentifier);
+        get => $this->globallyUniqueString ??= md5((string)$this->processIdentifier);
     }
     /** @var int The identifier of the process (often called process ID). */
     public int $processIdentifier {
-        get => $this->associatedValues[__PROPERTY__] ??= getmypid();
+        get => $this->processIdentifier ??= getmypid();
     }
     /** @var string The process name is used to register application defaults and is used in error messages. It does not uniquely identify the process. */
     public string $processName {
-        get => $this->associatedValues[__PROPERTY__] ??= $this->processName();
-        set => $this->associatedValues[__PROPERTY__] = $value;
+        get => $this->processName ??= $this->processName();
     }
     /** @var string Returns the account name of the current user. */
     public string $userName {
-        get => $this->associatedValues[__PROPERTY__] ??= get_current_user();
+        get => $this->userName ??= get_current_user();
     }
     /** @var string Returns the full name of the current user. */
     public string $fullUserName {
-        get => $this->associatedValues[__PROPERTY__] ??= get_current_user();
+        get => $this->fullUserName ??= get_current_user();
     }
     /** @var string The name of the host computer on which the process is executing. */
     public string $hostName {
-        get => $this->associatedValues[__PROPERTY__] ??= gethostname();
+        get => $this->hostName ??= gethostname();
     }
 
     /**
