@@ -26,11 +26,7 @@ abstract class Operation extends ObjectClass
         }
     }
     /** @var bool A Boolean value indicating whether the operation is currently executing. */
-    private(set) bool $isExecuting = false {
-        set {
-            $this->isExecuting = $value;
-        }
-    }
+    private(set) bool $isExecuting = false;
     /** @var bool A Boolean value indicating whether the operation has finished executing its task. */
     private(set) bool $isFinished = false {
         set {
