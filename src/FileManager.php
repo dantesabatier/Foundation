@@ -22,19 +22,19 @@ final class FileManager extends ObjectClass
     /** @var FileManagerDelegate|null The delegate of the file manager object. It is recommended that you assign a delegate to the file manager object only if you allocated and initialized the object yourself. Avoid assigning a delegate to the shared file manager obtained from the default method. */
     public ?FileManagerDelegate $delegate = null;
     /** @var URL The system root directory. */
-    public URL $systemRootDirectory {
+    private(set) URL $systemRootDirectory {
         get => $this->systemRootDirectory ??= URL::fileURL("/");
     }
     /** @var URL The home directory for the current user. */
-    public URL $homeDirectoryForCurrentUser {
+    private(set) URL $homeDirectoryForCurrentUser {
         get => $this->homeDirectoryForCurrentUser ??= URL::fileURL(home_directory());
     }
     /** @var URL The temporary directory for the current user. */
-    public URL $temporaryDirectory {
+    private(set) URL $temporaryDirectory {
         get => $this->temporaryDirectory ??= URL::fileURL(temporary_directory());
     }
     /** @var URL The document root directory. */
-    public URL $documentRootDirectory {
+    private(set) URL $documentRootDirectory {
         get => $this->documentRootDirectory ??= URL::fileURL(document_root_directory());
     }
 
