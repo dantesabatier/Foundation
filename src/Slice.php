@@ -43,7 +43,7 @@ class Slice extends ObjectClass implements Collection, IteratorAggregate
         get => $this->bounds;
     }
     public array $array {
-        get => array_slice($this->base->array, $this->startIndex, $this->endIndex);
+        get => $this->array ??= array_slice($this->base->array, $this->startIndex, $this->endIndex);
     }
     public string $description {
         get => sprintf("<%s %s [%s...<%s]>", typeof($this->base), human_readable_value($this->base), $this->startIndex, $this->endIndex);
