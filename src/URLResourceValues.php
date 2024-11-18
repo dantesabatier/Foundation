@@ -10,63 +10,63 @@ use JetBrains\PhpStorm\ExpectedValues;
 class URLResourceValues extends ObjectClass
 {
     /** @var bool|null True for directories. */
-    public bool|null $isDirectory {
+    public ?bool $isDirectory {
         get => $this->allValues["isDirectory"];
     }
     /** @var string|null Returns the file system object type. */
-    public string|null $fileResourceType {
+    public ?string $fileResourceType {
         get => $this->allValues["fileResourceType"];
     }
     /** @var int|null Total file size in bytes. */
-    public int|null $fileSize {
+    public ?int $fileSize {
         get => $this->allValues["fileSize"];
     }
     /** @var bool|null True if this process (as determined by EUID) can execute a file resource or search a directory resource. */
-    public bool|null $isExecutable {
+    public ?bool $isExecutable {
         get => $this->allValues["isExecutable"];
     }
     /** @var bool|null True for regular files. */
-    public bool|null $isRegularFile {
+    public ?bool $isRegularFile {
         get => $this->allValues["isRegularFile"];
     }
     /** @var Date|null The time the resource's attributes were last modified. */
-    public Date|null $attributeModificationDate {
+    public ?Date $attributeModificationDate {
         get => $this->allValues["attributeModificationDate"];
     }
     /** @var Date|null The date the resource was created. */
-    public Date|null $creationDate {
+    public ?Date $creationDate {
         get => $this->allValues["creationDate"];
     }
     /** @var bool|null true if the resource is a Finder alias file or a symlink, false otherwise. */
-    public bool|null $isAliasFile {
+    public ?bool $isAliasFile {
         get => $this->allValues["isAliasFile"];
     }
     /** @var bool|null True for resources normally not displayed to users. */
-    public bool|null $isHidden {
+    public ?bool $isHidden {
         get => $this->allValues["isHidden"];
     }
     /** @var bool|null True if this process (as determined by EUID) can read the resource. */
-    public bool|null $isReadable {
+    public ?bool $isReadable {
         get => $this->allValues["isReadable"];
     }
     /** @var bool|null True for symlinks. */
-    public bool|null $isSymbolicLink {
+    public ?bool $isSymbolicLink {
         get => $this->allValues["isSymbolicLink"];
     }
     /** @var bool|null True if this process (as determined by EUID) can write to the resource. */
-    public bool|null $isWritable {
+    public ?bool $isWritable {
         get => $this->allValues["isWritable"];
     }
     /** @var string|null The resource name provided by the file system. */
-    public string|null $name {
+    public ?string $name {
         get => $this->allValues["name"];
     }
     /** @var URL|null The resource's parent directory, if any. */
-    public URL|null $parentDirectory {
+    public ?URL $parentDirectory {
         get => $this->allValues["parentDirectory"];
     }
     /** @var string|null The URL's path as a file system path. */
-    public string|null $path {
+    public ?string $path {
         get => $this->allValues["path"];
     }
 
