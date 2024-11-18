@@ -9,9 +9,7 @@ class Scanner extends ObjectClass
 {
     /** @var int The character position at which the receiver will begin its next scanning operation. This property is useful for backing up to rescan after an error. Rather than setting the scan location directly to skip known sequences of characters, use {@see scanString()} or {@see scanCharacters()}, which allow you to verify that the expected substring (or set of characters) is in fact present. */
     public int $scanLocation = 0 {
-        set {
-            $this->scanLocation = min(max($value, 0), strlen($this->string));
-        }
+        set => min(max($value, 0), strlen($this->string));
     }
     /** @var bool Flag that indicates whether the receiver distinguishes case in the characters it scans. */
     public bool $caseSensitive = false;
