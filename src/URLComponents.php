@@ -98,31 +98,26 @@ class URLComponents extends ObjectClass
                 return new URLQueryItem($name, $value);
             });
         }
+        set {
+            if ($value === null) {
+                $this->query = null;
+            } else {
+                $this->query = http_build_query($value->flatMap(fn(URLQueryItem $queryItem): array => [$queryItem->name => $queryItem->value])->array);
+            }
+        }
     }
 
     public function __construct(?string $string = null)
     {
         if ($string && ($components = parse_url($string))) {
             foreach ($components as $key => $value) {
+                if ($key === "pass") {
+                    $key = "password";
+                }
                 if (!empty($value)) {
                     $this->$key = $value;
                 }
             }
-        }
-    }
-
-    public function __set(string $name, mixed $value): void
-    {
-        if ($name === "pass") {
-            $this->password = $value;
-        } elseif ($name === "queryItems") {
-            if ($value === null) {
-                $this->query = null;
-            } else {
-                $this->query = http_build_query($value->flatMap(fn(URLQueryItem $queryItem): array => [$queryItem->name => $queryItem->value])->array);
-            }
-        } else {
-            $this->setValueForUndefinedKey($value, $name);
         }
     }
 
