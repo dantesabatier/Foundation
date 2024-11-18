@@ -7,11 +7,11 @@ namespace Sabatier\Foundation;
  */
 class ArrayConverter
 {
-    public ArrayClass $array {
-        get => $this->newCollection($this->reserved, ArrayClass::class);
+    private(set) ArrayClass $array {
+        get => $this->array ??= $this->newCollection($this->reserved, ArrayClass::class);
     }
-    public Dictionary $dictionary {
-        get => $this->newCollection(is_sequential($this->reserved) ? array_combine(array_map(fn(int $i): string => human_readable_value($i), array_keys($this->reserved)), array_values($this->reserved)) : $this->reserved, Dictionary::class);
+    private(set) Dictionary $dictionary {
+        get => $this->dictionary ??= $this->newCollection(is_sequential($this->reserved) ? array_combine(array_map(fn(int $i): string => human_readable_value($i), array_keys($this->reserved)), array_values($this->reserved)) : $this->reserved, Dictionary::class);
     }
 
     /**
