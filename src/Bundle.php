@@ -23,27 +23,27 @@ final class Bundle extends ObjectClass
     private static ?Dictionary $loadedBundles = null;
     public const string didLoadNotification = BundleDidLoadNotification;
     /** @var URL|null The file URL of the bundle's subdirectory containing resource files. */
-    public ?URL $resourceURL {
+    private(set) ?URL $resourceURL {
         get => $this->resourceURL ??= $this->directoryURL($this->bundleURL, "Resources");
     }
     /** @var URL|null The file URL of the receiver's executable file. */
-    public ?URL $executableURL {
+    private(set) ?URL $executableURL {
         get => $this->executableURL ??= $this->directoryURL($this->bundleURL->appendingPathComponent("OS"), $this->object(kCFBundleExecutableKey) ?? $this->object(kCFBundleNameKey));
     }
     /** @var URL|null The file URL of the bundle's subdirectory containing private frameworks. */
-    public ?URL $privateFrameworksURL {
+    private(set) ?URL $privateFrameworksURL {
         get => $this->privateFrameworksURL ??= $this->directoryURL($this->bundleURL, "PrivateFrameworks");
     }
     /** @var URL|null The file URL of the receiver's subdirectory containing shared frameworks. */
-    public ?URL $sharedFrameworksURL {
+    private(set) ?URL $sharedFrameworksURL {
         get => $this->sharedFrameworksURL ??= $this->directoryURL($this->bundleURL, "Frameworks");
     }
     /** @var URL|null The file URL of the receiver's subdirectory containing plug-ins. */
-    public ?URL $builtInPlugInsURL {
+    private(set) ?URL $builtInPlugInsURL {
         get => $this->builtInPlugInsURL ??= $this->directoryURL($this->bundleURL, "Plugins");
     }
     /** @var URL|null The file URL of the bundle's subdirectory containing shared support files. */
-    public ?URL $sharedSupportURL {
+    private(set) ?URL $sharedSupportURL {
         get => $this->sharedSupportURL ??= $this->directoryURL($this->bundleURL, "SharedSupport");
     }
     /** @var string|null The receiver's bundle identifier. */
@@ -51,7 +51,7 @@ final class Bundle extends ObjectClass
         get => $this->object(kCFBundleIdentifierKey);
     }
     /** @var Dictionary|null A dictionary, constructed from the bundle's Info.plist file, that contains information about the receiver. */
-    public ?Dictionary $infoDictionary {
+    private(set) ?Dictionary $infoDictionary {
         get => $this->infoDictionary ??= PropertyListSerialization::propertyListWithURL($this->bundleURL->appendingPathComponent("Info")->appendingPathExtension("plist"));
     }
     /** @var ArrayClass<string> $localizations A list of all the localizations contained in the bundle. An array of string objects containing language IDs for all the localizations contained in the bundle. */
@@ -59,7 +59,7 @@ final class Bundle extends ObjectClass
         get => $this->object(kCFBundleLocalizationsKey) ?? new ArrayClass();
     }
     /** @var ArrayClass<string> $preferredLocalizations An ordered list of preferred localizations contained in the bundle. An array of string objects containing language IDs for localizations in the bundle. The strings are ordered according to the user's language preferences and available localizations */
-    public ArrayClass $preferredLocalizations {
+    private(set) ArrayClass $preferredLocalizations {
         get => $this->preferredLocalizations ??= $this->preferredLocalizations();
     }
     /** @var string|null The localization for the development language.
@@ -72,7 +72,7 @@ final class Bundle extends ObjectClass
         get => $this->infoDictionary;
     }
     /** @var class-string|null $principalClass The bundle's principal class. */
-    public ?string $principalClass {
+    private(set) ?string $principalClass {
         get => $this->principalClass ??= $this->principalClass();
     }
 
