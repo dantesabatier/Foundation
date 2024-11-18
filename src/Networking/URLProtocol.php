@@ -65,14 +65,14 @@ abstract class URLProtocol extends ObjectClass
     }
 
     /**
-     * @param ArrayClass<class-string<URLProtocol>> $protocols
+     * @param ArrayClass<class-string<URLProtocol>> $protocolClasses
      * @param URLRequest $request
      * @return class-string<URLProtocol>|null
      * @internal
      */
-    public static function getProtocolClass(ArrayClass $protocols, URLRequest $request): ?string
+    public static function getProtocolClass(ArrayClass $protocolClasses, URLRequest $request): ?string
     {
-        return $protocols->first(fn(URLProtocol $protocol) => $protocol::canInit($request));
+        return $protocolClasses->first(fn(mixed $protocolClass) => $protocolClass::canInit($request));
     }
 
     /**
