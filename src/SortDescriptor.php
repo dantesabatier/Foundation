@@ -12,7 +12,7 @@ class SortDescriptor extends ObjectClass
 {
     /** @var SortDescriptor Returns a sort descriptor that reverses the sort order. */
     public SortDescriptor $reversedSortDescriptor {
-        get => new SortDescriptor($this->key, !$this->ascending, $this->comparator);
+        get => $this->reversedSortDescriptor ??= new SortDescriptor($this->key, !$this->ascending, $this->comparator);
     }
     public string $description {
         get => sprintf("%s %s", $this->key, human_readable_value($this->ascending));
