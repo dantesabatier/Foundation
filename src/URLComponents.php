@@ -99,9 +99,8 @@ class URLComponents extends ObjectClass
             });
         }
         set {
-            if ($value === null) {
-                $this->query = null;
-            } else {
+            $this->query = null;
+            if ($value instanceof ArrayClass) {
                 $this->query = http_build_query($value->flatMap(fn(URLQueryItem $queryItem): array => [$queryItem->name => $queryItem->value])->array);
             }
         }
