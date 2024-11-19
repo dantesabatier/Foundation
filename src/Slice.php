@@ -42,7 +42,7 @@ class Slice extends ObjectClass implements Collection, IteratorAggregate
     public Range $indices {
         get => $this->bounds;
     }
-    public array $array {
+    private(set) array $array {
         get => $this->array ??= array_slice($this->base->array, $this->startIndex, $this->endIndex);
     }
     public string $description {
