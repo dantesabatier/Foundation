@@ -26,7 +26,7 @@ class Range extends ObjectClass implements ExpressibleByArrayLiteral, IteratorAg
     public string $description {
         get => "[$this->lowerBound...<$this->upperBound]";
     }
-    public array $array {
+    private(set) array $array {
         get => $this->array ??= range($this->lowerBound, $this->upperBound - 1);
     }
 
