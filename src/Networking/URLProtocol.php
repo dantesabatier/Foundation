@@ -5,6 +5,7 @@ namespace Sabatier\Foundation\Networking;
 use Sabatier\Foundation\ArrayClass;
 use Sabatier\Foundation\ObjectClass;
 use function Sabatier\Foundation\fatal_error;
+use function Sabatier\Foundation\request_concrete_implementation;
 
 /**
  * An abstract class that handles the loading of protocol-specific URL data.
@@ -153,7 +154,10 @@ abstract class URLProtocol extends ObjectClass
      * @param URLRequest $request The request whose canonical version is desired.
      * @return URLRequest The canonical form of request.
      */
-    abstract public static function canonicalRequest(URLRequest $request): URLRequest;
+    public static function canonicalRequest(URLRequest $request): URLRequest
+    {
+        request_concrete_implementation($request, __FUNCTION__);
+    }
 
     /**
      * A Boolean value indicating whether two requests are equivalent for cache purposes.
