@@ -31,28 +31,36 @@ abstract class URLSessionTask extends ObjectClass
     /** @var float The number of bytes that the task expects to receive in the response body. This value is determined based on the Content-Length header received from the server. If that header is absent, the value is {@see URLSessionTransferSizeUnknown}. */
     public float $countOfBytesExpectedToReceive = URLSessionTransferSizeUnknown {
         set {
+            $this->willChangeValueForKey(__PROPERTY__);
             $this->countOfBytesExpectedToReceive = $value;
+            $this->didChangeValueForKey(__PROPERTY__);
             $this->updateProgress();
         }
     }
     /** @var float The number of bytes that the task has received from the server in the response body. */
     public float $countOfBytesReceived = 0.0 {
         set {
+            $this->willChangeValueForKey(__PROPERTY__);
             $this->countOfBytesReceived = $value;
+            $this->didChangeValueForKey(__PROPERTY__);
             $this->updateProgress();
         }
     }
     /** @var float The number of bytes that the task has sent to the server in the request body. */
     public float $countOfBytesExpectedToSend = URLSessionTransferSizeUnknown {
         set {
+            $this->willChangeValueForKey(__PROPERTY__);
             $this->countOfBytesExpectedToSend = $value;
+            $this->didChangeValueForKey(__PROPERTY__);
             $this->updateProgress();
         }
     }
     /** @var float The number of bytes that the task has sent to the server in the request body. */
     public float $countOfBytesSent = 0.0 {
         set {
+            $this->willChangeValueForKey(__PROPERTY__);
             $this->countOfBytesSent = $value;
+            $this->didChangeValueForKey(__PROPERTY__);
             $this->updateProgress();
         }
     }
@@ -73,14 +81,18 @@ abstract class URLSessionTask extends ObjectClass
     /** @var float A best-guess upper bound on the number of bytes the client expects to send. */
     public float $countOfBytesClientExpectsToSend = URLSessionTransferSizeUnknown {
         set {
+            $this->willChangeValueForKey(__PROPERTY__);
             $this->countOfBytesClientExpectsToSend = $value;
+            $this->didChangeValueForKey(__PROPERTY__);
             $this->updateProgress();
         }
     }
     /** @var float A best-guess upper bound on the number of bytes the client expects to receive. */
     public float $countOfBytesClientExpectsToReceive = URLSessionTransferSizeUnknown {
         set {
+            $this->willChangeValueForKey(__PROPERTY__);
             $this->countOfBytesClientExpectsToReceive = $value;
+            $this->didChangeValueForKey(__PROPERTY__);
             $this->updateProgress();
         }
     }
