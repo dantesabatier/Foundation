@@ -105,7 +105,10 @@ abstract class URLProtocol extends ObjectClass
      * @param URLRequest $request The request to be handled.
      * @return bool true if the protocol subclass can handle request, otherwise false.
      */
-    abstract public static function canInit(URLRequest $request): bool;
+    public static function canInit(URLRequest $request): bool
+    {
+        request_concrete_implementation(static::class, __FUNCTION__);
+    }
 
     /**
      * Fetches the property associated with the specified key in the specified request.
@@ -156,7 +159,7 @@ abstract class URLProtocol extends ObjectClass
      */
     public static function canonicalRequest(URLRequest $request): URLRequest
     {
-        request_concrete_implementation($request, __FUNCTION__);
+        request_concrete_implementation(static::class, __FUNCTION__);
     }
 
     /**
