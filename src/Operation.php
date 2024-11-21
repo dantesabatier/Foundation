@@ -21,18 +21,26 @@ abstract class Operation extends ObjectClass
     /** @var bool A Boolean value indicating whether the operation has been cancelled. */
     private(set) bool $isCancelled = false {
         set {
-            $this->dependencies->setValueForKey($value, "isCancelled");
+            $this->willChangeValueForKey(__PROPERTY__);
             $this->isCancelled = $value;
+            $this->didChangeValueForKey(__PROPERTY__);
+            $this->dependencies->setValueForKey($value, "isCancelled");
         }
     }
     /** @var bool A Boolean value indicating whether the operation is currently executing. */
-    private(set) bool $isExecuting = false;
+    private(set) bool $isExecuting = false {
+        set {
+            $this->willChangeValueForKey(__PROPERTY__);
+            $this->isExecuting = $value;
+            $this->didChangeValueForKey(__PROPERTY__);
+        }
+    }
     /** @var bool A Boolean value indicating whether the operation has finished executing its task. */
     private(set) bool $isFinished = false {
         set {
-            $this->willChangeValueForKey("isFinished");
+            $this->willChangeValueForKey(__PROPERTY__);
             $this->isFinished = $value;
-            $this->didChangeValueForKey("isFinished");
+            $this->didChangeValueForKey(__PROPERTY__);
         }
     }
     /** @var bool A Boolean value indicating whether the operation executes its task asynchronously. Use the {@see isAsynchronous} property instead. The value of this property is true for operations that run asynchronously with respect to the current thread or false for operations that run synchronously on the current thread. The default value of this property is false. */
@@ -42,9 +50,9 @@ abstract class Operation extends ObjectClass
     /** @var bool A Boolean value indicating whether the operation can be performed now. The readiness of operations is determined by their dependencies on other operations and potentially by custom conditions that you define. The Operation class manages dependencies on other operations and reports the readiness of the receiver based on those dependencies. If you want to use custom conditions to define the readiness of your operation object, reimplement this property and return a value that accurately reflects the readiness of the receiver. If you do so, your custom implementation must get the default property value from super and incorporate that readiness value into the new value of the property. In your custom implementation, you must generate KVO notifications for the isReady key path whenever the ready state of your operation object changes. */
     private(set) bool $isReady = true {
         set {
-            $this->willChangeValueForKey("isReady");
+            $this->willChangeValueForKey(__PROPERTY__);
             $this->isReady = $value;
-            $this->didChangeValueForKey("isReady");
+            $this->didChangeValueForKey(__PROPERTY__);
         }
     }
     /** @var string|null The name of the operation. */
