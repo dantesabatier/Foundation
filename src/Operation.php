@@ -24,7 +24,7 @@ abstract class Operation extends ObjectClass
             $this->willChangeValueForKey(__PROPERTY__);
             $this->isCancelled = $value;
             $this->didChangeValueForKey(__PROPERTY__);
-            $this->dependencies->setValueForKey($value, "isCancelled");
+            $this->dependencies->setValueForKey($value, __PROPERTY__);
         }
     }
     /** @var bool A Boolean value indicating whether the operation is currently executing. */
