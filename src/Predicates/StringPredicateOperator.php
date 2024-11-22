@@ -17,7 +17,7 @@ class StringPredicateOperator extends PredicateOperator
 {
     public string $symbol {
         get {
-            $symbol = parent::$symbol->get();
+            $symbol = parent::$symbol::get();
             $options = $this->options;
             if ($options) {
                 $symbol .= "[";
