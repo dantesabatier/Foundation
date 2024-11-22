@@ -50,8 +50,8 @@ class Expression extends ObjectClass
         get => $this->predicateFormat;
     }
     /** @internal */
-    public bool $usesKVC {
-        get => str_contains((string)$this, "@");
+    private(set) bool $usesKVC {
+        get => $this->usesKVC ??= str_contains((string)$this, "@");
     }
 
     /**
