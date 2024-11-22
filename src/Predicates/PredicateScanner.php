@@ -25,10 +25,24 @@ use function Sabatier\Foundation\typeof;
 /** @internal */
 class PredicateScanner extends Scanner
 {
+    public ?Predicate $predicate {
+        get {
+            try {
+                return $this->parsePredicate();
+            } catch (Throwable $throwable) {
+                $message = sprintf("Unable to parse predicate \"%s\" %s:%s", $this->string, typeof($throwable), human_readable_value($throwable));
+                if (!$this->isAtEnd) {
+                    $message .= sprintf(" - Format string contains extra characters \"%s***%s***\"", substring_to_index($this->string, $this->scanLocation), substring_from_index($this->string, $this->scanLocation));
+                }
+                throw new InternalInconsistencyException($message, (int)$throwable->getCode(), previous: $throwable);
+            }
+        }
+    }
+    public string $charactersToBeSkipped = " \r\n";
+
     public function __construct(string $format, private readonly ArrayClass $arguments)
     {
         parent::__construct($format);
-        $this->charactersToBeSkipped = " \r\n";
     }
 
     private function scanKeyword(string $keyword): bool
@@ -46,19 +60,6 @@ class PredicateScanner extends Scanner
         }
         $this->scanLocation = $scanLocation;
         return false;
-    }
-
-    public function predicate(): ?Predicate
-    {
-        try {
-            return $this->parsePredicate();
-        } catch (Throwable $throwable) {
-            $message = sprintf("Unable to parse predicate \"%s\" %s:%s", $this->string, typeof($throwable), human_readable_value($throwable));
-            if (!$this->isAtEnd) {
-                $message .= sprintf(" - Format string contains extra characters \"%s***%s***\"", substring_to_index($this->string, $this->scanLocation), substring_from_index($this->string, $this->scanLocation));
-            }
-            throw new InternalInconsistencyException($message, (int)$throwable->getCode(), previous: $throwable);
-        }
     }
 
     /**
