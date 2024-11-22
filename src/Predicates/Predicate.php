@@ -33,7 +33,7 @@ class Predicate extends ObjectClass
      */
     public static function format(string $format, ArrayClass $arguments = new ArrayClass()): ?Predicate
     {
-        return new PredicateScanner($format, $arguments)->predicate();
+        return new PredicateScanner($format, $arguments)->predicate;
     }
 
     /**
