@@ -7,7 +7,7 @@ use Throwable;
 class ErrorException extends \ErrorException implements CustomDebugStringConvertible
 {
     public Error $error {
-        get => $this->error ??= new Error(CocoaErrorDomain, $this->getCode(), new Dictionary([LocalizedDescriptionKey => "An unexpected error has occurred", LocalizedFailureReasonErrorKey => $this->getMessage()]));
+        get => $this->error ??= new Error(CocoaErrorDomain, $this->code, new Dictionary([LocalizedDescriptionKey => "An unexpected error has occurred", LocalizedFailureReasonErrorKey => $this->message]));
     }
     public string $description {
         get => sprintf("<%s %s> %s", class_name(get_called_class()), spl_object_id($this), $this->error->description);
