@@ -35,10 +35,10 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
         get => get_parent_class($this);
     }
     public string $description {
-        get => sprintf("<%s %s>", class_name(get_called_class()), spl_object_id($this));
+        get => sprintf("<%s %s>", class_name(get_class($this)), spl_object_id($this));
     }
     public string $debugDescription {
-        get => sprintf("<%s %s>", class_name(get_called_class()), spl_object_id($this));
+        get => $this->description;
     }
 
     /**
