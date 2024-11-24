@@ -10,7 +10,7 @@ class ErrorException extends \ErrorException implements CustomDebugStringConvert
         get => $this->error ??= new Error(CocoaErrorDomain, $this->code, new Dictionary([LocalizedDescriptionKey => "An unexpected error has occurred", LocalizedFailureReasonErrorKey => $this->message]));
     }
     public string $description {
-        get => sprintf("<%s %s> %s", class_name(get_called_class()), spl_object_id($this), $this->error->description);
+        get => sprintf("<%s %s> %s", class_name(get_class($this)), spl_object_id($this), $this->error->description);
     }
     public string $debugDescription {
         get => $this->description;
