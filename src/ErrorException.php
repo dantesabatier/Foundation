@@ -10,10 +10,10 @@ class ErrorException extends \ErrorException implements CustomDebugStringConvert
         get => $this->error ??= new Error(CocoaErrorDomain, $this->getCode(), new Dictionary([LocalizedDescriptionKey => "An unexpected error has occurred", LocalizedFailureReasonErrorKey => $this->getMessage()]));
     }
     public string $description {
-        get => sprintf("<%s %s>", class_name(get_called_class()), spl_object_id($this));
+        get => sprintf("<%s %s> %s", class_name(get_called_class()), spl_object_id($this), $this->error->description);
     }
     public string $debugDescription {
-        get => sprintf("<%s %s>", class_name(get_called_class()), spl_object_id($this));
+        get => $this->description;
     }
 
     public function __construct(string $message = "", int $code = 0, int $severity = 1, ?string $filename = __FILE__, ?int $line = __LINE__, ?Throwable $previous = null, ?Error $error = null)
@@ -22,5 +22,10 @@ class ErrorException extends \ErrorException implements CustomDebugStringConvert
         if ($error) {
             $this->error = $error;
         }
+    }
+
+    public function __toString(): string
+    {
+        return $this->description;
     }
 }
