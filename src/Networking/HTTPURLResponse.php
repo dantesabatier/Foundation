@@ -16,12 +16,12 @@ use function Sabatier\Foundation\string_is_equal;
  */
 class HTTPURLResponse extends URLResponse
 {
-    public readonly string $httpVersion;
+    protected(set) string $httpVersion;
     /** @var int The response's HTTP status code. */
     #[ExpectedValues(valuesFromClass: HTTPStatusCode::class)]
-    public readonly int $statusCode;
+    protected(set) int $statusCode;
     /** @var Dictionary All HTTP header fields of the response. */
-    public readonly Dictionary $allHeaderFields;
+    protected(set) Dictionary $allHeaderFields;
     public string $description {
         get => sprintf("<HTTPURLResponse %s> { URL: %s }{ status: %d, headers {\n%s} }", $this->hash, $this->url->absoluteString, $this->statusCode, $this->allHeaderFields->mapValues(fn(mixed $value, string $key): string => is_string($value) ? "\"$key\" = \"$value\";\n" : sprintf("\"%s\" = %s;\n", $key, human_readable_value($value)))->values->join(""));
     }
