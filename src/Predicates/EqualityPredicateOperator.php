@@ -9,6 +9,7 @@
 
 namespace Sabatier\Foundation\Predicates;
 
+use BackedEnum;
 use JetBrains\PhpStorm\ExpectedValues;
 use Override;
 use Sabatier\Foundation\CompareOptions;
@@ -27,12 +28,6 @@ class EqualityPredicateOperator extends PredicateOperator
     #[Override]
     public function performPrimitiveOperation(mixed $left, mixed $right): bool
     {
-        if ($left instanceof Value) {
-            $left = $left->value;
-        }
-        if ($right instanceof Value) {
-            $right = $right->value;
-        }
         if ($left === "") {
             $left = null;
         }
@@ -45,6 +40,12 @@ class EqualityPredicateOperator extends PredicateOperator
         }
         if ($left === null || $right === null) {
             return $isNegation;
+        }
+        if ($left instanceof BackedEnum || $left instanceof Value) {
+            $left = $left->value;
+        }
+        if ($right instanceof BackedEnum || $right instanceof Value) {
+            $right = $right->value;
         }
         if ($left instanceof Stringable) {
             $left = (string)$left;
