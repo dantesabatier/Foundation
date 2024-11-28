@@ -8,9 +8,9 @@ namespace Sabatier\Foundation;
 class Invocation
 {
     /** @var string The receiver's selector, or 0 if it hasn't been set. */
-    public string $selector;
-    /** @var object The receiver's target, or nil if the receiver has no target. The target is the receiver of the message sent by {@see invoke()}. */
-    public object $target;
+    public string $selector = "0";
+    /** @var object|null The receiver's target, or nil if the receiver has no target. The target is the receiver of the message sent by {@see invoke()}. */
+    public ?object $target = null;
     /** @var ArrayClass<mixed> */
     public ArrayClass $arguments;
     public mixed $returnValue;
@@ -27,7 +27,7 @@ class Invocation
      */
     public function invoke(): void
     {
-        $target = $this->target;
+        $target = $this->target ?? fatal_error("Invalid argument: target cannot be null");
         $selector = $this->selector;
         assert(method_exists($target, $selector), sprintf("<%s %s> %s() unrecognized selector sent to instance", class_name($target::class), spl_object_id($target), $selector));
         $this->returnValue = $target->$selector(...$this->arguments->array);
