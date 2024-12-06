@@ -114,7 +114,7 @@ abstract class URLSessionTask extends ObjectClass
     public bool $isSuspendedAfterResume {
         get => $this->hasTriggeredResume && $this->state === URLSessionTaskState::suspended;
     }
-    /** @var string|null class-string<URLProtocol>|null */
+    /** @var class-string<URLProtocol>|null */
     public ?string $protocolClass {
         get {
             /** @var URLRequest $request */
