@@ -16,7 +16,7 @@ class UUID extends ObjectClass
         get => $this->uuidString;
     }
     public string $debugDescription {
-        get => sprintf("<%s %s %s>", self::class, $this->hash, $this->description);
+        get => sprintf("<%s %s %s>", $this->class, $this->hash, $this->description);
     }
 
     /**

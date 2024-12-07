@@ -31,14 +31,17 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
     public int $hash {
         get => spl_object_id($this);
     }
+    public string $class {
+        get => get_class($this);
+    }
     public string $superclass {
         get => get_parent_class($this);
     }
     public string $description {
-        get => sprintf("<%s %s>", class_name(get_class($this)), spl_object_id($this));
+        get => sprintf("<%s %s>", $this->class, $this->hash);
     }
     public string $debugDescription {
-        get => $this->description;
+        get => sprintf("<%s %s>", $this->class, $this->hash);
     }
 
     /**
