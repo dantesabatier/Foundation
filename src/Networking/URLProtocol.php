@@ -58,6 +58,9 @@ abstract class URLProtocol extends ObjectClass
      */
     public static function registerClass(string $protocolClass): bool
     {
+        if (!is_subclass_of($protocolClass, URLProtocol::class)) {
+            return false;
+        }
         $registeredProtocolClasses = self::registeredProtocolClasses();
         if (!$registeredProtocolClasses->containsElement($protocolClass)) {
             $registeredProtocolClasses[] = $protocolClass;
