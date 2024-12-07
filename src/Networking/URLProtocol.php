@@ -104,7 +104,7 @@ abstract class URLProtocol extends ObjectClass
     /**
      * Determines whether the protocol subclass can handle the specified request.
      *
-     * A subclass should inspect request and determine whether or not the implementation can perform a load with that request. This is an abstract method and subclasses must provide an implementation.
+     * A subclass should inspect request and determine whether the implementation can perform a load with that request. This is an abstract method and subclasses must provide an implementation.
      * @param URLRequest $request The request to be handled.
      * @return bool true if the protocol subclass can handle request, otherwise false.
      */
