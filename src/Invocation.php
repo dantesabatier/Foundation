@@ -12,13 +12,10 @@ class Invocation
     /** @var object|null The receiver's target, or nil if the receiver has no target. The target is the receiver of the message sent by {@see invoke()}. */
     public ?object $target = null;
     /** @var ArrayClass<mixed> */
-    public ArrayClass $arguments;
-    public mixed $returnValue;
-
-    public function __construct()
-    {
-        $this->arguments = new ArrayClass();
+    public ArrayClass $arguments {
+        get => $this->arguments ??= new ArrayClass();
     }
+    public mixed $returnValue;
 
     /**
      * Sends the receiver's message (with arguments) to its target and sets the return value.
