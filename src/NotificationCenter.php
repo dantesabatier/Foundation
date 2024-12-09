@@ -18,11 +18,8 @@ final class NotificationCenter
 {
     private static ?NotificationCenter $default = null;
     /** @var ArrayClass<NotificationObserver> $observers */
-    private ArrayClass $observers;
-
-    public function __construct()
-    {
-        $this->observers = new ArrayClass();
+    private ArrayClass $observers {
+        get => $this->observers ??= new ArrayClass();
     }
 
     /**
