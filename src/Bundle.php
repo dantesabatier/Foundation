@@ -60,7 +60,14 @@ final class Bundle extends ObjectClass
     }
     /** @var ArrayClass<string> $preferredLocalizations An ordered list of preferred localizations contained in the bundle. An array of string objects containing language IDs for localizations in the bundle. The strings are ordered according to the user's language preferences and available localizations */
     private(set) ArrayClass $preferredLocalizations {
-        get => $this->preferredLocalizations ??= $this->preferredLocalizations();
+        get {
+            if (!isset($this->preferredLocalizations)) {
+                $preferredLocalizations = clone $this->localizations;
+                $preferredLocalizations->partition(fn(string $localization): bool => $localization !== Locale::getPrimaryLanguage(Locale::getDefault()));
+                $this->preferredLocalizations = $preferredLocalizations;
+            }
+            return $this->preferredLocalizations;
+        }
     }
     /** @var string|null The localization for the development language.
      * This property corresponds to the value in the CFBundleDevelopmentRegion key of the bundle's property list (Info.plist). */
@@ -73,7 +80,14 @@ final class Bundle extends ObjectClass
     }
     /** @var class-string|null $principalClass The bundle's principal class. */
     private(set) ?string $principalClass {
-        get => $this->principalClass ??= $this->principalClass();
+        get {
+            if (!isset($this->principalClass)) {
+                /** @var class-string|null $principalClass */
+                $principalClass = $this->object(kCFBundlePrincipalClassKey);
+                $this->principalClass = empty($principalClass) ? null : $this->classNamed($principalClass);
+            }
+            return $this->principalClass;
+        }
     }
 
     /**
@@ -88,20 +102,6 @@ final class Bundle extends ObjectClass
     public function __destruct()
     {
         self::loadedBundles()->removeValueForKey($this->bundleURL->absoluteString);
-    }
-
-    private function preferredLocalizations(): ArrayClass
-    {
-        $preferredLocalizations = clone $this->localizations;
-        $preferredLocalizations->partition(fn(string $localization): bool => $localization !== Locale::getPrimaryLanguage(Locale::getDefault()));
-        return $preferredLocalizations;
-    }
-
-    private function principalClass(): ?string
-    {
-        /** @var class-string|null $principalClass */
-        $principalClass = $this->object(kCFBundlePrincipalClassKey);
-        return empty($principalClass) ? null : $this->classNamed($principalClass);
     }
 
     private function directoryURL(URL $baseURL, string $name): ?URL
