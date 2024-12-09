@@ -109,7 +109,7 @@ final class URL extends ObjectClass
     }
     /** @var string|null The host component of a URL if the URL conforms to RFC 1808 (the most common form of URL), otherwise nil. */
     public ?string $host {
-        get => $this->parse(PHP_URL_HOST) ?? "";
+        get => $this->parse(PHP_URL_HOST);
     }
     /** @var string The last path component of the URL, or an empty string if the path is an empty string. */
     public string $lastPathComponent {
