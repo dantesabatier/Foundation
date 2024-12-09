@@ -27,7 +27,6 @@ class BlockOperation extends Operation
      */
     public function __construct(Closure $block)
     {
-        parent::__construct();
         $this->executionBlocks = new ArrayClass([$block]);
     }
 
