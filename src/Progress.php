@@ -94,11 +94,17 @@ class Progress extends ObjectClass
     public float $fractionCompleted {
         get => $this->fraction->total > 0 ? $this->fraction->fractionCompleted : $this->fraction->add($this->childFraction)->fractionCompleted;
     }
-    private ?Progress $parent = null;
+    private ?Progress $parent;
     /** @var Set<Progress> */
-    private Set $children;
-    private readonly ProgressFraction $fraction;
-    private ProgressFraction $childFraction;
+    private Set $children {
+        get => $this->children ??= new Set();
+    }
+    private ProgressFraction $fraction {
+        get => $this->fraction ??= new ProgressFraction();
+    }
+    private ProgressFraction $childFraction {
+        get => $this->childFraction ??= new ProgressFraction(total: 1.0);
+    }
     private float $portionOfParent = 0.0;
 
     /**
@@ -109,12 +115,9 @@ class Progress extends ObjectClass
      */
     public function __construct(?Progress $parent = null, ?Dictionary $userInfo = null)
     {
+        $this->parent = $parent;
         $this->userInfo = $userInfo ?? new Dictionary();
-        $this->children = new Set();
-        $this->fraction = new ProgressFraction();
-        $this->childFraction = new ProgressFraction();
-        $this->childFraction->total = 1.0;
-        $parent?->addChild($this, $this->totalUnitCount);
+        $this->parent?->addChild($this, $this->totalUnitCount);
     }
 
     private function overallFraction(): ProgressFraction
