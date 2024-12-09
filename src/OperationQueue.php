@@ -28,7 +28,9 @@ final class OperationQueue extends ObjectClass
     private static ?ArrayClass $queues = null;
     private static ?OperationQueue $main = null;
     /** @var ArrayClass<Operation> $operations The operations currently in the queue. */
-    private(set) ArrayClass $operations;
+    private(set) ArrayClass $operations {
+        get => $this->operations ??= new ArrayClass();
+    }
     /** @var int The maximum number of queued operations that can run at the same time. */
     public int $maxConcurrentOperationCount;
     /** @var string|null The name of the operation queue. */
@@ -41,7 +43,6 @@ final class OperationQueue extends ObjectClass
 
     public function __construct()
     {
-        $this->operations = new ArrayClass();
         self::allQueues()->append($this);
     }
 
