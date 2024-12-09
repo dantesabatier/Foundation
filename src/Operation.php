@@ -62,18 +62,15 @@ abstract class Operation extends ObjectClass
     /** @var Closure(): void|null The block to execute after the operation's main task is completed. */
     public ?Closure $completionBlock = null;
     /** @var ArrayClass<Operation> */
-    private(set) ArrayClass $dependencies;
+    private(set) ArrayClass $dependencies {
+        get => $this->dependencies ??= new ArrayClass();
+    }
     /** @internal */
     public int $pid = NotFound;
     /** @internal */
     public OperationQueue $queue;
     public string $description {
         get => sprintf("<%s %s>", self::class, $this->name ?? $this->hash);
-    }
-
-    public function __construct()
-    {
-        $this->dependencies = new ArrayClass();
     }
 
     /**
