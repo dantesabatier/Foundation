@@ -2,8 +2,6 @@
 
 namespace Sabatier\Foundation;
 
-use Exception;
-
 /**
  * A collection of information about the current process.
  */
@@ -16,7 +14,30 @@ class ProcessInfo extends ObjectClass
     }
     /** @var Dictionary<string> The variable names (keys) and their values in the environment from which the process was launched. */
     private(set) Dictionary $environment {
-        get => $this->environment ??= $this->environment();
+        get {
+            if (!isset($this->environment)) {
+                /** @var Dictionary<string> $environment */
+                $environment = new Dictionary();
+                $fileManager = FileManager::default();
+                $url = $fileManager->documentRootDirectory->appendingPathComponent(".env");
+                $path = $url->path;
+                if ($fileManager->fileExists($path) && ($string = $fileManager->contents($path))) {
+                    $scanner = new Scanner($string);
+                    $scanner->charactersToBeSkipped = PHP_EOL;
+                    while ($scanner->scanUpCharacters(PHP_EOL, $line) && $line) {
+                        /** @psalm-suppress RedundantCast */
+                        $components = explode("=", (string)$line, 2);
+                        if (count($components) === 2) {
+                            [$key, $value] = $components;
+                            $environment[trim($key)] = trim($value, "\"' ");
+                            $scanner->scanLocation += 1;
+                        }
+                    }
+                }
+                $this->environment = $environment;
+            }
+            return $this->environment;
+        }
     }
     /** @var string Global unique identifier for the process. */
     private(set) string $globallyUniqueString {
@@ -28,7 +49,20 @@ class ProcessInfo extends ObjectClass
     }
     /** @var string The process name is used to register application defaults and is used in error messages. It does not uniquely identify the process. */
     public string $processName {
-        get => $this->processName ??= $this->processName();
+        get {
+            if (!isset($this->processName)) {
+                $processName = "Unknown";
+                /** @psalm-suppress RedundantCondition */
+                if (RUNNING_FROM_CLI) {
+                    $processTitle = cli_get_process_title();
+                    if ($processTitle !== null) {
+                        $processName = $processTitle;
+                    }
+                }
+                $this->processName = $processName;
+            }
+            return $this->processName;
+        }
     }
     /** @var string Returns the account name of the current user. */
     private(set) string $userName {
@@ -41,45 +75,6 @@ class ProcessInfo extends ObjectClass
     /** @var string The name of the host computer on which the process is executing. */
     private(set) string $hostName {
         get => $this->hostName ??= gethostname();
-    }
-
-    /**
-     * @throws Exception
-     */
-    private function environment(): Dictionary
-    {
-        /** @var Dictionary<string> $environment */
-        $environment = new Dictionary();
-        $fileManager = FileManager::default();
-        $url = $fileManager->documentRootDirectory->appendingPathComponent(".env");
-        $path = $url->path;
-        if ($fileManager->fileExists($path) && ($string = $fileManager->contents($path))) {
-            $scanner = new Scanner($string);
-            $scanner->charactersToBeSkipped = PHP_EOL;
-            while ($scanner->scanUpCharacters(PHP_EOL, $line) && $line) {
-                /** @psalm-suppress RedundantCast */
-                $components = explode("=", (string)$line, 2);
-                if (count($components) === 2) {
-                    [$key, $value] = $components;
-                    $environment[trim($key)] = trim($value, "\"' ");
-                    $scanner->scanLocation += 1;
-                }
-            }
-        }
-        return $environment;
-    }
-
-    private function processName(): string
-    {
-        $processName = "Unknown";
-        /** @psalm-suppress RedundantCondition */
-        if (RUNNING_FROM_CLI) {
-            $processTitle = cli_get_process_title();
-            if ($processTitle !== null) {
-                $processName = $processTitle;
-            }
-        }
-        return $processName;
     }
 
     /**
