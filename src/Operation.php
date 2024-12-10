@@ -70,7 +70,7 @@ abstract class Operation extends ObjectClass
     /** @internal */
     public OperationQueue $queue;
     public string $description {
-        get => sprintf("<%s %s>", self::class, $this->name ?? $this->hash);
+        get => sprintf("<%s %s>", $this->class, $this->name ?? $this->hash);
     }
 
     /**
