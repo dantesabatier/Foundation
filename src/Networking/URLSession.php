@@ -19,10 +19,14 @@ use function Sabatier\Foundation\unsupported;
 final class URLSession implements URLSessionProtocol
 {
     private static ?URLSession $shared = null;
-    private readonly MultiHandle $multiHandle;
+    private MultiHandle $multiHandle {
+        get => $this->multiHandle ??= new MultiHandle($this->configuration);
+    }
     /** @internal */
-    public readonly TaskRegistry $taskRegistry;
-    public readonly ?string $identifier;
+    private(set) TaskRegistry $taskRegistry {
+        get => $this->taskRegistry ??= new TaskRegistry();
+    }
+    private(set) ?string $identifier = null;
     private bool $invalidated = false;
     private int $nextTaskIdentifier = 1;
 
@@ -35,8 +39,6 @@ final class URLSession implements URLSessionProtocol
      */
     public function __construct(public readonly URLSessionConfiguration $configuration, public readonly ?URLSessionDelegate $delegate = null, public readonly OperationQueue $delegateQueue = new OperationQueue())
     {
-        $this->multiHandle = new MultiHandle($this->configuration);
-        $this->taskRegistry = new TaskRegistry();
         self::registerProtocols();
     }
 
