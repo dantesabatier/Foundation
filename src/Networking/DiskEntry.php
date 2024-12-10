@@ -4,13 +4,18 @@ namespace Sabatier\Foundation\Networking;
 
 use Sabatier\Foundation\Date;
 use Sabatier\Foundation\URL;
+use Sabatier\Foundation\UUID;
 
 /** @internal */
 class DiskEntry
 {
     public final const string pathExtension = "storedcachedurlresponse";
-    public readonly Date $date;
-    public readonly string $identifier;
+    private(set) Date $date {
+        get => $this->date ??= new Date();
+    }
+    private(set) string $identifier {
+        get => $this->identifier ??= new UUID()->uuidString;
+    }
 
     private function __construct(public readonly URL $url)
     {
