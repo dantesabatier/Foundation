@@ -98,6 +98,18 @@ class FlattenSequence extends ObjectClass implements Sequence, IteratorAggregate
         return new ($this->base::class)($this)->flatMap($transform);
     }
 
+    /**
+     * Returns a Sequence containing, in order, the elements of the sequence that satisfy the given predicate.
+     *
+     * Complexity: O(n), where n is the length of the sequence.
+     * @param Closure(Element, int=, bool=): bool $isIncluded
+     * @return Sequence<int, Element>
+     */
+    public function filter(Closure $isIncluded): Sequence
+    {
+        return new ($this->base::class)($this)->filter($isIncluded);
+    }
+
     #[Override]
     public function getIterator(): Generator
     {
