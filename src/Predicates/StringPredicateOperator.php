@@ -52,7 +52,7 @@ class StringPredicateOperator extends PredicateOperator
             }
         }
         if ($options & ComparisonPredicateOptions::localeSensitive) {
-            fatal_error(sprintf("%s comparison predicate option \"ComparisonPredicateOptions::localeSensitive\" is not supported by predicate operator %s", self::class, $operatorType->name));
+            fatal_error(sprintf("%s comparison predicate option \"ComparisonPredicateOptions::localeSensitive\" is not supported by predicate operator %s", $this->class, $operatorType->name));
         }
         parent::__construct($operatorType, $modifier, $op);
     }
