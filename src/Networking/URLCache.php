@@ -30,14 +30,18 @@ class URLCache extends ObjectClass
 {
     private static ?URLCache $shared = null;
     /** @var int The current size of the on-disk cache, in bytes. */
-    public readonly int $currentDiskUsage;
+    private(set) int $currentDiskUsage = 0;
     /** @var int The current size of the in-memory cache, in bytes. */
-    public readonly int $currentMemoryUsage;
-    private readonly ?URL $cacheDirectory;
+    private(set) int $currentMemoryUsage = 0;
+    private ?URL $cacheDirectory;
     /** @var ArrayClass<string> */
-    private readonly ArrayClass $inMemoryCacheOrder;
+    private ArrayClass $inMemoryCacheOrder {
+        get => $this->inMemoryCacheOrder ??= new ArrayClass();
+    }
     /** @var Dictionary<CacheEntry> */
-    private readonly Dictionary $inMemoryCacheContents;
+    private Dictionary $inMemoryCacheContents {
+        get => $this->inMemoryCacheContents ??= new Dictionary();
+    }
 
     /**
      * Creates a URL cache object with the specified memory and disk capacities, in the specified directory.
@@ -65,8 +69,6 @@ class URLCache extends ObjectClass
         } else {
             $this->cacheDirectory = $directory;
         }
-        $this->inMemoryCacheOrder = new ArrayClass();
-        $this->inMemoryCacheContents = new Dictionary();
     }
 
     private function evictFromMemoryCacheAssumingLockHeld(int $maximumSize): void
