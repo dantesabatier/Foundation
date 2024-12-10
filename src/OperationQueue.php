@@ -38,7 +38,7 @@ final class OperationQueue extends ObjectClass
     /** @internal */
     public bool $isCurrentQueue = false;
     public string $description {
-        get => sprintf("<%s %s>", self::class, $this->name ?? $this->hash);
+        get => sprintf("<%s %s>", $this->class, $this->name ?? $this->hash);
     }
 
     public function __construct()
