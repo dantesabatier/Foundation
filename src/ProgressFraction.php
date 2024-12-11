@@ -29,7 +29,7 @@ class ProgressFraction extends ObjectClass
         get => "$this->completed / $this->total ($this->fractionCompleted)";
     }
 
-    public function __construct(public float $completed = 0.0, public float $total = 0.0, public readonly bool $overflowed = false)
+    public function __construct(public float $completed = 0.0, public float $total = 0.0, public bool $overflowed = false)
     {
     }
 
