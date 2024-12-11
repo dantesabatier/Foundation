@@ -14,20 +14,20 @@ use Rector\DeadCode\Rector\ClassMethod\RemoveUselessReturnTagRector;
 use Rector\DeadCode\Rector\If_\RemoveAlwaysTrueIfConditionRector;
 use Rector\Exception\Configuration\InvalidConfigurationException;
 use Rector\Php73\Rector\ConstFetch\SensitiveConstantNameRector;
+use Rector\Php74\Rector\Property\RestoreDefaultNullToNullableTypePropertyRector;
 use Rector\Php80\Rector\Class_\ClassPropertyAssignToConstructorPromotionRector;
-use Rector\Php80\Rector\FunctionLike\MixedTypeRector;
 use Rector\Php81\Rector\ClassMethod\NewInInitializerRector;
+use Rector\Php81\Rector\Property\ReadOnlyPropertyRector;
 use Rector\Strict\Rector\Empty_\DisallowedEmptyRuleFixerRector;
 
 try {
     return RectorConfig::configure()
         ->withPaths([
             __DIR__ . "/src",
-        ])->withPhpSets()->withSkip([
+        ])->withPhpSets(php84: true)->withSkip([
             SensitiveConstantNameRector::class,
             ClassPropertyAssignToConstructorPromotionRector::class,
             NewInInitializerRector::class,
-            MixedTypeRector::class,
             ExplicitBoolCompareRector::class,
             FlipTypeControlToUseExclusiveTypeRector::class,
             DisallowedEmptyRuleFixerRector::class,
@@ -40,7 +40,10 @@ try {
                 __DIR__ . "/src/URL.php",
                 __DIR__ . "/src/StandardAdditions.php"
             ],
-            ExplicitReturnNullRector::class,
+            ExplicitReturnNullRector::class, RestoreDefaultNullToNullableTypePropertyRector::class => [
+                __DIR__ . "/src/URLResourceValues.php"
+            ],
+            ReadOnlyPropertyRector::class
         ])->withPreparedSets(deadCode: true, codeQuality: true, earlyReturn: true);
 } catch (InvalidConfigurationException $e) {
     error_log($e->getMessage());
