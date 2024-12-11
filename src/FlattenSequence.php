@@ -6,6 +6,7 @@ use Closure;
 use Generator;
 use IteratorAggregate;
 use Override;
+use Sabatier\Foundation\Predicates\Predicate;
 use Traversable;
 
 /**
@@ -108,6 +109,19 @@ class FlattenSequence extends ObjectClass implements Sequence, IteratorAggregate
     public function filter(Closure $isIncluded): Sequence
     {
         return new ($this->base::class)($this)->filter($isIncluded);
+    }
+
+    /**
+     * Evaluates a given predicate against each object in the receiving and returns a new sequence containing the objects for which the predicate returns true.
+     *
+     * Complexity: O(n), where n is the length of the sequence.
+     * @param Predicate $predicate The predicate against which to evaluate the receiving sequence's elements.
+     * @return Sequence<int, Element> A new sequence containing the objects in the receiving array for which predicate returns true.
+     * Objects in the resulting array appear in the same order as they do in the receiver.
+     */
+    public function filtered(Predicate $predicate): Sequence
+    {
+        return new ($this->base::class)($this)->filtered($predicate);
     }
 
     #[Override]
