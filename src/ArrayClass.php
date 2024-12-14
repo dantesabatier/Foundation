@@ -610,7 +610,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
         }
         $subSequenceEnd = $subSequenceStart;
         $cachedEndIndex = $this->endIndex;
-        while ($subSequenceEnd != $cachedEndIndex) {
+        while ($subSequenceEnd !== $cachedEndIndex) {
             if ($isSeparator($this[$subSequenceEnd])) {
                 $didAppend = $appendSubsequence($subSequenceEnd);
                 $this->formIndexAfter($subSequenceEnd);
@@ -622,7 +622,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
             }
             $this->formIndexAfter($subSequenceEnd);
         }
-        if ($subSequenceStart != $cachedEndIndex || !$omittingEmptySubsequences) {
+        if ($subSequenceStart !== $cachedEndIndex || !$omittingEmptySubsequences) {
             /** @psalm-suppress InvalidArgument */
             $result[] = new Slice($this, new Range($subSequenceStart, $cachedEndIndex));
         }
