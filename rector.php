@@ -40,9 +40,7 @@ try {
                 __DIR__ . "/src/URL.php",
                 __DIR__ . "/src/StandardAdditions.php"
             ],
-            ExplicitReturnNullRector::class, RestoreDefaultNullToNullableTypePropertyRector::class => [
-                __DIR__ . "/src/URLResourceValues.php"
-            ],
+            ExplicitReturnNullRector::class, RestoreDefaultNullToNullableTypePropertyRector::class,
             ReadOnlyPropertyRector::class
         ])->withPreparedSets(deadCode: true, codeQuality: true, earlyReturn: true);
 } catch (InvalidConfigurationException $e) {
