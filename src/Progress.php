@@ -202,7 +202,7 @@ class Progress extends ObjectClass
     }
 
     /**
-     * Sets the progress object as the current object of the current thread, and assigns the amount of work for the next suboperation progress object to perform.
+     * Sets the progress object as the current object of the current thread, and assigns the amount of work for the next sub operation progress object to perform.
      * @param float $unitCount The number of units of work for the next progress object that initializes when you invoke {@see __construct()} in the current thread with this progress object as the containing progress object.
      *
      * The number represents the portion of work to perform in relation to the total number of units of work, which is the value of the progress object's totalUnitCount property. The units of work for this parameter must be the same units of work in the progress object's totalUnitCount property.
@@ -212,9 +212,9 @@ class Progress extends ObjectClass
     }
 
     /**
-     * Adds a process object as a suboperation of a progress tree.
+     * Adds a process object as a sub operation of a progress tree.
      * @param Progress $child The progress instance to add to the progress tree.
-     * @param float $unitCount The number of units of work for the new suboperation to complete.
+     * @param float $unitCount The number of units of work for the new sub operation to complete.
      */
     public function addChild(Progress $child, float $unitCount): void
     {
