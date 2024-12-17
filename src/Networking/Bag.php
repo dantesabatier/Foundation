@@ -11,10 +11,7 @@ use Sabatier\Foundation\ArrayClass;
 class Bag
 {
     /** @var ArrayClass<Element> */
-    public ArrayClass $values;
-
-    public function __construct()
-    {
-        $this->values = new ArrayClass();
+    public ArrayClass $values {
+        get => $this->values ??= new ArrayClass();
     }
 }
