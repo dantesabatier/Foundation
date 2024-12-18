@@ -82,15 +82,15 @@ class PredicateScanner extends Scanner
                 if ($left instanceof CompoundPredicate && ($left->compoundPredicateType === CompoundPredicateLogicalType::and)) {
                     $left->subpredicates->appendContentsOf($right->subpredicates);
                 } else {
-                    /** @psalm-suppress PossiblyNullArgument */
+                    assert($left instanceof Predicate);
                     $right->subpredicates[] = $left;
                     $left = $right;
                 }
             } elseif ($left instanceof CompoundPredicate && ($left->compoundPredicateType === CompoundPredicateLogicalType::and)) {
-                /** @psalm-suppress PossiblyNullArgument */
+                assert($right instanceof Predicate);
                 $left->subpredicates[] = $right;
             } else {
-                /** @psalm-suppress InvalidArgument */
+                assert($left instanceof Predicate && $right instanceof Predicate);
                 $left = CompoundPredicate::andPredicateWithSubpredicates(new ArrayClass([$left, $right]));
             }
         }
@@ -134,15 +134,15 @@ class PredicateScanner extends Scanner
                 if ($left instanceof CompoundPredicate && ($left->compoundPredicateType === CompoundPredicateLogicalType::or)) {
                     $left->subpredicates->appendContentsOf($right->subpredicates);
                 } else {
-                    /** @psalm-suppress PossiblyNullArgument */
+                    assert($left instanceof Predicate);
                     $right->subpredicates[] = $left;
                     $left = $right;
                 }
             } elseif ($left instanceof CompoundPredicate && ($left->compoundPredicateType === CompoundPredicateLogicalType::or)) {
-                /** @psalm-suppress PossiblyNullArgument */
+                assert($right instanceof Predicate);
                 $left->subpredicates[] = $right;
             } else {
-                /** @psalm-suppress InvalidArgument */
+                assert($left instanceof Predicate && $right instanceof Predicate);
                 $left = CompoundPredicate::orPredicateWithSubpredicates(new ArrayClass([$left, $right]));
             }
         }
@@ -218,7 +218,7 @@ class PredicateScanner extends Scanner
             fatal_error("Invalid argument: invalid option \"[n]\" at index $this->scanLocation");
         }
         $right = $this->parseExpression();
-        /** @psalm-suppress PossiblyNullArgument */
+        assert($left instanceof Expression && $right instanceof Expression);
         $predicate = new ComparisonPredicate($left, $right, $operator, $modifier, $options);
         if ($negate) {
             return CompoundPredicate::notPredicateWithSubpredicate($predicate);
@@ -244,8 +244,9 @@ class PredicateScanner extends Scanner
             return Expression::expressionForConstantValue($number);
         }
         if ($this->scanString("-")) {
-            /** @psalm-suppress InvalidArgument */
-            return Expression::expressionForFunction("chs:", new ArrayClass([$this->parseExpression()]));
+            $expression = $this->parseExpression();
+            assert($expression instanceof Expression);
+            return Expression::expressionForFunction("chs:", new ArrayClass([$expression]));
         }
         if ($this->scanString("(")) {
             $expression = $this->parseExpression();
@@ -260,11 +261,13 @@ class PredicateScanner extends Scanner
             if ($this->scanString("}")) {
                 return Expression::expressionForConstantValue($subexpressions);
             }
-            /** @psalm-suppress PossiblyNullArgument */
-            $subexpressions[] = $this->parseExpression();
+            $expression = $this->parseExpression();
+            assert($expression instanceof Expression);
+            $subexpressions[] = $expression;
             while ($this->scanString(",")) {
-                /** @psalm-suppress PossiblyNullArgument */
-                $subexpressions[] = $this->parseExpression();
+                $expression = $this->parseExpression();
+                assert($expression instanceof Expression);
+                $subexpressions[] = $expression;
             }
             if (!$this->scanString("}")) {
                 fatal_error("Invalid argument: missing closing \"}\" at index $this->scanLocation");
@@ -452,31 +455,32 @@ class PredicateScanner extends Scanner
         $left = $this->parseSimpleExpression();
         while (true) {
             if ($this->scanString(".")) {
-                /** @var Expression $right */
                 $right = $this->parseSimpleExpression();
+                assert($right instanceof Expression);
                 $expressionType = $right->expressionType;
                 if ($expressionType === ExpressionType::keyPath) {
-                    /** @psalm-suppress PossiblyNullArgument */
+                    assert($left instanceof Expression);
                     $left = new KeyPathExpression($right, $left);
                 } elseif ($expressionType === ExpressionType::variable || $expressionType === ExpressionType::constantValue) {
-                    /** @psalm-suppress PossiblyNullArgument */
+                    assert($left instanceof Expression);
                     $left = Expression::expressionForSelector($left, "valueForKey", new ArrayClass([$right]));
                 } else {
                     fatal_error(sprintf("%s %s() unhandled expression type \"%s\"", $this->debugDescription, __FUNCTION__, $expressionType->name));
                 }
             } elseif ($this->scanString("[")) {
                 if ($this->scanKeyword("FIRST")) {
-                    /** @psalm-suppress InvalidArgument */
+                    assert($left instanceof Expression);
                     $left = Expression::expressionForFunction("first:", new ArrayClass([$left]));
                 } elseif ($this->scanKeyword("LAST")) {
-                    /** @psalm-suppress InvalidArgument */
+                    assert($left instanceof Expression);
                     $left = Expression::expressionForFunction("last:", new ArrayClass([$left]));
                 } elseif ($this->scanKeyword("SIZE")) {
-                    /** @psalm-suppress InvalidArgument */
+                    assert($left instanceof Expression);
                     $left = Expression::expressionForFunction("size:", new ArrayClass([$left]));
                 } else {
-                    /** @psalm-suppress InvalidArgument */
-                    $left = Expression::expressionForFunction("index:", new ArrayClass([$left, $this->parseExpression()]));
+                    $expression = $this->parseExpression();
+                    assert($expression instanceof Expression);
+                    $left = Expression::expressionForFunction("index:", new ArrayClass([$left, $expression]));
                 }
                 if (!$this->scanString("]", $string)) {
                     fatal_error("Invalid argument: missing closing \"]\" at index $this->scanLocation");
@@ -497,11 +501,13 @@ class PredicateScanner extends Scanner
                 /** @var ArrayClass<Expression> $subexpressions */
                 $subexpressions = new ArrayClass();
                 if (!$this->scanString(")")) {
-                    /** @psalm-suppress PossiblyNullArgument */
-                    $subexpressions[] = $this->parseExpression();
+                    $expression = $this->parseExpression();
+                    assert($expression instanceof Expression);
+                    $subexpressions[] = $expression;
                     while ($this->scanString(",")) {
-                        /** @psalm-suppress PossiblyNullArgument */
-                        $subexpressions[] = $this->parseExpression();
+                        $expression = $this->parseExpression();
+                        assert($expression instanceof Expression);
+                        $subexpressions[] = $expression;
                     }
                     if (!$this->scanString(")")) {
                         fatal_error("Invalid argument: missing closing \")\" at index $this->scanLocation");
@@ -509,14 +515,17 @@ class PredicateScanner extends Scanner
                 }
                 $left = Expression::expressionForFunction($function, $subexpressions);
             } elseif ($this->scanString("UNION")) {
-                /** @psalm-suppress PossiblyNullArgument */
-                $left = Expression::expressionForUnionSet($left, $this->parseExpression());
+                $right = $this->parseExpression();
+                assert($right instanceof Expression);
+                $left = Expression::expressionForUnionSet($left, $right);
             } elseif ($this->scanString("INTERSECT")) {
-                /** @psalm-suppress PossiblyNullArgument */
-                $left = Expression::expressionForIntersectSet($left, $this->parseExpression());
+                $right = $this->parseExpression();
+                assert($right instanceof Expression);
+                $left = Expression::expressionForIntersectSet($left, $right);
             } elseif ($this->scanString("MINUS")) {
-                /** @psalm-suppress PossiblyNullArgument */
-                $left = Expression::expressionForMinusSet($left, $this->parseExpression());
+                $right = $this->parseExpression();
+                assert($right instanceof Expression);
+                $left = Expression::expressionForMinusSet($left, $right);
             } else {
                 return $left;
             }
@@ -532,7 +541,7 @@ class PredicateScanner extends Scanner
         while (true) {
             if ($this->scanString("%")) {
                 $right = $this->parseFunctionalExpression();
-                /** @psalm-suppress InvalidArgument */
+                assert($right instanceof Expression);
                 $left = Expression::expressionForFunction("modulus:by:", new ArrayClass([$left, $right]));
             } else {
                 return $left;
@@ -549,7 +558,7 @@ class PredicateScanner extends Scanner
         while (true) {
             if ($this->scanString("**")) {
                 $right = $this->parseModulusExpression();
-                /** @psalm-suppress InvalidArgument */
+                assert($right instanceof Expression);
                 $left = Expression::expressionForFunction("raise:toPower:", new ArrayClass([$left, $right]));
             } else {
                 return $left;
@@ -566,11 +575,11 @@ class PredicateScanner extends Scanner
         while (true) {
             if ($this->scanString("*")) {
                 $right = $this->parsePowerExpression();
-                /** @psalm-suppress InvalidArgument */
+                assert($right instanceof Expression);
                 $left = Expression::expressionForFunction("multiply:by:", new ArrayClass([$left, $right]));
             } elseif ($this->scanString("/")) {
                 $right = $this->parsePowerExpression();
-                /** @psalm-suppress InvalidArgument */
+                assert($right instanceof Expression);
                 $left = Expression::expressionForFunction("divide:by:", new ArrayClass([$left, $right]));
             } else {
                 return $left;
@@ -587,11 +596,11 @@ class PredicateScanner extends Scanner
         while (true) {
             if ($this->scanString("+")) {
                 $right = $this->parseMultiplicationExpression();
-                /** @psalm-suppress InvalidArgument */
+                assert($right instanceof Expression);
                 $left = Expression::expressionForFunction("add:to:", new ArrayClass([$left, $right]));
             } elseif ($this->scanString("-")) {
                 $right = $this->parseMultiplicationExpression();
-                /** @psalm-suppress InvalidArgument */
+                assert($right instanceof Expression);
                 $left = Expression::expressionForFunction("from:subtract:", new ArrayClass([$left, $right]));
             } else {
                 return $left;
