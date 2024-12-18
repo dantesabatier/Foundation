@@ -31,7 +31,6 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
         min as private sequenceMin;
         max as private sequenceMax;
         reduce as private sequenceReduce;
-        indexOf as private collectionIndexOf;
         filter as private sequenceFilter;
         filtered as private collectionFiltered;
         sorted as private collectionSorted;
