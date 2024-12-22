@@ -58,7 +58,7 @@ class CompoundPredicate extends Predicate
     /**
      * Returns the receiver initialized to a given type using predicates from a given array.
      * @param CompoundPredicateLogicalType $compoundPredicateType The type of the new predicate (see {@see CompoundPredicateLogicalType}).
-     * @param ArrayClass<Predicate> $subpredicates An array of Predicate objects.
+     * @param ArrayClass<covariant Predicate> $subpredicates An array of Predicate objects.
      */
     public function __construct(public readonly CompoundPredicateLogicalType $compoundPredicateType, public ArrayClass $subpredicates)
     {
@@ -66,7 +66,7 @@ class CompoundPredicate extends Predicate
 
     /**
      * Returns a new predicate formed by AND-ing the predicates in a given array.
-     * @param ArrayClass<Predicate> $subpredicates An array of Predicate objects.
+     * @param ArrayClass<covariant Predicate> $subpredicates An array of Predicate objects.
      * @return CompoundPredicate A new predicate formed by AND-ing the predicates specified by subpredicates.
      */
     public static function andPredicateWithSubpredicates(ArrayClass $subpredicates): CompoundPredicate
@@ -87,7 +87,7 @@ class CompoundPredicate extends Predicate
     /**
      * Returns a new predicate formed by OR-ing the predicates in a given array.
      * An OR predicate with no subpredicates evaluates to FALSE.
-     * @param ArrayClass<Predicate> $subpredicates An array of Predicate objects.
+     * @param ArrayClass<covariant Predicate> $subpredicates An array of Predicate objects.
      * @return CompoundPredicate A new predicate formed by OR-ing the predicates specified by subpredicates.
      */
     public static function orPredicateWithSubpredicates(ArrayClass $subpredicates): CompoundPredicate
