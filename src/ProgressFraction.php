@@ -14,7 +14,7 @@ class ProgressFraction extends ObjectClass
     public bool $isFinished {
         get => (($this->completed >= $this->total) && $this->completed > 0 && $this->total > 0) || ($this->completed > 0 && $this->total == 0);
     }
-    public bool $fractionCompleted {
+    public float $fractionCompleted {
         get {
             if ($this->isIndeterminate) {
                 return 0.0;
