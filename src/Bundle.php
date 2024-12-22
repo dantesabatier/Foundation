@@ -230,13 +230,14 @@ final class Bundle extends ObjectClass
     /**
      * @param URL $baseURL
      * @param string|null $name
-     * @param ArrayClass<string>|null $extensions
-     * @param ArrayClass<string>|null $languages
+     * @param ArrayClass<covariant string>|null $extensions
+     * @param ArrayClass<covariant string>|null $languages
      * @param int $limit
      * @return ArrayClass<URL>|null
      */
     private static function findBundleResources(URL $baseURL, ?string $name = null, ?ArrayClass $extensions = null, ?ArrayClass $languages = null, int $limit = NotFound): ?ArrayClass
     {
+        /** @var ArrayClass<string> $extensions */
         $extensions ??= new ArrayClass();
         if ($extensions->isEmpty && $name) {
             /** @var string $extension */
@@ -275,7 +276,7 @@ final class Bundle extends ObjectClass
     {
         $baseURL = $this->resourceURL ?? $this->bundleURL;
         /** @psalm-suppress InvalidArgument */
-        return self::findBundleResources($subpath ? $baseURL->appendingPathComponent($subpath) : $baseURL, $name, $extension ? new ArrayClass([$extension]) : null, $localization ? new ArrayClass([$localization]) : null, 1)?->first;
+        return self::findBundleResources($subpath ? $baseURL->appendingPathComponent($subpath) : $baseURL, $name, $extension !== null ? new ArrayClass([$extension]) : null, $localization !== null ? new ArrayClass([$localization]) : null, 1)?->first;
     }
 
     /**
