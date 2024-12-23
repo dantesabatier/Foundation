@@ -22,6 +22,10 @@ final class Bundle extends ObjectClass
     /** @var Dictionary<Bundle>|null $loadedBundles */
     private static ?Dictionary $loadedBundles = null;
     public const string didLoadNotification = BundleDidLoadNotification;
+    /** @var ArrayClass<class-string> */
+    private ArrayClass $loadedClasses {
+        get => $this->loadedClasses ??= new ArrayClass();
+    }
     /** @var URL|null The file URL of the bundle's subdirectory containing resource files. */
     private(set) ?URL $resourceURL {
         get => $this->resourceURL ??= $this->directoryURL($this->bundleURL, "Resources");
@@ -399,6 +403,18 @@ final class Bundle extends ObjectClass
     }
 
     /**
+     * @param class-string $class
+     */
+    private function append(string $class): void
+    {
+        if ($this->loadedClasses->containsElement($class)) {
+            return;
+        }
+        $this->loadedClasses[] = $class;
+        NotificationCenter::default()->postNotificationName(self::didLoadNotification, $this, new Dictionary([LoadedClasses => $this->loadedClasses]));
+    }
+
+    /**
      * Returns the Class for the specified name.
      * @param string $className The name of a class.
      * @return class-string|null The Class for className.
@@ -408,6 +424,7 @@ final class Bundle extends ObjectClass
     public function classNamed(string $className): ?string
     {
         if (class_exists($className)) {
+            $this->append($className);
             return $className;
         }
         $components = explode("\\", $className);
@@ -430,7 +447,7 @@ final class Bundle extends ObjectClass
             if (!class_exists($class)) {
                 continue;
             }
-            NotificationCenter::default()->postNotificationName(self::didLoadNotification, $this, new Dictionary([LoadedClasses => new ArrayClass([$class])]));
+            $this->append($class);
             return $class;
         }
         return null;
