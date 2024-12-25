@@ -44,6 +44,7 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
     public bool $isEmpty {
         get => $this->count === 0;
     }
+    /** @var Element|null $first */
     public mixed $first {
         get => $this->first();
     }

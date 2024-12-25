@@ -70,9 +70,11 @@ class IndexPath extends ObjectClass implements MutableCollection, Iterator
     public bool $isEmpty {
         get => $this->count === 0;
     }
+    /** @var int|null $first */
     public mixed $first {
         get => $this->first();
     }
+    /** @var int|null $last */
     public mixed $last {
         get => $this->last();
     }
@@ -85,6 +87,7 @@ class IndexPath extends ObjectClass implements MutableCollection, Iterator
     public Range $indices {
         get => new Range($this->startIndex, $this->endIndex);
     }
+    /** @var array<int> */
     public array $array {
         get => $this->reserved;
     }

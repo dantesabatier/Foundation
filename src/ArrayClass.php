@@ -84,9 +84,11 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
     public bool $isEmpty {
         get => $this->count === 0;
     }
+    /** @var Element|null $first */
     public mixed $first {
         get => $this->first();
     }
+    /** @var Element|null $last */
     public mixed $last {
         get => $this->last();
     }

@@ -30,6 +30,7 @@ class Slice extends ObjectClass implements Collection, IteratorAggregate
     public bool $isEmpty {
         get => $this->bounds->isEmpty;
     }
+    /** @var Element|null $first */
     public mixed $first {
         get => $this->first();
     }
@@ -42,6 +43,7 @@ class Slice extends ObjectClass implements Collection, IteratorAggregate
     public Range $indices {
         get => $this->bounds;
     }
+    /** @var array<Element> */
     private(set) array $array {
         get => $this->array ??= array_slice($this->base->array, $this->startIndex, $this->endIndex);
     }
