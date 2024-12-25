@@ -14,7 +14,7 @@ use Sabatier\Foundation\ArrayClass;
 use Sabatier\Foundation\Dictionary;
 
 /** @internal */
-class CompoundPredicateOperator extends PredicateOperator
+final class CompoundPredicateOperator extends PredicateOperator
 {
     private static ?CompoundPredicateOperator $notPredicateOperator = null;
     private static ?CompoundPredicateOperator $andPredicateOperator = null;
