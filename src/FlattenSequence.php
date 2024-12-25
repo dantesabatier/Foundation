@@ -33,9 +33,11 @@ class FlattenSequence extends ObjectClass implements Sequence, IteratorAggregate
     public bool $isEmpty {
         get => $this->count === 0;
     }
+    /** @var Element|null $first */
     public mixed $first {
         get => $this->first();
     }
+    /** @var array<Element> */
     public array $array {
         get => iterator_to_array($this);
     }
