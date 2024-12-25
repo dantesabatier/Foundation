@@ -11,7 +11,7 @@ use Sabatier\Foundation\ObjectClass;
 /**
  * The manager of a shared credentials cache.
  */
-class URLCredentialStorage extends ObjectClass
+final class URLCredentialStorage extends ObjectClass
 {
     private static ?URLCredentialStorage $shared = null;
     /** @var Dictionary<Dictionary<URLCredential>> The dictionary has keys corresponding to the {@see URLProtectionSpace} instances. The values are dictionaries where the keys are username strings, and each value is the corresponding {@see URLCredential} instances. */
@@ -30,8 +30,8 @@ class URLCredentialStorage extends ObjectClass
      */
     public static function shared(): URLCredentialStorage
     {
-        static::$shared ??= new URLCredentialStorage();
-        return static::$shared;
+        self::$shared ??= new URLCredentialStorage();
+        return self::$shared;
     }
 
     /**

@@ -33,20 +33,20 @@ class CompoundPredicateOperator extends PredicateOperator
 
     public static function notPredicateOperator(): CompoundPredicateOperator
     {
-        static::$notPredicateOperator ??= new CompoundPredicateOperator(CompoundPredicateLogicalType::not);
-        return static::$notPredicateOperator;
+        self::$notPredicateOperator ??= new CompoundPredicateOperator(CompoundPredicateLogicalType::not);
+        return self::$notPredicateOperator;
     }
 
     public static function andPredicateOperator(): CompoundPredicateOperator
     {
-        static::$andPredicateOperator ??= new CompoundPredicateOperator(CompoundPredicateLogicalType::and);
-        return static::$andPredicateOperator;
+        self::$andPredicateOperator ??= new CompoundPredicateOperator(CompoundPredicateLogicalType::and);
+        return self::$andPredicateOperator;
     }
 
     public static function orPredicateOperator(): CompoundPredicateOperator
     {
-        static::$orPredicateOperator ??= new CompoundPredicateOperator(CompoundPredicateLogicalType::or);
-        return static::$orPredicateOperator;
+        self::$orPredicateOperator ??= new CompoundPredicateOperator(CompoundPredicateLogicalType::or);
+        return self::$orPredicateOperator;
     }
 
     public function evaluatePredicates(ArrayClass $predicates, mixed $object = null, ?Dictionary $substitutionVariables = null): bool

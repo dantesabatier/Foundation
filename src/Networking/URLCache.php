@@ -26,7 +26,7 @@ use Sabatier\Foundation\URLResourceKey;
  * An object that maps URL requests to cached response objects.
  * @psalm-consistent-constructor
  */
-class URLCache extends ObjectClass
+final class URLCache extends ObjectClass
 {
     private static ?URLCache $shared = null;
     /** @var int The current size of the on-disk cache, in bytes. */
@@ -206,8 +206,8 @@ class URLCache extends ObjectClass
      */
     public static function shared(): URLCache
     {
-        static::$shared ??= new static(4 * 1024 * 1024, 20 * 1024 * 1024);
-        return static::$shared;
+        self::$shared ??= new URLCache(4 * 1024 * 1024, 20 * 1024 * 1024);
+        return self::$shared;
     }
 
     /**
