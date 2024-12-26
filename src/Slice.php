@@ -43,7 +43,7 @@ class Slice extends ObjectClass implements Collection, IteratorAggregate
     public Range $indices {
         get => $this->bounds;
     }
-    /** @var array<Element> */
+    /** @var Element[] */
     private(set) array $array {
         get => $this->array ??= array_slice($this->base->array, $this->startIndex, $this->endIndex);
     }
@@ -121,7 +121,7 @@ class Slice extends ObjectClass implements Collection, IteratorAggregate
 
     /**
      * Returns a Collection containing, in order, the elements of the collection that satisfy the given predicate.
-     * @param Closure(Element, int=, bool=): bool $isIncluded
+     * @param Closure(Element, int=, bool &$stop): bool $isIncluded
      * @return ArrayClass<Element>
      */
     #[Override]

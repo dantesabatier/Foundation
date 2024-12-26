@@ -209,6 +209,7 @@ class UserDefaults
      */
     public function dictionaryRepresentation(): Dictionary
     {
+        /** @phpstan-ignore nullsafe.neverNull */
         return self::standardUserPreferences()->valueForKey($this->suiteName)?->dictionaryRepresentation ?? fatal_error("Suite \"$this->suiteName\" not found");
     }
 

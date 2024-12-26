@@ -58,7 +58,7 @@ class CompoundPredicate extends Predicate
     /**
      * Returns the receiver initialized to a given type using predicates from a given array.
      * @param CompoundPredicateLogicalType $compoundPredicateType The type of the new predicate (see {@see CompoundPredicateLogicalType}).
-     * @param ArrayClass<covariant Predicate> $subpredicates An array of Predicate objects.
+     * @param ArrayClass<Predicate> $subpredicates An array of Predicate objects.
      */
     public function __construct(public readonly CompoundPredicateLogicalType $compoundPredicateType, public ArrayClass $subpredicates)
     {
