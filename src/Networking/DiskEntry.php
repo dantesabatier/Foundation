@@ -9,7 +9,7 @@ use Sabatier\Foundation\UUID;
 /** @internal */
 class DiskEntry
 {
-    public final const string pathExtension = "storedcachedurlresponse";
+    final public const string pathExtension = "storedcachedurlresponse";
     private(set) Date $date {
         get => $this->date ??= new Date();
     }
