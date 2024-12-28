@@ -35,17 +35,13 @@ abstract class NativeProtocol extends URLProtocol implements EasyHandleDelegate
         get => $this->easyHandle ??= new EasyHandle($this);
     }
     private(set) URL $tempFileURL {
-        get => $this->tempFileURL ??= $this->tempFileURL();
-    }
-
-    /**
-     * @throws Exception
-     */
-    private function tempFileURL(): URL
-    {
-        $tempFileURL = FileManager::default()->url(SearchPathDirectory::cachesDirectory, SearchPathDomainMask::local, null, true)->appendingPathComponent(uniqid((string)new SystemRandomNumberGenerator()->next(), true))->appendPathExtension($this->task->originalRequest?->url?->pathExtension ?? "");
-        FileManager::default()->createFile($tempFileURL->path, null);
-        return $tempFileURL;
+        get {
+            if (!isset($this->tempFileURL)) {
+                $this->tempFileURL = FileManager::default()->url(SearchPathDirectory::cachesDirectory, SearchPathDomainMask::local, null, true)->appendingPathComponent(uniqid((string)new SystemRandomNumberGenerator()->next(), true))->appendPathExtension($this->task->originalRequest?->url?->pathExtension ?? "");
+                FileManager::default()->createFile($this->tempFileURL->path, null);
+            }
+            return $this->tempFileURL;
+        }
     }
 
     public static function enableLibcurlDebugOutput(): bool
