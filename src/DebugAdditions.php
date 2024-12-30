@@ -22,7 +22,7 @@ if (!defined("HAS_ESCAPE_SEQUENCES")) {
 
 function debuglog(string $string): void
 {
-    print $string . PHP_EOL;
+    print "$string\n";
 }
 
 #[Deprecated("since Foundation 0.1, use debuglog() instead", "debuglog(%parametersList%)")]
