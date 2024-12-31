@@ -87,7 +87,7 @@ class IndexPath extends ObjectClass implements MutableCollection, Iterator
     public Range $indices {
         get => new Range($this->startIndex, $this->endIndex);
     }
-    /** @var array<int> */
+    /** @var int[] */
     public array $array {
         get => $this->reserved;
     }

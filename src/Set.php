@@ -109,6 +109,7 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
     public Range $indices {
         get => new Range($this->startIndex, $this->endIndex);
     }
+    /** @var Element[] */
     public array $array {
         get => $this->reserved;
     }
