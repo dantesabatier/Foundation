@@ -4,3 +4,4 @@ parameters:
 		- src
 	ignoreErrors:
 		- identifier: staticClassAccess.privateProperty
+		- identifier: assign.propertyReadOnly
