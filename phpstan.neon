@@ -5,3 +5,4 @@ parameters:
 	ignoreErrors:
 		- identifier: staticClassAccess.privateProperty
 		- identifier: assign.propertyReadOnly
+		- identifier: property.staticAccess
