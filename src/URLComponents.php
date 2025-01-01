@@ -86,7 +86,7 @@ class URLComponents extends ObjectClass
                 return null;
             }
             $components = explode("&", $query);
-            if (!count($components)) {
+            if ($components === []) {
                 return null;
             }
             return new ArrayClass($components)->map(function (string $pair): URLQueryItem {

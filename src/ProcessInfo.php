@@ -26,7 +26,7 @@ class ProcessInfo extends ObjectClass
                     $scanner->charactersToBeSkipped = PHP_EOL;
                     while ($scanner->scanUpCharacters(PHP_EOL, $line) && $line) {
                         /** @psalm-suppress RedundantCast */
-                        $components = explode("=", (string)$line, 2);
+                        $components = explode("=", $line, 2);
                         if (count($components) === 2) {
                             [$key, $value] = $components;
                             $environment[trim($key)] = trim($value, "\"' ");

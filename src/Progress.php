@@ -56,7 +56,7 @@ class Progress extends ObjectClass
         get => $this->fraction->total;
         set {
             $previous = $this->overallFraction();
-            if ($this->fraction->total != $value && $this->fraction->total > 0) {
+            if ($this->fraction->total !== $value && $this->fraction->total > 0) {
                 $this->childFraction = $this->childFraction->multiply(new ProgressFraction($this->fraction->total, $value));
             }
             $this->willChangeValueForKey("totalUnitCount");
