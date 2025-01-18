@@ -166,7 +166,9 @@ final class URL extends ObjectClass
             return $this->isFileURL && file_exists($path) ? is_dir($path) : $this->pathExtension === "";
         }
     }
-    private URLResourceValuesStorage $storage;
+    private URLResourceValuesStorage $storage {
+        get => $this->storage ??= new URLResourceValuesStorage();
+    }
     public string $description {
         get => $this->absoluteString;
     }
@@ -191,7 +193,6 @@ final class URL extends ObjectClass
             }
         }
         $this->string = $string;
-        $this->storage = new URLResourceValuesStorage();
     }
 
     public function __serialize(): array
