@@ -28,7 +28,7 @@ class FlattenSequence extends ObjectClass implements Sequence, IteratorAggregate
         get => sprintf("<%s %s <%s>>", $this->class, $this->base::class, human_readable_value($this->base));
     }
     public int $count {
-        get => count($this->reserved);
+        get => $this->count();
     }
     public bool $isEmpty {
         get => $this->count === 0;
