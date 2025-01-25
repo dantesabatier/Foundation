@@ -93,7 +93,6 @@ class HTTPURLResponse extends URLResponse
     private function contentType(?Dictionary $headerFields): ?array
     {
         if ($value = $headerFields?->valueForCaseInsensitiveKey("Content-Type")) {
-            /** @var string $mimeType */
             $mimeType = $value;
             if (str_contains((string)$value, ";")) {
                 [$mimeType, $part] = explode(";", (string)$value);
