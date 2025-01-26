@@ -248,15 +248,14 @@ final class Bundle extends ObjectClass
                 $extensions[] = $extension;
             }
         }
-        $languages ??= new ArrayClass([""]);
-        $resources = $languages->flatMap(fn(string $language): ArrayClass => FileManager::default()->contentsOfDirectory($language ? $baseURL->appendingPathComponent($language) : $baseURL, null, DirectoryEnumerationOptions::skipsHiddenFiles))->filter(function (URL $url, int $idx, bool &$stop) use ($name, $extensions, $limit): bool {
+        $resources = $languages?->flatMap(fn(string $language): ArrayClass => FileManager::default()->contentsOfDirectory($baseURL->appendingPathComponent($language), null, DirectoryEnumerationOptions::skipsHiddenFiles))?->filter(function (URL $url, int $idx, bool &$stop) use ($name, $extensions, $limit): bool {
             $pathExtension = $url->pathExtension;
             /** @psalm-suppress InvalidArgument */
             $ok = $name ? (string_is_equal($url->deletingPathExtension()->lastPathComponent, pathinfo($name, PATHINFO_FILENAME)) && (empty($pathExtension) || $extensions?->containsElement($pathExtension))) : (empty($pathExtension) || $extensions?->containsElement($pathExtension));
             $stop = $ok && $limit > 0 && $limit >= $idx;
             return $ok;
         });
-        if ($resources->isEmpty) {
+        if ($resources?->isEmpty) {
             return null;
         }
         return $resources;
@@ -332,7 +331,7 @@ final class Bundle extends ObjectClass
      */
     public function urlForImageResource(string $name): ?URL
     {
-        return self::findBundleResources($this->resourceURL ?? $this->bundleURL, $name, new ArrayClass([MimeTypeJPEG, MimeTypePNG])->flatMap(fn(string $mimeType): iterable => URLFileTypeMappings::shared()->extensions($mimeType) ?? []), null, 1)?->first;
+        return self::findBundleResources($this->resourceURL ?? $this->bundleURL, $name, new ArrayClass([MimeTypeJPEG, MimeTypePNG])->flatMap(fn(string $mimeType): ArrayClass => URLFileTypeMappings::shared()->extensions($mimeType) ?? new ArrayClass()), null, 1)?->first;
     }
 
     /**
