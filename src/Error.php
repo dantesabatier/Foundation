@@ -26,66 +26,51 @@ class Error extends ObjectClass
     }
     /** @var string|null A string containing the localized explanation of the reason for the error. The object in the user info dictionary for the key {@see LocalizedFailureReasonErrorKey}. */
     public ?string $localizedFailureReason {
-        get {
-            $localizedFailureReason = $this->userInfo?->valueForKey(LocalizedFailureReasonErrorKey);
-            if (!$localizedFailureReason) {
-                switch ($this->domain) {
-                    case CocoaErrorDomain:
-                        $localizedFailureReason = match ($this->code) {
-                            4, 260 => "The file doesn't exist.",
-                            255 => "The file couldn't be locked.",
-                            257, 513 => "You don't have permission.",
-                            258, 514 => "The file name is invalid.",
-                            259 => "The file isn't in the correct format.",
-                            261, 517 => "The specified text encoding isn't applicable.",
-                            262, 518 => "The specified URL type isn't supported.",
-                            263 => "The item is too large.",
-                            264 => "The text encoding of the contents couldn't be determined.",
-                            516 => "A file with the same name already exists.",
-                            640 => "There isn't enough space.",
-                            642 => "The volume is read only.",
-                            1024, 2048 => "The value is invalid.",
-                            3072 => "The operation was cancelled.",
-                            3328 => "The requested operation is not supported.",
-                            3840 => "The data is not in the correct format.",
-                            3841 => "The data is in a format that this application doesn't understand.",
-                            3842 => "An error occurred in the source of the data.",
-                            3851 => "An error occurred in the destination for the data.",
-                            3852 => "An error occurred in the content of the data.",
-                            4353 => "The file is not available on iCloud yet.",
-                            4354 => "There isn't enough space in your account.",
-                            4355 => "The iCloud servers might be unreachable or your settings might be incorrect.",
-                            4864, 4866 => "The data isn't in the correct format.",
-                            4865 => "The data is missing.",
-                            default => null,
-                        };
-                        break;
-                    case POSIXErrorDomain:
-                        /** @noinspection SpellCheckingInspection */
-                        if (function_exists("posix_strerror")) {
-                            $localizedFailureReason = posix_strerror($this->code);
-                        }
-                        break;
-                    case URLErrorDomain:
-                        $localizedFailureReason = match ($this->code) {
-                            URLErrorUnsupportedURL, URLErrorBadURL => "The specified URL type isn't supported.",
-                            URLErrorCannotFindHost => "Cannot find host.",
-                            URLErrorNetworkConnectionLost => "Network connection lost.",
-                            URLErrorBadServerResponse => "Bad server response.",
-                            URLErrorUnknown => "Unknown error.",
-                            URLErrorTimedOut => "The request timed out.",
-                            URLErrorHTTPTooManyRedirects => "Too many HTTP redirects.",
-                            URLErrorFileDoesNotExist => "The file doesn't exist.",
-                            URLErrorNoPermissionsToReadFile => "You don't have permission.",
-                            default => null,
-                        };
-                        break;
-                    default:
-                        break;
-                }
-            }
-            return $localizedFailureReason;
-        }
+        /** @noinspection SpellCheckingInspection */
+        get => $this->userInfo?->valueForKey(LocalizedFailureReasonErrorKey) ?? match ($this->domain) {
+            CocoaErrorDomain => match ($this->code) {
+                4, 260 => "The file doesn't exist.",
+                255 => "The file couldn't be locked.",
+                257, 513 => "You don't have permission.",
+                258, 514 => "The file name is invalid.",
+                259 => "The file isn't in the correct format.",
+                261, 517 => "The specified text encoding isn't applicable.",
+                262, 518 => "The specified URL type isn't supported.",
+                263 => "The item is too large.",
+                264 => "The text encoding of the contents couldn't be determined.",
+                516 => "A file with the same name already exists.",
+                640 => "There isn't enough space.",
+                642 => "The volume is read only.",
+                1024, 2048 => "The value is invalid.",
+                3072 => "The operation was cancelled.",
+                3328 => "The requested operation is not supported.",
+                3840 => "The data is not in the correct format.",
+                3841 => "The data is in a format that this application doesn't understand.",
+                3842 => "An error occurred in the source of the data.",
+                3851 => "An error occurred in the destination for the data.",
+                3852 => "An error occurred in the content of the data.",
+                4353 => "The file is not available on iCloud yet.",
+                4354 => "There isn't enough space in your account.",
+                4355 => "The iCloud servers might be unreachable or your settings might be incorrect.",
+                4864, 4866 => "The data isn't in the correct format.",
+                4865 => "The data is missing.",
+                default => null,
+            },
+            URLErrorDomain => match ($this->code) {
+                URLErrorUnsupportedURL, URLErrorBadURL => "The specified URL type isn't supported.",
+                URLErrorCannotFindHost => "Cannot find host.",
+                URLErrorNetworkConnectionLost => "Network connection lost.",
+                URLErrorBadServerResponse => "Bad server response.",
+                URLErrorUnknown => "Unknown error.",
+                URLErrorTimedOut => "The request timed out.",
+                URLErrorHTTPTooManyRedirects => "Too many HTTP redirects.",
+                URLErrorFileDoesNotExist => "The file doesn't exist.",
+                URLErrorNoPermissionsToReadFile => "You don't have permission.",
+                default => null,
+            },
+            POSIXErrorDomain => function_exists("posix_strerror") ? posix_strerror($this->code) : null,
+            default => null,
+        };
     }
     /** @var ErrorRecoveryAttempting|null The object in the user info dictionary corresponding to the {@see RecoveryAttempterErrorKey} key. If userInfo doesn't contain a value for {@see RecoveryAttempterErrorKey}, this property is nil. */
     public ?ErrorRecoveryAttempting $recoveryAttempter {
