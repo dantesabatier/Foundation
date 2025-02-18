@@ -86,7 +86,7 @@ enum ExpressionOperatorType: int
             "log:" => self::log,
             "raise:toPower:" => self::raiseToPower,
             "exp:" => self::exp,
-            "ceiling:" => self::ceiling,
+            "ceiling:", "ceil:" => self::ceiling,
             "abs:" => self::abs,
             "trunc:" => self::trunc,
             "random:" => self::random,
