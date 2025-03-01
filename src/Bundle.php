@@ -241,7 +241,6 @@ final class Bundle extends ObjectClass
      */
     private static function findBundleResources(URL $baseURL, ?string $name = null, ?ArrayClass $extensions = null, ?ArrayClass $languages = null, int $limit = NotFound): ?ArrayClass
     {
-        $name ??= "";
         if ($extensions instanceof ArrayClass && $extensions->isEmpty && $name) {
             /** @var string $extension */
             $extension = pathinfo($name, PATHINFO_EXTENSION);
@@ -251,7 +250,7 @@ final class Bundle extends ObjectClass
         }
         $languages ??= new ArrayClass([""]);
         $resources = $languages->flatMap(fn(string $language): ArrayClass => FileManager::default()->contentsOfDirectory($language ? $baseURL->appendingPathComponent($language) : $baseURL, null, DirectoryEnumerationOptions::skipsHiddenFiles))->filter(function (URL $url, int $idx, bool &$stop) use ($name, $extensions, $limit): bool {
-            $ok = $url->deletingPathExtension()->lastPathComponent === pathinfo($name, PATHINFO_FILENAME) && (!$extensions instanceof ArrayClass || $extensions->containsElement($url->pathExtension));
+            $ok = $url->deletingPathExtension()->lastPathComponent === pathinfo((string)$name, PATHINFO_FILENAME) && (!$extensions instanceof ArrayClass || $extensions->containsElement($url->pathExtension));
             $stop = $ok && $limit > 0 && $limit >= $idx;
             return $ok;
         });
