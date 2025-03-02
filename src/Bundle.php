@@ -254,7 +254,6 @@ final class Bundle extends ObjectClass
             $stop = $ok && $limit > 0 && $limit >= $idx;
             return $ok;
         });
-        error_log(sprintf("%s:%s", human_readable_value($name), human_readable_value($resources)));
         if ($resources->isEmpty) {
             return null;
         }
