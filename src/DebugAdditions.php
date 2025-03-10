@@ -104,7 +104,21 @@ function human_readable_time(float $interval): string
         $string .= " ";
         $interval -= $s;
     }
-    return $string . sprintf("%.f seconds", $interval);
+    return $string . sprintf("%.f milliseconds", $interval);
+}
+
+function human_readable_bytes(mixed $value): string
+{
+    if ($value >= 1 << 30) {
+        return number_format($value / (1 << 30), 2) . " GB";
+    }
+    if ($value >= 1 << 20) {
+        return number_format($value / (1 << 20), 2) . " MB";
+    }
+    if ($value >= 1 << 10) {
+        return number_format($value / (1 << 10), 2) . " KB";
+    }
+    return number_format($value) . " bytes";
 }
 
 /**
