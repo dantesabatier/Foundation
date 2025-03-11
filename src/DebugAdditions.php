@@ -107,7 +107,7 @@ function human_readable_time(float $interval): string
     return $string . sprintf("%.f milliseconds", $interval);
 }
 
-function human_readable_bytes(mixed $value): string
+function human_readable_bytes(float $value): string
 {
     if ($value >= 1 << 30) {
         return number_format($value / (1 << 30), 2) . " GB";
