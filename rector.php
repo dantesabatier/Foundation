@@ -21,7 +21,6 @@ use Rector\Php74\Rector\Property\RestoreDefaultNullToNullableTypePropertyRector;
 use Rector\Php80\Rector\Class_\ClassPropertyAssignToConstructorPromotionRector;
 use Rector\Php80\Rector\ClassConstFetch\ClassOnThisVariableObjectRector;
 use Rector\Php80\Rector\FuncCall\ClassOnObjectRector;
-use Rector\Php81\Rector\ClassMethod\NewInInitializerRector;
 use Rector\Php81\Rector\Property\ReadOnlyPropertyRector;
 use Rector\Strict\Rector\Empty_\DisallowedEmptyRuleFixerRector;
 
@@ -32,7 +31,6 @@ try {
         ])->withPhpSets(php84: true)->withSkip([
             SensitiveConstantNameRector::class,
             ClassPropertyAssignToConstructorPromotionRector::class,
-            NewInInitializerRector::class,
             ExplicitBoolCompareRector::class,
             FlipTypeControlToUseExclusiveTypeRector::class,
             DisallowedEmptyRuleFixerRector::class,
