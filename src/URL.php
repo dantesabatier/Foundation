@@ -232,7 +232,7 @@ final class URL extends ObjectClass
 
     /**
      * Creates a file URL that references the local file or directory at path.
-     * @param string $path The path that the URL object will represent. path should be a valid system path, and must not be an empty path. If path begins with a tilde, it must first be expanded with expandingTildeInPath. If path is a relative path, it is treated as being relative to the current working directory.
+     * @param string $path The path that the URL object will represent path should be a valid system path, and must not be an empty path. If path begins with a tilde, it must first be expanded with expandingTildeInPath. If path is a relative path, it is treated as being relative to the current working directory.
      * @param URL|null $base A URL that provides a file system location that the path extends.
      * @return URL A URL object initialized with path.
      */
@@ -369,7 +369,7 @@ final class URL extends ObjectClass
      * This method first checks if the URL object already caches the resource value. If so, it returns the cached resource value to the caller. If not, then this method synchronously obtains the resource value from the backing store, adds the resource value to the URL object's cache, and returns the resource value to the caller.
      * The type of the returned resource value varies by resource property; for details, see the documentation for the key you want to access.
      * If this method returns true and the value is populated with nil, it means that the resource property is not available for the specified resource, and that no errors occurred when determining that the resource property was unavailable.
-     * @param mixed $value The location where the value for the resource property identified by key should be stored.
+     * @param mixed $value The location where the value for the resource property identified by $key should be stored.
      * @param string $key The name of one of the URL's resource properties.
      */
     public function getResourceValue(mixed &$value, #[ExpectedValues(valuesFromClass: URLResourceKey::class)] string $key): void
