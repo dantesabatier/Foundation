@@ -18,7 +18,7 @@ use Throwable;
  */
 abstract class Operation extends ObjectClass
 {
-    /** @var bool A Boolean value indicating whether the operation has been cancelled. */
+    /** @var bool A Boolean value indicating whether the operation has been canceled. */
     private(set) bool $isCancelled = false {
         set {
             $this->willChangeValueForKey(__PROPERTY__);
@@ -115,7 +115,7 @@ abstract class Operation extends ObjectClass
     /**
      * Advises the operation object that it should stop executing its task.
      *
-     * This method does not force your operation code to stop. Instead, it updates the object's internal flags to reflect the change in state. If the operation has already finished executing, this method has no effect. Canceling an operation that is currently in an operation queue, but not yet executing, makes it possible to remove the operation from the queue sooner than usual.
+     * This method does not force your operation code to stop. Instead, it updates the object's internal flags to reflect the change in state. If the operation has already finished executing, this method has no effect. Canceling an operation currently in an operation queue, but not yet executing, makes it possible to remove the operation from the queue sooner than usual.
      */
     public function cancel(): void
     {
