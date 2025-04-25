@@ -8,8 +8,8 @@ use Override;
 
 /**
  * An object that conveys ongoing progress to the user for a specified task.
- * @psalm-type UnpublishingHandler = Closure(): void
- * @psalm-type PublishingHandler = Closure(Progress): ?UnpublishingHandler
+ * @phpstan-type UnpublishingHandler Closure(): void
+ * @phpstan-type PublishingHandler Closure(Progress): ?UnpublishingHandler
  */
 class Progress extends ObjectClass
 {

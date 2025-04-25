@@ -13,8 +13,8 @@ use function Sabatier\Foundation\unsupported;
 
 /**
  * An object that coordinates a group of related, network data-transfer tasks.
- * @psalm-type DataCompletionHandler = Closure(string|null, URLResponse|null, Error|null): void
- * @psalm-type DownloadCompletionHandler = Closure(URL|null, URLResponse|null, Error|null): void
+ * @phpstan-type DataCompletionHandler Closure(string|null, URLResponse|null, Error|null): void
+ * @phpstan-type DownloadCompletionHandler Closure(URL|null, URLResponse|null, Error|null): void
  */
 final class URLSession implements URLSessionProtocol
 {
@@ -34,8 +34,8 @@ final class URLSession implements URLSessionProtocol
      * Creates a session with the specified session configuration.
      * @param URLSessionConfiguration $configuration A configuration object that specifies certain behaviors, such as caching policies, timeouts, proxies, pipelining, TLS versions to support, cookie policies, credential storage, and so on.
      * @param URLSessionDelegate|null $delegate A session delegate object that handles requests for authentication and other session-related events.
-     * This delegate object is responsible for handling authentication challenges, for making caching decisions, and for handling other session-related events. If nil, the class should be used only with methods that take completion handlers.
-     * @param OperationQueue $delegateQueue An operation queue for scheduling the delegate calls and completion handlers. The queue should be a serial queue, in order to ensure the correct ordering of callbacks. If nil, the session creates a serial operation queue for performing all delegate method calls and completion handler calls.
+     * This delegate object is responsible for handling authentication challenges, for making caching decisions and for handling other session-related events. If nil, the class should be used only with methods that take completion handlers.
+     * @param OperationQueue $delegateQueue An operation queue for scheduling the delegate calls and completion handlers. The queue should be a serial queue to ensure the correct ordering of callbacks. If nil, the session creates a serial operation queue for performing all delegate method calls and completion handler calls.
      */
     public function __construct(public readonly URLSessionConfiguration $configuration, public readonly ?URLSessionDelegate $delegate = null, public readonly OperationQueue $delegateQueue = new OperationQueue())
     {
@@ -142,7 +142,7 @@ final class URLSession implements URLSessionProtocol
     }
 
     /**
-     * Creates a download task that retrieves the contents of the specified URL, saves the results to a file, and calls a handler upon completion.
+     * Creates a download task that retrieves the contents of the specified URL, saves the results to a file and calls a handler upon completion.
      *
      * @param URL $url The URL to download.
      * @param DownloadCompletionHandler|null $completionHandler The completion handler to call when the load request is complete. This handler is executed on the delegate queue.
@@ -191,7 +191,7 @@ final class URLSession implements URLSessionProtocol
     /**
      * Creates a WebSocket task for the provided URL request.
      *
-     * You can modify the request's properties prior to calling resume on the task. The task uses these properties during the HTTP handshake phase.
+     * You can modify the request's properties before calling resume on the task. The task uses these properties during the HTTP handshake phase.
      * To add custom protocols, add a header with the key Sec-WebSocket-Protocol, and a comma-separated list of protocols you want to negotiate with the server. The custom HTTP headers provided by the client remain unchanged for the handshake with the server.
      * @param URLRequest $request A URL request that indicates a WebSockets endpoint with which to connect.
      * @return URLSessionWebSocketTask
@@ -248,7 +248,7 @@ final class URLSession implements URLSessionProtocol
     }
 
     /**
-     * Empties all cookies, caches and credential stores, removes disk files, flushes in-progress downloads to disk, and ensures that future requests occur on a new socket.
+     * Empties all cookies, caches and credential stores, removes disk files, flushes in-progress downloads to disk and ensures that future requests occur on a new socket.
      * @param Closure(): void $completionHandler The completion handler to call when the reset operation is complete.
      */
     public function reset(Closure $completionHandler): void
