@@ -49,9 +49,9 @@ class Range extends ObjectClass implements ExpressibleByArrayLiteral, IteratorAg
     /**
      * Returns a Boolean value indicating whether the given element is contained within the range.
      *
-     * Because Range represents a half-open range, a Range instance does not contain its upper bound. element is contained in the range if it is greater than or equal to the lower bound and less than the upper bound.
+     * Because Range represents a half-open range, a Range instance does not contain its upper bound $element is contained in the range if it is greater than or equal to the lower bound and less than the upper bound.
      * @param int $element The element to check for containment.
-     * @return bool true if element is contained in the range; otherwise, false.
+     * @return bool true if $element is contained in the range; otherwise, false.
      */
     public function contains(int $element): bool
     {
