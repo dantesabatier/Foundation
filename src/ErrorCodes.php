@@ -10,13 +10,13 @@ const FileReadNoPermissionError = 257;
 const FileWriteNoPermissionError = 513;
 /** @var string Could not perform an operation because the destination file already exists. */
 const FileWriteFileExistsError = 516;
-/** @var string A formatter couldn't generate a string for an object, or parse a string into an object. */
+/** @var string A formatter couldn't generate a string for an object or parse a string into an object. */
 const FormattingError = 2048;
 /** @var string The user canceled the operation (for example, by pressing Command-period) */
 const UserCancelledError = 3072;
 /** @var string A key-value coding validation error. */
 const KeyValueValidationError = 1024;
-/** @var int A properly formed URL couldn't be handled by the framework. */
+/** @var int The framework couldn't handle a properly formed URL. */
 const URLErrorUnsupportedURL = -1002;
 /** @var int The host name for a URL couldn't be resolved. */
 const URLErrorCannotFindHost = -1003;
@@ -30,7 +30,7 @@ const URLErrorBadServerResponse = -1011;
 const URLErrorUnknown = -1;
 /** @var int An asynchronous operation timed out. */
 const URLErrorTimedOut = -1001;
-/** @var int A redirect loop was detected or the threshold for number of allowable redirects was exceeded (currently 16). */
+/** @var int A redirect loop was detected, or the threshold for the number of allowable redirects was exceeded (currently 16). */
 const URLErrorHTTPTooManyRedirects = -1007;
 /** @var int The specified file doesn't exist. */
 const URLErrorFileDoesNotExist = -1100;
