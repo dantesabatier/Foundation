@@ -149,7 +149,7 @@ class Date extends ObjectClass
     /**
      * Returns the interval between this date and another given date.
      * @param Date $date The date with which to compare to this one.
-     * @return float The interval between the receiver and the another parameter. If the receiver is earlier than date, the return value is negative. If date is nil, the results are undefined.
+     * @return float The interval between the receiver and another parameter. If the receiver is earlier than $date, the return value is negative.
      */
     #[Pure]
     public function timeIntervalSince(Date $date): float
