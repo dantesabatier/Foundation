@@ -9,6 +9,7 @@
 
 namespace Sabatier\Foundation;
 
+use Exception;
 use GdImage;
 use Locale;
 use ReflectionClass;
@@ -410,6 +411,21 @@ final class Bundle extends ObjectClass
         NotificationCenter::default()->postNotificationName(self::didLoadNotification, $this, new Dictionary([LoadedClasses => $this->loadedClasses]));
     }
 
+    private function namespace(URL $url): ?string
+    {
+        try {
+            if (!($contents = FileManager::default()->contents($url->path))) {
+                return null;
+            }
+            preg_match("/\s*namespace\s+([^;]+);/", $contents, $matches);
+            if (isset($matches[1])) {
+                return trim($matches[1]);
+            }
+        } catch (Exception) {
+        }
+        return null;
+    }
+
     /**
      * Returns the Class for the specified name.
      * @param string $className The name of a class.
@@ -423,23 +439,23 @@ final class Bundle extends ObjectClass
             $this->append($className);
             return $className;
         }
-        $components = explode("\\", $className);
-        $name = $components[count($components) - 1] ?? $className;
+        $components = new ArrayClass(explode("\\", $className));
+        $name = $components->last ?? $className;
         if (!($enumerator = FileManager::default()->enumerator($this->bundleURL->appendingPathComponent("src"), null, DirectoryEnumerationOptions::skipsHiddenFiles))) {
             return null;
         }
+        $autoloadPath = $this->bundleURL->appendingPathComponent("vendor")->appendingPathComponent("autoload")->appendingPathExtension("php");
+        if (FileManager::default()->fileExists($autoloadPath)) {
+            require_once $autoloadPath;
+        }
         foreach ($enumerator as $url) {
-            $path = $url->path;
             if (!string_is_equal($url->pathExtension, "php", CompareOptions::caseInsensitive)) {
                 continue;
             }
-            if (!string_is_equal(pathinfo($path, PATHINFO_FILENAME), $name, CompareOptions::caseInsensitive)) {
+            if (!string_is_equal(FileManager::default()->displayName($url->path), $name, CompareOptions::caseInsensitive)) {
                 continue;
             }
-            require_once $path;
-            if (!($class = array_find(array_reverse(get_declared_classes()), fn(string $class): bool => str_ends_with($class, $className)))) {
-                continue;
-            }
+            $class = $name !== $className ? $className : sprintf("%s\\%s", $this->namespace($url), $name);
             if (!class_exists($class)) {
                 continue;
             }
