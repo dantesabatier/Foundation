@@ -11,7 +11,7 @@ class Scanner extends ObjectClass
     public int $scanLocation = 0 {
         set => min(max($value, 0), strlen($this->string));
     }
-    /** @var bool Flag that indicates whether the receiver distinguishes case in the characters it scans. */
+    /** @var bool Flag that indicates whether the receiver distinguishes the case in the characters it scans. */
     public bool $caseSensitive = false;
     /** @var string Character set containing the characters the scanner ignores when looking for a scannable element. Characters to be skipped are skipped prior to the scanner examining the target. For example, if a scanner ignores spaces, and you send it a {@see scanInt()} message, it skips spaces until it finds a decimal digit or other character. While an element is being scanned, no characters are skipped. If you scan for something made of characters in the set to be skipped (for example, using {@see scanInt()} when the set of characters to be skipped is the decimal digits), the result is undefined. The characters to be skipped are treated as single values. A scanner doesn't apply its case sensitivity setting to these characters and doesn't attempt to match composed character sequences with anything in the set of characters to be skipped (though it does match pre-composed characters individually). If you want to skip all vowels while scanning a string, for example, you can set the characters to be skipped to those in the string “AEIOUaeiou” (plus any accented variants with pre-composed characters). The default set to skip is the whitespace and newline character set.
      */
@@ -83,7 +83,7 @@ class Scanner extends ObjectClass
     /**
      * Scans a given string, returning an equivalent string object by reference if a match is found.
      *
-     * If string is present at the current scan location, then the current scan location is advanced to after the string; otherwise the scan location does not change.
+     * If $string is present at the current scan location, then the current scan location is advanced to after the string; otherwise the scan location does not change.
      * @param string $string The string for which to scan at the current scan location.
      * @param string|null $into Upon return, if the receiver contains a string equivalent to string at the current scan location, contains a string equivalent to string.
      * @return bool true if string matches the characters at the scan location, otherwise false.
