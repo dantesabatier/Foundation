@@ -11,7 +11,7 @@ use Exception;
  */
 final class FileHandle extends ObjectClass
 {
-    /** @var string Raised by FileHandle if attempts to determine file-handle type fail or if attempts to read from a file or channel fail. */
+    /** @var string Raised by FileHandle if attempts to determine a file-handle type fail or if attempts to read from a file or channel fail. */
     public const string fileHandleOperationException = "FileHandleOperationException";
     private static ?FileHandle $standardError = null;
     private static ?FileHandle $standardInput = null;
