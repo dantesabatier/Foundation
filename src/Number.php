@@ -7,7 +7,7 @@ use Override;
 /**
  * An object wrapper for primitive scalar numeric values.
  *
- * Number is a subclass of Value that offers a value as any scalar (numeric) type. It defines a set of methods specifically for setting and accessing the value as an int, float, double or as a BOOL. (Note that number objects do not necessarily preserve the type they are created with.) It also defines a {@see Comparable::compare()} method to determine the ordering of two Number objects.
+ * Number is a subclass of Value that offers a value as any scalar (numeric) type. It defines a set of methods specifically for setting and accessing the value as an int, float, double, or as a BOOL. (Note that number objects do not necessarily preserve the type they are created with.) It also defines a {@see Comparable::compare()} method to determine the ordering of two Number objects.
  */
 class Number extends Value
 {
