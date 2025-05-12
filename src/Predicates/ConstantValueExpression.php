@@ -20,7 +20,7 @@ class ConstantValueExpression extends Expression
         }
     }
     public string $keyPath {
-        get => $this->predicateFormat;
+        get => $this->keyPath ??= $this->predicateFormat;
     }
 
     public function __construct(mixed $value)

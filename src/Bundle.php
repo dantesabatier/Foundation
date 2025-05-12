@@ -235,8 +235,8 @@ final class Bundle extends ObjectClass
     /**
      * @param URL $baseURL
      * @param string|null $name
-     * @param ArrayClass<covariant string>|null $extensions
-     * @param ArrayClass<covariant string>|null $languages
+     * @param ArrayClass<string>|null $extensions
+     * @param ArrayClass<string>|null $languages
      * @param int $limit
      * @return ArrayClass<URL>|null
      */
