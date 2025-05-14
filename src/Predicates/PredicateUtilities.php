@@ -353,6 +353,11 @@ class PredicateUtilities
         return substring_to_index($string, $index);
     }
 
+    public static function replace(string $string, string $search, string $replace): string
+    {
+        return str_replace($search, $replace, $string);
+    }
+
     public static function length(string $string): int
     {
         return strlen($string);
