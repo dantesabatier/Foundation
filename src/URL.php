@@ -231,10 +231,10 @@ final class URL extends ObjectClass
     }
 
     /**
-     * Creates a file URL that references the local file or directory at path.
-     * @param string $path The path that the URL object will represent path should be a valid system path, and must not be an empty path. If path begins with a tilde, it must first be expanded with expandingTildeInPath. If path is a relative path, it is treated as being relative to the current working directory.
+     * Creates a file URL that references the local file or directory at $path.
+     * @param string $path The path that the URL object will represent path should be a valid system path and must not be an empty path. If $path begins with a tilde, it must first be expanded with expandingTildeInPath. If $path is a relative path, it is treated as being relative to the current working directory.
      * @param URL|null $base A URL that provides a file system location that the path extends.
-     * @return URL A URL object initialized with path.
+     * @return URL A URL object initialized with $path.
      */
     public static function fileURL(string $path, ?URL $base = null): URL
     {
@@ -353,7 +353,7 @@ final class URL extends ObjectClass
     /**
      * Return a collection of resource values identified by the given resource keys.
      *
-     * This method first checks if the URL object already caches the resource value. If so, it returns the cached resource value to the caller. If not, then this method synchronously obtains the resource value from the backing store, adds the resource value to the URL object's cache, and returns the resource value to the caller. The type of the resource value varies by resource property (see {@see URLResourceKey}). If this method does not throw and the resulting value in the URLResourceValues is populated with nil, it means the resource property is not available for the specified resource and no errors occurred when determining the resource property was not available. This method is currently applicable only to URLs for file system resources.
+     * This method first checks if the URL object already caches the resource value. If so, it returns the cached resource value to the caller. If not, then this method synchronously gets the resource value from the backing store, adds the resource value to the URL object's cache, and returns the resource value to the caller. The type of the resource value varies by resource property (see {@see URLResourceKey}). If this method does not throw and the resulting value in the URLResourceValues is populated with nil, it means the resource property is not available for the specified resource and no errors occurred when determining the resource property was not available. This method is currently applicable only to URLs for file system resources.
      * Only the values for the keys specified in keys will be populated.
      * @param Set<string> $keys
      * @return URLResourceValues
@@ -366,7 +366,7 @@ final class URL extends ObjectClass
     /**
      * Returns the value of the resource property for the specified key.
      *
-     * This method first checks if the URL object already caches the resource value. If so, it returns the cached resource value to the caller. If not, then this method synchronously obtains the resource value from the backing store, adds the resource value to the URL object's cache, and returns the resource value to the caller.
+     * This method first checks if the URL object already caches the resource value. If so, it returns the cached resource value to the caller. If not, then this method synchronously gets the resource value from the backing store, adds the resource value to the URL object's cache, and returns the resource value to the caller.
      * The type of the returned resource value varies by resource property; for details, see the documentation for the key you want to access.
      * If this method returns true and the value is populated with nil, it means that the resource property is not available for the specified resource, and that no errors occurred when determining that the resource property was unavailable.
      * @param mixed $value The location where the value for the resource property identified by $key should be stored.
@@ -391,7 +391,7 @@ final class URL extends ObjectClass
     /**
      * Removes the cached resource value identified by a given resource value key from the URL object.
      *
-     * Removing a cached resource value may remove other cached resource values because some resource values are cached as a set of values, and because some resource values depend on other resource values (temporary resource values have no dependencies). This method is currently applicable only to URLs for file system resources.
+     * Removing a cached resource value may remove other cached resource values because some resource values are cached as a set of values and because some resource values depend on other resource values (temporary resource values have no dependencies). This method is currently applicable only to URLs for file system resources.
      */
     public function removeCachedResourceValue(#[ExpectedValues(valuesFromClass: URLResourceKey::class)] string $key): void
     {
@@ -410,8 +410,8 @@ final class URL extends ObjectClass
     /**
      * Sets a temporary resource value on the URL object.
      *
-     * Temporary resource values are for client use. Temporary resource values exist only in memory and are never written to the resource's backing store. Once set, a temporary resource value can be copied from the URL object with func {@see resourceValues()}. The values are stored in the loosely-typed allValues dictionary property.
-     * To remove a temporary resource value from the URL object, use func {@see removeCachedResourceValue()}. Care should be taken to ensure the key that identifies a temporary resource value is unique and does not conflict with system defined keys (using reverse domain name notation in your temporary resource value keys is recommended). This method is currently applicable only to URLs for file system resources.
+     * Temporary resource values are for client use. Temporary resource values exist only in memory and are never written to the resource's backing store. Once set, a temporary resource value can be copied from the URL object with func {@see resourceValues()}. The values are stored in the loosely typed allValues dictionary property.
+     * To remove a temporary resource value from the URL object, use func {@see removeCachedResourceValue()}. Care should be taken to ensure the key that identifies a temporary resource value is unique and does not conflict with system-defined keys (using reverse domain name notation in your temporary resource value keys is recommended). This method is currently applicable only to URLs for file system resources.
      */
     public function setTemporaryResourceValue(mixed $value, #[ExpectedValues(valuesFromClass: URLResourceKey::class)] string $key): void
     {
@@ -421,7 +421,7 @@ final class URL extends ObjectClass
     /**
      * @template ResultType
      * Passes the URL's path in the file system representation to a closure.
-     * @param Closure(string): ResultType $block A closure to execute, which receives a string as its parameter, and returns a value of a type you choose.
+     * @param Closure(string): ResultType $block A closure to execute, which receives a string as its parameter and returns a value of a type you choose.
      * The parameter passed to the closure is nil if the URL cannot be represented by the file system. For example, if the URL contains an accented character and the file system only supports ASCII, no file system representation is possible.
      * @return ResultType
      */
