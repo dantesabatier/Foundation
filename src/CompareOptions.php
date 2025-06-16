@@ -14,7 +14,7 @@ class CompareOptions
     final const int diacriticInsensitive = 2;
     /** @var int Indicates that the strings to be compared have been preprocessed. */
     final const int normalized = 4;
-    /** @var int Indicates that strings to be compared using <, <=, =, =>, > should be handled in a locale aware fashion. */
+    /** @var int Indicates that strings to be compared using <, <=, =, =>, > should be handled in a locale-aware fashion. */
     final const int localeSensitive = 8;
     /** @var int Search words. */
     final const int words = 16;
