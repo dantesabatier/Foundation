@@ -78,7 +78,7 @@ interface Sequence extends Traversable, Countable, Comparable, ExpressibleByArra
      *
      * Complexity: O(n), where n is the length of the sequence.
      * @param Closure(Element, Index=): bool $predicate A closure that takes an element of the sequence as its argument and returns a Boolean value that indicates whether the passed element satisfies a condition.
-     * @return bool true if the sequence contains only elements that satisfy predicate; otherwise, false.
+     * @return bool true if the sequence contains only elements that satisfy $predicate; otherwise, false.
      */
     public function allSatisfy(Closure $predicate): bool;
 
@@ -127,7 +127,7 @@ interface Sequence extends Traversable, Countable, Comparable, ExpressibleByArra
      * @template Result
      * @param Result $initialResult The value to use as the initial accumulating value.
      * @param Closure(Result, Element, Index=): Result $updateAccumulatingResult A closure that updates the accumulating value with an element of the sequence.
-     * @return Result The final accumulated value. If the sequence has no elements, the result is initialResult.
+     * @return Result The final accumulated value. If the sequence has no elements, the result is $initialResult.
      */
     public function reduce(mixed $initialResult, Closure $updateAccumulatingResult);
 
