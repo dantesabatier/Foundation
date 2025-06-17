@@ -121,7 +121,7 @@ class Slice extends ObjectClass implements Collection, IteratorAggregate
 
     /**
      * Returns a Collection containing, in order, the elements of the collection that satisfy the given predicate.
-     * @param Closure(Element, int=, bool &$stop): bool $isIncluded
+     * @param Closure(Element, int=, bool=): bool $isIncluded
      * @return ArrayClass<Element>
      */
     #[Override]
