@@ -53,7 +53,7 @@ class Slice extends ObjectClass implements Collection, IteratorAggregate
 
     /**
      * Creates a view into the given collection that allows access to elements within the specified range.
-     * @param Collection<int, Element> $base The underlying collection of the slice.
+     * @param Collection<int, Element> $base The underlying collection of the Slice.
      * @param Range $bounds The range of indices to allow access to in the new slice.
      */
     public function __construct(public readonly Collection $base, public readonly Range $bounds)
@@ -72,7 +72,7 @@ class Slice extends ObjectClass implements Collection, IteratorAggregate
      * @template Result
      * @param Result $initialResult The value to use as the initial accumulating value.
      * @param Closure(Result, mixed, int=): Result $updateAccumulatingResult A closure that updates the accumulating value with an element of the sequence.
-     * @return Result The final accumulated value. If the sequence has no elements, the result is initialResult.
+     * @return Result The final accumulated value. If the sequence has no elements, the result is $initialResult.
      */
     #[Override]
     public function reduce(mixed $initialResult, Closure $updateAccumulatingResult)
