@@ -70,7 +70,6 @@ trait SequenceAlgorithms
         return $this->filter(fn(mixed $e): bool => $predicate->evaluate($e));
     }
 
-    /** @noinspection PhpLoopCanBeConvertedToArrayAnyInspection */
     public function contains(Closure $predicate): bool
     {
         foreach (clone $this as $i => $e) {
