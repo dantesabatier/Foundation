@@ -58,7 +58,7 @@ class Scanner extends ObjectClass
     }
 
     /**
-     * Scans the string as long as characters from a given character set are encountered, accumulating characters into a string that's returned by reference.
+     * Scans the string as long as characters from a given character set are encountered, accumulating characters into a string that reference returns.
      * @param string $characters The set of characters to scan.
      * @param string|null $into Upon return, contains the characters scanned.
      * @return bool true if the receiver scanned any characters, otherwise false.
@@ -106,7 +106,7 @@ class Scanner extends ObjectClass
     }
 
     /**
-     * Scans the string until a given string is encountered, accumulating characters into a string that's returned by reference.
+     * Scans the string until a given string is encountered, accumulating characters into a string that reference returns.
      * @param string $string The string to scan up to.
      * @param string|null $into Upon return, contains any characters that were scanned.
      * @return bool true if the receiver scans any characters, otherwise false.
