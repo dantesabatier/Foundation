@@ -5,7 +5,7 @@ namespace Sabatier\Foundation;
 class KeyedUnarchiver
 {
     /**
-     * Decodes a previously-archived object graph, and returns the root object.
+     * Decodes a previously archived object graph and returns the root object.
      * @param string $data An object graph previously encoded by {@see KeyedArchiver}.
      * @return mixed The unarchived object, or nil if an error occurred.
      */

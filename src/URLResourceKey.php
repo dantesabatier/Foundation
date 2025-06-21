@@ -38,6 +38,6 @@ class URLResourceKey
     final const string isWritableKey = "isWritable";
     /** @var string The resource's name in the file system, returned as a string (read-write). */
     final const string nameKey = "name";
-    /** @var string The file system path for the URL, returned as a string (read-only). */
+    /** @var string The file system path for the URL returned as a string (read-only). */
     final const string pathKey = "path";
 }

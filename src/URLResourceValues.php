@@ -72,7 +72,7 @@ class URLResourceValues extends ObjectClass
 
     /**
      * @param Set<string> $keys
-     * @param Dictionary $allValues A loosely-typed dictionary containing all keys and values.
+     * @param Dictionary $allValues A loosely typed dictionary containing all keys and values.
      */
     public function __construct(public readonly Set $keys, private(set) Dictionary $allValues)
     {

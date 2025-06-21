@@ -14,7 +14,7 @@ class KeyValueChangeKey
     final const string kindKey = "kindKey";
     /** @var string If the value of the kindKey entry is KeyValueChange::setting, and new was specified when the observer was registered, the value of this key is the new value for the attribute. For KeyValueChange::insertion or KeyValueChange::replacement, if new was specified when the observer was registered, the value for this key is an ArrayClass instance that contains the objects that have been inserted or replaced other objects, respectively. */
     final const string newKey = "newKey";
-    /** @var string If the prior option was specified when the observer was registered this notification is sent prior to a change. The change dictionary contains an notificationIsPriorKey entry whose value is a Number object that contains the Boolean value true. */
+    /** @var string If the prior option was specified when the observer was registered, this notification is sent prior to a change. The change dictionary contains a notificationIsPriorKey entry whose value is a Number object that contains the Boolean value true. */
     final const string notificationIsPriorKey = "notificationIsPriorKey";
     /** @var string If the value of the kindKey entry is KeyValueChange::setting, and old was specified when the observer was registered, the value of this key is the value before the attribute was changed. For KeyValueChange::removal or KeyValueChange::replacement, if old was specified when the observer was registered, the value is an ArrayClass instance that contains the objects that have been removed or have been replaced by other objects, respectively. */
     final const string oldKey = "oldKey";

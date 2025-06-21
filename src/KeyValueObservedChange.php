@@ -17,6 +17,6 @@ class KeyValueObservedChange
     public mixed $newValue = null;
     /** @var mixed|null If the value of the kindKey entry is KeyValueChange::setting, and old was specified when the observer was registered, the value of this key is the value before the attribute was changed. For KeyValueChange::removal or KeyValueChange::replacement, if old was specified when the observer was registered, the value is an ArrayClass instance that contains the objects that have been removed or have been replaced by other objects, respectively. */
     public mixed $oldValue = null;
-    /** @var bool If the prior option was specified when the observer was registered this notification is sent prior to a change. */
+    /** @var bool If the prior option was specified when the observer was registered, this notification is sent prior to a change. */
     public bool $isPrior = false;
 }

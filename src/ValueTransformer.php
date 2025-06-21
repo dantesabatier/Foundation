@@ -37,7 +37,7 @@ abstract class ValueTransformer extends ObjectClass
     /**
      * Returns the value transformer identified by a given identifier.
      *
-     * If valueTransformerForName() does not find a registered transformer instance for name, it will attempt to find a class with the specified name. If a corresponding class is found an instance will be created and initialized then automatically registered with name.
+     * If valueTransformerForName() does not find a registered transformer instance for name, it will attempt to find a class with the specified name. If a corresponding class is found, an instance will be created and initialized, then automatically registered with $name.
      * @param string $name The transformer identifier.
      * @return ValueTransformer|null The value transformer identified by name in the shared registry, or nil if not found.
      */
@@ -90,7 +90,7 @@ abstract class ValueTransformer extends ObjectClass
      * A subclass should override this method to transform and return an object based on value.
      * @param mixed $value The value to transform.
      * @return mixed The result of transforming value.
-     * The default implementation simply returns value.
+     * The default implementation simply returns $value.
      */
     public function transformedValue(mixed $value): mixed
     {
@@ -101,7 +101,7 @@ abstract class ValueTransformer extends ObjectClass
      * Returns the result of the reverse transformation of a given value.
      *
      * The default implementation raises an exception if {@see allowsReverseTransformation()} returns false; otherwise it will invoke {@see transformedValue()} with value.
-     * A subclass should override this method if they require a reverse transformation that is not the same as simply reapplying the original transform (as would be the case with negation, for example). For example, if a value transformer converts a value in Fahrenheit to Celsius, this method would convert a value from Celsius to Fahrenheit.
+     * A subclass should override this method if they require a reverse transformation that is different from simply reapplying the original transform (as would be the case with negation, for example). For example, if a value transformer converts a value in Fahrenheit to Celsius, this method would convert a value from Celsius to Fahrenheit.
      * @param mixed $value The value to reverse transform.
      * @return mixed The reverse transformation of value.
      */

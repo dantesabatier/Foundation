@@ -310,7 +310,7 @@ class UserDefaults
     /**
      * Inserts the specified domain name into the receiver's search list.
      *
-     * The suiteName domain is similar to a bundle identifier string, but isn't necessarily tied to a particular application or bundle. A suite can be used to hold preferences that are shared between multiple applications.
+     * The suiteName domain is similar to a bundle identifier string but isn't necessarily tied to a particular application or bundle. A suite can be used to hold preferences that are shared between multiple applications.
      * @param string $named The domain name to insert.
      */
     public function addSuite(string $named): void

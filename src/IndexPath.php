@@ -164,7 +164,7 @@ class IndexPath extends ObjectClass implements MutableCollection, Iterator
      * @template Result
      * @param Result $initialResult The value to use as the initial accumulating value.
      * @param Closure(Result, int, int=): Result $updateAccumulatingResult A closure that updates the accumulating value with an element of the sequence.
-     * @return Result The final accumulated value. If the sequence has no elements, the result is initialResult.
+     * @return Result The final accumulated value. If the sequence has no elements, the result is $initialResult.
      */
     #[Override]
     public function reduce(mixed $initialResult, Closure $updateAccumulatingResult)
@@ -211,7 +211,7 @@ class IndexPath extends ObjectClass implements MutableCollection, Iterator
     /**
      * Returns the first element of the collection that satisfies the given predicate.
      * @param Closure(int, int=): bool|null $where A closure that takes an element of the collection as its argument and returns a Boolean value indicating whether the element is a match.
-     * @return int|null The first element of the collection that satisfies predicate, or nil if there is no element that satisfies predicate.
+     * @return int|null The first element of the collection that satisfies $where, or nil if there is no element that satisfies $where.
      */
     #[Override]
     public function first(?Closure $where = null): ?int
@@ -222,7 +222,7 @@ class IndexPath extends ObjectClass implements MutableCollection, Iterator
     /**
      * Returns the last element of the collection that satisfies the given predicate.
      * @param Closure(int, int=): bool|null $where A closure that takes an element of the collection as its argument and returns a Boolean value indicating whether the element is a match.
-     * @return int|null The last element of the collection that satisfies predicate, or nil if there is no element that satisfies predicate.
+     * @return int|null The last element of the collection that satisfies $where, or nil if there is no element that satisfies predicate.
      */
     #[Override]
     public function last(?Closure $where = null): ?int
@@ -233,8 +233,8 @@ class IndexPath extends ObjectClass implements MutableCollection, Iterator
     /**
      * Returns the first index in which an element of the collection satisfies the given predicate.
      * @param Closure(int): bool $where A closure that takes an element as its argument and returns a Boolean value that indicates whether the passed element represents a match.
-     * @return int|null The index of the first element for which predicate returns true.
-     * If no elements in the collection satisfy the given predicate, returns nil.
+     * @return int|null The index of the first element for which $where returns true.
+     * If no elements in the collection satisfy the given $where, returns nil.
      */
     #[Override]
     public function firstIndex(Closure $where): ?int
@@ -245,8 +245,8 @@ class IndexPath extends ObjectClass implements MutableCollection, Iterator
     /**
      * Returns the last index in which an element of the collection satisfies the given predicate.
      * @param Closure(int): bool $where A closure that takes an element as its argument and returns a Boolean value that indicates whether the passed element represents a match.
-     * @return int|null The index of the last element for which predicate returns true.
-     * If no elements in the collection satisfy the given predicate, returns nil.
+     * @return int|null The index of the last element for which $where returns true.
+     * If no elements in the collection satisfy the given $where, returns nil.
      */
     #[Override]
     public function lastIndex(Closure $where): ?int
@@ -257,7 +257,7 @@ class IndexPath extends ObjectClass implements MutableCollection, Iterator
     /**
      * Returns the first index where the specified value appears in the collection.
      * @param int $element An element to search for in the collection.
-     * @return int|null The first index where element is found. If element is not found in the collection, returns nil.
+     * @return int|null The first index where $element is found. If $element is not found in the collection, it returns nil.
      */
     #[Override]
     public function indexOf(mixed $element): ?int
@@ -411,7 +411,7 @@ class IndexPath extends ObjectClass implements MutableCollection, Iterator
      * The new element is inserted before the element currently at the specified index.
      * If you pass the collection's endIndex property as the index parameter, the new element is appended to the collection.
      * @param int $element The new element to insert into the collection.
-     * @param int $at The position at which to insert the new element. index must be a valid index into the collection.
+     * @param int $at The position at which to insert the new element. $at must be a valid index into the collection.
      */
     #[Override]
     public function insertAt(mixed $element, int $at): void
@@ -424,7 +424,7 @@ class IndexPath extends ObjectClass implements MutableCollection, Iterator
      * The new elements are inserted before the element currently at the specified index.
      * If you pass the collection's endIndex property as the index parameter, the new elements are appended to the collection.
      * @param iterable<int, int> $newElements The new elements to insert into the collection.
-     * @param int $at The position at which to insert the new elements. index must be a valid index of the collection.
+     * @param int $at The position at which to insert the new elements. $at must be a valid index of the collection.
      */
     #[Override]
     public function insertContentsOf(iterable $newElements, int $at = NotFound): void
@@ -445,7 +445,7 @@ class IndexPath extends ObjectClass implements MutableCollection, Iterator
     }
 
     /**
-     * @param int $index The index of the member to remove, position must be a valid index of the collection, and must not be equal to the collection's end index.
+     * @param int $index The index of the member to remove, position must be a valid index of the collection and must not be equal to the collection's end index.
      * @return int The value that was removed.
      */
     #[Override]
@@ -478,7 +478,7 @@ class IndexPath extends ObjectClass implements MutableCollection, Iterator
 
     /**
      * Removes and returns the first element of the collection.
-     * @return int|null A member of the collection. If the collection is empty, returns nil.
+     * @return int|null A member of the collection. If the collection is empty, it returns nil.
      */
     #[Override]
     public function popFirst(): ?int
@@ -501,7 +501,7 @@ class IndexPath extends ObjectClass implements MutableCollection, Iterator
     /**
      * Returns a subsequence by skipping elements while predicate returns true and returning the remaining elements.
      * @param Closure(int): bool $while A closure that takes an element of the sequence as its argument and returns true if the element should be skipped or false if it should be included.
-     * Once the predicate returns false it will not be called again.
+     * Once the predicate returns false, it will not be called again.
      * @return Slice<int>
      */
     #[Override]
@@ -514,7 +514,7 @@ class IndexPath extends ObjectClass implements MutableCollection, Iterator
      * Returns a subsequence containing all but the given number of initial elements.
      *
      * If the number of elements to drop exceeds the number of elements in the collection, the result is an empty subsequence.
-     * @param int $k The number of elements to drop from the beginning of the collection. k must be greater than or equal to zero.
+     * @param int $k The number of elements to drop from the beginning of the collection. $k must be greater than or equal to zero.
      * @return Slice<int> A subsequence starting after the specified number of elements.
      */
     #[Override]
@@ -527,7 +527,7 @@ class IndexPath extends ObjectClass implements MutableCollection, Iterator
      * Returns a subsequence containing all but the specified number of final elements.
      *
      * If the number of elements to drop exceeds the number of elements in the collection, the result is an empty subsequence.
-     * @param int $k The number of elements to drop off the end of the collection. k must be greater than or equal to zero.
+     * @param int $k The number of elements to drop off the end of the collection. $k must be greater than or equal to zero.
      * @return Slice<int> A subsequence that leaves off the specified number of elements at the end.
      */
     #[Override]
