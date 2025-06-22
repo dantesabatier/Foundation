@@ -15,7 +15,7 @@ use function Sabatier\Foundation\request_concrete_implementation;
  */
 class Expression extends ObjectClass
 {
-    /** @var ArrayClass<Expression>|null The arguments for the expression. An expression's arguments is the array of expressions that will be passed as parameters during invocation of the selector on the operand of a function expression. Accessing this property raises an exception if it is not applicable to the expression. */
+    /** @var ArrayClass<Expression>|null The arguments for the expression. An expression's arguments are the array of expressions that will be passed as parameters during invocation of the selector on the operand of a function expression. Accessing this property raises an exception if it is not applicable to the expression. */
     protected(set) ?ArrayClass $arguments = null;
     /** @var mixed The collection of expressions in an aggregate expression, or the collection element of a subquery expression. Accessing this property raises an exception if it is not applicable to the expression. */
     protected(set) mixed $collection;
@@ -80,7 +80,7 @@ class Expression extends ObjectClass
     /**
      * Returns a new expression that represents a given constant value.
      * @param mixed $obj The constant value the new expression is to represent.
-     * @return Expression A new expression that represents the constant value, obj.
+     * @return Expression A new expression that represents the constant value, $obj.
      */
     public static function expressionForConstantValue(mixed $obj): Expression
     {
@@ -128,7 +128,7 @@ class Expression extends ObjectClass
     /**
      * Returns a new aggregate expression for a given collection.
      * @param ArrayClass<Expression> $subexpressions A collection object that contains further expressions.
-     * @return Expression A new expression that contains the expressions in collection.
+     * @return Expression A new expression that contains the expressions in $subexpressions.
      */
     public static function expressionForAggregate(ArrayClass $subexpressions): Expression
     {
@@ -136,7 +136,7 @@ class Expression extends ObjectClass
     }
 
     /**
-     * Returns a new Expression object that represent the union of a given set and collection.
+     * Returns a new Expression that represents the union of a given set and collection.
      * @param Expression $left An expression that evaluates to a Set object.
      * @param Expression $right An expression that evaluates to a collection object.
      * @return Expression A new Expression object that represents the union of left and right.
@@ -147,7 +147,7 @@ class Expression extends ObjectClass
     }
 
     /**
-     * Returns a new Expression object that represent the intersection of a given set and collection.
+     * Returns a new Expression that represents the intersection of a given set and collection.
      * @param Expression $left An expression that evaluates to a Set object.
      * @param Expression $right An expression that evaluates to a collection object.
      * @return Expression A new Expression object that represents the intersection of left and right.
@@ -158,10 +158,10 @@ class Expression extends ObjectClass
     }
 
     /**
-     * Returns a new Expression object that represent the subtraction of a given collection from a given set.
+     * Returns a new Expression that represents the subtraction of a given collection from a given set.
      * @param Expression $left An expression that evaluates to a Set object.
      * @param Expression $right An expression that evaluates to a collection object.
-     * @return Expression A new Expression object that represents the subtraction of right from left.
+     * @return Expression A new Expression object that represents the subtraction of $right from $left.
      */
     public static function expressionForMinusSet(Expression $left, Expression $right): Expression
     {
@@ -171,10 +171,10 @@ class Expression extends ObjectClass
     /**
      * Returns an expression that filters a collection by storing elements in the collection in a given variable and keeping the elements for which qualifier returns true.
      * @param Expression $expression A predicate expression that evaluates to a collection.
-     * @param Expression $variable Used as a local variable, and will shadow any instances of variable in the bindings dictionary.
+     * @param Expression $variable Used as a local variable, and will shadow any instances of variable in the Bindings dictionary.
      * The variable is removed or the old value replaced once evaluation completes.
      * @param Predicate $predicate The predicate used to determine whether the element belongs in the result collection.
-     * @return Expression This method creates a sub-expression, evaluation of which returns a subset of a collection of objects.
+     * @return Expression This method creates a sub-expression, the evaluation of which returns a subset of a collection of objects.
      * It allows you to create sophisticated queries across relationships, such as a search for multiple correlated values on the destination object of a relationship.
      */
     public static function expressionForSubquery(Expression $expression, Expression $variable, Predicate $predicate): Expression
@@ -249,7 +249,7 @@ class Expression extends ObjectClass
     /**
      * Evaluates an expression using a given object and context.
      * @param mixed|null $object The object against which the expression is evaluated.
-     * @param Dictionary|null $context A dictionary that the expression can use to store temporary state for one predicate evaluation. Can be nil.
+     * @param Dictionary|null $context A dictionary that the expression can use to store a temporary state for one predicate evaluation. Can be nil.
      * Note that context is mutable, and that it can only be accessed during the evaluation of the expression.
      * You must not attempt to retain it for use elsewhere.
      * @return mixed The evaluated object.
