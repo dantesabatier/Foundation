@@ -12,7 +12,7 @@ enum ExpressionType: int
     case constantValue = 0;
     /** An expression that always returns the parameter object itself. */
     case evaluatedObject = 1;
-    /** An expression that always returns whatever value is associated with the key specified by 'variable' in the bindings dictionary. */
+    /** An expression that always returns whatever value is associated with the key specified by 'variable' in the bindings' dictionary. */
     case variable = 2;
     /** An expression that returns something that can be used as a key path. */
     case keyPath = 3;
@@ -22,7 +22,7 @@ enum ExpressionType: int
     case unionSet = 5;
     /** An expression that creates an intersection of the results of two nested expressions. */
     case intersectSet = 6;
-    /** An expression that combines two nested expression results by set subtraction. */
+    /** An expression that combines two nested expressions results by set subtraction. */
     case minusSet = 7;
     /** @internal */
     case keyPathSpecifierExpressionType = 10;
