@@ -134,7 +134,7 @@ function string_compare(string $string, string $other, #[ExpectedValues(flagsFro
 }
 
 /**
- * Checks if two string are equal using the given options.
+ * Checks if two strings are equal using the given options.
  * @param string $string The receiver string.
  * @param string $other The string with which to compare.
  * @param int $options The options for the comparison.
@@ -146,11 +146,11 @@ function string_is_equal(string $string, string $other, #[ExpectedValues(flagsFr
 }
 
 /**
- * Returns a Boolean value indicating whether the initial characters of the string are the same as the characters in prefix.
+ * Returns a Boolean value indicating whether the initial characters of the string are the same as the characters in $prefix.
  * @param string $string The receiver string.
  * @param string $prefix The string with which to compare.
  * @param int $options The options for the comparison.
- * @return bool true if the initial characters of the string are the same as the characters of prefix; otherwise, false.
+ * @return bool true if the initial characters of the string are the same as the characters of $prefix; otherwise, false.
  */
 function string_has_prefix(string $string, string $prefix, #[ExpectedValues(flagsFromClass: CompareOptions::class)] int $options = CompareOptions::none): bool
 {
@@ -230,8 +230,8 @@ function is_ascii(string $string): bool
  * Returns a localized version of the string designated by the specified key and residing in the specified table.
  * @param string $string The key for a string in the specified table.
  * @param string $domain The name of the table containing the key-value pairs.
- * @param string $directory The directory containing the strings file.
- * @param string $comment The comment to place above the key-value pair in the strings file.
+ * @param string $directory The directory containing the .strings file.
+ * @param string $comment The comment to place above the key-value pair in the .strings file.
  * @return string The localized string.
  * @noinspection PhpUnusedParameterInspection
  */
@@ -257,7 +257,6 @@ function localized_string(string $string, string $domain = "Localizable", string
 function document_root_directory(): string
 {
     $path = $_SERVER["DOCUMENT_ROOT"] ?? "";
-    /** @psalm-suppress RedundantCondition */
     if (RUNNING_FROM_CLI) {
         if (isset($_SERVER["PWD"])) {
             $path = $_SERVER["PWD"];
@@ -272,6 +271,7 @@ function document_root_directory(): string
 /**
  * Returns the path to either the user's home directory, depending on the platform.
  * @return string The path to the current home directory.
+ * @noinspection SpellCheckingInspection
  */
 function home_directory(): string
 {
@@ -289,6 +289,7 @@ function home_directory(): string
  */
 function full_user_name(): string
 {
+    /** @noinspection SpellCheckingInspection */
     if (function_exists("posix_getpwuid")) {
         /** @noinspection PhpComposerExtensionStubsInspection */
         return posix_getpwuid(posix_geteuid())["name"] ?? get_current_user();
