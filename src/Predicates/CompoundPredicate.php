@@ -18,8 +18,8 @@ use function Sabatier\Foundation\fatal_error;
  */
 class CompoundPredicate extends Predicate
 {
-    public CompoundPredicateOperator $predicateOperator {
-        get => match ($this->compoundPredicateType) {
+    private CompoundPredicateOperator $predicateOperator {
+        get => $this->predicateOperator ??= match ($this->compoundPredicateType) {
             CompoundPredicateLogicalType::not => CompoundPredicateOperator::notPredicateOperator(),
             CompoundPredicateLogicalType::and => CompoundPredicateOperator::andPredicateOperator(),
             CompoundPredicateLogicalType::or => CompoundPredicateOperator::orPredicateOperator(),
