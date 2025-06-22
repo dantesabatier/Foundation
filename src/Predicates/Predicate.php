@@ -29,7 +29,7 @@ class Predicate extends ObjectClass
      * Initializes a predicate by substituting the values in a given array into a format string and parsing the result.
      * @param string $format The format string for the new predicate.
      * @param ArrayClass $arguments The arguments to substitute into format. Values are substituted in the order they appear in the array.
-     * @return Predicate|null A new predicate by substituting the values in arguments into format, and parsing the result.
+     * @return Predicate|null A new predicate by substituting the values in arguments into format and parsing the result.
      */
     public static function format(string $format, ArrayClass $arguments = new ArrayClass()): ?Predicate
     {
@@ -78,7 +78,7 @@ class Predicate extends ObjectClass
      * @param mixed $object The object against which to evaluate the predicate.
      * @param Dictionary|null $substitutionVariables The substitution variables dictionary.
      * The dictionary must contain key-value pairs for all variables in the predicate.
-     * @return bool true if object matches the conditions specified by the predicate after substituting in the values in variables for any replacement tokens, otherwise false.
+     * @return bool true if $object matches the conditions specified by the predicate after substituting in the values in variables for any replacement tokens, otherwise false.
      */
     public function evaluate(mixed $object = null, ?Dictionary $substitutionVariables = null): bool
     {
@@ -92,7 +92,7 @@ class Predicate extends ObjectClass
     }
 
     /**
-     * Forces a predicate that was securely decoded to allow evaluation.
+     * Forces a predicate securely decoded to allow evaluation.
      *
      * When securely decoding Predicate objects that are encoded using SecureCoding, evaluation is disabled because it is potentially unsafe to evaluate predicates you get out of an archive.
      * Before you enable evaluation, you should validate key paths, selectors, and other details to ensure no erroneous or malicious code will be executed.
