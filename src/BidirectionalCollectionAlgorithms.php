@@ -5,7 +5,7 @@ namespace Sabatier\Foundation;
 use Closure;
 
 /**
- * @psalm-require-implements BidirectionalCollection
+ * @phpstan-require-implements BidirectionalCollection
  */
 trait BidirectionalCollectionAlgorithms
 {

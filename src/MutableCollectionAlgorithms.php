@@ -5,7 +5,7 @@ namespace Sabatier\Foundation;
 use Closure;
 
 /**
- * @psalm-require-implements MutableCollection
+ * @phpstan-require-implements MutableCollection
  */
 trait MutableCollectionAlgorithms
 {

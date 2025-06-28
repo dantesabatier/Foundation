@@ -7,7 +7,7 @@ use Override;
 use Sabatier\Foundation\Predicates\Predicate;
 
 /**
- * @psalm-require-implements Sequence
+ * @phpstan-require-implements Sequence
  */
 trait SequenceAlgorithms
 {
