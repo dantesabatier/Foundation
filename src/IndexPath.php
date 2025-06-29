@@ -257,7 +257,7 @@ class IndexPath extends ObjectClass implements MutableCollection, Iterator
     /**
      * Returns the first index where the specified value appears in the collection.
      * @param int $element An element to search for in the collection.
-     * @return int|null The first index where $element is found. If $element is not found in the collection, it returns nil.
+     * @return int|null The first index where $element is found. If the $element is not found in the collection, it returns nil.
      */
     #[Override]
     public function indexOf(mixed $element): ?int
