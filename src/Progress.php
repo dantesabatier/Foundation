@@ -49,7 +49,7 @@ class Progress extends ObjectClass
     public ?int $fileTotalCount = null;
     /** @var int|null The number of completed files for a file progress object. */
     public ?int $fileCompletedCount = null;
-    /** @var bool A Boolean value that indicates when the observed progress object invokes the publish method before you subscribe to it. The publish and subscribe mechanism is generally level-triggered, in that when you invoke addSubscriber(), the system invokes your block for every relevant published and unpublished progress object. Sometimes you need to implement edge-triggered behavior, in which you do something either exactly when new progress begins or not at all. In the example above, the Dock doesn't animate file icons when this method returns true. There's no reliable definition of before in this case, which involves multiple processes in a preemptively scheduled system. Don't use this method for anything more important than best efforts at animating. It can be inaccurate due to processes coming and going from unpredictable user actions. */
+    /** @var bool A Boolean value that indicates when the observed progress object invokes the publish method before you subscribe to it. The {@see publish()} and subscribe mechanism is generally level-triggered, in that when you invoke {@see addSubscriber()}, the system invokes your block for every relevant published and unpublished progress object. Sometimes you need to implement edge-triggered behavior, in which you do something either exactly when new progress begins or not at all. In the example above, the Dock doesn't animate file icons when this method returns true. There's no reliable definition of before in this case, which involves multiple processes in a preemptively scheduled system. Don't use this method for anything more important than the best efforts at animating. It can be inaccurate due to processes coming and going from unpredictable user actions. */
     private(set) bool $isOld = false;
     /** @var float The total number of tracked units of work for the current progress. */
     public float $totalUnitCount {
@@ -202,7 +202,7 @@ class Progress extends ObjectClass
     }
 
     /**
-     * Sets the progress object as the current object of the current thread, and assigns the amount of work for the next sub operation progress object to perform.
+     * Sets the progress object as the current object of the current thread and assigns the amount of work for the next sub operation progress object to perform.
      * @param float $unitCount The number of units of work for the next progress object that initializes when you invoke {@see __construct()} in the current thread with this progress object as the containing progress object.
      *
      * The number represents the portion of work to perform in relation to the total number of units of work, which is the value of the progress object's totalUnitCount property. The units of work for this parameter must be the same units of work in the progress object's totalUnitCount property.
@@ -334,11 +334,11 @@ class Progress extends ObjectClass
     /**
      * Publishes the progress object for other processes to observe it.
      *
-     * Entries in the user info dictionary determine whether another process can discover the progress object to observe it, and how it does that. For example, a {@see ProgressUserInfoKey::fileURLKey} entry makes a progress object discoverable by corresponding invokers of {@see addSubscriber()}. The system constrains access to the published progress URL with your app sandbox. If you can't see the file due to the app's sandbox restrictions, you can't observe the progress on it.
+     * Entries in the user info dictionary determine whether another process can discover the progress object to observe it and how it does that. For example, a {@see ProgressUserInfoKey::fileURLKey} entry makes a progress object discoverable by corresponding invokers of {@see addSubscriber()}. The system constrains access to the published progress URL with your app sandbox. If you can't see the file due to the app's sandbox restrictions, you can't observe the progress on it.
      *
-     * When you make a progress object observable by other processes, you must ensure that at least {@see $localizedDescription}, {@see $isIndeterminate}, and {@see $fractionCompleted} always work when you send proxies of your progress object in other processes. You make {@see $isIndeterminate} and {@see $fractionCompleted} work by accurately setting the total and completed unit counts of the progress. You make {@see $localizedDescription} work by setting the value of the kind property to something valid, like file, and then fulfilling the requirements for that kind of progress.
+     * When you make a progress object observable by other processes, you must ensure that at least {@see $localizedDescription}, {@see $isIndeterminate}, and {@see $fractionCompleted} always work when you send proxies of your progress object in other processes. You make {@see $isIndeterminate} and {@see $fractionCompleted} work by accurately setting the total and completed unit counts of the progress. You make {@see $localizedDescription} work by setting the value of the kind property to something valid, like a file, and then fulfilling the requirements for that kind of progress.
      *
-     * You can instead set the value of localizedDescription directly, but that's not perfectly reliable because other processes might be using a different localization than yours.
+     * You can instead set the value of {@see $localizedDescription} directly, but that's not perfectly reliable because other processes might be using different localization than yours.
      *
      * You can publish an instance of {@see Progress} one time only.
      */
