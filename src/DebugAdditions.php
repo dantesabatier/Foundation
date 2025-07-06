@@ -121,6 +121,11 @@ function human_readable_bytes(float $value): string
     return number_format($value) . " bytes";
 }
 
+function human_readable_plural(string $string, int|float $number): string
+{
+    return sprintf("%s%s", $string, $number === 0 || $number > 1 ? "s" : "");
+}
+
 /**
  * @param string $message The string to print. The default is an empty string.
  * @param string $file The file name to print with message. The default is the file where fatal_error() is called.
@@ -165,9 +170,8 @@ function invalid_mutation(): never
  * @param Closure(): Result $block
  * @return Result
  */
-function unsafe_value(Closure $block): mixed
+function unsafe_value(Closure $block)
 {
-    /** @psalm-suppress NoValue */
     set_error_handler(fn(int $severity, string $message, string $file, int $line): bool => fatal_error($message, $file, $line));
     $value = $block();
     restore_error_handler();
