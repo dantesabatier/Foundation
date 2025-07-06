@@ -128,8 +128,8 @@ function human_readable_plural(string $string, int|float $number): string
 
 /**
  * @param string $message The string to print. The default is an empty string.
- * @param string $file The file name to print with message. The default is the file where fatal_error() is called.
- * @param int $line The line number to print along with message. The default is the file where fatal_error() is called.
+ * @param string $file The file name to print with the message. The default is the file where fatal_error() is called.
+ * @param int $line The line number to print along with the message. The default is the file where fatal_error() is called.
  */
 function fatal_error(string $message = "", string $file = "", int $line = 0): never
 {
