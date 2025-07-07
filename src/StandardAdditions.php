@@ -254,6 +254,11 @@ function localized_string(string $string, string $domain = "Localizable", string
     return gettext($string);
 }
 
+function base64_url_encode(string $string): string
+{
+    return rtrim(strtr(base64_encode($string), '+/', '-_'), '=');
+}
+
 function document_root_directory(): string
 {
     $path = $_SERVER["DOCUMENT_ROOT"] ?? "";
