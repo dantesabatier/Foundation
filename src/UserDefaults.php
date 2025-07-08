@@ -2,6 +2,8 @@
 
 namespace Sabatier\Foundation;
 
+use BackedEnum;
+
 /**
  * An interface to the user's defaults database, where you store key-value pairs persistently across launches of your app.
  */
@@ -124,6 +126,9 @@ class UserDefaults
         if (is_string($object)) {
             return $object;
         }
+        if ($object instanceof BackedEnum) {
+            return human_readable_value($object->value);
+        }
         return null;
     }
 
@@ -159,7 +164,7 @@ class UserDefaults
     /**
      * Returns the integer value associated with the specified key.
      *
-     * This method automatically coerces certain values into equivalent integer values (if one can be determined). The Boolean value true becomes 1 and false becomes 0. A floating point number becomes the greatest integer that's less than that number (for example, 2.67 becomes 2). A string that represents an integer becomes the equivalent integer (for example "123" becomes 123).
+     * This method automatically coerces certain values into equivalent integer values (if one can be determined). The Boolean value true becomes 1 and false becomes 0. A floating point number becomes the greatest integer that's less than that number (for example, 2.67 becomes 2). A string that represents an integer becomes the equivalent integer (for example, "123" becomes 123).
      * @param string $key A key in the current user's defaults database.
      * @return int The integer value associated with the specified key. If the specified key doesn't exist, this method returns 0.
      */
@@ -175,7 +180,7 @@ class UserDefaults
     /**
      * Returns the float value associated with the specified key.
      *
-     * This method automatically coerces certain values into equivalent float values (if one can be determined). The Boolean value true becomes 1.0 and false becomes 0.0. An integer becomes the equivalent float (for example, 2 becomes 2.0). A string that represents a floating point number becomes the equivalent float (for example "123.4" becomes 123.4).
+     * This method automatically coerces certain values into equivalent float values (if one can be determined). The Boolean value true becomes 1.0 and false becomes 0.0. An integer becomes the equivalent float (for example, 2 becomes 2.0). A string that represents a floating point number becomes the equivalent float (for example, "123.4" becomes 123.4).
      * @param string $key A key in the current user's defaults database.
      * @return float The float value associated with the specified key. If the key doesn't exist, this method returns 0.
      */
@@ -192,7 +197,7 @@ class UserDefaults
      * Returns the double value associated with the specified key.
      * @param string $key A key in the current user's defaults database.
      * @return float The double value associated with the specified key. If the key doesn't exist, this method returns 0.
-     * This method automatically coerces certain values into equivalent double values (if one can be determined). The Boolean value true becomes 1.0 and false becomes 0.0. An integer becomes the equivalent double (for example, 2 becomes 2.0). A string that represents a floating point number becomes the equivalent double (for example "123.4" becomes 123.4).
+     * This method automatically coerces certain values into equivalent double values (if one can be determined). The Boolean value true becomes 1.0 and false becomes 0.0. An integer becomes the equivalent double (for example, 2 becomes 2.0). A string that represents a floating point number becomes the equivalent double (for example, "123.4" becomes 123.4).
      */
     public function doble(string $key): float
     {
@@ -205,7 +210,7 @@ class UserDefaults
 
     /**
      * Returns a dictionary that contains a union of all key-value pairs in the domains in the search list.
-     * @return Dictionary A dictionary containing the keys. The keys are names of defaults and the value corresponding to each key is a property list object (Data, String, Number, Date, Array, or Dictionary).
+     * @return Dictionary A dictionary containing the keys. The keys are names of defaults, and the value corresponding to each key is a property list object (Data, String, Number, Date, Array, or Dictionary).
      */
     public function dictionaryRepresentation(): Dictionary
     {
