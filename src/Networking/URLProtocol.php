@@ -185,7 +185,7 @@ abstract class URLProtocol extends ObjectClass
      * When this method is called, the subclass implementation should start loading the request, providing feedback to the URL loading system via the {@see URLProtocolClient} protocol.
      * Subclasses must implement this method.
      */
-    public abstract function startLoading(): void;
+    abstract public function startLoading(): void;
 
     /**
      * Stops protocol-specific loading of the request.
@@ -193,5 +193,5 @@ abstract class URLProtocol extends ObjectClass
      * When this method is called, the subclass implementation should stop loading a request. This could be in response to a cancel operation, so protocol implementations must be able to handle this call while a load is in progress. When your protocol receives a call to this method, it should also stop sending notifications to the client.
      * Subclasses must implement this method.
      */
-    public abstract function stopLoading(): void;
+    abstract public function stopLoading(): void;
 }
