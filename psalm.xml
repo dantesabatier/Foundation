@@ -36,7 +36,7 @@
         </ReferenceConstraintViolation>
         <MissingOverrideAttribute>
             <errorLevel type="suppress">
-                <file name=" src/AssociativeArrayStrategy.php"/>
+                <file name="src/AssociativeArrayStrategy.php"/>
                 <file name="src/FlattenSequence.php"/>
                 <file name="src/SequentialArrayStrategy.php"/>
             </errorLevel>
