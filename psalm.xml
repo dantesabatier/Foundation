@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--suppress XmlDefaultAttributeValue -->
-<psalm errorLevel="3" findUnusedCode="false" findUnusedBaselineEntry="true" xmlns="https://getpsalm.org/schema/config">
+<psalm errorLevel="4" findUnusedCode="false" findUnusedBaselineEntry="true" xmlns="https://getpsalm.org/schema/config">
     <projectFiles>
         <directory name="src"/>
         <ignoreFiles>
@@ -34,6 +34,13 @@
                 <file name="src/SequenceAlgorithms.php"/>
             </errorLevel>
         </ReferenceConstraintViolation>
+        <MissingOverrideAttribute>
+            <errorLevel type="suppress">
+                <file name=" src/AssociativeArrayStrategy.php"/>
+                <file name="src/FlattenSequence.php"/>
+                <file name="src/SequentialArrayStrategy.php"/>
+            </errorLevel>
+        </MissingOverrideAttribute>
         <RiskyTruthyFalsyComparison errorLevel="suppress"/>
         <DuplicateClass errorLevel="suppress"/>
         <DuplicateFunction errorLevel="suppress"/>
