@@ -444,7 +444,7 @@ final class Bundle extends ObjectClass
         if (!($enumerator = FileManager::default()->enumerator($this->bundleURL->appendingPathComponent("src"), null, DirectoryEnumerationOptions::skipsHiddenFiles))) {
             return null;
         }
-        $autoloadPath = $this->bundleURL->appendingPathComponent("vendor")->appendingPathComponent("autoload")->appendingPathExtension("php");
+        $autoloadPath = $this->bundleURL->appendingPathComponent("vendor")->appendingPathComponent("autoload")->appendingPathExtension("php")->path;
         if (FileManager::default()->fileExists($autoloadPath)) {
             require_once $autoloadPath;
         }

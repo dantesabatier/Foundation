@@ -202,7 +202,7 @@ class PredicateUtilities
 
     public static function trunc(Number|int|float $number): Number
     {
-        return new Number((int)(pn($number) * 1e2) / 1e2);
+        return new Number((int)(pn($number) * 1e2 / 1e2));
     }
 
     public static function random(Number|int $max = NotFound): Number

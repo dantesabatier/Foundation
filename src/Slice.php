@@ -60,6 +60,7 @@ class Slice extends ObjectClass implements Collection, IteratorAggregate
     {
     }
 
+    #[Override]
     public function count(): int
     {
         return $this->count;

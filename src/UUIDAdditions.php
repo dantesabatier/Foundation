@@ -25,7 +25,7 @@ function nanotime(): float
 function read_time(): float
 {
     $time = nanotime();
-    return ($time * 1.0e+9) + ($time / 100) + 0x01B21DD213814000;
+    return ($time * 1.0e+9) + ($time / 100.0) + (float)0x01B21DD213814000;
 }
 
 function uuid_compare(string $uu1, string $uu2): int

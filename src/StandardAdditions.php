@@ -2,25 +2,9 @@
 
 namespace Sabatier\Foundation;
 
-use Closure;
 use Collator;
 use JetBrains\PhpStorm\ExpectedValues;
 use JetBrains\PhpStorm\Pure;
-use SplStack;
-use function call_user_func;
-
-function defer(Closure $closure, ?SplStack &$context = null): void
-{
-    $context ??= new class() extends SplStack {
-        public function __destruct()
-        {
-            while ($this->count() > 0) {
-                call_user_func($this->pop());
-            }
-        }
-    };
-    $context->push($closure);
-}
 
 /**
  * Returns the current system absolute time.
@@ -29,7 +13,7 @@ function defer(Closure $closure, ?SplStack &$context = null): void
 function absolute_time_get_current(): float
 {
     $tv = gettimeofday();
-    return $tv["sec"] + (1.0e-6 * (float)$tv["usec"]);
+    return (float)$tv["sec"] + (1.0e-6 * (float)$tv["usec"]);
 }
 
 function random_color(): string
