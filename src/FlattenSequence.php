@@ -13,7 +13,7 @@ use Traversable;
  * A sequence consisting of all the elements contained in each segment contained in some Base sequence.
  *
  * The elements of this view are a concatenation of the elements of each sequence in the base.
- * The joined method is always lazy, but does not implicitly confer laziness on algorithms applied to its result.
+ * The joined method is always lazy but does not implicitly confer laziness on algorithms applied to its result.
  * @template Element
  * @implements Sequence<int, Element>
  * @implements IteratorAggregate<int, Element>
@@ -56,8 +56,8 @@ class FlattenSequence extends ObjectClass implements Sequence, IteratorAggregate
      * For example, you can use this method on an array of integers to filter adjacent equal entries or count frequencies.
      * @template Result
      * @param Result $initialResult The value to use as the initial accumulating value.
-     * @param Closure(Result, mixed, int=): Result $updateAccumulatingResult A closure that updates the accumulating value with an element of the sequence.
-     * @return Result The final accumulated value. If the sequence has no elements, the result is initialResult.
+     * @param Closure(Result, mixed, int<0, max>=): Result $updateAccumulatingResult A closure that updates the accumulating value with an element of the sequence.
+     * @return Result The final accumulated value. If the sequence has no elements, the result is $initialResult.
      */
     #[Override]
     public function reduce(mixed $initialResult, Closure $updateAccumulatingResult)
@@ -68,7 +68,7 @@ class FlattenSequence extends ObjectClass implements Sequence, IteratorAggregate
     /**
      * @template Result
      * Returns a Collection containing the results of mapping the given closure over the collection's elements.
-     * @param Closure(mixed, int=): Result $transform
+     * @param Closure(mixed, int<0, max>=): Result $transform
      * @return Sequence<int, Result>
      */
     #[Override]
@@ -80,7 +80,7 @@ class FlattenSequence extends ObjectClass implements Sequence, IteratorAggregate
     /**
      * @template Result
      * Returns a Collection containing the non-nil results of calling the given transformation with each element of this collection.
-     * @param Closure(mixed, int=): Result $transform
+     * @param Closure(mixed, int<0, max>=): Result $transform
      * @return Sequence<int, Result>
      */
     #[Override]
@@ -92,7 +92,7 @@ class FlattenSequence extends ObjectClass implements Sequence, IteratorAggregate
     /**
      * @template Result
      * Returns a Collection containing the concatenated results of calling the given transformation with each element of this collection.
-     * @param Closure(mixed, int=): iterable<Result> $transform
+     * @param Closure(mixed, int<0, max>=): iterable<Result> $transform
      * @return Sequence<int, Result>
      */
     #[Override]
@@ -105,7 +105,7 @@ class FlattenSequence extends ObjectClass implements Sequence, IteratorAggregate
      * Returns a Sequence containing, in order, the elements of the sequence that satisfy the given predicate.
      *
      * Complexity: O(n), where n is the length of the sequence.
-     * @param Closure(Element, int=, bool=): bool $isIncluded
+     * @param Closure(Element, int<0, max>=, bool=): bool $isIncluded
      * @return Sequence<int, Element>
      */
     public function filter(Closure $isIncluded): Sequence

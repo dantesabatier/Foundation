@@ -287,7 +287,7 @@ class PredicateScanner extends Scanner
             return Expression::expressionForEvaluatedObject();
         }
         if ($this->scanString("\$")) {
-            if (!($keyPath = $this->parseSimpleExpression()->keyPath)) {
+            if (!($keyPath = $this->parseSimpleExpression()?->keyPath)) {
                 fatal_error("Invalid argument: expecting key path");
             }
             return Expression::expressionForVariable("\$$keyPath");
@@ -372,7 +372,7 @@ class PredicateScanner extends Scanner
             return Expression::expressionForConstantValue($value);
         }
         if ($this->scanString("@")) {
-            if (!($keyPath = $this->parseSimpleExpression()->keyPath)) {
+            if (!($keyPath = $this->parseSimpleExpression()?->keyPath)) {
                 fatal_error("Invalid argument: expecting expression at index $this->scanLocation");
             }
             return Expression::expressionForKeyPath("@$keyPath");

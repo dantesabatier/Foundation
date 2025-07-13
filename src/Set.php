@@ -131,7 +131,7 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
 
     /**
      * Returns a Boolean value indicating whether the sequence contains an element that satisfies the given predicate.
-     * @param Closure(Element, int): bool $predicate A closure that takes an element of the sequence as its argument and returns a Boolean value that indicates whether the passed element represents a match.
+     * @param Closure(Element, int<0, max>): bool $predicate A closure that takes an element of the sequence as its argument and returns a Boolean value that indicates whether the passed element represents a match.
      * @return bool true if the sequence contains an element that satisfies predicate; otherwise, false.
      */
     #[Override]
@@ -178,8 +178,8 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
      * For example, you can use this method on an array of integers to filter adjacent equal entries or count frequencies.
      * @template Result
      * @param Result $initialResult The value to use as the initial accumulating value.
-     * @param Closure(Result, Element, int=): Result $updateAccumulatingResult A closure that updates the accumulating value with an element of the sequence.
-     * @return Result The final accumulated value. If the sequence has no elements, the result is initialResult.
+     * @param Closure(Result, Element, int<0, max>=): Result $updateAccumulatingResult A closure that updates the accumulating value with an element of the sequence.
+     * @return Result The final accumulated value. If the sequence has no elements, the result is $initialResult.
      */
     #[Override]
     public function reduce(mixed $initialResult, Closure $updateAccumulatingResult)
@@ -190,7 +190,7 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
     /**
      * @template Result
      * Returns a Collection containing the results of mapping the given closure over the collection's elements.
-     * @param Closure(Element, int=): Result $transform
+     * @param Closure(Element, int<0, max>=): Result $transform
      * @return Set<Result>
      */
     #[Override]
@@ -202,7 +202,7 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
     /**
      * @template Result
      * Returns a Collection containing the non-nil results of calling the given transformation with each element of this collection.
-     * @param Closure(Element, int=): Result $transform
+     * @param Closure(Element, int<0, max>=): Result $transform
      * @return Set<Result>
      */
     #[Override]
@@ -214,7 +214,7 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
     /**
      * @template Result
      * Returns a Sequence containing the concatenated results of calling the given transformation with each element of this Sequence.
-     * @param Closure(Element, int=): iterable<Result> $transform
+     * @param Closure(Element, int<0, max>=): iterable<Result> $transform
      * @return Set<Result>
      */
     #[Override]
@@ -225,8 +225,8 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
 
     /**
      * Returns the first element of the collection that satisfies the given predicate.
-     * @param Closure(Element, int=): bool|null $where A closure that takes an element of the collection as its argument and returns a Boolean value indicating whether the element is a match.
-     * @return Element|null The first element of the collection that satisfies predicate, or nil if there is no element that satisfies predicate.
+     * @param Closure(Element, int<0, max>=): bool|null $where A closure that takes an element of the collection as its argument and returns a Boolean value indicating whether the element is a match.
+     * @return Element|null The first element of the collection that satisfies predicate or nil if there is no element that satisfies predicate.
      */
     #[Override]
     public function first(?Closure $where = null)
@@ -236,8 +236,8 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
 
     /**
      * Returns the last element of the collection that satisfies the given predicate.
-     * @param Closure(Element, int=): bool|null $where A closure that takes an element of the collection as its argument and returns a Boolean value indicating whether the element is a match.
-     * @return Element|null The last element of the collection that satisfies predicate, or nil if there is no element that satisfies predicate.
+     * @param Closure(Element, int<0, max>=): bool|null $where A closure that takes an element of the collection as its argument and returns a Boolean value indicating whether the element is a match.
+     * @return Element|null The last element of the collection that satisfies predicate or nil if there is no element that satisfies predicate.
      */
     #[Override]
     public function last(?Closure $where = null)
@@ -248,8 +248,8 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
     /**
      * Returns the first index in which an element of the collection satisfies the given predicate.
      * @param Closure(Element): bool $where A closure that takes an element as its argument and returns a Boolean value that indicates whether the passed element represents a match.
-     * @return int|null The index of the first element for which predicate returns true.
-     * If no elements in the collection satisfy the given predicate, returns nil.
+     * @return int|null The index of the first element for which $where returns true.
+     * If no elements in the collection satisfy the given $where returns nil.
      */
     #[Override]
     public function firstIndex(Closure $where): ?int
@@ -260,8 +260,8 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
     /**
      * Returns the last index in which an element of the collection satisfies the given predicate.
      * @param Closure(Element): bool $where A closure that takes an element as its argument and returns a Boolean value that indicates whether the passed element represents a match.
-     * @return int|null The index of the last element for which predicate returns true.
-     * If no elements in the collection satisfy the given predicate, returns nil.
+     * @return int|null The index of the last element for which $where returns true.
+     * If no elements in the collection satisfy the given $where returns nil.
      */
     #[Override]
     public function lastIndex(Closure $where): ?int
@@ -272,7 +272,7 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
     /**
      * Returns the first index where the specified value appears in the collection.
      * @param Element $element An element to search for in the collection.
-     * @return int|null The first index where element is found. If element is not found in the collection, returns nil.
+     * @return int|null The first index where $element is found. If the element is not found in the collection, it returns nil.
      */
     #[Override]
     public function indexOf(mixed $element): ?int
@@ -293,7 +293,7 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
 
     /**
      * Returns a Collection containing, in order, the elements of the collection that satisfy the given predicate.
-     * @param Closure(Element, int=, bool=): bool $isIncluded
+     * @param Closure(Element, int<0, max>=, bool=): bool $isIncluded
      * @return Set<Element>
      */
     #[Override]
@@ -382,7 +382,7 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
 
     /**
      * Invokes {@see KeyValueCoding::setValueForKey()} on each of the set's members.
-     * @param mixed $value The value for the property identified by key.
+     * @param mixed $value The value for the property identified by $key.
      * @param string $key The name of one of the properties of the set's members.
      */
     #[Override]
@@ -451,7 +451,7 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
      * The new element is inserted before the element currently at the specified index.
      * If you pass the collection's endIndex property as the index parameter, the new element is appended to the collection.
      * @param Element $element The new element to insert into the collection.
-     * @param int $at The position at which to insert the new element. index must be a valid index into the collection.
+     * @param int $at The position at which to insert the new element. The $at must be a valid index into the collection.
      */
     #[Override]
     public function insertAt(mixed $element, int $at): void
@@ -497,7 +497,7 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
     }
 
     /**
-     * @param int $index The index of the member to remove, position must be a valid index of the collection, and must not be equal to the collection's end index.
+     * @param int $index The index of the member to remove, position must be a valid index of the collection and must not be equal to the collection's end index.
      * @return Element The value that was removed.
      */
     #[Override]
@@ -530,7 +530,7 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
 
     /**
      * Removes and returns the first element of the collection.
-     * @return Element|null A member of the collection. If the collection is empty, returns nil.
+     * @return Element|null A member of the collection. If the collection is empty, it returns nil.
      */
     #[Override]
     public function popFirst()
@@ -553,7 +553,7 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
     /**
      * Returns a subsequence by skipping elements while predicate returns true and returning the remaining elements.
      * @param Closure(Element): bool $while A closure that takes an element of the sequence as its argument and returns true if the element should be skipped or false if it should be included.
-     * Once the predicate returns false it will not be called again.
+     * Once the predicate returns false, it will not be called again.
      * @return Slice<Element>
      */
     #[Override]
@@ -589,8 +589,8 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
     }
 
     /**
-     * Determines whether a given object is present in the set, and returns that object if it is.
-     * Each element of the set is checked for equality with object until a match is found or the end of the set is reached. Objects are considered equal if {@see Equatable::isEqual()} returns true.
+     * Determines whether a given object is present in the set and returns that object if it is.
+     * Each element of the set is checked for equality with an object until a match is found or the end of the set is reached. Objects are considered equal if {@see Equatable::isEqual()} returns true.
      * @param Element $element An object to look for in the set.
      * @return Element|null Returns an object equal to object if it's present in the set, otherwise nil.
      */
@@ -613,7 +613,7 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
     /**
      * Inserts the elements of the given sequence into the set.
      * If the set already contains one or more elements that are also in other, the existing members are kept.
-     * If other contains multiple instances of equivalent elements, only the first instance is kept.
+     * If $other contains multiple instances of equivalent elements, only the first instance is kept.
      * @param SetAlgebra<Element> $other A sequence of elements. other must be finite.
      */
     #[Override]

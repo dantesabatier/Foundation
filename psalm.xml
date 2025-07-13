@@ -16,14 +16,21 @@
             <errorLevel type="suppress">
                 <file name="src/Networking/Challenge.php"/>
                 <file name="src/Networking/HTTPCookieStorage.php"/>
+                <file name="src/Predicates/PredicateScanner.php"/>
             </errorLevel>
         </InvalidArgument>
+        <PossiblyNullArgument>
+            <errorLevel type="suppress">
+                <file name="src/Predicates/PredicateScanner.php"/>
+            </errorLevel>
+        </PossiblyNullArgument>
         <ArgumentTypeCoercion>
             <errorLevel type="suppress">
                 <file name="src/Networking/EasyHandle.php"/>
                 <file name="src/Networking/HTTPCookie.php"/>
                 <file name="src/Networking/URLCache.php"/>
                 <file name="src/SequenceAlgorithms.php"/>
+                <file name="src/Slice.php"/>
             </errorLevel>
         </ArgumentTypeCoercion>
         <ReferenceConstraintViolation>

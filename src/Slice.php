@@ -72,7 +72,7 @@ class Slice extends ObjectClass implements Collection, IteratorAggregate
      * For example, you can use this method on an array of integers to filter adjacent equal entries or count frequencies.
      * @template Result
      * @param Result $initialResult The value to use as the initial accumulating value.
-     * @param Closure(Result, mixed, int=): Result $updateAccumulatingResult A closure that updates the accumulating value with an element of the sequence.
+     * @param Closure(Result, mixed, int<0, max>=): Result $updateAccumulatingResult A closure that updates the accumulating value with an element of the sequence.
      * @return Result The final accumulated value. If the sequence has no elements, the result is $initialResult.
      */
     #[Override]
@@ -84,7 +84,7 @@ class Slice extends ObjectClass implements Collection, IteratorAggregate
     /**
      * @template Result
      * Returns a Collection containing the results of mapping the given closure over the collection's elements.
-     * @param Closure(mixed, int=): Result $transform
+     * @param Closure(mixed, int<0, max>=): Result $transform
      * @return Collection<int, Result>
      * @psalm-suppress LessSpecificReturnStatement, MoreSpecificReturnType
      */
@@ -97,7 +97,7 @@ class Slice extends ObjectClass implements Collection, IteratorAggregate
     /**
      * @template Result
      * Returns a Collection containing the non-nil results of calling the given transformation with each element of this collection.
-     * @param Closure(mixed, int=): Result $transform
+     * @param Closure(mixed, int<0, max>=): Result $transform
      * @return Collection<int, Result>
      * @psalm-suppress LessSpecificReturnStatement, MoreSpecificReturnType
      */
@@ -110,7 +110,7 @@ class Slice extends ObjectClass implements Collection, IteratorAggregate
     /**
      * @template Result
      * Returns a Collection containing the concatenated results of calling the given transformation with each element of this collection.
-     * @param Closure(mixed, int=): iterable<Result> $transform
+     * @param Closure(mixed, int<0, max>=): iterable<Result> $transform
      * @return Collection<int, Result>
      * @psalm-suppress LessSpecificReturnStatement, MoreSpecificReturnType
      */

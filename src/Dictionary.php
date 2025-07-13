@@ -190,7 +190,7 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
      * @template Result
      * @param Result $initialResult The value to use as the initial accumulating value.
      * @param Closure(Result, Element, string=): Result $updateAccumulatingResult A closure that updates the accumulating value with an element of the sequence.
-     * @return Result The final accumulated value. If the sequence has no elements, the result is initialResult.
+     * @return Result The final accumulated value. If the sequence has no elements, the result is $initialResult.
      */
     #[Override]
     public function reduce(mixed $initialResult, Closure $updateAccumulatingResult)
@@ -291,8 +291,8 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
     /**
      * Returns the first index in which an element of the collection satisfies the given predicate.
      * @param Closure(Element): bool $where A closure that takes an element as its argument and returns a Boolean value that indicates whether the passed element represents a match.
-     * @return string|null The index of the first element for which predicate returns true.
-     * If no elements in the collection satisfy the given predicate, returns nil.
+     * @return string|null The index of the first element for which $where returns true.
+     * If no elements in the collection satisfy the given $where returns nil.
      */
     #[Override]
     public function firstIndex(Closure $where): ?string
@@ -313,7 +313,7 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
     /**
      * Returns the first index where the specified value appears in the collection.
      * @param Element $element An element to search for in the collection.
-     * @return string|null The first index where element is found. If element is not found in the collection, returns nil.
+     * @return string|null The first index where $element is found. If the element is not found in the collection, it returns nil.
      */
     #[Override]
     public function indexOf(mixed $element): ?string
@@ -324,7 +324,7 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
     /**
      * Returns the first element of the collection that satisfies the given predicate.
      * @param Closure(Element, string=): bool|null $where A closure that takes an element of the collection as its argument and returns a Boolean value indicating whether the element is a match.
-     * @return Element|null The first element of the collection that satisfies predicate, or nil if there is no element that satisfies predicate.
+     * @return Element|null The first element of the collection that satisfies predicate or nil if there is no element that satisfies predicate.
      */
     #[Override]
     public function first(?Closure $where = null)
@@ -416,7 +416,7 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
     /**
      * Merges the given dictionary into this dictionary, using a combining closure to determine the value for any duplicate keys.
      *
-     * Use the combine closure to select a value to use in the updated dictionary, or to combine existing and new values.
+     * Use the combine closure to select a value to use in the updated dictionary or to combine existing and new values.
      * As the key-values pairs in other are merged with this dictionary, the combine closure is called with the current and new values for any duplicate keys that are encountered.
      * @param Sequence<string, Element> $other A dictionary to merge.
      * @param Closure(Element, Element, ?string): Element|null $combine A closure that takes the current and new values for any duplicate keys.
@@ -453,7 +453,7 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
     /**
      * Returns the value associated with a given key.
      * @param string $key The key for which to return the corresponding value.
-     * @return Element|null The value associated with key.
+     * @return Element|null The value associated with $key.
      */
     #[Override]
     public function valueForKey(string $key): mixed
@@ -463,7 +463,7 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
 
     /**
      * Adds a given key-value pair to the dictionary.
-     * @param Element|null $value The value for key.
+     * @param Element|null $value The value for $key.
      * @param string $key The key for value.
      */
     #[Override]
@@ -485,12 +485,12 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
     }
 
     /**
-     * Updates the value stored in the dictionary for the given key, or adds a new key-value pair if the key does not exist.
+     * Updates the value stored in the dictionary for the given key or adds a new key-value pair if the key does not exist.
      *
      * Use this method instead of key-based subscripting when you need to know whether the new value supplants the value of an existing key. If the value of an existing key is updated, updateValue() returns the original value.
      * @param Element $value The new value to add to the dictionary.
-     * @param string $key The key to associate with value. If key already exists in the dictionary, value replaces the existing associated value. If key isn't already a key of the dictionary, the (key, value) pair is added.
-     * @return Element The value that was replaced, or nil if a new key-value pair was added.
+     * @param string $key The key to associate with value. If $key already exists in the dictionary, $value replaces the existing associated value. If $key isn't already a key of the dictionary, the (key, value) pair is added.
+     * @return Element The $value that was replaced, or nil if a new key-value pair was added.
      */
     public function updateValue(mixed $value, string $key)
     {
@@ -504,7 +504,7 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
      *
      * If the key is found in the dictionary, this method returns the key's associated value. On removal, this method invalidates all indices with respect to the dictionary.
      * @param string $key The key to remove along with its associated value.
-     * @return Element|null The value that was removed, or nil if the key was not present in the dictionary.
+     * @return Element|null The $value that was removed, or nil if the key was not present in the dictionary.
      */
     public function removeValueForKey(string $key)
     {
