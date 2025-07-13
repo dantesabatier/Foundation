@@ -38,6 +38,7 @@
             <errorLevel type="suppress">
                 <file name="src/AssociativeArrayStrategy.php"/>
                 <file name="src/FlattenSequence.php"/>
+                <file name="src/ObjectClass.php"/>
                 <file name="src/SequentialArrayStrategy.php"/>
             </errorLevel>
         </MissingOverrideAttribute>
