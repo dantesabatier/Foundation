@@ -49,5 +49,5 @@ function kvc_components(string $keyPath): array
             $keyPathToProperty = implode(".", $components);
         }
     }
-    return [$collection, substring_from_index($keyPath, $idx + 1), $keyPathToProperty];
+    return [(string)$collection, substring_from_index($keyPath, $idx + 1), $keyPathToProperty];
 }

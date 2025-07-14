@@ -26,6 +26,7 @@ class DiskEntry
         if ($url->pathExtension !== self::pathExtension) {
             return null;
         }
+        /** @var string[] $parts */
         $parts = preg_split(sprintf("/%s/", preg_quote(".", "/")), $url->deletingPathExtension()->lastPathComponent, -1, PREG_SPLIT_NO_EMPTY);
         if (count($parts) !== 3) {
             return null;

@@ -39,6 +39,7 @@ final class EasyHandle
     {
         $this->pauseState = new EasyHandlePauseState();
         if (!$this->delegate instanceof WebSocketURLProtocol) {
+            /** @psalm-suppress PossiblyFalsePropertyAssignmentValue */
             $this->rawHandle = curl_init();
             $this->setupCallbacks();
         }
@@ -119,6 +120,7 @@ final class EasyHandle
                 "Sec-WebSocket-Version" => "13"
             ]);
             $this->url = $url;
+            /** @psalm-suppress PossiblyFalsePropertyAssignmentValue */
             $this->rawHandle = stream_socket_client($url->absoluteString);
             return;
         }
@@ -339,9 +341,9 @@ final class EasyHandle
 
     public function connect(): void
     {
-        if (!($url = $this->url)) {
-            fatal_error("URL cannot be null");
-        }
+        $url = $this->url ?? fatal_error("URL cannot be null");
+        $rawHandle = $this->rawHandle;
+        assert(is_resource($rawHandle));
         $path = $url->path;
         if ($query = $url->query) {
             $path .= "?$query";
@@ -350,10 +352,10 @@ final class EasyHandle
         /** @psalm-suppress ArgumentTypeCoercion, ReferenceConstraintViolation */
         $header .= $this->allHeaderFields->reduce("", fn(string &$result, string $value, string $key): string => $result .= "$key: $value\r\n");
         $header .= "\r\n";
-        fwrite($this->rawHandle, $header);
+        fwrite($rawHandle, $header);
         $buffer = "";
         do {
-            $data = $this->fill($this->rawHandle);
+            $data = $this->fill($rawHandle);
             $buffer .= $data;
             $this->didReceiveHeaderData($data, strlen($data));
         } while (substr_count($buffer, "\r\n\r\n") === 0);
@@ -361,10 +363,11 @@ final class EasyHandle
 
     public function disconnect(): void
     {
-        if ($this->rawHandle instanceof CurlHandle) {
-            curl_close($this->rawHandle);
-        } elseif (is_resource($this->rawHandle)) {
-            fclose($this->rawHandle);
+        $rawHandle = $this->rawHandle;
+        if ($rawHandle instanceof CurlHandle) {
+            curl_close($rawHandle);
+        } elseif (is_resource($rawHandle)) {
+            fclose($rawHandle);
         }
     }
 
@@ -380,10 +383,12 @@ final class EasyHandle
     public function receiveWebSocketsData(): array
     {
         $read = function (int $length): string {
+            $rawHandle = $this->rawHandle;
+            assert(is_resource($rawHandle));
             $data = "";
             while (strlen($data) < $length) {
-                if (!($buffer = fread($this->rawHandle, $length - strlen($data)))) {
-                    if (stream_get_meta_data($this->rawHandle)["timed_out"]) {
+                if (!($buffer = fread($rawHandle, $length - strlen($data)))) {
+                    if (stream_get_meta_data($rawHandle)["timed_out"]) {
                         fatal_error("Connection timeout");
                     }
                     fatal_error("Unexpected message received from server");
@@ -463,6 +468,8 @@ final class EasyHandle
      */
     public function sendWebSocketsData(string $data, URLSessionWebSocketOperation $operation): void
     {
+        $rawHandle = $this->rawHandle;
+        assert(is_resource($rawHandle));
         $parts = new ArrayClass(str_split($data, 4096) ?: [""]);
         /** @var ArrayClass<array{string, URLSessionWebSocketOperation, bool, bool}> $frames */
         $frames = $parts->map(fn(string $e, int $i): array => [$e, $i === 0 ? $operation : URLSessionWebSocketOperation::cont, $i === $parts->indexBefore($parts->endIndex), true]);
@@ -495,7 +502,7 @@ final class EasyHandle
             } else {
                 $data .= $payload;
             }
-            fwrite($this->rawHandle, $data);
+            fwrite($rawHandle, $data);
         }
         if ($operation !== URLSessionWebSocketOperation::close) {
             return;

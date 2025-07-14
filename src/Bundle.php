@@ -455,7 +455,7 @@ final class Bundle extends ObjectClass
             if (!string_is_equal(FileManager::default()->displayName($url->path), $name, CompareOptions::caseInsensitive)) {
                 continue;
             }
-            $class = $name !== $className ? $className : sprintf("%s\\%s", $this->namespace($url), $name);
+            $class = $name !== $className ? $className : sprintf("%s\\%s", human_readable_value($this->namespace($url)), $name);
             if (!class_exists($class)) {
                 continue;
             }
