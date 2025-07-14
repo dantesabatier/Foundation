@@ -132,7 +132,10 @@ class Scanner extends ObjectClass
     }
 
     /**
+     * @param float|int $number
      * @param-out float|int $number
+     * @param bool $isInt
+     * @return bool
      */
     private function scanNumber(float|int &$number, bool $isInt = true): bool
     {
@@ -156,17 +159,18 @@ class Scanner extends ObjectClass
     /**
      * Scans for an int value from a decimal representation, returning a found value by reference.
      * @param int $int Upon return, contains the scanned value.
+     * @param-out int|float $int
      * @return bool true if the receiver finds a valid decimal integer representation, otherwise false.
      */
     public function scanInt(int &$int): bool
     {
-        /** @phpstan-ignore parameterByRef.type */
         return $this->scanNumber($int);
     }
 
     /**
      * Scans for a float value, returning a found value by reference.
      * @param float $float Upon return, contains the scanned value.
+     * @param-out float $float
      * @return bool true if the receiver finds a valid floating-point representation, otherwise false.
      */
     public function scanFloat(float &$float): bool

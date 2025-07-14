@@ -28,8 +28,8 @@ class SubqueryExpression extends Expression
         /** @var ArrayClass $collection */
         $collection = $this->collectionExpression->expressionValue($object, $context) ?? new ArrayClass();
         assert($collection instanceof Collection);
-        /** @var Dictionary|null $context */
         $context ??= new Dictionary();
+        /** @psalm-suppress InvalidArgument */
         $context[$this->variable] ??= Expression::expressionForEvaluatedObject();
         $predicate = $this->predicate->withSubstitutionVariables($context);
         $value = $collection->filter(fn(mixed $obj): bool => $predicate->evaluate($obj, $context));

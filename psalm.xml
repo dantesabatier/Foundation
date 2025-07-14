@@ -24,6 +24,11 @@
                 <file name="src/Predicates/PredicateScanner.php"/>
             </errorLevel>
         </PossiblyNullArgument>
+        <PossiblyNullReference>
+            <errorLevel type="suppress">
+                <file name="src/Predicates/FunctionExpression.php"/>
+            </errorLevel>
+        </PossiblyNullReference>
         <ArgumentTypeCoercion>
             <errorLevel type="suppress">
                 <file name="src/Networking/EasyHandle.php"/>
@@ -58,5 +63,6 @@
         <UndefinedDocblockClass errorLevel="suppress"/>
         <InvalidOperand errorLevel="suppress"/>
         <ClassMustBeFinal errorLevel="suppress"/>
+        <NoInterfaceProperties errorLevel="suppress"/>
     </issueHandlers>
 </psalm>

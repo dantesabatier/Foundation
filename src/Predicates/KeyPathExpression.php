@@ -45,12 +45,10 @@ class KeyPathExpression extends FunctionExpression
     #[Override]
     public function expressionValue(mixed $object = null, ?Dictionary $context = null): mixed
     {
-        $operand = $this->operand;
-        $obj = $operand->expressionValue($object, $context);
-        $selector = $this->selector;
-        $keyPath = $this->keyPath;
+        $obj = $this->operand?->expressionValue($object, $context);
         if (is_object($obj)) {
-            $arguments = [$keyPath];
+            $selector = $this->selector;
+            $arguments = [$this->keyPath];
             $value = $obj->$selector(...$arguments);
             if (Predicate::$debugDefault) {
                 error_log(sprintf("Foundation: expression %s: %s::%s(%s) => %s", $this->expressionType->name, typeof($obj), $selector, implode(", ", $arguments), human_readable_value($value)));
