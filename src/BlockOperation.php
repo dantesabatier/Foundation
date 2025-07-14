@@ -21,7 +21,7 @@ class BlockOperation extends Operation
     private(set) ArrayClass $executionBlocks;
 
     /**
-     * Creates and returns an BlockOperation object and adds the specified block to it.
+     * Creates and returns a {@see BlockOperation} object and adds the specified block to it.
      * @param Closure(): void $block The block to add to the new block operation object's list.
      * The block should take no parameters and have no return value.
      */
