@@ -10,7 +10,7 @@
 namespace Sabatier\Foundation;
 
 /**
- * Interface Comparable
+ * Defines a contract for classes whose instances can be compared to determine their ordering relative to other objects.
  */
 interface Comparable extends Equatable
 {
