@@ -56,6 +56,7 @@ const BundleDidLoadNotification = "BundleDidLoadNotification";
 /** @var string A constant used as a key for the userInfo dictionary of a {@see BundleDidLoadNotification} notification that corresponds to an array of names of each class that was loaded. */
 const LoadedClasses = "LoadedClasses";
 const EscapeSequenceBackgroundColorAddition = 10;
+const BytesPerKilobyte = 1024;
 /** @var string Posted whenever an UndoManager object opens or closes an undo group (except when it opens a top-level group) and when checking the redo stack in {@see UndoManager::canRedo}. */
 const UndoManagerCheckpointNotification = "UndoManagerCheckpointNotification";
 /** @var string Posted just before an UndoManager object performs an undo operation. */
