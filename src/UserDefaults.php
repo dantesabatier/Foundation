@@ -2,10 +2,8 @@
 
 namespace Sabatier\Foundation;
 
-use BackedEnum;
-
 /**
- * An interface to the user's defaults database, where you store key-value pairs persistently across launches of your app.
+ * An interface to the user defaults database, where you store key-value pairs persistently across launches of your app.
  */
 class UserDefaults
 {
@@ -65,7 +63,7 @@ class UserDefaults
      *
      * This method searches the domains included in the search list in the order in which they are listed and returns the object associated with the first occurrence of the specified default.
      * The returned object is immutable, even if the value you originally set was mutable.
-     * @param string $key A key in the current user's defaults database.
+     * @param string $key A key in the current user defaults database.
      * @return mixed The object associated with the specified key, or nil if the key was not found.
      */
     public function object(string $key): mixed
@@ -75,7 +73,7 @@ class UserDefaults
 
     /**
      * Returns the URL associated with the specified key.
-     * @param string $key A key in the current user's defaults database.
+     * @param string $key A key in the current user defaults database.
      * @return URL|null The URL associated with the specified key. If the key doesn't exist, this method returns nil.
      */
     public function url(string $key): ?URL
@@ -88,7 +86,7 @@ class UserDefaults
 
     /**
      * Returns the array associated with the specified key.
-     * @param string $key A key in the current user's defaults database.
+     * @param string $key A key in the current user defaults database.
      * @return ArrayClass|null The array associated with the specified key, or nil if the key does not exist or its value is not an array.
      */
     public function array(string $key): ?ArrayClass
@@ -101,7 +99,7 @@ class UserDefaults
 
     /**
      * Returns the dictionary object associated with the specified key.
-     * @param string $key A key in the current user's defaults database.
+     * @param string $key A key in the current user defaults database.
      * @return Dictionary|null The dictionary object associated with the specified key, or nil if the key does not exist or its value is not a dictionary.
      */
     public function dictionary(string $key): ?Dictionary
@@ -114,7 +112,7 @@ class UserDefaults
 
     /**
      * Returns the string associated with the specified key.
-     * @param string $key A key in the current user's defaults database.
+     * @param string $key A key in the current user defaults database.
      * @return string|null For string values, the string associated with the specified key; for number values, the string value of the number. Returns nil if the default does not exist or is not a string or number value.
      */
     public function string(string $key): ?string
@@ -126,15 +124,12 @@ class UserDefaults
         if (is_string($object)) {
             return $object;
         }
-        if ($object instanceof BackedEnum) {
-            return human_readable_value($object->value);
-        }
         return null;
     }
 
     /**
      * Returns the array of strings associated with the specified key.
-     * @param string $key A key in the current user's defaults database.
+     * @param string $key A key in the current user defaults database.
      * @return ArrayClass<string>|null The array of string objects, or nil if the specified default does not exist, the default does not contain an array, or the array does not contain strings.
      */
     public function stringArray(string $key): ?ArrayClass
@@ -149,7 +144,7 @@ class UserDefaults
      * Returns the Boolean value associated with the specified key.
      *
      * This method automatically coerces certain "truthy" values—such as the strings "true", "YES", and "1", and the numbers 1 and 1.0 to the Boolean value true. The same is true for certain "falsy" values—such as the strings "false", "NO", and "0", and the numbers 0 and 0.0—which are automatically coerced to the Boolean value false.
-     * @param string $key A key in the current user's defaults database.
+     * @param string $key A key in the current user defaults database.
      * @return bool The Boolean value associated with the specified key. If the specified key doesn't exist, this method returns false.
      */
     public function bool(string $key): bool
@@ -165,7 +160,7 @@ class UserDefaults
      * Returns the integer value associated with the specified key.
      *
      * This method automatically coerces certain values into equivalent integer values (if one can be determined). The Boolean value true becomes 1 and false becomes 0. A floating point number becomes the greatest integer that's less than that number (for example, 2.67 becomes 2). A string that represents an integer becomes the equivalent integer (for example, "123" becomes 123).
-     * @param string $key A key in the current user's defaults database.
+     * @param string $key A key in the current user defaults database.
      * @return int The integer value associated with the specified key. If the specified key doesn't exist, this method returns 0.
      */
     public function integer(string $key): int
@@ -181,7 +176,7 @@ class UserDefaults
      * Returns the float value associated with the specified key.
      *
      * This method automatically coerces certain values into equivalent float values (if one can be determined). The Boolean value true becomes 1.0 and false becomes 0.0. An integer becomes the equivalent float (for example, 2 becomes 2.0). A string that represents a floating point number becomes the equivalent float (for example, "123.4" becomes 123.4).
-     * @param string $key A key in the current user's defaults database.
+     * @param string $key A key in the current user defaults database.
      * @return float The float value associated with the specified key. If the key doesn't exist, this method returns 0.
      */
     public function float(string $key): float
@@ -195,7 +190,7 @@ class UserDefaults
 
     /**
      * Returns the double value associated with the specified key.
-     * @param string $key A key in the current user's defaults database.
+     * @param string $key A key in the current user defaults database.
      * @return float The double value associated with the specified key. If the key doesn't exist, this method returns 0.
      * This method automatically coerces certain values into equivalent double values (if one can be determined). The Boolean value true becomes 1.0 and false becomes 0.0. An integer becomes the equivalent double (for example, 2 becomes 2.0). A string that represents a floating point number becomes the equivalent double (for example, "123.4" becomes 123.4).
      */
@@ -221,7 +216,7 @@ class UserDefaults
      * Sets the value of the specified default key.
      *
      * The value parameter can be only property list objects: Data, String, Number, Date, Array, or Dictionary. For Array and Dictionary objects, their contents must be property list objects.
-     * @param mixed $value The object to store in the defaults database.
+     * @param mixed $value The object to store in the user defaults database.
      * @param string $key The key with which to associate the value.
      */
     public function setObject(mixed $value, string $key): void
@@ -234,7 +229,7 @@ class UserDefaults
      * Sets the value of the specified default key to the specified float value.
      *
      * This is a convenience method for calling {@see setObject()}.
-     * @param float $value The object to store in the defaults database.
+     * @param float $value The object to store in the user defaults database.
      * @param string $key The key with which to associate the value.
      */
     public function setFloat(float $value, string $key): void
@@ -258,7 +253,7 @@ class UserDefaults
      * Sets the value of the specified default key to the specified integer value.
      *
      * This is a convenience method for calling {@see setObject()}.
-     * @param int $value The object to store in the defaults database.
+     * @param int $value The object to store in the user defaults database.
      * @param string $key The key with which to associate the value.
      */
     public function setInteger(int $value, string $key): void
@@ -270,7 +265,7 @@ class UserDefaults
      * Sets the value of the specified default key to the specified Boolean value.
      *
      * This is a convenience method for calling {@see setObject()}.
-     * @param bool $value The object to store in the defaults database.
+     * @param bool $value The object to store in the user defaults database.
      * @param string $key The key with which to associate the value.
      */
     public function setBool(bool $value, string $key): void
@@ -282,7 +277,7 @@ class UserDefaults
      * Sets the value of the specified default key to the specified URL.
      *
      * This is a convenience method for calling {@see setObject()}.
-     * @param URL|null $value The URL to store in the defaults database.
+     * @param URL|null $value The URL to store in the user defaults database.
      * @param string $key The key with which to associate the value.
      */
     public function setURL(?URL $value, string $key): void
