@@ -23,7 +23,7 @@ readonly class ApplicationPreferences
             $object = $notification->object;
             if ($this->dictionaryRepresentation->isEqual($object->dictionaryRepresentation())) {
                 $bytes = PropertyListSerialization::writePropertyList($this->dictionaryRepresentation, $this->url);
-                if ($bytes * 1024 > USER_DEFAULTS_SIZE_LIMIT) {
+                if ($bytes * BytesPerKilobyte > USER_DEFAULTS_SIZE_LIMIT) {
                     NotificationCenter::default()->postNotificationName(UserDefaults::sizeLimitExceededNotification, $object);
                 }
             }
