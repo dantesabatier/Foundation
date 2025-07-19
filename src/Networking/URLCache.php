@@ -49,7 +49,7 @@ final class URLCache extends ObjectClass
      * A disk cache measured in the tens of megabytes is acceptable in most cases.
      * @param int $memoryCapacity The memory capacity of the cache, in bytes.
      * @param int $diskCapacity The disk capacity of the cache, in bytes.
-     * @param URL|null $directory The path to an on-disk directory, where the system stores the on-disk cache. If directory is nil, the cache uses a default directory.
+     * @param URL|null $directory The path to an on-disk directory, where the system stores the on-disk cache. If the directory is nil, the cache uses a default directory.
      */
     public function __construct(public int $memoryCapacity, public int $diskCapacity, ?URL $directory = null)
     {
