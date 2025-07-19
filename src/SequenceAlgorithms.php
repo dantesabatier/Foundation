@@ -72,6 +72,7 @@ trait SequenceAlgorithms
 
     public function contains(Closure $predicate): bool
     {
+        /** @noinspection PhpLoopCanBeConvertedToArrayAnyInspection */
         foreach (clone $this as $i => $e) {
             if ($predicate($e, $i)) {
                 return true;
