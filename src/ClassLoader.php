@@ -31,7 +31,7 @@ final class ClassLoader
         if (FileManager::default()->fileExists($this->autoloadPath)) {
             require_once $this->autoloadPath;
         }
-        $components = new ARrayClass(explode("\\", $className));
+        $components = new ArrayClass(explode("\\", $className));
         $name = $components->last ?? $className;
         foreach ($fileEnumerator as $url) {
             if (!$this->isCorrectFile($url, $name)) {
