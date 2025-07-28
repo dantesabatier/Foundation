@@ -54,6 +54,11 @@
                 <file name="src/SequentialArrayStrategy.php"/>
             </errorLevel>
         </MissingOverrideAttribute>
+        <UnresolvableInclude>
+            <errorLevel type="suppress">
+                <file name="src/ClassLoader.php"/>
+            </errorLevel>
+        </UnresolvableInclude>
         <RiskyTruthyFalsyComparison errorLevel="suppress"/>
         <DuplicateClass errorLevel="suppress"/>
         <DuplicateFunction errorLevel="suppress"/>
