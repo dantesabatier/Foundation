@@ -9,7 +9,6 @@
 
 namespace Sabatier\Foundation;
 
-use Exception;
 use GdImage;
 use Locale;
 use ReflectionClass;
@@ -411,21 +410,6 @@ final class Bundle extends ObjectClass
         NotificationCenter::default()->postNotificationName(self::didLoadNotification, $this, new Dictionary([LoadedClasses => $this->loadedClasses]));
     }
 
-    private function namespace(URL $url): ?string
-    {
-        try {
-            if (!($contents = FileManager::default()->contents($url->path))) {
-                return null;
-            }
-            preg_match("/\s*namespace\s+([^;]+);/", $contents, $matches);
-            if (isset($matches[1])) {
-                return trim($matches[1]);
-            }
-        } catch (Exception) {
-        }
-        return null;
-    }
-
     /**
      * Returns the Class for the specified name.
      * @param string $className The name of a class.
@@ -435,33 +419,11 @@ final class Bundle extends ObjectClass
      */
     public function classNamed(string $className): ?string
     {
-        if (class_exists($className)) {
-            $this->append($className);
-            return $className;
-        }
-        $components = new ArrayClass(explode("\\", $className));
-        $name = $components->last ?? $className;
-        if (!($enumerator = FileManager::default()->enumerator($this->bundleURL->appendingPathComponent("src"), null, DirectoryEnumerationOptions::skipsHiddenFiles))) {
-            return null;
-        }
-        $autoloadPath = $this->bundleURL->appendingPathComponent("vendor")->appendingPathComponent("autoload")->appendingPathExtension("php")->path;
-        if (FileManager::default()->fileExists($autoloadPath)) {
-            require_once $autoloadPath;
-        }
-        foreach ($enumerator as $url) {
-            if (!string_is_equal($url->pathExtension, "php", CompareOptions::caseInsensitive)) {
-                continue;
-            }
-            if (!string_is_equal(FileManager::default()->displayName($url->path), $name, CompareOptions::caseInsensitive)) {
-                continue;
-            }
-            $class = $name !== $className ? $className : sprintf("%s\\%s", human_readable_value($this->namespace($url)), $name);
-            if (!class_exists($class)) {
-                continue;
-            }
+        $loader = new ClassLoader($this->bundleURL);
+        $class = $loader->load($className);
+        if ($class) {
             $this->append($class);
-            return $class;
         }
-        return null;
+        return $class;
     }
 }
