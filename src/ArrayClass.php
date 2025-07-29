@@ -115,6 +115,8 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
             $this->reserved = $elements->array;
         } elseif ($elements instanceof Dictionary) {
             $this->reserved = $elements->values->array;
+        } elseif ($elements instanceof ExpressibleByArrayLiteral) {
+            $this->reserved = $elements->array;
         } elseif (is_array($elements)) {
             $this->reserved = is_sequential($elements) ? $elements : array_values($elements);
         } else {
