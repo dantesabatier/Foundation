@@ -73,7 +73,6 @@ final class URLCache extends ObjectClass
 
     private function evictFromMemoryCacheAssumingLockHeld(int $maximumSize): void
     {
-        /** @psalm-suppress ArgumentTypeCoercion, ReferenceConstraintViolation */
         $totalSize = $this->inMemoryCacheContents->reduce(0, fn(int &$size, CacheEntry $entry): int => $size += $entry->cost);
         $countEvicted = 0;
         foreach ($this->inMemoryCacheOrder as $identifier) {

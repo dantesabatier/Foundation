@@ -275,7 +275,6 @@ final class Bundle extends ObjectClass
     public function url(?string $name, ?string $extension = null, ?string $subpath = null, ?string $localization = null): ?URL
     {
         $baseURL = $this->resourceURL ?? $this->bundleURL;
-        /** @psalm-suppress InvalidArgument */
         return self::findBundleResources($subpath ? $baseURL->appendingPathComponent($subpath) : $baseURL, $name, $extension !== null ? new ArrayClass([$extension]) : null, $localization !== null ? new ArrayClass([$localization]) : null, 1)?->first;
     }
 
@@ -415,7 +414,6 @@ final class Bundle extends ObjectClass
      * @param string $className The name of a class.
      * @return class-string|null The Class for className.
      * Returns null if className is not one of the classes associated with the receiver or if there is an error loading the executable code containing the class implementation.
-     * @psalm-suppress UnresolvableInclude
      */
     public function classNamed(string $className): ?string
     {

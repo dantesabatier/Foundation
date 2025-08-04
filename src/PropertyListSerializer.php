@@ -98,8 +98,7 @@ readonly class PropertyListSerializer
     {
         $dictionary = new Dictionary();
         for ($node = $for->firstChild; $node !== null; $node = $node->nextSibling) {
-            /** @psalm-suppress NoValue */
-            if (!($node instanceof DOMElement)) {
+            if (!$node instanceof DOMElement) {
                 continue;
             }
             if ($node->tagName !== "key") {

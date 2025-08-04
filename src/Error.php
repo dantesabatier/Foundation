@@ -126,7 +126,6 @@ class Error extends ObjectClass
         $dictionary = $this->dictionaryWithValues(new ArrayClass(["domain", "code", "localizedDescription", "localizedRecoveryOptions", "localizedRecoverySuggestion", "localizedFailureReason"]));
         if ($userInfo = $this->userInfo) {
             $copy = clone $userInfo;
-            /** @psalm-suppress ArgumentTypeCoercion */
             $copy->removeAll(fn(mixed $value, string $key): bool => match ($key) {
                 LocalizedDescriptionKey, LocalizedRecoveryOptionsErrorKey, LocalizedRecoverySuggestionErrorKey, LocalizedFailureReasonErrorKey => true,
                 default => false

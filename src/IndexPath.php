@@ -335,7 +335,6 @@ class IndexPath extends ObjectClass implements MutableCollection, Iterator
     /**
      * Returns the elements of this sequence of sequences, concatenated.
      * @return FlattenSequence<int> A flattened view of the elements of this sequence of sequences.
-     * @psalm-suppress LessSpecificReturnStatement, MoreSpecificReturnType
      */
     #[Override]
     public function joined(): FlattenSequence

@@ -349,7 +349,6 @@ final class EasyHandle
             $path .= "?$query";
         }
         $header = "GET $path HTTP/1.1\r\n";
-        /** @psalm-suppress ArgumentTypeCoercion, ReferenceConstraintViolation */
         $header .= $this->allHeaderFields->reduce("", fn(string &$result, string $value, string $key): string => $result .= "$key: $value\r\n");
         $header .= "\r\n";
         fwrite($rawHandle, $header);
