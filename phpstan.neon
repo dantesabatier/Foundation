@@ -7,3 +7,9 @@ parameters:
 		- identifier: property.staticAccess
 		- identifier: method.childReturnType
 		  path: src/Dictionary.php
+		- identifier: return.type
+		  path: src/ObjectClass.php
+		- identifier: paramOut.type
+		  path: src/Scanner.php
+		- identifier: varTag.nativeType
+		  path: src/Networking/DiskEntry.php

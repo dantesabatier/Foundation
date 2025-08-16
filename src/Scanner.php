@@ -175,7 +175,6 @@ class Scanner extends ObjectClass
      */
     public function scanFloat(float &$float): bool
     {
-        /** @phpstan-ignore parameterByRef.type */
         return $this->scanNumber($float, false);
     }
 
