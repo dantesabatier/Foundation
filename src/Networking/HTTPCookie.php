@@ -161,8 +161,8 @@ class HTTPCookie extends ObjectClass
      * Creates an array of HTTP cookies that corresponds to the provided response header fields for the provided URL.
      *
      * This method ignores irrelevant header fields in headerFields, allowing dictionaries to contain additional data.
-     * If headerFields doesn't specify a domain for a given cookie, the cookie is created with a default domain value of URL.
-     * If headerFields doesn't specify a path for a given cookie, the cookie is created with a default path value of "/".
+     * If $headerFields doesn't specify a domain for a given cookie, the cookie is created with a default domain value of URL.
+     * If $headerFields doesn't specify a path for a given cookie, the cookie is created with a default path value of "/".
      * @param Dictionary<string> $headerFields The header fields used to create the HTTPCookie objects.
      * @param URL $url The URL associated with the created cookies.
      * @return ArrayClass<HTTPCookie> The array of created cookies.
