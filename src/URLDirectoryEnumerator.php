@@ -21,7 +21,31 @@ class URLDirectoryEnumerator extends DirectoryEnumerator
     private readonly RecursiveIteratorIterator $iterator;
     private ?URL $currentURL = null;
     private bool $shouldContinue = false;
-    private bool $isPostOrderDirectory = false;
+    public ?Dictionary $directoryAttributes {
+        get {
+            try {
+                return FileManager::default()->attributesOfItem($this->url->path);
+            } catch (Exception) {
+                return null;
+            }
+        }
+    }
+    public ?Dictionary $fileAttributes {
+        get {
+            if (!($currentURL = $this->currentURL)) {
+                return null;
+            }
+            try {
+                return FileManager::default()->attributesOfItem($currentURL->path);
+            } catch (Exception) {
+                return null;
+            }
+        }
+    }
+    public int $level {
+        get => $this->iterator->getDepth();
+    }
+    private(set) bool $isEnumeratingDirectoryPostOrder = false;
 
     public function __construct(private readonly URL $url, private readonly ?ArrayClass $keys = null, #[ExpectedValues(flagsFromClass: DirectoryEnumerationOptions::class)] private readonly int $options = DirectoryEnumerationOptions::skipsHiddenFiles, private readonly ?Closure $errorHandler = null)
     {
@@ -29,44 +53,9 @@ class URLDirectoryEnumerator extends DirectoryEnumerator
     }
 
     #[Override]
-    public function directoryAttributes(): ?Dictionary
-    {
-        try {
-            return FileManager::default()->attributesOfItem($this->url->path);
-        } catch (Exception) {
-            return null;
-        }
-    }
-
-    #[Override]
-    public function fileAttributes(): ?Dictionary
-    {
-        if (!($currentURL = $this->currentURL)) {
-            return null;
-        }
-        try {
-            return FileManager::default()->attributesOfItem($currentURL->path);
-        } catch (Exception) {
-            return null;
-        }
-    }
-
-    #[Override]
-    public function level(): int
-    {
-        return $this->iterator->getDepth();
-    }
-
-    #[Override]
     public function skipDescendants(): void
     {
         $this->shouldContinue = true;
-    }
-
-    #[Override]
-    public function isEnumeratingDirectoryPostOrder(): bool
-    {
-        return $this->isPostOrderDirectory;
     }
 
     #[Override]
@@ -84,7 +73,7 @@ class URLDirectoryEnumerator extends DirectoryEnumerator
                     continue;
                 }
                 if ($this->shouldContinue) {
-                    $this->isPostOrderDirectory = $url->hasDirectoryPath;
+                    $this->isEnumeratingDirectoryPostOrder = $url->hasDirectoryPath;
                     continue;
                 }
                 if ($keys !== null) {
@@ -101,7 +90,7 @@ class URLDirectoryEnumerator extends DirectoryEnumerator
                 }
                 $this->currentURL = $url;
                 yield $url;
-                $this->shouldContinue = $this->isEnumeratingDirectoryPostOrder();
+                $this->shouldContinue = $this->isEnumeratingDirectoryPostOrder;
             }
         })();
     }
