@@ -79,8 +79,8 @@ final class OperationQueue extends ObjectClass
      * Returns the operation queue that launched the current operation.
      *
      * You can use this method from within a running operation object to get a reference to the operation queue that started it.
-     * Calling this method from outside the context of a running operation typically results in nil being returned.
-     * @return OperationQueue|null The operation queue that started the operation or nil if the queue could not be determined.
+     * Calling this method from outside the context of a running operation typically results in null being returned.
+     * @return OperationQueue|null The operation queue that started the operation or null if the queue could not be determined.
      */
     public static function current(): ?OperationQueue
     {

@@ -78,7 +78,7 @@ class URLComponents extends ObjectClass
             return empty($string) ? null : $string;
         }
     }
-    /** @var ArrayClass<URLQueryItem>|null $queryItems An array of query items for the URL in the order in which they appear in the original query string. Each URLQueryItem represents a single key-value pair, Note that a name may appear more than once in a single query string, so the name values are not guaranteed to be unique. If the URLComponents has an empty query component, it returns an empty array. If the URLComponents has no query component, it returns nil. The setter combines an array containing any number of URLQueryItems, each of which represents a single key-value pair, into a query string and sets the URLComponents query property. Passing an empty array sets the query component of the URLComponents to an empty string. Passing nil removes the query component of the URLComponents. */
+    /** @var ArrayClass<URLQueryItem>|null $queryItems An array of query items for the URL in the order in which they appear in the original query string. Each URLQueryItem represents a single key-value pair, Note that a name may appear more than once in a single query string, so the name values are not guaranteed to be unique. If the URLComponents has an empty query component, it returns an empty array. If the URLComponents has no query component, it returns null. The setter combines an array containing any number of URLQueryItems, each of which represents a single key-value pair, into a query string and sets the URLComponents query property. Passing an empty array sets the query component of the URLComponents to an empty string. Passing null removes the query component of the URLComponents. */
     public ?ArrayClass $queryItems {
         get {
             $query = $this->query;
@@ -124,7 +124,7 @@ class URLComponents extends ObjectClass
      * Returns a URL based on the component settings and relative to a given base URL.
      *
      * If the URLComponents have an authority component (user, password, host or port) and a path component, then the path must either begin with “/” or be an empty string.
-     * If the URLComponents does not have an authority component (user, password, host or port) and has a path component, the path component must not start with “//”. If those requirements are not met, nil is returned.
+     * If the URLComponents does not have an authority component (user, password, host or port) and has a path component, the path component must not start with “//”. If those requirements are not met, null is returned.
      */
     public function urlRelativeTo(?URL $baseURL): ?URL
     {

@@ -164,7 +164,7 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
 
     /**
      * Returns the minimum element in the sequence.
-     * @return Element|null The sequence's minimum element. If the sequence has no elements, returns nil.
+     * @return Element|null The sequence's minimum element. If the sequence has no elements, returns null.
      */
     #[Override]
     public function min()
@@ -174,7 +174,7 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
 
     /**
      * Returns the maximum element in the sequence.
-     * @return Element|null The sequence's maximum element. If the sequence has no elements, returns nil.
+     * @return Element|null The sequence's maximum element. If the sequence has no elements, returns null.
      */
     #[Override]
     public function max()
@@ -233,10 +233,10 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
 
     /**
      * @template Result
-     * Returns an array containing the non-nil results of calling the given transformation with each element of this sequence.
+     * Returns an array containing the non-null results of calling the given transformation with each element of this sequence.
      * Use this method to receive an array of non-optional values when your transformation produces an optional value.
      * @param Closure(Element, string=): Result $transform A closure that accepts an element of this sequence as its argument and returns an optional value.
-     * @return ArrayClass<Result> An array of the non-nil results of calling transform with each element of the sequence.
+     * @return ArrayClass<Result> An array of the non-null results of calling transform with each element of the sequence.
      * @psalm-suppress ImplementedReturnTypeMismatch
      */
     #[Override]
@@ -254,7 +254,7 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
 
     /**
      * @template Result
-     * Returns a new dictionary containing only the key-value pairs that have non-nil values as the result of transformation by the given closure.
+     * Returns a new dictionary containing only the key-value pairs that have non-null values as the result of transformation by the given closure.
      * @param Closure(Element, string=): Result $transform A closure that transforms a value. transform accepts each value of the dictionary as its parameter and returns an optional transformed value of the same or of a different type.
      * @return Dictionary<Result> A dictionary containing the keys and non-nil transformed values of this dictionary.
      */

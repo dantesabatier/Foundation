@@ -110,7 +110,7 @@ class Progress extends ObjectClass
     /**
      * @param Progress|null $parent The containing Progress object, if any, to notify when reporting progress, or to consult when checking for cancellation.
      *
-     * The only valid values are current() or nil.
+     * The only valid values are current() or null.
      * @param Dictionary|null $userInfo The optional user information dictionary for the progress object.
      */
     public function __construct(?Progress $parent = null, ?Dictionary $userInfo = null)
@@ -168,7 +168,7 @@ class Progress extends ObjectClass
     /**
      * Creates and returns a progress instance with the specified unit count that isn't part of any existing progress tree.
      * @param float $totalUnitCount The total number of units of work to assign to the progress instance.
-     * @return Progress A new progress instance with its containing progress object set to nil.
+     * @return Progress A new progress instance with its containing progress object set to null.
      */
     public static function discreteProgress(float $totalUnitCount): Progress
     {
@@ -322,8 +322,8 @@ class Progress extends ObjectClass
      *
      * Use this method to set a value in the {@see $userInfo} dictionary, with appropriate KVO notification for properties with values that can depend on values in the user info dictionary, like {@see $localizedDescription}.
      *
-     * Supply a value of nil to remove an existing dictionary entry for a specified key.
-     * @param mixed $objectOrNil The object to set for the specified key, or nil to remove an existing entry in the dictionary.
+     * Supply a value of null to remove an existing dictionary entry for a specified key.
+     * @param mixed $objectOrNil The object to set for the specified key, or null to remove an existing entry in the dictionary.
      * @param string $key The key for storing the specified object.
      */
     public function setUserInfoObject(mixed $objectOrNil, string $key): void

@@ -12,7 +12,7 @@ class URLResourceKey
     final const string isApplicationKey = "isApplication";
     /** @var string Key for determining whether the resource is a directory (read-only). */
     final const string isDirectoryKey = "isDirectory";
-    /** @var string The parent directory of the resource, returned as a URL object, or nil if the resource is the root directory of its volume (read-only). */
+    /** @var string The parent directory of the resource, returned as a URL object, or null if the resource is the root directory of its volume (read-only). */
     final const string parentDirectoryURLKey = "parentDirectory";
     /** @var string The resource's object type, returned as a string (read-only). */
     final const string fileResourceTypeKey = "fileResourceType";
@@ -22,7 +22,7 @@ class URLResourceKey
     final const string isAliasFileKey = "isAliasFile";
     /** @var string Key for determining whether the resource is a regular file, as opposed to a directory or a symbolic link (read-only). */
     final const string isRegularFileKey = "isRegularFile";
-    /** @var string The time at which the resource's attributes were most recently modified, returned as a Date object if the volume supports attribute modification dates, or nil if attribute modification dates are unsupported (read-only). */
+    /** @var string The time at which the resource's attributes were most recently modified, returned as a Date object if the volume supports attribute modification dates, or null if attribute modification dates are unsupported (read-only). */
     final const string attributeModificationDateKey = "attributeModificationDate";
     /** @var string The time at which the resource was created. */
     final const string creationDateKey = "creationDate";

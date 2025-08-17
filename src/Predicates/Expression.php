@@ -188,7 +188,7 @@ class Expression extends ObjectClass
      * @param ArrayClass<Expression>|null $arguments An array containing Expression objects that will be used as parameters during the invocation of selector.
      * For a selector taking no parameters, the array should be empty.
      * For a selector taking one or more parameters, the array should contain one Expression object which will evaluate to an instance of the appropriate type for each parameter.
-     * If there is a mismatch between the number of parameters expected and the number you provide during evaluation, an exception may be raised or missing parameters may simply be replaced by nil (which occurs depends on how many parameters are provided, and whether you have over- or underflow).
+     * If there is a mismatch between the number of parameters expected and the number you provide during evaluation, an exception may be raised or missing parameters may simply be replaced by null (which occurs depends on how many parameters are provided, and whether you have over- or underflow).
      * See ({@see expressionForFunction()}) for a complete list of arguments.
      * @return Expression An expression that filters a collection using the specified Block.
      */
@@ -203,7 +203,7 @@ class Expression extends ObjectClass
      * @param ArrayClass<Expression> $parameters An array containing Expression objects that will be used as parameters during the invocation of selector.
      * For a selector taking no parameters, the array should be empty.
      * For a selector taking one or more parameters, the array should contain one Expression object which will evaluate to an instance of the appropriate type for each parameter.
-     * If there is a mismatch between the number of parameters expected and the number you provide during evaluation, an exception may be raised or missing parameters may simply be replaced by nil (which occurs depends on how many parameters are provided, and whether you have over or underflow).
+     * If there is a mismatch between the number of parameters expected and the number you provide during evaluation, an exception may be raised or missing parameters may simply be replaced by null (which occurs depends on how many parameters are provided, and whether you have over or underflow).
      * @return Expression A new expression that invokes the function name using the parameters in parameters.
      */
     public static function expressionForFunction(string $name, ArrayClass $parameters): Expression
@@ -249,7 +249,7 @@ class Expression extends ObjectClass
     /**
      * Evaluates an expression using a given object and context.
      * @param mixed|null $object The object against which the expression is evaluated.
-     * @param Dictionary|null $context A dictionary that the expression can use to store a temporary state for one predicate evaluation. Can be nil.
+     * @param Dictionary|null $context A dictionary that the expression can use to store a temporary state for one predicate evaluation. Can be null.
      * Note that context is mutable, and that it can only be accessed during the evaluation of the expression.
      * You must not attempt to retain it for use elsewhere.
      * @return mixed The evaluated object.

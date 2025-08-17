@@ -16,7 +16,7 @@ interface Equatable
 {
     /**
      * Returns a Boolean value that indicates whether the receiver is equal to another given object.
-     * @param mixed $other The object to be compared to the receiver. May be nil, in which case this method returns false.
+     * @param mixed $other The object to be compared to the receiver. May be null, in which case this method returns false.
      * @return bool true if the receiver and other are equal, otherwise false.
      */
     public function isEqual(mixed $other): bool;

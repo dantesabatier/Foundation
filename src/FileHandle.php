@@ -42,7 +42,7 @@ final class FileHandle extends ObjectClass
      * The file pointer is set to the beginning of the file. You cannot write data to the returned file handle object. Use the {@see readToEnd()} or {@see read()} methods to read data from it.
      * When using this method to create a file handle object, the file handle owns its associated file descriptor and is responsible for closing it.
      * @param URL $url The URL of the file, device, or named socket to access.
-     * @return FileHandle|null The initialized file handle object or nil if no file exists at url.
+     * @return FileHandle|null The initialized file handle object or null if no file exists at url.
      * @throws Exception
      */
     public static function fileHandleForReadingFromURL(URL $url): ?FileHandle
@@ -59,7 +59,7 @@ final class FileHandle extends ObjectClass
      * The file pointer is set to the beginning of the file. The returned object responds only to {@see write()}.
      * When using this method to create a file handle object, the file handle owns its associated file descriptor and is responsible for closing it.
      * @param URL $url The URL of the file, device, or named socket to access.
-     * @return FileHandle|null The initialized file handle object or nil if no file exists at url.
+     * @return FileHandle|null The initialized file handle object or null if no file exists at url.
      * @throws Exception
      */
     public static function fileHandleForWritingToURL(URL $url): ?FileHandle
@@ -76,7 +76,7 @@ final class FileHandle extends ObjectClass
      * The file pointer is set to the beginning of the file. The returned object responds to both {@see read()}... messages and {@see write()}.
      * When using this method to create a file handle object, the file handle owns its associated file descriptor and is responsible for closing it.
      * @param URL $url The URL of the file, device, or named socket to access.
-     * @return FileHandle|null The initialized file handle object or nil if no file exists at url.
+     * @return FileHandle|null The initialized file handle object or null if no file exists at url.
      * @throws Exception
      */
     public static function fileHandleForUpdatingURL(URL $url): ?FileHandle

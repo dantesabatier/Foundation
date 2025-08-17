@@ -138,7 +138,7 @@ class IndexPath extends ObjectClass implements MutableCollection, Iterator
 
     /**
      * Returns the minimum element in the sequence.
-     * @return int|null The sequence's minimum element. If the sequence has no elements, returns nil.
+     * @return int|null The sequence's minimum element. If the sequence has no elements, returns null.
      */
     #[Override]
     public function min(): ?int
@@ -148,7 +148,7 @@ class IndexPath extends ObjectClass implements MutableCollection, Iterator
 
     /**
      * Returns the maximum element in the sequence.
-     * @return int|null The sequence's maximum element. If the sequence has no elements, returns nil.
+     * @return int|null The sequence's maximum element. If the sequence has no elements, returns null.
      */
     #[Override]
     public function max(): ?int
@@ -186,7 +186,7 @@ class IndexPath extends ObjectClass implements MutableCollection, Iterator
 
     /**
      * @template Result
-     * Returns a Collection containing the non-nil results of calling the given transformation with each element of this collection.
+     * Returns a Collection containing the non-null results of calling the given transformation with each element of this collection.
      * @param Closure(int, int<0, max>=): Result $transform
      * @return ArrayClass<Result>
      */
@@ -211,7 +211,7 @@ class IndexPath extends ObjectClass implements MutableCollection, Iterator
     /**
      * Returns the first element of the collection that satisfies the given predicate.
      * @param Closure(int, int<0, max>=): bool|null $where A closure that takes an element of the collection as its argument and returns a Boolean value indicating whether the element is a match.
-     * @return int|null The first element of the collection that satisfies $where, or nil if there is no element that satisfies $where.
+     * @return int|null The first element of the collection that satisfies $where, or null if there is no element that satisfies $where.
      */
     #[Override]
     public function first(?Closure $where = null): ?int
@@ -222,7 +222,7 @@ class IndexPath extends ObjectClass implements MutableCollection, Iterator
     /**
      * Returns the last element of the collection that satisfies the given predicate.
      * @param Closure(int, int<0, max>=): bool|null $where A closure that takes an element of the collection as its argument and returns a Boolean value indicating whether the element is a match.
-     * @return int|null The last element of the collection that satisfies $where, or nil if there is no element that satisfies predicate.
+     * @return int|null The last element of the collection that satisfies $where, or null if there is no element that satisfies predicate.
      */
     #[Override]
     public function last(?Closure $where = null): ?int
@@ -234,7 +234,7 @@ class IndexPath extends ObjectClass implements MutableCollection, Iterator
      * Returns the first index in which an element of the collection satisfies the given predicate.
      * @param Closure(int, int<0, max>=): bool $where A closure that takes an element as its argument and returns a Boolean value that indicates whether the passed element represents a match.
      * @return int|null The index of the first element for which $where returns true.
-     * If no elements in the collection satisfy the given $where, returns nil.
+     * If no elements in the collection satisfy the given $where, returns null.
      */
     #[Override]
     public function firstIndex(Closure $where): ?int
@@ -246,7 +246,7 @@ class IndexPath extends ObjectClass implements MutableCollection, Iterator
      * Returns the last index in which an element of the collection satisfies the given predicate.
      * @param Closure(int, int<0, max>=): bool $where A closure that takes an element as its argument and returns a Boolean value that indicates whether the passed element represents a match.
      * @return int|null The index of the last element for which $where returns true.
-     * If no elements in the collection satisfy the given $where, returns nil.
+     * If no elements in the collection satisfy the given $where, returns null.
      */
     #[Override]
     public function lastIndex(Closure $where): ?int
@@ -257,7 +257,7 @@ class IndexPath extends ObjectClass implements MutableCollection, Iterator
     /**
      * Returns the first index where the specified value appears in the collection.
      * @param int $element An element to search for in the collection.
-     * @return int|null The first index where $element is found. If the $element is not found in the collection, it returns nil.
+     * @return int|null The first index where $element is found. If the $element is not found in the collection, it returns null.
      */
     #[Override]
     public function indexOf(mixed $element): ?int
@@ -268,7 +268,7 @@ class IndexPath extends ObjectClass implements MutableCollection, Iterator
     /**
      * Returns a random element of the collection, using the given generator as a source for randomness.
      * @param RandomNumberGenerator $generator The random number generator to use when choosing a random element.
-     * @return int|null A random element from the collection. If the collection is empty, the method returns nil.
+     * @return int|null A random element from the collection. If the collection is empty, the method returns null.
      */
     #[Override]
     public function randomElement(RandomNumberGenerator $generator = new SystemRandomNumberGenerator()): ?int
@@ -435,7 +435,7 @@ class IndexPath extends ObjectClass implements MutableCollection, Iterator
      * Inserts the given element into the collection unconditionally.
      * If an element equal to newElement is already contained in the collection, newElement replaces the existing element.
      * @param int $element An element to insert into the collection.
-     * @return int|null An element equal to newElement if the collection already contained such a member; otherwise, nil.
+     * @return int|null An element equal to newElement if the collection already contained such a member; otherwise, null.
      */
     #[Override]
     public function update(mixed $element): ?int
@@ -477,7 +477,7 @@ class IndexPath extends ObjectClass implements MutableCollection, Iterator
 
     /**
      * Removes and returns the first element of the collection.
-     * @return int|null A member of the collection. If the collection is empty, it returns nil.
+     * @return int|null A member of the collection. If the collection is empty, it returns null.
      */
     #[Override]
     public function popFirst(): ?int
@@ -489,7 +489,7 @@ class IndexPath extends ObjectClass implements MutableCollection, Iterator
      * Removes and returns the last element of the collection.
      *
      * Calling this method may invalidate all saved indices of this collection. Do not rely on a previously stored index value after altering a collection with any operation that can change its length.
-     * @return int|null The last element of the collection if the collection is not empty; otherwise, nil.
+     * @return int|null The last element of the collection if the collection is not empty; otherwise, null.
      */
     #[Override]
     public function popLast(): ?int

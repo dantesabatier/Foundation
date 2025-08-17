@@ -39,7 +39,7 @@ abstract class ValueTransformer extends ObjectClass
      *
      * If valueTransformerForName() does not find a registered transformer instance for name, it will attempt to find a class with the specified name. If a corresponding class is found, an instance will be created and initialized, then automatically registered with $name.
      * @param string $name The transformer identifier.
-     * @return ValueTransformer|null The value transformer identified by name in the shared registry, or nil if not found.
+     * @return ValueTransformer|null The value transformer identified by name in the shared registry, or null if not found.
      */
     public static function valueTransformerForName(string $name): ?ValueTransformer
     {

@@ -154,7 +154,7 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
 
     /**
      * Returns the minimum element in the sequence.
-     * @return Element|null The sequence's minimum element. If the sequence has no elements, returns nil.
+     * @return Element|null The sequence's minimum element. If the sequence has no elements, returns null.
      */
     #[Override]
     public function min()

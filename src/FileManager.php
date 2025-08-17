@@ -158,7 +158,7 @@ final class FileManager extends ObjectClass
      * Performs a shallow search of the specified directory and returns URLs for the contained items.
      * @param URL $url The URL for the directory whose contents you want to enumerate.
      * @param ArrayClass<string>|null $keys An array of keys that identify the file properties that you want pre-fetched for each item in the directory. For each returned URL, the specified properties are fetched and cached in the URL object.
-     * If you want directory contents to have no pre-fetched file properties, pass an empty array to this parameter. If you want directory contents to have default set of pre-fetched file properties, pass nil to this parameter.
+     * If you want directory contents to have no pre-fetched file properties, pass an empty array to this parameter. If you want directory contents to have default set of pre-fetched file properties, pass null to this parameter.
      * @param int $options Options for the enumeration. Because this method performs only shallow enumerations, options that prevent descending into subdirectories or packages are not allowed; the only supported option is {@see DirectoryEnumerationOptions::skipsHiddenFiles}.
      * @return ArrayClass<URL> An array of URL objects, each of which identifies a file, directory, or symbolic link contained in url.
      * If the directory contains no entries, this method returns an empty array.
@@ -189,7 +189,7 @@ final class FileManager extends ObjectClass
      * @param URL $url The location of the directory for which you want an enumeration.
      * This URL must not be a symbolic link that points to the desired directory.
      * You can use the {@see URL::resolvingSymlinksInPath} method to resolve any symlinks in the URL.
-     * @param ArrayClass<string>|null $keys An array of keys that identify the properties that you want pre-fetched for each item in the enumeration. The values for these keys are cached in the corresponding URL objects. You may specify nil for this parameter.
+     * @param ArrayClass<string>|null $keys An array of keys that identify the properties that you want pre-fetched for each item in the enumeration. The values for these keys are cached in the corresponding URL objects. You may specify null for this parameter.
      * @param int $options Options for the enumeration. For a list of valid options, see {@see DirectoryEnumerationOptions}.
      * @param Closure(URL, Error): bool|null $errorHandler An optional error handler block for the file manager to call when an error occurs. The handler block should return true if you want the enumeration to continue or false if you want the enumeration to stop.
      * @return DirectoryEnumerator<URL>|null A directory enumerator object that enumerates the contents of the directory at url.
@@ -230,14 +230,14 @@ final class FileManager extends ObjectClass
     /**
      * Creates a file with the specified content and attributes at the given location.
      *
-     * If you specify nil for the attributes' parameter, this method uses a default set of values for the owner, group, and permissions of any newly created directories in the path. Similarly, if you omit a specific attribute, the default value is used. The default values for newly created files are as follows:
+     * If you specify null for the attributes' parameter, this method uses a default set of values for the owner, group, and permissions of any newly created directories in the path. Similarly, if you omit a specific attribute, the default value is used. The default values for newly created files are as follows:
      * Permissions are set according to the umask of the current process. For more information, see umask.
      * The owner ID is set to the effective user ID of the process.
      * The group ID is set to that of the parent directory.
      * If a file already exists at path, this method overwrites the contents of that file if the current process has the appropriate privileges to do so.
      * @param string $path The path for the new file.
      * @param string|null $data A data object containing the contents of the new file.
-     * @param Dictionary|null $attributes A dictionary containing the attributes to associate with the new file. You can use these attributes to set the owner and group numbers, file permissions, and modification date. For a list of keys, see {@see FileAttributeKey}. If you specify nil for attributes, the file is created with a set of default attributes.
+     * @param Dictionary|null $attributes A dictionary containing the attributes to associate with the new file. You can use these attributes to set the owner and group numbers, file permissions, and modification date. For a list of keys, see {@see FileAttributeKey}. If you specify null for attributes, the file is created with a set of default attributes.
      * @return bool true if the operation was successful or if the item already exists, otherwise false.
      * @throws Exception
      */
@@ -538,7 +538,7 @@ final class FileManager extends ObjectClass
      * Returns the contents of the file at the specified path.
      * @param string $path The path of the file whose contents you want.
      * @return string|null A Data object with the contents of the file.
-     * If path specifies a directory, or if some other error occurs, this method returns nil.
+     * If path specifies a directory, or if some other error occurs, this method returns null.
      * @throws Exception
      */
     public function contents(string $path): ?string

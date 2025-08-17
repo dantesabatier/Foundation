@@ -25,7 +25,7 @@ class HTTPCookie extends ObjectClass
     public readonly string $domain;
     /** @var string The cookie's path. The cookie will be sent with requests for this path in the cookie's domain, and all paths that have this prefix. A path of "/" means the cookie will be sent for all URLs in the domain. */
     public readonly string $path;
-    /** @var ArrayClass<Number>|null The cookie's port list. The list of ports for the cookie, returned as an array of Number objects containing integers. If the cookie has no port list, the value of this property is nil and the cookie will be sent to any port. Otherwise, the cookie is only sent to ports specified in the port list. */
+    /** @var ArrayClass<Number>|null The cookie's port list. The list of ports for the cookie, returned as an array of Number objects containing integers. If the cookie has no port list, the value of this property is null and the cookie will be sent to any port. Otherwise, the cookie is only sent to ports specified in the port list. */
     public readonly ?ArrayClass $portList;
     /** @var string The cookie's name. */
     public readonly string $name;
@@ -33,7 +33,7 @@ class HTTPCookie extends ObjectClass
     public readonly string $value;
     /** @var int The cookie's version. Version 0 maps to “old-style” Netscape cookies. Version 1 maps to RFC 6265 cookies. */
     public readonly int $version;
-    /** @var Date|null The cookie's expiration date. This value is nil if there is no specific expiration date, as with session-only cookies. The expiration date is the date when the cookie should be deleted. */
+    /** @var Date|null The cookie's expiration date. This value is null if there is no specific expiration date, as with session-only cookies. The expiration date is the date when the cookie should be deleted. */
     public readonly ?Date $expiresDate;
     /** @var bool A Boolean value that indicates whether the cookie should be discarded at the end of the session (regardless of expiration date). */
     public readonly bool $isSessionOnly;
@@ -41,7 +41,7 @@ class HTTPCookie extends ObjectClass
     public readonly bool $isHTTPOnly;
     /** @var bool A Boolean value that indicates whether the cookie may only be sent over secure channels. */
     public readonly bool $isSecure;
-    /** @var string|null Along with the policy values defined by {@see HTTPCookieStringPolicy}, this property may also be nil. In this case, cross-site requests include the cookie. */
+    /** @var string|null Along with the policy values defined by {@see HTTPCookieStringPolicy}, this property may also be null. In this case, cross-site requests include the cookie. */
     public readonly ?string $sameSitePolicy;
     /** @var string|null The cookie's comment string. */
     public readonly ?string $comment;

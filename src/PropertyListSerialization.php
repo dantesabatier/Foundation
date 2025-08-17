@@ -43,7 +43,7 @@ class PropertyListSerialization
      * @param int $options The options used to create the property list.
      * For possible values, see {@see PropertyListSerializationMutabilityOptions}.
      * @param PropertyListSerializationFormat|null $format Upon return, contains the format that the property list was stored in.
-     * Pass nil if you do not need to know the format.
+     * Pass null if you do not need to know the format.
      * @return mixed A property list object corresponding to the representation in data.
      * If data is not in a supported format, returns nil.
      */

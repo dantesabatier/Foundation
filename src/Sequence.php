@@ -97,7 +97,7 @@ interface Sequence extends Traversable, Countable, Comparable, ExpressibleByArra
      *
      * Complexity: O(n), where n is the length of the sequence.
      * @param Closure(Element, Index=): bool|null $where A closure that takes an element of the sequence as its argument and returns a Boolean value indicating whether the element is a match.
-     * @return Element|null The first element of the sequence that satisfies predicate, or nil if there is no element that satisfies predicate.
+     * @return Element|null The first element of the sequence that satisfies predicate, or null if there is no element that satisfies predicate.
      */
     public function first(?Closure $where = null);
 
@@ -105,7 +105,7 @@ interface Sequence extends Traversable, Countable, Comparable, ExpressibleByArra
      * Returns the minimum element in the sequence.
      *
      * Complexity: O(n), where n is the length of the sequence.
-     * @return Element|null The sequence's minimum element. If the sequence has no elements, returns nil.
+     * @return Element|null The sequence's minimum element. If the sequence has no elements, returns null.
      */
     public function min();
 
@@ -113,7 +113,7 @@ interface Sequence extends Traversable, Countable, Comparable, ExpressibleByArra
      * Returns the maximum element in the sequence.
      *
      * Complexity: O(n), where n is the length of the sequence.
-     * @return Element|null The sequence's maximum element. If the sequence has no elements, returns nil.
+     * @return Element|null The sequence's maximum element. If the sequence has no elements, returns null.
      */
     public function max();
 
@@ -151,7 +151,7 @@ interface Sequence extends Traversable, Countable, Comparable, ExpressibleByArra
 
     /**
      * @template Result
-     * Returns a sequence containing the non-nil results of calling the given transformation with each element of this sequence.
+     * Returns a sequence containing the non-null results of calling the given transformation with each element of this sequence.
      *
      * Complexity: O(n), where n is the length of the sequence.
      * @param Closure(Element, Index=): Result $transform

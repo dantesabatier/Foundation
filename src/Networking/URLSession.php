@@ -34,8 +34,8 @@ final class URLSession implements URLSessionProtocol
      * Creates a session with the specified session configuration.
      * @param URLSessionConfiguration $configuration A configuration object that specifies certain behaviors, such as caching policies, timeouts, proxies, pipelining, TLS versions to support, cookie policies, credential storage, and so on.
      * @param URLSessionDelegate|null $delegate A session delegate object that handles requests for authentication and other session-related events.
-     * This delegate object is responsible for handling authentication challenges, for making caching decisions and for handling other session-related events. If nil, the class should be used only with methods that take completion handlers.
-     * @param OperationQueue $delegateQueue An operation queue for scheduling the delegate calls and completion handlers. The queue should be a serial queue to ensure the correct ordering of callbacks. If nil, the session creates a serial operation queue for performing all delegate method calls and completion handler calls.
+     * This delegate object is responsible for handling authentication challenges, for making caching decisions and for handling other session-related events. If null, the class should be used only with methods that take completion handlers.
+     * @param OperationQueue $delegateQueue An operation queue for scheduling the delegate calls and completion handlers. The queue should be a serial queue to ensure the correct ordering of callbacks. If null, the session creates a serial operation queue for performing all delegate method calls and completion handler calls.
      */
     public function __construct(public readonly URLSessionConfiguration $configuration, public readonly ?URLSessionDelegate $delegate = null, public readonly OperationQueue $delegateQueue = new OperationQueue())
     {
@@ -121,7 +121,7 @@ final class URLSession implements URLSessionProtocol
      * Creates a task that retrieves the contents of the specified URL, then calls a handler upon completion.
      *
      * @param URL $url The URL to be retrieved.
-     * @param DataCompletionHandler|null $completionHandler The completion handler to call when the load request is complete. This handler is executed on the delegate queue. If you pass nil, only the session delegate methods are called when the task completes, making this method equivalent to the {@see dataTaskWithRequest()} method.
+     * @param DataCompletionHandler|null $completionHandler The completion handler to call when the load request is complete. This handler is executed on the delegate queue. If you pass null, only the session delegate methods are called when the task completes, making this method equivalent to the {@see dataTaskWithRequest()} method.
      * @return URLSessionDataTask The new session data task.
      */
     public function dataTaskWithURL(URL $url, ?Closure $completionHandler = null): URLSessionDataTask

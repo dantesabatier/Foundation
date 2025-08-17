@@ -9,7 +9,7 @@ class Invocation
 {
     /** @var string The receiver's selector, or 0 if it hasn't been set. */
     public string $selector = "0";
-    /** @var object|null The receiver's target, or nil if the receiver has no target. The target is the receiver of the message sent by {@see invoke()}. */
+    /** @var object|null The receiver's target, or null if the receiver has no target. The target is the receiver of the message sent by {@see invoke()}. */
     public ?object $target = null;
     /** @var ArrayClass<mixed> */
     public ArrayClass $arguments {

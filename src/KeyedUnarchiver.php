@@ -7,7 +7,7 @@ class KeyedUnarchiver
     /**
      * Decodes a previously archived object graph and returns the root object.
      * @param string $data An object graph previously encoded by {@see KeyedArchiver}.
-     * @return mixed The unarchived object, or nil if an error occurred.
+     * @return mixed The unarchived object, or null if an error occurred.
      */
     public static function unarchiveTopLevelObjectWithData(string $data): mixed
     {

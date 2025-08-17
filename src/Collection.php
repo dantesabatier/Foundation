@@ -51,7 +51,7 @@ interface Collection extends Sequence, ArrayAccess
      * Returns the first index in which an element of the collection satisfies the given predicate.
      * @param Closure(Element): bool $where A closure that takes an element as its argument and returns a Boolean value that indicates whether the passed element represents a match.
      * @return Index|null The index of the first element for which $where returns true.
-     * If no elements in the collection satisfy the given $where returns nil.
+     * If no elements in the collection satisfy the given $where returns null.
      */
     public function firstIndex(Closure $where);
 

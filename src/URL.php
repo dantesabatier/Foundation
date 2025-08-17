@@ -65,7 +65,7 @@ final class URL extends ObjectClass
             return $baseURL->appendingPathComponent($relative);
         }
     }
-    /** @var string The relative path of the URL if the URL conforms to RFC 1808 (the most common form of URL), otherwise nil. */
+    /** @var string The relative path of the URL if the URL conforms to RFC 1808 (the most common form of URL), otherwise null. */
     public string $relativePath {
         get {
             if ($this->baseURL === null) {
@@ -87,7 +87,7 @@ final class URL extends ObjectClass
     public string $fileSystemRepresentation {
         get => new SplFileInfo($this->path)->getRealPath();
     }
-    /** @var string|null The fragment component of the URL if the URL conforms to RFC 1808 (the most common form of URL), otherwise nil. */
+    /** @var string|null The fragment component of the URL if the URL conforms to RFC 1808 (the most common form of URL), otherwise null. */
     public ?string $fragment {
         get => $this->parse(PHP_URL_FRAGMENT);
     }
@@ -107,7 +107,7 @@ final class URL extends ObjectClass
     public string $scheme {
         get => $this->parse(PHP_URL_SCHEME) ?? "";
     }
-    /** @var string|null The host component of a URL if the URL conforms to RFC 1808 (the most common form of URL), otherwise nil. */
+    /** @var string|null The host component of a URL if the URL conforms to RFC 1808 (the most common form of URL), otherwise null. */
     public ?string $host {
         get => $this->parse(PHP_URL_HOST);
     }
@@ -139,19 +139,19 @@ final class URL extends ObjectClass
     public string $pathExtension {
         get => pathinfo($this->path, PATHINFO_EXTENSION);
     }
-    /** @var int|null The port component of the URL if the URL conforms to RFC 1808 (the most common form of URL), otherwise nil. */
+    /** @var int|null The port component of the URL if the URL conforms to RFC 1808 (the most common form of URL), otherwise null. */
     public ?int $port {
         get => $this->parse(PHP_URL_PORT);
     }
-    /** @var string|null The query of the URL if the URL conforms to RFC 1808 (the most common form of URL), otherwise nil. */
+    /** @var string|null The query of the URL if the URL conforms to RFC 1808 (the most common form of URL), otherwise null. */
     public ?string $query {
         get => $this->parse(PHP_URL_QUERY);
     }
-    /** @var string|null The user component of the URL if the URL conforms to RFC 1808 (the most common form of URL), otherwise nil. */
+    /** @var string|null The user component of the URL if the URL conforms to RFC 1808 (the most common form of URL), otherwise null. */
     public ?string $user {
         get => $this->parse(PHP_URL_USER);
     }
-    /** @var string|null The password component of the URL if the URL conforms to RFC 1808 (the most common form of URL), otherwise nil. */
+    /** @var string|null The password component of the URL if the URL conforms to RFC 1808 (the most common form of URL), otherwise null. */
     public ?string $password {
         get => $this->parse(PHP_URL_PASS);
     }
@@ -353,7 +353,7 @@ final class URL extends ObjectClass
     /**
      * Return a collection of resource values identified by the given resource keys.
      *
-     * This method first checks if the URL object already caches the resource value. If so, it returns the cached resource value to the caller. If not, then this method synchronously gets the resource value from the backing store, adds the resource value to the URL object's cache, and returns the resource value to the caller. The type of the resource value varies by resource property (see {@see URLResourceKey}). If this method does not throw and the resulting value in the URLResourceValues is populated with nil, it means the resource property is not available for the specified resource and no errors occurred when determining the resource property was not available. This method is currently applicable only to URLs for file system resources.
+     * This method first checks if the URL object already caches the resource value. If so, it returns the cached resource value to the caller. If not, then this method synchronously gets the resource value from the backing store, adds the resource value to the URL object's cache, and returns the resource value to the caller. The type of the resource value varies by resource property (see {@see URLResourceKey}). If this method does not throw and the resulting value in the URLResourceValues is populated with null, it means the resource property is not available for the specified resource and no errors occurred when determining the resource property was not available. This method is currently applicable only to URLs for file system resources.
      * Only the values for the keys specified in keys will be populated.
      * @param Set<string> $keys
      * @return URLResourceValues
@@ -368,7 +368,7 @@ final class URL extends ObjectClass
      *
      * This method first checks if the URL object already caches the resource value. If so, it returns the cached resource value to the caller. If not, then this method synchronously gets the resource value from the backing store, adds the resource value to the URL object's cache, and returns the resource value to the caller.
      * The type of the returned resource value varies by resource property; for details, see the documentation for the key you want to access.
-     * If this method returns true and the value is populated with nil, it means that the resource property is not available for the specified resource, and that no errors occurred when determining that the resource property was unavailable.
+     * If this method returns true and the value is populated with null, it means that the resource property is not available for the specified resource, and that no errors occurred when determining that the resource property was unavailable.
      * @param mixed $value The location where the value for the resource property identified by $key should be stored.
      * @param string $key The name of one of the URL's resource properties.
      */

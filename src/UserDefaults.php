@@ -20,7 +20,7 @@ class UserDefaults
     /**
      * Creates a user defaults object initialized with the defaults for the specified database name.
      *
-     * If you pass nil to this parameter, the system uses the default search list that the {@see standard()} class method uses. Because a suite manages the defaults of a specified app group, a suite name must be distinct from your app's main bundle identifier. The {@see globalDomain} is also an invalid suite name, because it isn't writeable by apps.
+     * If you pass null to this parameter, the system uses the default search list that the {@see standard()} class method uses. Because a suite manages the defaults of a specified app group, a suite name must be distinct from your app's main bundle identifier. The {@see globalDomain} is also an invalid suite name, because it isn't writeable by apps.
      * @param string|null $suiteName The domain identifier of the search list.
      */
     public function __construct(?string $suiteName = null)
@@ -64,7 +64,7 @@ class UserDefaults
      * This method searches the domains included in the search list in the order in which they are listed and returns the object associated with the first occurrence of the specified default.
      * The returned object is immutable, even if the value you originally set was mutable.
      * @param string $key A key in the current user defaults database.
-     * @return mixed The object associated with the specified key, or nil if the key was not found.
+     * @return mixed The object associated with the specified key, or null if the key was not found.
      */
     public function object(string $key): mixed
     {
@@ -74,7 +74,7 @@ class UserDefaults
     /**
      * Returns the URL associated with the specified key.
      * @param string $key A key in the current user defaults database.
-     * @return URL|null The URL associated with the specified key. If the key doesn't exist, this method returns nil.
+     * @return URL|null The URL associated with the specified key. If the key doesn't exist, this method returns null.
      */
     public function url(string $key): ?URL
     {
@@ -87,7 +87,7 @@ class UserDefaults
     /**
      * Returns the array associated with the specified key.
      * @param string $key A key in the current user defaults database.
-     * @return ArrayClass|null The array associated with the specified key, or nil if the key does not exist or its value is not an array.
+     * @return ArrayClass|null The array associated with the specified key, or null if the key does not exist or its value is not an array.
      */
     public function array(string $key): ?ArrayClass
     {
@@ -100,7 +100,7 @@ class UserDefaults
     /**
      * Returns the dictionary object associated with the specified key.
      * @param string $key A key in the current user defaults database.
-     * @return Dictionary|null The dictionary object associated with the specified key, or nil if the key does not exist or its value is not a dictionary.
+     * @return Dictionary|null The dictionary object associated with the specified key, or null if the key does not exist or its value is not a dictionary.
      */
     public function dictionary(string $key): ?Dictionary
     {
@@ -113,7 +113,7 @@ class UserDefaults
     /**
      * Returns the string associated with the specified key.
      * @param string $key A key in the current user defaults database.
-     * @return string|null For string values, the string associated with the specified key; for number values, the string value of the number. Returns nil if the default does not exist or is not a string or number value.
+     * @return string|null For string values, the string associated with the specified key; for number values, the string value of the number. Returns null if the default does not exist or is not a string or number value.
      */
     public function string(string $key): ?string
     {
@@ -130,7 +130,7 @@ class UserDefaults
     /**
      * Returns the array of strings associated with the specified key.
      * @param string $key A key in the current user defaults database.
-     * @return ArrayClass<string>|null The array of string objects, or nil if the specified default does not exist, the default does not contain an array, or the array does not contain strings.
+     * @return ArrayClass<string>|null The array of string objects, or null if the specified default does not exist, the default does not contain an array, or the array does not contain strings.
      */
     public function stringArray(string $key): ?ArrayClass
     {
