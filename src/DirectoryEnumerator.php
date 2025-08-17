@@ -13,39 +13,26 @@ use IteratorAggregate;
  */
 abstract class DirectoryEnumerator implements IteratorAggregate
 {
-    /**
-     * A dictionary with the attributes of the directory at which enumeration started.
-     */
-    public function directoryAttributes(): ?Dictionary
-    {
-        request_concrete_implementation($this, __FUNCTION__);
+    /** @var Dictionary|null A dictionary with the attributes of the directory at which enumeration started. */
+    abstract public ?Dictionary $directoryAttributes {
+        get;
     }
-
-    /**
-     * A dictionary with the attributes of the most recently returned file or subdirectory (as referenced by the pathname).
-     */
-    public function fileAttributes(): ?Dictionary
-    {
-        request_concrete_implementation($this, __FUNCTION__);
+    /** @var Dictionary|null A dictionary with the attributes of the most recently returned file or subdirectory (as referenced by the pathname). */
+    abstract ?Dictionary $fileAttributes {
+        get;
     }
-
-    /**
-     * The number of levels deep the current object is in the directory hierarchy being enumerated.
-     */
-    public function level(): int
-    {
-        request_concrete_implementation($this, __FUNCTION__);
+    /** @var int The number of levels deep the current object is in the directory hierarchy being enumerated. */
+    abstract public int $level {
+        get;
+    }
+    abstract public bool $isEnumeratingDirectoryPostOrder {
+        get;
     }
 
     /**
      * Causes the receiver to skip recursion into the most recently obtained subdirectory.
      */
     public function skipDescendants(): void
-    {
-        request_concrete_implementation($this, __FUNCTION__);
-    }
-
-    public function isEnumeratingDirectoryPostOrder(): bool
     {
         request_concrete_implementation($this, __FUNCTION__);
     }
