@@ -13,11 +13,11 @@ use IteratorAggregate;
  */
 abstract class DirectoryEnumerator implements IteratorAggregate
 {
-    /** @var Dictionary<mixed>|null A dictionary with the attributes of the directory at which enumeration started. */
+    /** @var Dictionary|null A dictionary with the attributes of the directory at which enumeration started. */
     abstract public ?Dictionary $directoryAttributes {
         get;
     }
-    /** @var Dictionary<mixed>|null A dictionary with the attributes of the most recently returned file or subdirectory (as referenced by the pathname). */
+    /** @var Dictionary|null A dictionary with the attributes of the most recently returned file or subdirectory (as referenced by the pathname). */
     abstract ?Dictionary $fileAttributes {
         get;
     }
