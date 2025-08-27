@@ -57,7 +57,7 @@ trait SequenceAlgorithms
             if ($isIncluded($e, $i, $stop)) {
                 $instance[] = $e;
             }
-            /** @psalm-suppress TypeDoesNotContainType */
+            /** @noinspection PhpConditionAlreadyCheckedInspection */
             if ($stop) {
                 break;
             }
@@ -72,7 +72,6 @@ trait SequenceAlgorithms
 
     public function contains(Closure $predicate): bool
     {
-        /** @noinspection PhpLoopCanBeConvertedToArrayAnyInspection */
         foreach (clone $this as $i => $e) {
             if ($predicate($e, $i)) {
                 return true;
