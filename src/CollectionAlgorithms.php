@@ -110,10 +110,7 @@ trait CollectionAlgorithms
 
     public function valueForKey(string $key): self
     {
-        return $this->map(function (KeyValueCoding $e) use ($key): mixed {
-            assert($e instanceof KeyValueCoding, sprintf("Invalid argument: expecting %s, \"%s\" given", KeyValueCoding::class, typeof($e)));
-            return $e->valueForKey($key);
-        });
+        return $this->map(fn(mixed $e): mixed => $e?->valueForKey($key));
     }
 
     public function setValueForKey(mixed $value, string $key): void
