@@ -116,8 +116,7 @@ trait CollectionAlgorithms
     public function setValueForKey(mixed $value, string $key): void
     {
         foreach (clone $this as $e) {
-            assert($e instanceof KeyValueCoding, sprintf("Invalid argument: expecting %s, \"%s\" given", KeyValueCoding::class, typeof($e)));
-            $e->setValueForKey($value, $key);
+            $e?->setValueForKey($value, $key);
         }
     }
 
