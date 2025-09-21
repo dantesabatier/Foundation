@@ -134,7 +134,7 @@ class Slice extends ObjectClass implements Collection, IteratorAggregate
             if ($isIncluded($e, $i, $stop)) {
                 $instance[] = $e;
             }
-            /** @psalm-suppress TypeDoesNotContainType */
+            /** @noinspection PhpConditionAlreadyCheckedInspection */
             if ($stop) {
                 break;
             }

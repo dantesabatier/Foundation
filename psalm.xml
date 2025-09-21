@@ -69,10 +69,11 @@
         <InvalidOperand errorLevel="suppress"/>
         <ClassMustBeFinal errorLevel="suppress"/>
         <NoInterfaceProperties errorLevel="suppress"/>
-        <TypeDoesNotContainType>
+        <TypeDoesNotContainType errorLevel="suppress"/>
+        <ForbiddenCode>
             <errorLevel type="suppress">
-                <file name="src/Networking/URLCache.php"/>
+                <file name="src/StandardAdditions.php"/>
             </errorLevel>
-        </TypeDoesNotContainType>
+        </ForbiddenCode>
     </issueHandlers>
 </psalm>

@@ -162,7 +162,7 @@ class DataURLProtocol extends URLProtocol
         if (!$decodeHeader()) {
             return null;
         }
-        /** @psalm-suppress TypeDoesNotContainType, RedundantCondition */
+        /** @psalm-suppress RedundantCondition */
         if (!($data = $base64 ? $decodeBase64Body() : $decodeStringBody())) {
             return null;
         }

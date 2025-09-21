@@ -347,7 +347,7 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
             if ($isIncluded($e, $i, $stop)) {
                 $instance[$i] = $e;
             }
-            /** @psalm-suppress TypeDoesNotContainType */
+            /** @noinspection PhpConditionAlreadyCheckedInspection */
             if ($stop) {
                 break;
             }

@@ -295,9 +295,6 @@ function temporary_directory(): string
     return sys_get_temp_dir();
 }
 
-/**
- * @psalm-suppress TypeDoesNotContainType, ForbiddenCode
- */
 function is_hidden(string $filename): bool
 {
     if (USE_UNSAFE_FUNCTIONS && TARGET_OS_WINDOWS) {

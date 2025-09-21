@@ -137,7 +137,7 @@ final class URLCache extends ObjectClass
             }
             $stop = false;
             $block($entry, $stop);
-            /** @psalm-suppress TypeDoesNotContainType */
+            /** @noinspection PhpConditionAlreadyCheckedInspection */
             if ($stop) {
                 break;
             }
