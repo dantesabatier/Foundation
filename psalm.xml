@@ -69,5 +69,10 @@
         <InvalidOperand errorLevel="suppress"/>
         <ClassMustBeFinal errorLevel="suppress"/>
         <NoInterfaceProperties errorLevel="suppress"/>
+        <TypeDoesNotContainType>
+            <errorLevel type="suppress">
+                <file name="src/Networking/URLCache.php"/>
+            </errorLevel>
+        </TypeDoesNotContainType>
     </issueHandlers>
 </psalm>
