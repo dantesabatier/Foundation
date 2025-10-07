@@ -332,10 +332,9 @@ class PredicateScanner extends Scanner
                         break;
                     case "q":
                         $this->scanString("q");
-                        /** @psalm-suppress RedundantCondition */
                         if (!$this->isAtEnd) {
                             $c = $this->string[$this->scanLocation];
-                            if ($c === "i" || $c === "u" || $c === "x" || $c === "X") {
+                            if (in_array($c, ["i", "u", "x", "X"], true)) {
                                 $this->scanLocation += 1;
                                 return Expression::expressionForConstantValue($this->arguments->popFirst());
                             }
