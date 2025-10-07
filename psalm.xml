@@ -24,6 +24,11 @@
                 <file name="src/Predicates/PredicateScanner.php"/>
             </errorLevel>
         </PossiblyNullArgument>
+        <RedundantCondition>
+            <errorLevel type="suppress">
+                <file name="src/Predicates/PredicateScanner.php"/>
+            </errorLevel>
+        </RedundantCondition>
         <PossiblyNullReference>
             <errorLevel type="suppress">
                 <file name="src/Predicates/FunctionExpression.php"/>
