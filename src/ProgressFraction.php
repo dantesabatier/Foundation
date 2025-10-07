@@ -48,7 +48,7 @@ class ProgressFraction extends ObjectClass
             $tmp = $b;
             $b = $a % $b;
             $a = $tmp;
-        } while ($b != 0);
+        } while ($b !== 0);
         return $a;
     }
 
