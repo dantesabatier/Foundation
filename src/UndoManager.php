@@ -21,7 +21,7 @@ class UndoManager extends ObjectClass
             }
         }
     }
-    /** @var bool A Boolean value that indicates whether the receiver automatically creates undo groups around each pass of the run loop. true if the receiver automatically creates undo groups around each pass of the run loop, otherwise false. The default is true. If you turn automatic grouping off, you must close groups explicitly before invoking either {@see undo()} or {@see undoNestedGroup()}. */
+    /** @var bool A Boolean value that indicates whether the receiver automatically creates undo groups around each pass of the run loop. True if the receiver automatically creates undo groups around each pass of the run loop, otherwise false. The default is true. If you turn automatic grouping off, you must close groups explicitly before invoking either {@see undo()} or {@see undoNestedGroup()}. */
     public bool $groupsByEvent = true;
     /** @var int The number of nested undo groups (or redo groups, if Redo was invoked last) in the current event loop. An integer indicating the number of nested groups. If 0 is returned, there is no open undo or redo group. */
     private(set) int $groupingLevel = 0;
@@ -45,7 +45,7 @@ class UndoManager extends ObjectClass
     public bool $canUndo {
         get => !$this->undoStack->isEmpty || $this->group?->actions->isEmpty === false;
     }
-    /** @var bool A Boolean value that indicates whether the receiver has any actions to redo. true if the receiver has any actions to redo, otherwise false. Because any undo operation registered clears the redo stack, this method posts an {@see UndoManagerCheckpointNotification} to allow clients to apply their pending operations before testing the redo stack. */
+    /** @var bool A Boolean value that indicates whether the receiver has any actions to redo. True if the receiver has any actions to redo, otherwise false. Because any undo operation registered clears the redo stack, this method posts an {@see UndoManagerCheckpointNotification} to allow clients to apply their pending operations before testing the redo stack. */
     public bool $canRedo {
         get {
             NotificationCenter::default()->postNotificationName(UndoManagerCheckpointNotification, $this);
@@ -180,7 +180,7 @@ class UndoManager extends ObjectClass
     }
 
     /**
-     * Performs the operations in the last group on the redo stack, if there are any, recording them on the undo stack as a single group.
+     * Performs the operations in the last group on the redo stack if there are any, recording them on the undo stack as a single group.
      *
      * Raises an InternalInconsistencyException if the method is invoked during an undo operation.
      * This method posts an {@see UndoManagerCheckpointNotification} and {@see UndoManagerWillRedoChangeNotification} before it performs the redo operation, and it posts the {@see UndoManagerDidRedoChangeNotification} after it performs the redo operation.
@@ -211,7 +211,7 @@ class UndoManager extends ObjectClass
     /**
      * Marks the beginning of an undo group.
      *
-     * All individual undo operations before a subsequent {@see endUndoGrouping()} message are grouped together and reversed by a later {@see undo()} message. By default, undo groups are begun automatically at the start of the event loop, but you can begin your own undo groups with this method, and nest them within other groups. This method posts an {@see UndoManagerCheckpointNotification} unless a top-level undo is in progress. It posts an {@see UndoManagerDidOpenUndoGroupNotification} if a new group was successfully created.
+     * All individual undo operations before a subsequent {@see endUndoGrouping()} message are grouped together and reversed by a later {@see undo()} message. By default, undo groups are begun automatically at the start of the event loop, but you can begin your own undo groups with this method and nest them within other groups. This method posts an {@see UndoManagerCheckpointNotification} unless a top-level undo is in progress. It posts an {@see UndoManagerDidOpenUndoGroupNotification} if a new group was successfully created.
      */
     public function beginUndoGrouping(): void
     {
@@ -303,7 +303,7 @@ class UndoManager extends ObjectClass
     /**
      * Enables the recording of undo operations.
      *
-     * Because undo registration is enabled by default, it is often used to balance a prior {@see disableUndoRegistration()} message. Undo registration isn't actually re-enabled until an enable message balances the last disable message in effect. Raises an InternalInconsistencyException if invoked while no {@see disableUndoRegistration()} message is in effect.
+     * Because undo registration is enabled by default, it is often used to balance a prior {@see disableUndoRegistration()} message. Undo registration isn't re-enabled until an enabled message balances the last disabled message in effect. Raises an InternalInconsistencyException if invoked while no {@see disableUndoRegistration()} message is in effect.
      */
     public function enableUndoRegistration(): void
     {
@@ -396,7 +396,7 @@ class UndoManager extends ObjectClass
 
     /**
      * Sets whether the next undo or redo action is discardable.
-     * @param bool $discardable Specifies if the action is discardable. true if the next undo or redo action can be discarded; false otherwise.
+     * @param bool $discardable Specifies if the action is discardable. True if the next undo or redo action can be discarded; false otherwise.
      */
     public function setActionIsDiscardable(bool $discardable): void
     {
