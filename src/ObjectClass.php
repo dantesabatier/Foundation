@@ -10,6 +10,7 @@
 namespace Sabatier\Foundation;
 
 use Closure;
+use InvalidArgumentException;
 use JetBrains\PhpStorm\ExpectedValues;
 use JetBrains\PhpStorm\Pure;
 use JsonSerializable;
@@ -103,12 +104,12 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
     /**
      * Handles messages the receiver doesn't recognize.
      *
-     * The runtime system invokes this method whenever an object receives an aSelector message it can't respond to or forward. This method, in turn, raises an InvalidArgumentException, and generates an error message.
+     * The runtime system invokes this method whenever an object receives a $selector message it can't respond to or forward. This method, in turn, raises an {@see InvalidArgumentException} and generates an error message.
      * @param string $selector A Selector that identifies a method not implemented or recognized by the receiver.
      */
     public function doesNotRecognizeSelector(string $selector): never
     {
-        fatal_error(sprintf("%s %s() unrecognized selector sent to instance", $this->debugDescription, $selector));
+        throw new InvalidArgumentException(sprintf("%s %s() unrecognized selector sent to instance", $this->debugDescription, $selector));
     }
 
     /**
