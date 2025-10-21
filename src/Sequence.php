@@ -105,7 +105,7 @@ interface Sequence extends Traversable, Countable, Comparable, ExpressibleByArra
      * Returns the minimum element in the sequence.
      *
      * Complexity: O(n), where n is the length of the sequence.
-     * @return Element|null The sequence's minimum element. If the sequence has no elements, returns null.
+     * @return Element|null The sequence's minimum element. If the sequence has no elements, it returns null.
      */
     public function min();
 
@@ -113,7 +113,7 @@ interface Sequence extends Traversable, Countable, Comparable, ExpressibleByArra
      * Returns the maximum element in the sequence.
      *
      * Complexity: O(n), where n is the length of the sequence.
-     * @return Element|null The sequence's maximum element. If the sequence has no elements, returns null.
+     * @return Element|null The sequence's maximum element. If the sequence has no elements, it returns null.
      */
     public function max();
 
