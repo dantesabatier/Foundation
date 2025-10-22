@@ -155,7 +155,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
 
     /**
      * Returns the minimum element in the sequence.
-     * @return Element|null The sequence's minimum element. If the sequence has no elements, returns null.
+     * @return Element|null The sequence's minimum element. If the sequence has no elements, it returns null.
      */
     #[Override]
     public function min()
@@ -165,7 +165,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
 
     /**
      * Returns the maximum element in the sequence.
-     * @return Element|null The sequence's maximum element. If the sequence has no elements, returns null.
+     * @return Element|null The sequence's maximum element. If the sequence has no elements, it returns null.
      */
     #[Override]
     public function max()

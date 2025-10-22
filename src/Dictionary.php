@@ -164,7 +164,7 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
 
     /**
      * Returns the minimum element in the sequence.
-     * @return Element|null The sequence's minimum element. If the sequence has no elements, returns null.
+     * @return Element|null The sequence's minimum element. If the sequence has no elements, it returns null.
      */
     #[Override]
     public function min()
@@ -174,7 +174,7 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
 
     /**
      * Returns the maximum element in the sequence.
-     * @return Element|null The sequence's maximum element. If the sequence has no elements, returns null.
+     * @return Element|null The sequence's maximum element. If the sequence has no elements, it returns null.
      */
     #[Override]
     public function max()
@@ -201,7 +201,7 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
     /**
      * @template Result
      * Returns a new dictionary containing the keys of this dictionary with the values transformed by the given closure.
-     * @param Closure(Element, string=): Result $transform A closure that transforms a value. transform accepts each value of the dictionary as its parameter and returns a transformed value of the same or of a different type.
+     * @param Closure(Element, string=): Result $transform A closure that transforms a value. $transform accepts each value of the dictionary as its parameter and returns a transformed value of the same or of a different type.
      * @return Dictionary<Result> A dictionary containing the keys and transformed values of this dictionary.
      */
     public function mapValues(Closure $transform): Dictionary
@@ -217,7 +217,7 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
     /**
      * @template Result
      * Returns an array containing the results of mapping the given closure over the sequence's elements.
-     * @param Closure(Element, string=): Result $transform A mapping closure. transform accepts an element of this sequence as its parameter and returns a transformed value of the same or of a different type.
+     * @param Closure(Element, string=): Result $transform A mapping closure. $transform accepts an element of this sequence as its parameter and returns a transformed value of the same or of a different type.
      * @return ArrayClass<Result> An array containing the transformed elements of this sequence.
      * @psalm-suppress ImplementedReturnTypeMismatch
      */
@@ -255,7 +255,7 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
     /**
      * @template Result
      * Returns a new dictionary containing only the key-value pairs that have non-null values as the result of transformation by the given closure.
-     * @param Closure(Element, string=): Result $transform A closure that transforms a value. transform accepts each value of the dictionary as its parameter and returns an optional transformed value of the same or of a different type.
+     * @param Closure(Element, string=): Result $transform A closure that transforms a value. $transform accepts each value of the dictionary as its parameter and returns an optional transformed value of the same or of a different type.
      * @return Dictionary<Result> A dictionary containing the keys and non-nil transformed values of this dictionary.
      */
     public function compactMapValues(Closure $transform): Dictionary

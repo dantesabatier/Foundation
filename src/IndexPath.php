@@ -138,7 +138,7 @@ class IndexPath extends ObjectClass implements MutableCollection, Iterator
 
     /**
      * Returns the minimum element in the sequence.
-     * @return int|null The sequence's minimum element. If the sequence has no elements, returns null.
+     * @return int|null The sequence's minimum element. If the sequence has no elements, it returns null.
      */
     #[Override]
     public function min(): ?int
@@ -148,7 +148,7 @@ class IndexPath extends ObjectClass implements MutableCollection, Iterator
 
     /**
      * Returns the maximum element in the sequence.
-     * @return int|null The sequence's maximum element. If the sequence has no elements, returns null.
+     * @return int|null The sequence's maximum element. If the sequence has no elements, it returns null.
      */
     #[Override]
     public function max(): ?int
@@ -234,7 +234,7 @@ class IndexPath extends ObjectClass implements MutableCollection, Iterator
      * Returns the first index in which an element of the collection satisfies the given predicate.
      * @param Closure(int, int<0, max>=): bool $where A closure that takes an element as its argument and returns a Boolean value that indicates whether the passed element represents a match.
      * @return int|null The index of the first element for which $where returns true.
-     * If no elements in the collection satisfy the given $where, returns null.
+     * If no elements in the collection satisfy the given $where, it returns null.
      */
     #[Override]
     public function firstIndex(Closure $where): ?int
@@ -246,7 +246,7 @@ class IndexPath extends ObjectClass implements MutableCollection, Iterator
      * Returns the last index in which an element of the collection satisfies the given predicate.
      * @param Closure(int, int<0, max>=): bool $where A closure that takes an element as its argument and returns a Boolean value that indicates whether the passed element represents a match.
      * @return int|null The index of the last element for which $where returns true.
-     * If no elements in the collection satisfy the given $where, returns null.
+     * If no elements in the collection satisfy the given $where, it returns null.
      */
     #[Override]
     public function lastIndex(Closure $where): ?int

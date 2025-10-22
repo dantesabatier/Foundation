@@ -154,7 +154,7 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
 
     /**
      * Returns the minimum element in the sequence.
-     * @return Element|null The sequence's minimum element. If the sequence has no elements, returns null.
+     * @return Element|null The sequence's minimum element. If the sequence has no elements, it returns null.
      */
     #[Override]
     public function min()
@@ -465,7 +465,7 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
      * The new elements are inserted before the element currently at the specified index.
      * If you pass the collection's endIndex property as the index parameter, the new elements are appended to the collection.
      * @param iterable<int, Element> $newElements The new elements to insert into the collection.
-     * @param int $at The position at which to insert the new elements. index must be a valid index of the collection.
+     * @param int $at The position at which to insert the new elements. $at must be a valid index of the collection.
      */
     #[Override]
     public function insertContentsOf(iterable $newElements, int $at = NotFound): void
@@ -565,7 +565,7 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
      * Returns a subsequence containing all but the given number of initial elements.
      *
      * If the number of elements to drop exceeds the number of elements in the collection, the result is an empty subsequence.
-     * @param int $k The number of elements to drop from the beginning of the collection. k must be greater than or equal to zero.
+     * @param int $k The number of elements to drop from the beginning of the collection. $k must be greater than or equal to zero.
      * @return Slice<Element> A subsequence starting after the specified number of elements.
      */
     #[Override]
@@ -578,7 +578,7 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
      * Returns a subsequence containing all but the specified number of final elements.
      *
      * If the number of elements to drop exceeds the number of elements in the collection, the result is an empty subsequence.
-     * @param int $k The number of elements to drop off the end of the collection. k must be greater than or equal to zero.
+     * @param int $k The number of elements to drop off the end of the collection. $k must be greater than or equal to zero.
      * @return Slice<Element> A subsequence that leaves off the specified number of elements at the end.
      */
     #[Override]
@@ -600,7 +600,7 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
 
     /**
      * Returns a new set with the elements of both this and the given set.
-     * @param SetAlgebra<Element> $other A sequence of elements. other must be finite.
+     * @param SetAlgebra<Element> $other A sequence of elements. $other must be finite.
      * @return Set<Element> A new set with the unique elements of this set and other.
      */
     #[Override]
@@ -613,7 +613,7 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
      * Inserts the elements of the given sequence into the set.
      * If the set already contains one or more elements that are also in other, the existing members are kept.
      * If $other contains multiple instances of equivalent elements, only the first instance is kept.
-     * @param SetAlgebra<Element> $other A sequence of elements. other must be finite.
+     * @param SetAlgebra<Element> $other A sequence of elements. $other must be finite.
      */
     #[Override]
     public function formUnion(SetAlgebra $other): void
@@ -634,7 +634,7 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
 
     /**
      * Removes the elements of the set that aren't also in the given sequence.
-     * @param SetAlgebra<Element> $other A sequence of elements. other must be finite.
+     * @param SetAlgebra<Element> $other A sequence of elements. $other must be finite.
      */
     #[Override]
     public function formIntersection(SetAlgebra $other): void
@@ -644,7 +644,7 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
 
     /**
      * Returns a new set with the elements that are either in this set or in the given sequence, but not in both.
-     * @param SetAlgebra<Element> $other A sequence of elements. other must be finite.
+     * @param SetAlgebra<Element> $other A sequence of elements. $other must be finite.
      * @return Set<Element> A new set.
      */
     #[Override]
