@@ -95,7 +95,7 @@ trait SequenceAlgorithms
         if ($this->compare($sequence) !== ComparisonResult::orderedSame) {
             return false;
         }
-        $areEquivalent ??= fn(mixed $e0, mixed $e1): bool => is_equal($e0, $e1);
+        $areEquivalent ??= is_equal(...);
         return $this->allSatisfy(fn(mixed $e, string|int $i) => $areEquivalent($e, $sequence->first(fn(mixed $v, string|int $k): bool => $k === $i)));
     }
 
