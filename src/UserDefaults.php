@@ -134,7 +134,7 @@ class UserDefaults
      */
     public function stringArray(string $key): ?ArrayClass
     {
-        if (($object = $this->object($key)) && $object instanceof ArrayClass && $object->allSatisfy(fn(mixed $value): bool => is_string($value))) {
+        if (($object = $this->object($key)) && $object instanceof ArrayClass && $object->allSatisfy(is_string(...))) {
             return $object;
         }
         return null;

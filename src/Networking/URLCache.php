@@ -367,7 +367,7 @@ final class URLCache extends ObjectClass
         foreach ($identifiersToRemove as $identifier) {
             $this->inMemoryCacheContents->removeValueForKey($identifier);
         }
-        $this->inMemoryCacheOrder->removeAll(fn(string $e): bool => $identifiersToRemove->containsElement($e));
+        $this->inMemoryCacheOrder->removeAll($identifiersToRemove->containsElement(...));
         try {
             $entriesToRemove = $this->diskEntries()->filter(fn(DiskEntry $e): bool => $e->date->timeIntervalSinceReferenceDate > $date->timeIntervalSinceReferenceDate);
             foreach ($entriesToRemove as $entry) {
