@@ -24,7 +24,7 @@ abstract class URLSessionTask extends ObjectClass
 {
     /** @var URLSessionTaskState The current state of the task—active, suspended, in the process of being canceled, or completed. */
     public URLSessionTaskState $state = URLSessionTaskState::suspended;
-    /** @var float The relative priority at which you'd like a host to handle the task, specified as a floating point value between 0.0 (lowest priority) and 1.0 (highest priority). To provide hints to a host on how to prioritize URL session tasks from your app, specify a priority for each task. Specifying a priority provides only a hint and does not guarantee performance. If you don't specify a priority, a URL session task has a priority of {@see URLSessionTaskPriority::default}, with a value of 0.5. There are three named priorities you can employ, described in {@see URLSessionTaskPriority}. */
+    /** @var float The relative priority at which you'd like a host to handle the task, specified as a floating point value between 0.0 (lowest priority) and 1.0 (the highest priority). To provide hints to a host on how to prioritize URL session tasks from your app, specify a priority for each task. Specifying a priority provides only a hint and does not guarantee performance. If you don't specify a priority, a URL session task has a priority of {@see URLSessionTaskPriority::default}, with a value of 0.5. There are three named priorities you can employ, described in {@see URLSessionTaskPriority}. */
     public float $priority = URLSessionTaskPriority::default;
     /** @var Progress A representation of the overall task progress. */
     public Progress $progress;
@@ -70,11 +70,11 @@ abstract class URLSessionTask extends ObjectClass
     public ?URLRequest $originalRequest = null;
     /** @var URLResponse|null The server's response to the currently active request. This object provides information about the request as provided by the server. This information always includes the original URL. It may also include an expected length, MIME type information, encoding information, a suggested filename, or a combination of these. */
     public ?URLResponse $response = null;
-    /** @var string|null An app-provided string value for the current task. The system doesn't interpret this value; use it for whatever purpose you see fit. For example, you could store a description of the task for debugging purposes, or a key to track the task in your own data structures. */
+    /** @var string|null An app-provided string value for the current task. The system doesn't interpret this value; use it for whatever purpose you see fit. For example, you could store a description of the task for debugging purposes or a key to track the task in your own data structures. */
     public ?string $taskDescription = null;
     /** @var int An identifier uniquely identifying the task within a given session. This value is unique only within the context of a single session; tasks in other sessions may have the same taskIdentifier value. */
     public readonly int $taskIdentifier;
-    /** @var Error|null An error object that indicates why the task failed. This value is nil if the task is still active or if the transfer completed successfully. */
+    /** @var Error|null An error object that indicates why the task failed. This value is nil if the task is still active or if the transfer is completed successfully. */
     public ?Error $error = null;
     /** @var URLSessionTaskDelegate|null A delegate specific to the task. This task-specific delegate receives messages from the task before the session's delegate receives them. This is similar to the behavior of the delegate parameter used by the asynchronous methods in URLSession like bytes(for:delegate:) and data(for:delegate:). */
     public ?URLSessionTaskDelegate $delegate = null;
@@ -324,7 +324,7 @@ abstract class URLSessionTask extends ObjectClass
     }
 
     /**
-     * Resumes the task, if it is suspended.
+     * Resumes the task if it is suspended.
      */
     public function resume(): void
     {
