@@ -13,7 +13,7 @@ interface URLSessionWebSocketDelegate extends URLSessionTaskDelegate
      * If the handshake fails, the task doesn't call this delegate method.
      @param URLSession $session The session of the WebSocket task that opened.
      @param URLSessionWebSocketTask $webSocketTask The WebSocket task that opened.
-     @param string|null $protocol The protocol picked during the handshake phase. This parameter is nil if the server did not pick a protocol, or if the client did not advertise protocols when creating the task.
+     @param string|null $protocol The protocol picked during the handshake phase. This parameter is nil if the server did not pick a protocol or if the client did not advertise protocols when creating the task.
      * 
      */
     public function urlSessionWebSocketTaskDidOpenWithProtocol(URLSession $session, URLSessionWebSocketTask $webSocketTask, ?string $protocol): void;
