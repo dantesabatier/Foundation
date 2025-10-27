@@ -436,7 +436,7 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
      *
      * If an element equal to newElement is already contained in the collection, this method has no effect.
      * @param Element $newElement An element to insert into the collection.
-     * @return array{inserted: boolean, elementAfterInsert: Element} (true, newElement) if newElement was not contained in the collection. If an element equal to newElement was already contained in the collection, the method returns (false, oldElement), where oldElement is the element that was equal to newElement. In some cases, oldElement may be distinguishable from newElement by identity comparison or some other means.
+     * @return array{inserted: bool, elementAfterInsert: Element} (true, newElement) if newElement was not contained in the collection. If an element equal to newElement was already contained in the collection, the method returns (false, oldElement), where oldElement is the element that was equal to newElement. In some cases, oldElement may be distinguishable from newElement by identity comparison or some other means.
      */
     #[Override]
     public function insert(mixed $newElement): array

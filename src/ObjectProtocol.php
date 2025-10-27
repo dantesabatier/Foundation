@@ -54,7 +54,7 @@ interface ObjectProtocol extends CustomDebugStringConvertible, Equatable
     /**
      * Returns a Boolean value that indicates whether the receiver conforms to a given protocol.
      * @param class-string $protocol A protocol object that represents a particular protocol.
-     * @return boolean true if the receiver conforms to aProtocol, otherwise false.
+     * @return bool true if the receiver conforms to aProtocol, otherwise false.
      */
     public function conforms(string $protocol): bool;
 

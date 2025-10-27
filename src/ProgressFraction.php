@@ -82,7 +82,7 @@ class ProgressFraction extends ObjectClass
     /**
      * @param ProgressFraction $fraction
      * @param Closure(float, float): float $whichOperator
-     * @param Closure(float, float): array{float, boolean} $whichOverflow
+     * @param Closure(float, float): array{float, bool} $whichOverflow
      * @return ProgressFraction
      */
     private function math(ProgressFraction $fraction, Closure $whichOperator, Closure $whichOverflow): ProgressFraction
