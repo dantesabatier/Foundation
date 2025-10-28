@@ -16,17 +16,36 @@ function absolute_time_get_current(): float
     return (float)$tv["sec"] + (1.0e-6 * (float)$tv["usec"]);
 }
 
+/**
+ * Generates and returns a random hexadecimal color code.
+ * @return string Returns a string representing a random color in hexadecimal format prefixed with '#'.
+ */
 function random_color(): string
 {
     return sprintf("#%s", substr(str_shuffle("ABCDEF0123456789"), 0, 6));
 }
 
+/**
+ * Determines whether a value falls within the specified range.
+ *
+ * @param float|int|string $value The value to check.
+ * @param float|int|string $min The lower bound of the range.
+ * @param float|int|string $max The upper bound of the range.
+ * @return bool Returns true if the value is within the range, otherwise false.
+ */
 #[Pure]
 function in_range(float|int|string $value, float|int|string $min, float|int|string $max): bool
 {
     return $max > $min && $value >= $min && $value < $max;
 }
 
+/**
+ * Determines whether the given array is sequential.
+ * An array is considered sequential if it is empty or if its keys are consecutive integers starting from 0.
+ *
+ * @param array $array The array to check.
+ * @return bool Returns true if the array is sequential, otherwise false.
+ */
 #[Pure]
 function is_sequential(array $array): bool
 {
@@ -34,6 +53,13 @@ function is_sequential(array $array): bool
     return is_null($key) || is_int($key);
 }
 
+/**
+ * Removes the first occurrence of a specified element from the array and re-indexes if necessary.
+ *
+ * @param array $array The reference to the array from which the element will be removed.
+ * @param mixed $element The element to be removed from the array.
+ * @return array The modified array after removing the specified element.
+ */
 function array_remove(array &$array, mixed $element): array
 {
     $index = array_search($element, $array, true);
@@ -46,12 +72,25 @@ function array_remove(array &$array, mixed $element): array
     return $array;
 }
 
+/**
+ * Extracts a substring from the given string starting at the specified index.
+ *
+ * @param string $string The original string from which the substring is extracted.
+ * @param int $index The starting index for the substring.
+ * @return string Returns the substring starting from the given index in the original string.
+ */
 #[Pure]
 function substring_from_index(string $string, int $index): string
 {
     return substr($string, $index, strlen($string));
 }
 
+/**
+ * Returns a substring from the beginning of the given string up to the specified index.
+ * @param string $string The input string from which the substring will be extracted.
+ * @param int $index The zero-based index indicating the length of the substring to extract.
+ * @return string The resulting substring up to the specified index.
+ */
 #[Pure]
 function substring_to_index(string $string, int $index): string
 {
@@ -59,11 +98,24 @@ function substring_to_index(string $string, int $index): string
 }
 
 /**
- * Returns a case and diacritic-insensitive string value.
+ * Converts the given string to its canonical form by applying case-insensitive and diacritic-insensitive transformations.
+ *
+ * @param string $string The input string to be converted.
+ * @return string The canonicalized version of the input string.
  */
 function canonical(string $string): string
 {
     return string_with_options($string, CompareOptions::caseInsensitive | CompareOptions::diacriticInsensitive);
+}
+
+/**
+ * Converts a string to camel case by capitalizing the first letter of each word after a space and removing the spaces.
+ * @param string $string The input string to be converted to camel case.
+ * @return string Returns the camel case representation of the input string.
+ */
+function camelcase(string $string): string
+{
+    return (string)preg_replace_callback("/\s(.)/", fn(array $matches) => strtoupper($matches[1]), $string);
 }
 
 /**
@@ -185,26 +237,62 @@ function string_search(string $string, string $needle, SearchMethod $method = Se
     return $value;
 }
 
+/**
+ * Checks if the string matches the specified other string using the given options.
+ * @param string $string The receiver string.
+ * @param string $other The string to check against.
+ * @param int $options Options for the string matching, you can combine any of the {@see CompareOptions} using a C bitwise OR operator.
+ * @return bool Returns true if the string matches the specified other string according to the options, otherwise false.
+ */
 function string_matches(string $string, string $other, #[ExpectedValues(flagsFromClass: CompareOptions::class)] int $options = CompareOptions::none): bool
 {
     return string_search($string, $other, SearchMethod::matches, $options) > 0;
 }
 
+/**
+ * Determines if the string begins with the specified substring using the given options.
+ *
+ * @param string $string The receiver string.
+ * @param string $other The substring to check for at the beginning of the string.
+ * @param int $options Options for the comparison, you can combine any of the {@see CompareOptions} using a C bitwise OR operator.
+ * @return bool Returns true if the string begins with the specified substring; otherwise, false.
+ */
 function string_begins_with(string $string, string $other, #[ExpectedValues(flagsFromClass: CompareOptions::class)] int $options = CompareOptions::none): bool
 {
     return string_search($string, $other, SearchMethod::beginsWith, $options) > 0;
 }
 
+/**
+ * Determines if the string ends with the specified substring using the given options.
+ *
+ * @param string $string The string to analyze.
+ * @param string $other The substring to check against the end of the string.
+ * @param int $options Options for the comparison, you can combine any of the {@see CompareOptions} using a C bitwise OR operator.
+ * @return bool Returns true if the string ends with the specified substring, otherwise false.
+ */
 function string_ends_with(string $string, string $other, #[ExpectedValues(flagsFromClass: CompareOptions::class)] int $options = CompareOptions::none): bool
 {
     return string_search($string, $other, SearchMethod::endsWith, $options) > 0;
 }
 
+/**
+ * Checks if a string contains a specified substring using the given options.
+ * @param string $string The string to search within.
+ * @param string $substring The substring to search for.
+ * @param int $options Options for the search, you can combine any of the {@see CompareOptions} using a C bitwise OR operator.
+ * @return bool Returns true if the substring is found in the string, false otherwise.
+ */
 function string_contains(string $string, string $substring, #[ExpectedValues(flagsFromClass: CompareOptions::class)] int $options = CompareOptions::none): bool
 {
     return string_search($string, $substring, SearchMethod::contains, $options) > 0;
 }
 
+/**
+ * Checks if the given string contains only ASCII characters.
+ *
+ * @param string $string The string to check.
+ * @return bool Returns true if the string contains only ASCII characters, otherwise false.
+ */
 function is_ascii(string $string): bool
 {
     return mb_check_encoding($string, "ASCII");
@@ -238,11 +326,22 @@ function localized_string(string $string, string $domain = "Localizable", string
     return gettext($string);
 }
 
+/**
+ * Encodes the given string into a Base64 URL-safe format.
+ * @param string $string The input string to encode.
+ * @return string Returns the Base64 URL-encoded representation of the input string.
+ */
 function base64_url_encode(string $string): string
 {
     return rtrim(strtr(base64_encode($string), '+/', '-_'), '=');
 }
 
+/**
+ * Retrieves the document root directory of the server environment.
+ * It detects the document root based on the server configuration or
+ * working directory if executed from the command line interface.
+ * @return string The document root directory path.
+ */
 function document_root_directory(): string
 {
     $path = $_SERVER["DOCUMENT_ROOT"] ?? "";
@@ -295,6 +394,12 @@ function temporary_directory(): string
     return sys_get_temp_dir();
 }
 
+/**
+ * Determines whether the specified file is hidden.
+ *
+ * @param string $filename The name of the file to check.
+ * @return bool Returns true if the file is hidden; otherwise, false.
+ */
 function is_hidden(string $filename): bool
 {
     if (USE_UNSAFE_FUNCTIONS && TARGET_OS_WINDOWS) {
@@ -304,6 +409,13 @@ function is_hidden(string $filename): bool
     return str_starts_with($filename, ".");
 }
 
+/**
+ * Determines if the given value is a serialized string.
+ *
+ * @param mixed $value The value to be evaluated.
+ * @param bool $strict Whether to perform strict checking for valid serialized strings. If true, the function evaluates the exact syntax of the serialized string more rigorously; if false, the evaluation is less strict.
+ * @return bool Returns true if the given value is a serialized string; otherwise, false.
+ */
 function is_serialized(mixed $value, bool $strict = true): bool
 {
     if (!is_string($value)) {
@@ -359,12 +471,25 @@ function is_serialized(mixed $value, bool $strict = true): bool
     return false;
 }
 
+/**
+ * Determines if the provided string matches the pattern of a password hash.
+ *
+ * @param string $string The string to be checked.
+ * @return bool Returns true if the string matches the password hash pattern, otherwise false.
+ */
 function is_password(string $string): bool
 {
     /** @noinspection SpellCheckingInspection */
     return string_begins_with($string, "\\$2[abxy]", CompareOptions::quoted);
 }
 
+/**
+ * Determines if two values are equal.
+ *
+ * @param mixed $a The first value to compare. This can be of any type.
+ * @param mixed $b The second value to compare. This can be of any type.
+ * @return bool Returns true if the values are considered equal, false otherwise.
+ */
 function is_equal(mixed $a, mixed $b): bool
 {
     if ($a instanceof Equatable) {
@@ -376,6 +501,13 @@ function is_equal(mixed $a, mixed $b): bool
     return $a === $b;
 }
 
+/**
+ * Compares two values to determine their ordering.
+ *
+ * @param mixed $a The first value to compare. Can be any type, but ideally implements Comparable.
+ * @param mixed $b The second value to compare. Can be any type, but ideally implements Comparable.
+ * @return int Returns a negative integer, zero, or a positive integer as $a is less than, equal to, or greater than $b.
+ */
 function compare(mixed $a, mixed $b): int
 {
     return $a instanceof Comparable && $b instanceof Comparable ? $a->compare($b)->value : $a <=> $b;
