@@ -2,11 +2,25 @@
 
 namespace Sabatier\Foundation;
 
+/**
+ * Validates if a given URL matches allowed schemes.
+ *
+ * @param string $url The URL to be validated.
+ * @return bool Returns true if the URL matches the allowed schemes, otherwise false.
+ */
 function url_validate(string $url): bool
 {
     return preg_match("/^(https?|file|data|sql|ssl|tcp|ftps?|wss?|php|x-coredata):\/\//", $url) === 1;
 }
 
+/**
+ * Constructs a complete URL by appending an endpoint and optional query parameters to a base URL.
+ *
+ * @param string $url The base URL.
+ * @param string $endpoint The resource endpoint to be appended to the base URL.
+ * @param array<string, mixed> $parameters Optional query parameters to be appended as a query string.
+ * @return string The fully assembled URL.
+ */
 function url_encode(string $url, string $endpoint, array $parameters = []): string
 {
     if (!str_ends_with($url, "/")) {
@@ -19,6 +33,13 @@ function url_encode(string $url, string $endpoint, array $parameters = []): stri
     return $url;
 }
 
+/**
+ * Constructs the full URL of the current request.
+ *
+ * This function builds the request URL based on the server variables available in the `$_SERVER` superglobal. It considers the scheme (HTTP or HTTPS), host, path, and query string from the request URI.
+ *
+ * @return string The constructed URL as a string, or an empty string if the components are not available.
+ */
 function request_url(): string
 {
     /** @var string[] $elements */
@@ -32,7 +53,11 @@ function request_url(): string
 }
 
 /**
- * @return array<string, string>
+ * Retrieves all HTTP headers from the current request.
+ *
+ * This function collects HTTP headers present in the PHP `$_SERVER` superglobal variable. It maps certain server variables, processes headers, starting with `HTTP_`, and also includes authorization headers.
+ *
+ * @return array<string, string> An associative array containing the HTTP headers, where the keys are the header names and the values are the corresponding header values.
  */
 function getallheaders(): array
 {
