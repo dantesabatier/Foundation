@@ -357,16 +357,18 @@ function document_root_directory(): string
 }
 
 /**
- * Returns the path to either the user's home directory, depending on the platform.
- * @return string The path to the current home directory.
- * @noinspection SpellCheckingInspection
+ * Retrieves the current user's home directory path.
+ *
+ * @return string Returns the path to the current user's home directory.
  */
 function home_directory(): string
 {
     if ($path = getenv("HOME")) {
         return rtrim($path, "/");
     }
+    /** @noinspection SpellCheckingInspection */
     if (!empty($_SERVER["HOMEDRIVE"]) && !empty($_SERVER["HOMEPATH"])) {
+        /** @noinspection SpellCheckingInspection */
         return rtrim($_SERVER["HOMEDRIVE"] . $_SERVER["HOMEPATH"], "\\/");
     }
     fatal_error("failed to get current user directory");
