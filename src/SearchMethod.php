@@ -3,7 +3,7 @@
 namespace Sabatier\Foundation;
 
 /**
- * These constants are used by the {@see string_search()} function.
+ * Defines methods of performing search operations.
  */
 enum SearchMethod: int
 {

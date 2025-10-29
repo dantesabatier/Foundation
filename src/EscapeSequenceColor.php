@@ -3,7 +3,9 @@
 namespace Sabatier\Foundation;
 
 /**
- * These constants are used by the {@see escape_sequence()} function.
+ * Represents ANSI color escape sequences used for terminal text formatting.
+ *
+ * This enum defines standard and bright colors used to set text colors in terminal output. Each case maps to a corresponding ANSI color code.
  */
 enum EscapeSequenceColor: int
 {

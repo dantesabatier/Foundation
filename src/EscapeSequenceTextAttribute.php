@@ -3,7 +3,11 @@
 namespace Sabatier\Foundation;
 
 /**
- * These constants are used by the {@see escape_sequence()} function.
+ * Represents text attributes for escape sequences used in terminal formatting.
+ *
+ * This enum provides a collection of constants that define various text styles and attributes that can be applied when formatting terminal or console output using escape sequences.
+ *
+ * Each case corresponds to a specific text attribute, with its associated integer value representing the escape sequence code for that attribute.
  */
 enum EscapeSequenceTextAttribute: int
 {
