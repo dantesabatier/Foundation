@@ -47,7 +47,7 @@ abstract class Operation extends ObjectClass
     private(set) bool $isConcurrent = false;
     /** @var bool A Boolean value indicating whether the operation executes its task asynchronously. The value of this property is true for operations that run asynchronously with respect to the current thread or false for operations that run synchronously on the current thread. The default value of this property is false. */
     private(set) bool $isAsynchronous = false;
-    /** @var bool A Boolean value indicating whether the operation can be performed now. The readiness of operations is determined by their dependencies on other operations and potentially by custom conditions that you define. The Operation class manages dependencies on other operations and reports the readiness of the receiver based on those dependencies. If you want to use custom conditions to define the readiness of your operation object, reimplement this property and return a value that accurately reflects the readiness of the receiver. If you do so, your custom implementation must get the default property value from super and incorporate that readiness value into the new value of the property. In your custom implementation, you must generate KVO notifications for the isReady key path whenever the ready state of your operation object changes. */
+    /** @var bool A Boolean value indicating whether the operation can be performed now. The readiness of operations is determined by their dependencies on other operations and potentially by custom conditions that you define. The Operation class manages dependencies on other operations and reports the readiness of the receiver based on those dependencies. If you want to use custom conditions to define the readiness of your operation object, reimplement this property and return a value that accurately reflects the readiness of the receiver. If you do so, your custom implementation must get the default property value from the parent and incorporate that readiness value into the new value of the property. In your custom implementation, you must generate KVO notifications for the isReady key path whenever the ready state of your operation object changes. */
     private(set) bool $isReady = true {
         set {
             $this->willChangeValueForKey(__PROPERTY__);
@@ -105,7 +105,7 @@ abstract class Operation extends ObjectClass
     /**
      * Performs the receiver's non-concurrent task.
      *
-     * The default implementation of this method does nothing. You should override this method to perform the desired task. In your implementation, do not invoke super.
+     * The default implementation of this method does nothing. You should override this method to perform the desired task. In your implementation, do not invoke the parent.
      * If you are implementing a concurrent operation, you are not required to override this method but may do so if you plan to call it from your custom start() method.
      */
     public function main(): void
