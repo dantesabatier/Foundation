@@ -158,9 +158,9 @@ final class FileManager extends ObjectClass
      * Performs a shallow search of the specified directory and returns URLs for the contained items.
      * @param URL $url The URL for the directory whose contents you want to enumerate.
      * @param ArrayClass<string>|null $keys An array of keys that identify the file properties that you want pre-fetched for each item in the directory. For each returned URL, the specified properties are fetched and cached in the URL object.
-     * If you want directory contents to have no pre-fetched file properties, pass an empty array to this parameter. If you want directory contents to have default set of pre-fetched file properties, pass null to this parameter.
+     * If you want directory contents to have no pre-fetched file properties, pass an empty array to this parameter. If you want directory contents to have a default set of pre-fetched file properties, pass null to this parameter.
      * @param int $options Options for the enumeration. Because this method performs only shallow enumerations, options that prevent descending into subdirectories or packages are not allowed; the only supported option is {@see DirectoryEnumerationOptions::skipsHiddenFiles}.
-     * @return ArrayClass<URL> An array of URL objects, each of which identifies a file, directory, or symbolic link contained in url.
+     * @return ArrayClass<URL> An array of URL objects, each of which identifies a file, directory, or symbolic link contained in $url.
      * If the directory contains no entries, this method returns an empty array.
      */
     public function contentsOfDirectory(URL $url, ?ArrayClass $keys = null, #[ExpectedValues(flagsFromClass: DirectoryEnumerationOptions::class)] int $options = 0): ArrayClass
@@ -177,7 +177,7 @@ final class FileManager extends ObjectClass
     /**
      * Performs a shallow search of the specified directory and returns the paths of any contained items.
      * @param string $path The path to the directory whose contents you want to enumerate.
-     * @return ArrayClass<string> An array of string, each of which identifies a file, directory, or symbolic link contained in path. Returns an empty array if the directory exists but has no contents.
+     * @return ArrayClass<string> An array of string, each of which identifies a file, directory, or symbolic link contained in $path. Returns an empty array if the directory exists but has no contents.
      */
     public function contentsOfDirectoryAtPath(string $path): ArrayClass
     {
@@ -192,7 +192,7 @@ final class FileManager extends ObjectClass
      * @param ArrayClass<string>|null $keys An array of keys that identify the properties that you want pre-fetched for each item in the enumeration. The values for these keys are cached in the corresponding URL objects. You may specify null for this parameter.
      * @param int $options Options for the enumeration. For a list of valid options, see {@see DirectoryEnumerationOptions}.
      * @param Closure(URL, Error): bool|null $errorHandler An optional error handler block for the file manager to call when an error occurs. The handler block should return true if you want the enumeration to continue or false if you want the enumeration to stop.
-     * @return DirectoryEnumerator<URL>|null A directory enumerator object that enumerates the contents of the directory at url.
+     * @return DirectoryEnumerator<URL>|null A directory enumerator object that lists the contents of the directory at url.
      */
     public function enumerator(URL $url, ?ArrayClass $keys = null, #[ExpectedValues(flagsFromClass: DirectoryEnumerationOptions::class)] int $options = 0, ?Closure $errorHandler = null): ?DirectoryEnumerator
     {
@@ -207,7 +207,7 @@ final class FileManager extends ObjectClass
      * @param URL $url A file URL that specifies the directory to create.
      * If you want to specify a relative path, you must set the current working directory before creating the corresponding URL object.
      * @param bool $createIntermediates If true, this method creates any nonexistent parent directories as part of creating the directory in url.
-     * If false, this method fails if any of the intermediate parent directories does not exist.
+     * If false, this method fails if any of the intermediate parent directories do not exist.
      * @param Dictionary|null $attributes The file attributes for the new directory.
      * You can set the owner and group numbers, file permissions, and modification date.
      * @return bool true if the directory was created, true if createIntermediates is set and the directory already exists, or false if an error occurred.
@@ -234,7 +234,7 @@ final class FileManager extends ObjectClass
      * Permissions are set according to the umask of the current process. For more information, see umask.
      * The owner ID is set to the effective user ID of the process.
      * The group ID is set to that of the parent directory.
-     * If a file already exists at path, this method overwrites the contents of that file if the current process has the appropriate privileges to do so.
+     * If a file already exists at $path, this method overwrites the contents of that file if the current process has the appropriate privileges to do so.
      * @param string $path The path for the new file.
      * @param string|null $data A data object containing the contents of the new file.
      * @param Dictionary|null $attributes A dictionary containing the attributes to associate with the new file. You can use these attributes to set the owner and group numbers, file permissions, and modification date. For a list of keys, see {@see FileAttributeKey}. If you specify null for attributes, the file is created with a set of default attributes.
@@ -327,7 +327,7 @@ final class FileManager extends ObjectClass
      * If the item at srcURL is a directory, this method copies the directory and all of its contents, including any hidden files.
      * If a file with the same name already exists at dstURL, this method stops the copy attempt and returns an appropriate error.
      * If the last component of srcURL is a symbolic link, only the link is copied to the new path.
-     * Prior to copying each item, the file manager asks its delegate if it should actually do so.
+     * Before copying each item, the file manager asks its delegate if it should actually do so.
      * It does this by calling the {@see FileManagerDelegate::fileManagerShouldCopyItemAtURL()} method;
      * If the delegate method returns true, or if the delegate does not implement the appropriate methods,
      * the file manager proceeds to copy the file or directory
@@ -354,7 +354,7 @@ final class FileManager extends ObjectClass
      * When moving items, the current process must have permission to read the item at sourceURL and write the parent directory of destinationURL.
      * If the item at srcURL is a directory, this method moves the directory and all of its contents, including any hidden files.
      * If an item with the same name already exists at dstURL, this method stops the move attempt and returns an appropriate error.
-     * Prior to moving the item, the file manager asks its delegate if it should actually move it.
+     * Before moving the item, the file manager asks its delegate if it should actually move it.
      * It does this by calling the {@see FileManagerDelegate::fileManagerShouldMoveItemAtURL()} method.
      * If the item being moved is a directory, the file manager notifies the delegate only for the directory itself and not for any of its contents.
      * If the delegate method returns true, or if the delegate does not implement the appropriate methods, the file manager moves the file.
@@ -373,7 +373,7 @@ final class FileManager extends ObjectClass
 
     /**
      * Creates a symbolic link at the specified URL that points to an item at the given URL.
-     * @param URL $sourceURL The file URL at which to create the new symbolic link. The last path component of the URL issued as the name of the link.
+     * @param URL $sourceURL The file URL at which to create the new symbolic link. The last path component of the URL is issued as the name of the link.
      * @param URL $destinationURL The file URL that contains the item to be pointed to by the link.
      * In other words, this is the destination of the link.
      * @return bool true if the symbolic link was created or false if an error occurred.
@@ -420,8 +420,8 @@ final class FileManager extends ObjectClass
     /**
      * Returns a Boolean value that indicates whether a file or directory exists at a specified path.
      * @param string $path The path of a file or directory.
-     * @param bool $isDirectory Upon return, contains true if path is a directory or if the final path element is a symbolic link that points to a directory; otherwise, contains false.
-     * @return bool true if a file at the specified path exists, or false if the file's does not exist or its existence could not be determined.
+     * @param bool $isDirectory Upon return, contains true if $path is a directory or if the final path element is a symbolic link that points to a directory; otherwise, contains false.
+     * @return bool true if a file at the specified path exists, or false if the file does not exist or its existence could not be determined.
      * @param-out bool $isDirectory
      */
     public function fileExists(string $path, ?bool &$isDirectory = null): bool
@@ -433,7 +433,7 @@ final class FileManager extends ObjectClass
     /**
      * Returns a Boolean value that indicates whether the invoking object appears able to read a specified file.
      * @param string $path A file path.
-     * @return bool true if the current process has read privileges for the file at path; otherwise false if the process does not have read privileges or the existence of the file could not be determined.
+     * @return bool true if the current process has read privileges for the file at $path; otherwise false if the process does not have read privileges or the existence of the file could not be determined.
      */
     public function isReadableFile(string $path): bool
     {
@@ -443,7 +443,7 @@ final class FileManager extends ObjectClass
     /**
      * Returns a Boolean value that indicates whether the invoking object appears able to write to a specified file.
      * @param string $path A file path.
-     * @return bool true if the current process has write privileges for the file at path; otherwise false if the process does not have write privileges or the existence of the file could not be determined.
+     * @return bool true if the current process has write privileges for the file at $path; otherwise false if the process does not have write privileges or the existence of the file could not be determined.
      */
     public function isWritableFile(string $path): bool
     {
@@ -453,7 +453,7 @@ final class FileManager extends ObjectClass
     /**
      * Returns a Boolean value that indicates whether the operating system appears able to execute a specified file.
      * @param string $path A file path.
-     * @return bool true if the current process has execute privileges for the file at path; otherwise false if the process does not have execute privileges or the existence of the file could not be determined.
+     * @return bool true if the current process has execute privileges for the file at $path; otherwise false if the process does not have execute privileges or the existence of the file could not be determined.
      */
     public function isExecutableFile(string $path): bool
     {
@@ -463,7 +463,7 @@ final class FileManager extends ObjectClass
     /**
      * Returns a Boolean value that indicates whether the invoking object appears able to delete a specified file.
      * @param string $path A file path.
-     * @return bool true if the current process has delete privileges for the file at path; otherwise false if the process does not have delete privileges or the existence of the file could not be determined.
+     * @return bool true if the current process has delete privileges for the file at $path; otherwise false if the process does not have delete privileges or the existence of the file could not be determined.
      */
     public function isDeletableFile(string $path): bool
     {
@@ -473,7 +473,7 @@ final class FileManager extends ObjectClass
     /**
      * Returns the display name of the file or directory at a specified path.
      * @param string $path The path of a file or directory.
-     * @return string The name of the file or directory at path.
+     * @return string The name of the file or directory at $path.
      */
     public function displayName(string $path): string
     {
@@ -483,7 +483,7 @@ final class FileManager extends ObjectClass
     /**
      * Returns the attributes of the item at a given path.
      * @param string $path The path of a file or directory.
-     * @return Dictionary A dictionary object that describes the attributes (file, directory, symlink, and so on) of the file specified by path.
+     * @return Dictionary A dictionary object that describes the attributes (file, directory, symlink, and so on) of the file specified by $path.
      * @throws Exception
      */
     public function attributesOfItem(string $path): Dictionary
@@ -503,9 +503,9 @@ final class FileManager extends ObjectClass
 
     /**
      * Sets the attributes of the specified file or directory.
-     * @param Dictionary $attributes A dictionary containing as keys the attributes to set for path and as values the corresponding value for the attribute.
+     * @param Dictionary $attributes A dictionary containing as keys the attributes to set for $path and as values the corresponding value for the attribute.
      * @param string $path The path of a file or directory.
-     * @return bool true if all changes succeed. If any change fails, returns false, but it is undefined whether any changes actually occurred.
+     * @return bool true if all changes succeed. If any change fails, it returns false, but it is undefined whether any changes actually occurred.
      * @throws Exception
      */
     public function setAttributes(Dictionary $attributes, string $path): bool
@@ -538,7 +538,7 @@ final class FileManager extends ObjectClass
      * Returns the contents of the file at the specified path.
      * @param string $path The path of the file whose contents you want.
      * @return string|null A Data object with the contents of the file.
-     * If path specifies a directory, or if some other error occurs, this method returns null.
+     * If $path specifies a directory, or if some other error occurs, this method returns null.
      * @throws Exception
      */
     public function contents(string $path): ?string
