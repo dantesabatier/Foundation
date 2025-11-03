@@ -25,7 +25,7 @@ interface Collection extends Sequence, ArrayAccess
     public int $startIndex {
         get;
     }
-    /** @var int The collection's “past the end” position—that is, the position one greater than the last valid subscript argument. */
+    /** @var int The collection's "past the end" position—that is, the position one greater than the last valid subscript argument. */
     public int $endIndex {
         get;
     }

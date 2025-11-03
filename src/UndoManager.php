@@ -60,11 +60,11 @@ class UndoManager extends ObjectClass
     public string $undoActionName {
         get => $this->group?->actionName ?? $this->undoStack->last?->actionName ?? "";
     }
-    /** @var string $redoMenuItemTitle The complete title of the Redo menu command, for example, “Redo Paste.” */
+    /** @var string $redoMenuItemTitle The complete title of the Redo menu command, for example, "Redo Paste." */
     public string $redoMenuItemTitle {
         get => $this->redoMenuTitle($this->redoActionName);
     }
-    /** @var string The complete title of the Undo menu command, for example, “Undo Paste.” */
+    /** @var string The complete title of the Undo menu command, for example, "Undo Paste." */
     public string $undoMenuItemTitle {
         get => $this->undoMenuTitle($this->undoActionName);
     }

@@ -96,7 +96,7 @@ class Dictionary extends ObjectClass implements Collection, IteratorAggregate
     /**
      * Creates a new dictionary whose keys are the groupings returned by the given closure and whose values are arrays of the elements that returned each key.
      *
-     * The arrays in the “values” position of the new dictionary each contain at least one element, with the elements in the same order as the source sequence.
+     * The arrays in the "values" position of the new dictionary each contain at least one element, with the elements in the same order as the source sequence.
      * The following example declares an array of names, and then creates a dictionary from that array by grouping the names by first letter:
      * <code>
      * $students = ["Kofi", "Abena", "Efua", "Kweku", "Akosua"]

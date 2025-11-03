@@ -9,7 +9,7 @@ use Override;
  */
 class UUID extends ObjectClass
 {
-    /** @var string Returns a string created from the UUID, such as “E621E1F8-C36C-495A-93FC-0C247A3E6E5F” */
+    /** @var string Returns a string created from the UUID, such as "E621E1F8-C36C-495A-93FC-0C247A3E6E5F" */
     public readonly string $uuidString;
     /** @var string A textual description of the UUID. */
     public string $description {

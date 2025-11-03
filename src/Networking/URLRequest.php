@@ -21,7 +21,7 @@ class URLRequest extends ObjectClass
     public ?string $httpBody = null;
     /** @var resource|null The stream used to deliver the HTTP body. */
     public mixed $httpBodyStream = null;
-    /** @var URL|null The main document URL associated with this request. This URL is used for the cookie “same domain as main document” policy. */
+    /** @var URL|null The main document URL associated with this request. This URL is used for the cookie "same domain as main document" policy. */
     public ?URL $mainDocumentURL = null;
     /** @var bool A Boolean value indicating whether cookies will be sent with and set for this request. */
     public bool $httpShouldHandleCookies = true;

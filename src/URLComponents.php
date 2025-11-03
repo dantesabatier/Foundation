@@ -123,8 +123,8 @@ class URLComponents extends ObjectClass
     /**
      * Returns a URL based on the component settings and relative to a given base URL.
      *
-     * If the URLComponents have an authority component (user, password, host or port) and a path component, then the path must either begin with “/” or be an empty string.
-     * If the URLComponents does not have an authority component (user, password, host or port) and has a path component, the path component must not start with “//”. If those requirements are not met, null is returned.
+     * If the URLComponents have an authority component (user, password, host or port) and a path component, then the path must either begin with "/" or be an empty string.
+     * If the URLComponents does not have an authority component (user, password, host or port) and has a path component, the path component must not start with "//". If those requirements are not met, null is returned.
      */
     public function urlRelativeTo(?URL $baseURL): ?URL
     {

@@ -91,7 +91,7 @@ final class URL extends ObjectClass
     public ?string $fragment {
         get => $this->parse(PHP_URL_FRAGMENT);
     }
-    /** @var URL A version of the URL with any instances of “..” or “.” removed from its path. */
+    /** @var URL A version of the URL with any instances of ".." or "." removed from its path. */
     public URL $standardized {
         get {
             $url = clone $this->absoluteURL;

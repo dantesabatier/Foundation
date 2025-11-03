@@ -18,7 +18,14 @@ use JetBrains\PhpStorm\ExpectedValues;
 interface KeyValueObserving
 {
     /**
-     * @param Closure(mixed, KeyValueObservedChange): void|null $handler
+     * Registers an observation for the specified key path of the object, allowing actions to be taken when the observed value changes.
+     *
+     * Observing an object through this method enables tracking changes to properties and reacting to updates based on the provided callback handler. Multiple options can customize the observation behavior.
+     *
+     * @param string $keyPath The key path of the property to observe.
+     * @param int $options A bitmask of options defining the behavior of the observation. Expected values are sourced from the KeyValueObservingOptions class.
+     * @param Closure(mixed, KeyValueObservedChange): void|null $handler A callback function invoked when the observed value changes. If null, a default handler will be used.
+     * @return KeyValueObservation An object that can be used to manage or stop the observation.
      */
     public function observe(string $keyPath, #[ExpectedValues(flagsFromClass: KeyValueObservingOptions::class)] int $options = KeyValueObservingOptions::new, ?Closure $handler = null): KeyValueObservation;
 
@@ -68,7 +75,7 @@ interface KeyValueObserving
     /**
      * Returns a Boolean value that indicates whether the observed object supports automatic key-value observation for the given key.
      *
-     * The default implementation of this method searches the receiving class for a method whose name matches the pattern automaticallyNotifiesObserversOf<Key>, and returns the result of invoking that method if it is found. Any found methods must return BOOL. If no such method is found, true is returned.
+     * The default implementation of this method searches the receiving class for a method whose name matches the pattern automaticallyNotifiesObserversOf<Key> and returns the result of invoking that method if it is found. Any found methods must return BOOL. If no such method is found, true is returned.
      * @param string $key The key whose value is affected by the key paths.
      * @return bool true if the key-value observing machinery should automatically invoke {@see willChangeValueForKey()}/{@see didChangeValueForKey()} whenever instances of the class receive key-value coding messages for the key, or mutating key-value-coding-compliant methods for the key are invoked; otherwise false.
      */
@@ -78,8 +85,8 @@ interface KeyValueObserving
      * Returns a set of key paths for properties whose values affect the value of the specified key.
      *
      * When an observer for the key is registered with an instance of the receiving class, key-value observing itself automatically observes all the key paths for the same instance and sends change notifications for the key to the observer when the value for any of those key paths changes.
-     * The default implementation of this method searches the receiving class for a method whose name matches the pattern keyPathsForValuesAffecting<Key>, and returns the result of invoking that method if it is found. Any such method must return a Set.
-     * You can override this method when the getter method of one of your properties computes a value to return using the values of other properties, including those that are located by key paths. Your override should typically call super and return a set that includes any members in the set that result from doing that (so as not to interfere with overrides of this method in superclasses).
+     * The default implementation of this method searches the receiving class for a method whose name matches the pattern keyPathsForValuesAffecting<Key> and returns the result of invoking that method if it is found. Any such method must return a Set.
+     * You can override this method when the getter method of one of your properties computes a value to return using the values of other properties, including those that are located by key paths. Your override should typically call parent and return a set that includes any members in the set that result from doing that (so as not to interfere with overrides of this method in superclasses).
      * @param string $key The key whose value is affected by the key paths.
      * @return Set<string>
      */

@@ -27,8 +27,7 @@ interface KeyValueCoding
     /**
      * Returns the value for the derived property identified by a given key path.
      * The default implementation gets the destination object for each relationship using {@see valueForKey()} and returns the result of a {@see valueForKey()} message to the final object.
-     * @param string $keyPath A key path of the form relationship.property (with one or more relationships);
-     * for example, “department.name” or “department.manager.lastName”.
+     * @param string $keyPath A key path of the form "relationship.property" (with one or more relationships); for example, "department.name" or "department.manager.lastName".
      * @return mixed The value for the derived property identified by keyPath.
      */
     public function valueForKeyPath(string $keyPath): mixed;
@@ -37,8 +36,7 @@ interface KeyValueCoding
      * Returns a dictionary containing the property values identified by each of the keys in a given array.
      * The default implementation invokes {@see valueForKey()} for each key in keys.
      * @param ArrayClass<string> $keys An array containing string objects that identify properties of the receiver.
-     * @return Dictionary A dictionary containing as keys the property names in keys,
-     * with corresponding values being the corresponding property values.
+     * @return Dictionary A dictionary containing as keys the property names in keys, with corresponding values being the corresponding property values.
      */
     public function dictionaryWithValues(ArrayClass $keys): Dictionary;
 
@@ -62,8 +60,8 @@ interface KeyValueCoding
     /**
      * Returns a mutable set proxy that provides read-write access to the unordered to-many relationship specified by a given key.
      * Objects added to the mutable set proxy become related to the receiver, and objects removed from the mutable set become unrelated.
-     * The default implementation recognizes the same simple accessor methods and set accessor methods as {@see valueForKey()}, and follows the same direct instance variable access policies.
-     * The default implementation raises an exception if relationship key cannot be found.
+     * The default implementation recognizes the same simple accessor methods and sets accessor methods as {@see valueForKey()}, and follows the same direct instance variable access policies.
+     * The default implementation raises an exception if the relationship $key cannot be found.
      * @param string $key The name of an unordered to-many relationship.
      * @return Set A mutable set that provides read-write access to the unordered to-many relationship specified by $key.
      */
@@ -74,7 +72,7 @@ interface KeyValueCoding
      * The default implementation of this method gets the destination object for each relationship using
      * {@see valueForKey()}, and sends the final object a {@see setValueForKey()} message.
      * @param mixed|null $value The value for the property identified by keyPath.
-     * @param string $keyPath A key path of the form relationship.property (with one or more relationships): for example, “department.name” or “department.manager.lastName.”
+     * @param string $keyPath A key path of the form "relationship.property" (with one or more relationships): for example, "department.name" or "department.manager.lastName."
      */
     public function setValueForKeyPath(mixed $value, string $keyPath): void;
 
@@ -111,8 +109,8 @@ interface KeyValueCoding
 
     /**
      * Throws an error when the value specified by a given pointer is not valid or can't be made valid for the property identified by a given key.
-     * The default implementation of this function searches the class of the receiver for a property specific validation function with a particular signature, allowing that function to determine the outcome of the validation.
-     * For it to be found, the property specific validation function must be exposed, must be named according to the pattern validate<InKey>, must take a single, optional AnyObject pointer argument, and must throw.
+     * The default implementation of this function searches the class of the receiver for a property-specific validation function with a particular signature, allowing that function to determine the outcome of the validation.
+     * For it to be found, the property-specific validation function must be exposed, must be named according to the pattern validate<InKey>, must take a single, optional AnyObject pointer argument, and must throw.
      * For example, for a property named someString, the validation function is:
      * <code>
      * public function validateSomeString(&$value) {
@@ -136,7 +134,7 @@ interface KeyValueCoding
      * @param mixed $value A pointer to a new value for the property identified by inKeyPath.
      * This method may modify or replace the value to make it valid.
      * @param string $keyPath The name of one of the receiver's properties.
-     * The key path must specify an attribute or a to-one relationship. The key path has the form relationship.property (with one or more relationships); for example, department.name or department.manager.lastName.
+     * The key path must specify an attribute or a to-one relationship. The key path has the form "relationship.property" (with one or more relationships); for example, department.name or department.manager.lastName.
      * @return bool A Boolean that is true if the value pointed at by ioValue is valid for the property identified by inKeyPath, or if the method is able to modify the value at ioValue to make it valid; otherwise false.
      */
     public function validateValueForKeyPath(mixed &$value, string $keyPath): bool;

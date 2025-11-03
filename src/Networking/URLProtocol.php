@@ -154,7 +154,7 @@ abstract class URLProtocol extends ObjectClass
     /**
      * Returns a canonical version of the specified request.
      *
-     * It is up to each concrete protocol implementation to define what “canonical” means. A protocol should guarantee that the same input request always yields the same canonical form.
+     * It is up to each concrete protocol implementation to define what "canonical" means. A protocol should guarantee that the same input request always yields the same canonical form.
      * Special consideration should be given when implementing this method, because the canonical form of a request is used to lookup objects in the URL cache, a process which performs equality checks between URLRequest instances.
      * This is an abstract method and subclasses must provide an implementation.
      * @param URLRequest $request The request whose canonical version is desired.

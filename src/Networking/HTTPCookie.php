@@ -31,7 +31,7 @@ class HTTPCookie extends ObjectClass
     public readonly string $name;
     /** @var string The cookie's string value. */
     public readonly string $value;
-    /** @var int The cookie's version. Version 0 maps to “old-style” Netscape cookies. Version 1 maps to RFC 6265 cookies. */
+    /** @var int The cookie's version. Version 0 maps to "old-style" Netscape cookies. Version 1 maps to RFC 6265 cookies. */
     public readonly int $version;
     /** @var Date|null The cookie's expiration date. This value is null if there is no specific expiration date, as with session-only cookies. The expiration date is the date when the cookie should be deleted. */
     public readonly ?Date $expiresDate;
