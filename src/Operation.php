@@ -106,7 +106,7 @@ abstract class Operation extends ObjectClass
      * Performs the receiver's non-concurrent task.
      *
      * The default implementation of this method does nothing. You should override this method to perform the desired task. In your implementation, do not invoke the parent.
-     * If you are implementing a concurrent operation, you are not required to override this method but may do so if you plan to call it from your custom start() method.
+     * If you are implementing a concurrent operation, you are not required to override this method but may do so if you plan to call it from your custom {@see start()} method.
      */
     public function main(): void
     {
