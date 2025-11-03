@@ -16,7 +16,7 @@ class PropertyListSerialization
      * Returns a Data object containing a given property list in a specified format.
      * @param mixed $plist A property list object.
      * @param PropertyListSerializationFormat $format A property list format.
-     * @param int $options The opt parameter is currently unused. No options should be specified.
+     * @param int $options This parameter is currently unused. No options should be specified.
      * @return string A data object containing plist in the format specified by format.
      */
     public static function data(mixed $plist, PropertyListSerializationFormat $format = PropertyListSerializationFormat::xml, int $options = 0): string
@@ -45,7 +45,7 @@ class PropertyListSerialization
      * @param PropertyListSerializationFormat|null $format Upon return, contains the format that the property list was stored in.
      * Pass null if you do not need to know the format.
      * @return mixed A property list object corresponding to the representation in data.
-     * If data is not in a supported format, returns nil.
+     * If data is not in a supported format, it returns nil.
      */
     public static function propertyList(string $data, #[ExpectedValues(flagsFromClass: PropertyListSerializationMutabilityOptions::class)] int $options = 0, ?PropertyListSerializationFormat &$format = null): mixed
     {
@@ -60,7 +60,7 @@ class PropertyListSerialization
      * @param PropertyListSerializationFormat $format Upon return, contains the format that the property list was stored in {@see PropertyListSerializationFormat}.
      * Pass nil if you do not need to know the format.
      * @return mixed A property list object corresponding to the representation in data.
-     * If data is not in a supported format, returns nil.
+     * If data is not in a supported format, it returns nil.
      */
     public static function propertyListWithURL(URL $url, #[ExpectedValues(flagsFromClass: PropertyListSerializationMutabilityOptions::class)] int $options = 0, PropertyListSerializationFormat $format = PropertyListSerializationFormat::xml): mixed
     {
