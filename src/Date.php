@@ -131,7 +131,10 @@ class Date extends ObjectClass
     #[Override]
     public function isEqual(mixed $other): bool
     {
-        return $this->compare($other) === ComparisonResult::orderedSame;
+        if ($other instanceof Date) {
+            return $this->compare($other) === ComparisonResult::orderedSame;
+        }
+        return false;
     }
 
     /**

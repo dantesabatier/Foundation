@@ -487,6 +487,9 @@ final class URL extends ObjectClass
     #[Override]
     public function isEqual(mixed $other): bool
     {
-        return $this->compare($other) === ComparisonResult::orderedSame;
+        if ($other instanceof URL) {
+            return $this->compare($other) === ComparisonResult::orderedSame;
+        }
+        return false;
     }
 }

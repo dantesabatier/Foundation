@@ -494,8 +494,11 @@ function is_password(string $string): bool
  */
 function is_equal(mixed $a, mixed $b): bool
 {
-    if ($a instanceof Equatable && $b instanceof Equatable) {
+    if ($a instanceof Equatable) {
         return $a->isEqual($b);
+    }
+    if ($b instanceof Equatable) {
+        return $b->isEqual($a);
     }
     return $a === $b;
 }
