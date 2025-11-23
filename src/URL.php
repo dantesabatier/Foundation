@@ -478,18 +478,15 @@ final class URL extends ObjectClass
     #[Override]
     public function compare(mixed $other): ComparisonResult
     {
-        if (!$other instanceof URL) {
-            fatal_error(sprintf("Invalid argument: expecting %s, \"%s\" given", URL::class, typeof($other)));
+        if ($other instanceof URL) {
+            return ComparisonResult::from(string_compare($this->absoluteString, $other->absoluteString, CompareOptions::caseInsensitive));
         }
-        return ComparisonResult::from(string_compare($this->absoluteString, $other->absoluteString, CompareOptions::caseInsensitive));
+        return ComparisonResult::orderedDescending;
     }
 
     #[Override]
     public function isEqual(mixed $other): bool
     {
-        if ($other instanceof URL) {
-            return $this->compare($other) === ComparisonResult::orderedSame;
-        }
-        return false;
+        return $this->compare($other) === ComparisonResult::orderedSame;
     }
 }

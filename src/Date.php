@@ -122,19 +122,16 @@ class Date extends ObjectClass
     #[Override]
     public function compare(mixed $other): ComparisonResult
     {
-        if (!$other instanceof Date) {
-            fatal_error(sprintf("Invalid argument: expecting %s, \"%s\" given", Date::class, typeof($other)));
+        if ($other instanceof Date) {
+            return ComparisonResult::from($this->timeIntervalSinceReferenceDate <=> $other->timeIntervalSinceReferenceDate);
         }
-        return ComparisonResult::from($this->timeIntervalSinceReferenceDate <=> $other->timeIntervalSinceReferenceDate);
+        return ComparisonResult::orderedDescending;
     }
 
     #[Override]
     public function isEqual(mixed $other): bool
     {
-        if ($other instanceof Date) {
-            return $this->compare($other) === ComparisonResult::orderedSame;
-        }
-        return false;
+        return $this->compare($other) === ComparisonResult::orderedSame;
     }
 
     /**

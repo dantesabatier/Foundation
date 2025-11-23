@@ -44,19 +44,16 @@ class UUID extends ObjectClass
     #[Override]
     public function compare(mixed $other): ComparisonResult
     {
-        if (!$other instanceof UUID) {
-            fatal_error(sprintf("Invalid argument: expecting %s, \"%s\" given", UUID::class, typeof($other)));
+        if ($other instanceof UUID) {
+            return ComparisonResult::from(uuid_compare($this->uuidString, $other->uuidString));
         }
-        return ComparisonResult::from(uuid_compare($this->uuidString, $other->uuidString));
+        return ComparisonResult::orderedDescending;
     }
 
     #[Override]
     public function isEqual(mixed $other): bool
     {
-        if ($other instanceof UUID) {
-            return $this->compare($other) === ComparisonResult::orderedSame;
-        }
-        return false;
+        return $this->compare($other) === ComparisonResult::orderedSame;
     }
 
     #[Override]

@@ -21,6 +21,7 @@ use Sabatier\Foundation\SearchPathDomainMask;
 use Sabatier\Foundation\Set;
 use Sabatier\Foundation\URL;
 use Sabatier\Foundation\URLResourceKey;
+use function Sabatier\Foundation\compare;
 
 /**
  * An object that maps URL requests to cached response objects.
@@ -92,7 +93,7 @@ final class URLCache extends ObjectClass
     {
         $keys = new ArrayClass([URLResourceKey::fileSizeKey]);
         $entries = $this->diskEntries($keys);
-        $entries->sort(fn(DiskEntry $e0, DiskEntry $e1): int => $e0->date->compare($e1->date)->value);
+        $entries->sort(fn(DiskEntry $e0, DiskEntry $e1): int => compare($e0->date, $e1->date));
         $sizes = $entries->map(fn(DiskEntry $entry): int => $entry->url->resourceValues(new Set($keys))->fileSize ?? 0);
         $totalSize = $sizes->sum();
         foreach ($entries as $index => $entry) {
@@ -273,7 +274,7 @@ final class URLCache extends ObjectClass
                     FileManager::default()->createFile($newURL->path, $serialized);
                 }
                 if ($identifier = $locators?->identifier) {
-                    $entriesToRemove = $this->diskEntries()->filter(fn(DiskEntry $entry): bool => $entry->identifier === $identifier)->sort(fn(DiskEntry $e0, DiskEntry $e1): int => $e0->date->compare($e1->date)->value);
+                    $entriesToRemove = $this->diskEntries()->filter(fn(DiskEntry $entry): bool => $entry->identifier === $identifier)->sort(fn(DiskEntry $e0, DiskEntry $e1): int => compare($e0->date, $e1->date));
                     $entriesToRemove->popFirst();
                     foreach ($entriesToRemove as $entry) {
                         FileManager::default()->removeItem($entry->url);
