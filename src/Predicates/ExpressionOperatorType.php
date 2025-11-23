@@ -59,7 +59,9 @@ enum ExpressionOperatorType: int
     case concat = 112;
     case substring = 113;
     case replace = 114;
-    case length = 115;
+    case regexpReplace = 115;
+    case length = 116;
+    case trim = 117;
     case isNull = 996;
     case ifNull = 997;
     case nullIf = 998;
@@ -120,7 +122,9 @@ enum ExpressionOperatorType: int
             "concat:" => self::concat,
             "substring:" => self::substring,
             "replace:" => self::replace,
+            "regexpReplace:" => self::regexpReplace,
             "length:" => self::length,
+            "trim:" => self::trim,
             "isNull:" => self::isNull,
             "ifNull:" => self::ifNull,
             "nullIf:" => self::nullIf,

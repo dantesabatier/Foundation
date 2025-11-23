@@ -12,6 +12,7 @@ namespace Sabatier\Foundation\Predicates;
 use Countable;
 use DateTime;
 use Exception;
+use JetBrains\PhpStorm\Language;
 use JetBrains\PhpStorm\Pure;
 use Sabatier\Foundation\ArrayClass;
 use Sabatier\Foundation\Date;
@@ -361,6 +362,16 @@ class PredicateUtilities
     public static function length(string $string): int
     {
         return strlen($string);
+    }
+
+    public static function trim(string $string): string
+    {
+        return self::trim($string);
+    }
+
+    public static function regexpReplace(string $subject, #[Language("RegExp")] string $pattern, string $replace): string
+    {
+        return preg_replace($pattern, $replace, $subject);
     }
 
     public static function uuid(): UUID
