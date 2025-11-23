@@ -39,7 +39,6 @@ class PredicateUtilities
 
     /**
      * @return Set<string>
-     * @noinspection SpellCheckingInspection
      */
     private static function reservedWords(): Set
     {
@@ -129,7 +128,6 @@ class PredicateUtilities
         return new Number(0);
     }
 
-    /** @noinspection SpellCheckingInspection */
     public static function stddev(ArrayClass|Set $values): Number
     {
         if ($values->isEmpty) {
@@ -409,13 +407,11 @@ class PredicateUtilities
         return new Number($n1 ^ $n2);
     }
 
-    /** @noinspection SpellCheckingInspection */
     public static function leftshiftBy(int $n1, int $n2): Number
     {
         return new Number($n1 << $n2);
     }
 
-    /** @noinspection SpellCheckingInspection */
     public static function rightshiftBy(int $n1, int $n2): Number
     {
         return new Number($n1 >> $n2);
