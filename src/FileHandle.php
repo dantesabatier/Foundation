@@ -18,6 +18,7 @@ final class FileHandle extends ObjectClass
     private static ?FileHandle $standardOutput = null;
     /** @var string The data currently available in the receiver. The data currently available through the receiver, up to the maximum size that can be represented by a string. If the receiver is a file, this method returns the data obtained by reading the file from the current file pointer to the end of the file. If the receiver is a communications channel, this method reads up to a buffer of data and returns it; if no data is available, the method blocks. Returns an empty data object if the end of file is reached. This method raises {@see fileHandleOperationException} if attempts to determine the file-handle type fail or if attempts to read from the file or channel fail. */
     public string $availableData {
+        /** @noinspection PhpUnhandledExceptionInspection */
         get => $this->read(PHP_INT_MAX) ?? "";
     }
 

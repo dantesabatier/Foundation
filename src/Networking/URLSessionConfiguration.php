@@ -57,11 +57,11 @@ final class URLSessionConfiguration
      */
     public static function ephemeral(): URLSessionConfiguration
     {
-        $ephemeral = clone self::default();
-        $ephemeral->httpCookieStorage = HTTPCookieStorage::ephemeralStorage();
-        $ephemeral->urlCredentialStorage = new URLCredentialStorage(true);
-        $ephemeral->urlCache = new URLCache(4 * 1024 * 1024, 0);
-        return $ephemeral;
+        return clone(self::default(), [
+            "httpCookieStorage" => HTTPCookieStorage::ephemeralStorage(),
+            "urlCredentialStorage" => new URLCredentialStorage(true),
+            "urlCache" => new URLCache(4 * 1024 * 1024, 0)
+        ]);
     }
 
     /** @internal */

@@ -364,7 +364,7 @@ final class EasyHandle
     {
         $rawHandle = $this->rawHandle;
         if ($rawHandle instanceof CurlHandle) {
-            curl_close($rawHandle);
+            unset($rawHandle);
         } elseif (is_resource($rawHandle)) {
             fclose($rawHandle);
         }
