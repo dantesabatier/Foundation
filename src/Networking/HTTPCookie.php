@@ -146,6 +146,9 @@ class HTTPCookie extends ObjectClass
         ]);
     }
 
+    /**
+     * @return array{0: string, 1: string|null}
+     */
     private static function splitNameValue(string $pair): array
     {
         $components = explode("=", $pair, 2);
