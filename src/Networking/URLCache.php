@@ -289,7 +289,7 @@ final class URLCache extends ObjectClass
      * Gets the cached URL response for a data task, passing it to the provided completion handler.
      *
      * @param URLSessionDataTask $dataTask The data task whose cached URL response is desired.
-     * @param Closure(CachedURLResponse|null): void $completionHandler A completion handler that receives the cached URL response for the data task's request, or nil if no response is found in the cache.
+     * @param Closure(CachedURLResponse|null): void $completionHandler A completion handler that receives the cached URL response for the data task's request or nil if no response is found in the cache.
      */
     public function getCachedResponse(URLSessionDataTask $dataTask, Closure $completionHandler): void
     {
