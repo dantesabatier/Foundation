@@ -104,9 +104,7 @@ class PredicateScanner extends Scanner
     {
         if ($this->scanString("(")) {
             $predicate = $this->parsePredicate();
-            if (!$this->scanString(")")) {
-                fatal_error("Invalid argument: missing closing \")\" at index $this->scanLocation");
-            }
+            $this->scanString(")") ?: fatal_error("Invalid argument: missing closing \")\" at index $this->scanLocation");
             return $predicate;
         }
         if ($this->scanKeyword("NOT") || $this->scanKeyword("!")) {
@@ -249,9 +247,7 @@ class PredicateScanner extends Scanner
         }
         if ($this->scanString("(")) {
             $expression = $this->parseExpression();
-            if (!$this->scanString(")")) {
-                fatal_error("Invalid argument: missing closing \")\" at index $this->scanLocation");
-            }
+            $this->scanString(")") ?: fatal_error("Invalid argument: missing closing \")\" at index $this->scanLocation");
             return $expression;
         }
         if ($this->scanString("{")) {
@@ -268,9 +264,7 @@ class PredicateScanner extends Scanner
                 assert($expression instanceof Expression);
                 $subexpressions[] = $expression;
             }
-            if (!$this->scanString("}")) {
-                fatal_error("Invalid argument: missing closing \"}\" at index $this->scanLocation");
-            }
+            $this->scanString("}") ?: fatal_error("Invalid argument: missing closing \"}\" at index $this->scanLocation");
             return Expression::expressionForAggregate($subexpressions);
         }
         if ($this->scanKeyword("TRUE") || $this->scanKeyword("YES")) {
@@ -351,9 +345,7 @@ class PredicateScanner extends Scanner
             $characters = $this->charactersToBeSkipped;
             $this->charactersToBeSkipped = "";
             $this->scanUpString("\"", $value);
-            if (!$this->scanString("\"")) {
-                fatal_error("Invalid argument: missing closing \"\"\" at index $this->scanLocation");
-            }
+            $this->scanString("\"") ?: fatal_error("Invalid argument: missing closing \"\"\" at index $this->scanLocation");
             $this->charactersToBeSkipped = $characters;
             return Expression::expressionForConstantValue($value);
         }
@@ -362,9 +354,7 @@ class PredicateScanner extends Scanner
             $characters = $this->charactersToBeSkipped;
             $this->charactersToBeSkipped = "";
             $this->scanUpString("'", $value);
-            if (!$this->scanString("'")) {
-                fatal_error("Invalid argument: missing closing \"'\" at index $this->scanLocation");
-            }
+            $this->scanString("'") ?: fatal_error("Invalid argument: missing closing \"'\" at index $this->scanLocation");
             $this->charactersToBeSkipped = $characters;
             return Expression::expressionForConstantValue($value);
         }
@@ -375,45 +365,27 @@ class PredicateScanner extends Scanner
             return Expression::expressionForKeyPath("@$keyPath");
         }
         if ($this->scanString("SUBQUERY")) {
-            if (!$this->scanString("(")) {
-                fatal_error("Invalid argument: expecting \"(\" at index $this->scanLocation");
-            }
+            $this->scanString("(") ?: fatal_error("Invalid argument: expecting \"(\" at index $this->scanLocation");
             $expression = $this->parseExpression() ?? fatal_error("Invalid argument: expecting expression at index $this->scanLocation");
-            if (!$this->scanString(",")) {
-                fatal_error("Invalid argument: expecting \",\" at index $this->scanLocation");
-            }
+            $this->scanString(",") ?: fatal_error("Invalid argument: expecting \",\" at index $this->scanLocation");
             $variable = $this->parseExpression() ?? fatal_error("Invalid argument: expecting expression at index $this->scanLocation");
-            if (!$this->scanString(",")) {
-                fatal_error("Invalid argument: expecting \",\" at index $this->scanLocation");
-            }
+            $this->scanString(",") ?: fatal_error("Invalid argument: expecting \",\" at index $this->scanLocation");
             $predicate = $this->parsePredicate() ?? fatal_error("Invalid argument: expecting predicate at index $this->scanLocation");
-            if (!$this->scanString(")")) {
-                fatal_error("Invalid argument: expecting \")\" at index $this->scanLocation");
-            }
+            $this->scanString(")") ?: fatal_error("Invalid argument: expecting \")\" at index $this->scanLocation");
             return Expression::expressionForSubquery($expression, $variable, $predicate);
         }
         if ($this->scanString("TERNARY")) {
-            if (!$this->scanString("(")) {
-                fatal_error("Invalid argument: expecting \"(\" at index $this->scanLocation");
-            }
+            $this->scanString("(") ?: fatal_error("Invalid argument: expecting \"(\" at index $this->scanLocation");
             $predicate = $this->parsePredicate() ?? fatal_error("Invalid argument: expecting predicate at index $this->scanLocation");
-            if (!$this->scanString(",")) {
-                fatal_error("Invalid argument: expecting \",\" at index $this->scanLocation");
-            }
+            $this->scanString(",") ?: fatal_error("Invalid argument: expecting \",\" at index $this->scanLocation");
             $trueExpression = $this->parseExpression() ?? fatal_error("Invalid argument: expecting expression at index $this->scanLocation");
-            if (!$this->scanString(",")) {
-                fatal_error("Invalid argument: expecting \",\" at index $this->scanLocation");
-            }
+            $this->scanString(",") ?: fatal_error("Invalid argument: expecting \",\" at index $this->scanLocation");
             $falseExpression = $this->parseExpression() ?? fatal_error("Invalid argument: expecting expression at index $this->scanLocation");
-            if (!$this->scanString(")")) {
-                fatal_error("Invalid argument: expecting \")\" at index $this->scanLocation");
-            }
+            $this->scanString(")") ?: fatal_error("Invalid argument: expecting \")\" at index $this->scanLocation");
             return Expression::expressionForConditional($predicate, $trueExpression, $falseExpression);
         }
         if ($this->scanString("FUNCTION")) {
-            if (!$this->scanString("(")) {
-                fatal_error("Invalid argument: expecting \"(\" at index $this->scanLocation");
-            }
+            $this->scanString("(") ?: fatal_error("Invalid argument: expecting \"(\" at index $this->scanLocation");
             /** @var ArrayClass<Expression> $arguments */
             $arguments = new ArrayClass();
             $argument = $this->parseExpression() ?? fatal_error("Invalid argument: expecting expression at index $this->scanLocation");
@@ -422,9 +394,7 @@ class PredicateScanner extends Scanner
                 $argument = $this->parseExpression() ?? fatal_error("Invalid argument: expecting expression at index $this->scanLocation");
                 $arguments[] = $argument;
             }
-            if (!$this->scanString(")")) {
-                fatal_error("Invalid argument: missing closing \")\" at index $this->scanLocation");
-            }
+            $this->scanString(")") ?: fatal_error("Invalid argument: missing closing \")\" at index $this->scanLocation");
             $operand = $arguments[0];
             $expression = $arguments[1];
             if ($expression->expressionType !== ExpressionType::constantValue && $expression->expressionType !== ExpressionType::keyPath) {
@@ -435,9 +405,7 @@ class PredicateScanner extends Scanner
         $this->scanString("#");
         $value = "";
         $identifier = "_\$abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-        if (!$this->scanCharacters($identifier, $value)) {
-            fatal_error("Invalid argument: parsing error at index $this->scanLocation");
-        }
+        $this->scanCharacters($identifier, $value) ?: fatal_error("Invalid argument: parsing error at index $this->scanLocation");
         if ($value === null) {
             fatal_error("Invalid argument: expecting value at index $this->scanLocation");
         }
@@ -479,9 +447,7 @@ class PredicateScanner extends Scanner
                     assert($expression instanceof Expression);
                     $left = Expression::expressionForFunction("index:", new ArrayClass([$left, $expression]));
                 }
-                if (!$this->scanString("]", $string)) {
-                    fatal_error("Invalid argument: missing closing \"]\" at index $this->scanLocation");
-                }
+                $this->scanString("]", $string) ?: fatal_error("Invalid argument: missing closing \"]\" at index $this->scanLocation");
             } elseif ($left instanceof KeyPathExpression && $this->scanString(":")) {
                 if (!($keyPath = $left->keyPath)) {
                     fatal_error("Invalid argument: expecting key path at index $this->scanLocation");
@@ -490,9 +456,7 @@ class PredicateScanner extends Scanner
                 if (!$this->scanString("(")) {
                     $string = "";
                     $this->scanCharacters("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ", $string);
-                    if (!$this->scanString(":(")) {
-                        fatal_error("Invalid argument: expecting expression at index $this->scanLocation");
-                    }
+                    $this->scanString(":(") ?: fatal_error("Invalid argument: missing closing \":(\" at index $this->scanLocation");
                     $function .= "$string:";
                 }
                 /** @var ArrayClass<Expression> $subexpressions */
@@ -506,9 +470,7 @@ class PredicateScanner extends Scanner
                         assert($expression instanceof Expression);
                         $subexpressions[] = $expression;
                     }
-                    if (!$this->scanString(")")) {
-                        fatal_error("Invalid argument: missing closing \")\" at index $this->scanLocation");
-                    }
+                    $this->scanString(")") ?: fatal_error("Invalid argument: missing closing \")\" at index $this->scanLocation");
                 }
                 $left = Expression::expressionForFunction($function, $subexpressions);
             } elseif ($this->scanString("UNION")) {
