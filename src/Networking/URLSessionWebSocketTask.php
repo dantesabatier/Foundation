@@ -20,7 +20,7 @@ use const Sabatier\Foundation\URLErrorUnsupportedURL;
  */
 class URLSessionWebSocketTask extends URLSessionTask
 {
-    /** @var int The maximum number of bytes to buffer before the receive call fails with an error. This value includes the sum of all bytes from continuation frames. Receive calls will fail once the task reaches this limit. */
+    /** @var int The maximum number of bytes to buffer before the receiving call fails with an error. This value includes the sum of all bytes from continuation frames. Receive calls will fail once the task reaches this limit. */
     public int $maximumMessageSize = 1024 * 1024;
     /** @var URLSessionWebSocketTaskCloseCode A code that indicates the reason a connection closed. */
     public URLSessionWebSocketTaskCloseCode $closeCode = URLSessionWebSocketTaskCloseCode::invalid;
