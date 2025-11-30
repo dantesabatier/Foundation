@@ -30,5 +30,5 @@ const URLProtectionSpaceHTTPS = "URLProtectionSpaceHTTPS";
 const URLProtectionSpaceFTP = "URLProtectionSpaceFTP";
 /** @var string A notification posted when the set of stored credentials changes. */
 const URLCredentialStorageChangedNotification = "URLCredentialStorageChangedNotification";
-/** @var string The corresponding value is an Number object representing a Boolean value that indicates whether credentials which contain the URLCredentialPersistence.synchronizable attribute should be removed. If the key is missing or the value is @NO, then no attempt will be made to remove such a credential. */
+/** @var string The corresponding value is a {@see Number} representing a Boolean value that indicates whether credentials which contain the URLCredentialPersistence.synchronizable attribute should be removed. If the key is missing or the value is @NO, then no attempt will be made to remove such a credential. */
 const URLCredentialStorageRemoveSynchronizableCredentials = "URLCredentialStorageRemoveSynchronizableCredentials";
