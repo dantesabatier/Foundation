@@ -23,7 +23,7 @@ abstract class Operation extends ObjectClass
         set {
             $this->willChangeValueForKey(__PROPERTY__, changedValue: $this->isCancelled);
             $this->isCancelled = $value;
-            $this->didChangeValueForKey(__PROPERTY__);
+            $this->didChangeValueForKey(__PROPERTY__, changedValue: $this->isCancelled);
             $this->dependencies->setValueForKey($value, __PROPERTY__);
         }
     }
@@ -32,7 +32,7 @@ abstract class Operation extends ObjectClass
         set {
             $this->willChangeValueForKey(__PROPERTY__, changedValue: $this->isExecuting);
             $this->isExecuting = $value;
-            $this->didChangeValueForKey(__PROPERTY__);
+            $this->didChangeValueForKey(__PROPERTY__, changedValue: $this->isExecuting);
         }
     }
     /** @var bool A Boolean value indicating whether the operation has finished executing its task. */
@@ -40,7 +40,7 @@ abstract class Operation extends ObjectClass
         set {
             $this->willChangeValueForKey(__PROPERTY__, changedValue: $this->isFinished);
             $this->isFinished = $value;
-            $this->didChangeValueForKey(__PROPERTY__);
+            $this->didChangeValueForKey(__PROPERTY__, changedValue: $this->isFinished);
         }
     }
     /** @var bool A Boolean value indicating whether the operation executes its task asynchronously. Use the {@see isAsynchronous} property instead. The value of this property is true for operations that run asynchronously with respect to the current thread or false for operations that run synchronously on the current thread. The default value of this property is false. */
@@ -52,7 +52,7 @@ abstract class Operation extends ObjectClass
         set {
             $this->willChangeValueForKey(__PROPERTY__, changedValue: $this->isReady);
             $this->isReady = $value;
-            $this->didChangeValueForKey(__PROPERTY__);
+            $this->didChangeValueForKey(__PROPERTY__, changedValue: $this->isReady);
         }
     }
     /** @var string|null The name of the operation. */
