@@ -25,7 +25,7 @@ class Notification implements CustomStringConvertible
      * The default value for userInfo is nil.
      * @param string $name The name for the new notification. May not be nil.
      * @param mixed $object The object for the new notification.
-     * @param Dictionary|null $userInfo The user information dictionary for the new notification. May be nil.
+     * @param Dictionary|null $userInfo The user information dictionary for the new notification. Maybe nil.
      */
     public function __construct(public string $name, public mixed $object = null, public ?Dictionary $userInfo = null)
     {
