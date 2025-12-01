@@ -35,7 +35,9 @@ class CacheControlDirectives
             return null;
         };
         /** @var ArrayClass<string> $parts */
-        $parts = new ArrayClass(explode(",", $this->headerValue))->map(fn(string $e): string => strtolower(trim($e)));
+        $parts = new ArrayClass(explode(",", $this->headerValue))->map(fn(string $e): string => $e
+                |> trim(...)
+                |> strtolower(...));
         foreach ($parts as $part) {
             if ($part === "no-cache") {
                 $this->noCache = true;
