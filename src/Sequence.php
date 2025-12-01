@@ -97,7 +97,7 @@ interface Sequence extends Traversable, Countable, Comparable, ExpressibleByArra
      *
      * Complexity: O(n), where n is the length of the sequence.
      * @param Closure(Element, Index=): bool|null $where A closure that takes an element of the sequence as its argument and returns a Boolean value indicating whether the element is a match.
-     * @return Element|null The first element of the sequence that satisfies predicate, or null if there is no element that satisfies predicate.
+     * @return Element|null The first element of the sequence that satisfies predicate or null if there is no element that satisfies predicate.
      */
     public function first(?Closure $where = null);
 
