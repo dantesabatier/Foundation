@@ -9,11 +9,15 @@
 
 namespace Sabatier\Foundation\Predicates;
 
+use BackedEnum;
 use JetBrains\PhpStorm\ExpectedValues;
 use Sabatier\Foundation\ArrayClass;
 use Sabatier\Foundation\CompareOptions;
 use Sabatier\Foundation\ObjectClass;
+use Sabatier\Foundation\Sequence;
 use Sabatier\Foundation\Set;
+use Sabatier\Foundation\Value;
+use Stringable;
 use function Sabatier\Foundation\fatal_error;
 use function Sabatier\Foundation\human_readable_value;
 use function Sabatier\Foundation\request_concrete_implementation;
@@ -101,6 +105,40 @@ class PredicateOperator extends ObjectClass
             error_log(sprintf("Foundation: predicate operator %s (%s): (%s)%s %s (%s)%s => %s", $this->operatorType->name, $this->modifier->name, typeof($left), human_readable_value($left), $this->symbol, typeof($right), human_readable_value($right), human_readable_value($v)));
         }
         return $v;
+    }
+
+    protected function coerce(mixed &$left, mixed &$right): void
+    {
+        if ($left instanceof BackedEnum || $left instanceof Value) {
+            $left = $left->value;
+        }
+        if ($right instanceof BackedEnum || $right instanceof Value) {
+            $right = $right->value;
+        }
+        if ($left instanceof Sequence && is_numeric($right)) {
+            $left = $left->count;
+        }
+        if ($right instanceof Sequence && is_numeric($left)) {
+            $right = $right->count;
+        }
+        if ($left instanceof Stringable) {
+            $left = (string)$left;
+        }
+        if ($right instanceof Stringable) {
+            $right = (string)$right;
+        }
+        if (is_string($left) && is_numeric($right)) {
+            $left = strlen($left);
+        }
+        if (is_string($right) && is_numeric($left)) {
+            $right = strlen($right);
+        }
+        if (is_numeric($left)) {
+            $left = (string)$left;
+        }
+        if (is_numeric($right)) {
+            $right = (string)$right;
+        }
     }
 
     public function performPrimitiveOperation(mixed $left, mixed $right): bool

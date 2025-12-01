@@ -103,8 +103,8 @@ class Predicate extends ObjectClass
     }
 
     #[Override]
-    public function jsonSerialize(): Dictionary
+    public function jsonSerialize(): string
     {
-        return new Dictionary(["format" => $this->predicateFormat]);
+        return $this->predicateFormat;
     }
 }

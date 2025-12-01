@@ -10,6 +10,7 @@
 namespace Sabatier\Foundation\Predicates;
 
 use Override;
+use Sabatier\Foundation\CompareOptions;
 use function Sabatier\Foundation\human_readable_value;
 use function Sabatier\Foundation\string_matches;
 
@@ -23,6 +24,10 @@ class MatchingPredicateOperator extends StringPredicateOperator
             return false;
         }
         assert(is_string($left) && is_string($right), sprintf("Cannot perform substring check on non-strings %s and %s", human_readable_value($left), human_readable_value($right)));
-        return string_matches($left, $right, $this->compareOptions);
+        $options = $this->compareOptions;
+        if (($options & CompareOptions::quoted) === 0) {
+            $options |= CompareOptions::quoted;
+        }
+        return string_matches($left, $right, $options);
     }
 }

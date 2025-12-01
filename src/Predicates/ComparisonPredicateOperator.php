@@ -2,13 +2,10 @@
 
 namespace Sabatier\Foundation\Predicates;
 
-use BackedEnum;
 use JetBrains\PhpStorm\ExpectedValues;
 use Override;
 use Sabatier\Foundation\CompareOptions;
 use Sabatier\Foundation\ComparisonResult;
-use Sabatier\Foundation\ObjectClass;
-use Sabatier\Foundation\Value;
 use function Sabatier\Foundation\fatal_error;
 use function Sabatier\Foundation\string_compare;
 
@@ -45,18 +42,7 @@ class ComparisonPredicateOperator extends PredicateOperator
                 default => fatal_error("Invalid predicate operator variant: $variant->name")
             };
         }
-        if ($left instanceof BackedEnum || $left instanceof Value) {
-            $left = $left->value;
-        }
-        if ($right instanceof BackedEnum || $right instanceof Value) {
-            $right = $right->value;
-        }
-        if ($left instanceof ObjectClass) {
-            $left = $left->description;
-        }
-        if ($right instanceof ObjectClass) {
-            $right = $right->description;
-        }
+        $this->coerce($left, $right);
         return match ($variant) {
             PredicateOperatorType::lessThan => $left < $right,
             PredicateOperatorType::lessThanOrEqualTo => $left <= $right,

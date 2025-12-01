@@ -221,16 +221,20 @@ function string_search(string $string, string $needle, SearchMethod $method = Se
     if (!($options & CompareOptions::quoted)) {
         $needle = preg_quote($needle);
     }
-    $pattern = "/";
-    $pattern .= match ($method) {
-        SearchMethod::matches => "^$needle$",
-        SearchMethod::beginsWith => "^$needle",
-        SearchMethod::endsWith => "$needle$",
-        SearchMethod::contains => ($options & CompareOptions::words) ? "(?:^|\W)$needle(?:$|\W)" : $needle
-    };
-    $pattern .= "/";
-    if ($options & CompareOptions::caseInsensitive) {
-        $pattern .= "i";
+    $pattern = $needle;
+    /** @noinspection PhpSuspiciousNameCombinationInspection */
+    if (!str_starts_with($needle, "/") && !str_ends_with($needle, "/")) {
+        $pattern = "/";
+        $pattern .= match ($method) {
+            SearchMethod::matches => "^$needle$",
+            SearchMethod::beginsWith => "^$needle",
+            SearchMethod::endsWith => "$needle$",
+            SearchMethod::contains => ($options & CompareOptions::words) ? "(?:^|\W)$needle(?:$|\W)" : $needle
+        };
+        $pattern .= "/";
+        if ($options & CompareOptions::caseInsensitive) {
+            $pattern .= "i";
+        }
     }
     $value = preg_match_all($pattern, $string, $matches);
     $matches = array_map(trim(...), $matches[0]);

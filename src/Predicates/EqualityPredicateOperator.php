@@ -9,12 +9,9 @@
 
 namespace Sabatier\Foundation\Predicates;
 
-use BackedEnum;
 use JetBrains\PhpStorm\ExpectedValues;
 use Override;
 use Sabatier\Foundation\CompareOptions;
-use Sabatier\Foundation\Value;
-use Stringable;
 use function Sabatier\Foundation\string_is_equal;
 
 /** @internal */
@@ -41,24 +38,7 @@ class EqualityPredicateOperator extends PredicateOperator
         if ($left === null || $right === null) {
             return $isNegation;
         }
-        if ($left instanceof BackedEnum || $left instanceof Value) {
-            $left = $left->value;
-        }
-        if ($right instanceof BackedEnum || $right instanceof Value) {
-            $right = $right->value;
-        }
-        if ($left instanceof Stringable) {
-            $left = (string)$left;
-        }
-        if ($right instanceof Stringable) {
-            $right = (string)$right;
-        }
-        if (is_numeric($left)) {
-            $left = (string)$left;
-        }
-        if (is_numeric($right)) {
-            $right = (string)$right;
-        }
+        $this->coerce($left, $right);
         $options = $this->compareOptions;
         if ($options === CompareOptions::none || !is_string($left) || !is_string($right)) {
             return $isNegation xor ($left === $right);
