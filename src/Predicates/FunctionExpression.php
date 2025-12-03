@@ -102,8 +102,8 @@ class FunctionExpression extends Expression
         }
         $this->operand->accept($visitor, $flags);
         if ($arguments = $this->arguments) {
-            foreach ($arguments as $expression) {
-                $expression->accept($visitor, $flags);
+            foreach ($arguments as $argument) {
+                $argument->accept($visitor, $flags);
             }
         }
         if ($flags & PredicateVisitorFlags::internalNodes) {

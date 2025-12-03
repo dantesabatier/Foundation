@@ -34,6 +34,7 @@ class KeyPathExpression extends FunctionExpression
         parent::__construct(ExpressionType::keyPath, $operand, $selector, new ArrayClass([$keyPath]));
         $this->keyPath = $keyPath;
         $this->constantValue = $keyPath;
+        $this->arguments = new ArrayClass();
     }
 
     #[Override]
