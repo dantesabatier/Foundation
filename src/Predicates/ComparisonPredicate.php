@@ -71,9 +71,6 @@ class ComparisonPredicate extends Predicate
     #[Override]
     public function accept(PredicateVisitor $visitor, #[ExpectedValues(flagsFromClass: PredicateVisitorFlags::class)] int $flags): void
     {
-        if (!($flags & PredicateVisitorFlags::expressions)) {
-            return;
-        }
         if ($flags & PredicateVisitorFlags::internalNodes) {
             $visitor->visitPredicate($this);
         }
@@ -86,9 +83,6 @@ class ComparisonPredicate extends Predicate
         }
         if ($flags & PredicateVisitorFlags::operators) {
             $this->predicateOperator->accept($visitor, $flags);
-        }
-        if ($flags & PredicateVisitorFlags::internalNodes) {
-            $visitor->visitPredicate($this);
         }
     }
 }

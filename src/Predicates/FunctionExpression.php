@@ -106,8 +106,5 @@ class FunctionExpression extends Expression
                 $argument->accept($visitor, $flags);
             }
         }
-        if ($flags & PredicateVisitorFlags::internalNodes) {
-            $visitor->visitPredicateExpression($this);
-        }
     }
 }

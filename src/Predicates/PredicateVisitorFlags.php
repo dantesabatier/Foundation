@@ -17,4 +17,5 @@ class PredicateVisitorFlags
     final const int internalNodes = 4;
     final const int operatorsBefore = 8;
     final const int common = PredicateVisitorFlags::expressions | PredicateVisitorFlags::operators | PredicateVisitorFlags::internalNodes;
+    final const int all = PredicateVisitorFlags::common | PredicateVisitorFlags::operatorsBefore;
 }
