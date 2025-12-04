@@ -41,8 +41,8 @@ class ComparisonPredicate extends Predicate
 
     /**
      * Initializes a predicate formed by combining given left and right expressions using a given selector.
-     * @param Expression $leftExpression The left hand expression.
-     * @param Expression $rightExpression The right hand expression.
+     * @param Expression $leftExpression The left-hand expression.
+     * @param Expression $rightExpression The right-hand expression.
      * @param PredicateOperatorType $type The predicate operator type (see {@see PredicateOperatorType}).
      * @param ComparisonPredicateModifier $modifier The modifier to apply (see {@see ComparisonPredicateModifier}).
      * @param int $options The options to apply (see {@see ComparisonPredicateOptions}). For no options, pass 0.
