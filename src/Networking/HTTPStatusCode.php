@@ -3,7 +3,7 @@
 namespace Sabatier\Foundation\Networking;
 
 /**
- * Constants to use with {@see HTTPURLResponse::statusCode()}.
+ * This class defines constants for standard HTTP status codes.
  */
 class HTTPStatusCode
 {

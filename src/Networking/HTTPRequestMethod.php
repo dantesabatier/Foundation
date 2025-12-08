@@ -3,7 +3,7 @@
 namespace Sabatier\Foundation\Networking;
 
 /**
- * Constants to use with {@see URLRequest::httpMethod()}.
+ * Defines the standard HTTP request methods.
  */
 class HTTPRequestMethod
 {
