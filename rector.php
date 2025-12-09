@@ -7,7 +7,6 @@ use Rector\CodeQuality\Rector\ClassMethod\ExplicitReturnNullRector;
 use Rector\CodeQuality\Rector\ClassMethod\LocallyCalledStaticMethodToNonStaticRector;
 use Rector\CodeQuality\Rector\Identical\FlipTypeControlToUseExclusiveTypeRector;
 use Rector\CodeQuality\Rector\If_\ExplicitBoolCompareRector;
-use Rector\CodingStyle\Rector\FunctionLike\FunctionLikeToFirstClassCallableRector;
 use Rector\Config\RectorConfig;
 use Rector\DeadCode\Rector\ClassMethod\RemoveEmptyClassMethodRector;
 use Rector\DeadCode\Rector\ClassMethod\RemoveUnusedPrivateMethodParameterRector;
@@ -50,7 +49,8 @@ try {
                 __DIR__ . "/src/URL.php",
                 __DIR__ . "/src/StandardAdditions.php"
             ],
-            ExplicitReturnNullRector::class, RestoreDefaultNullToNullableTypePropertyRector::class,
+            ExplicitReturnNullRector::class,
+            RestoreDefaultNullToNullableTypePropertyRector::class,
             ReadOnlyPropertyRector::class,
             ClassOnThisVariableObjectRector::class,
             ClassOnObjectRector::class,
@@ -68,9 +68,6 @@ try {
             ],
             NewInInitializerRector::class => [
                 __DIR__ . "/src/Progress.php"
-            ],
-            FunctionLikeToFirstClassCallableRector::class => [
-                __DIR__ . "/src/UserDefaults.php"
             ]
         ])->withPreparedSets(deadCode: true, codeQuality: true, earlyReturn: true);
 } catch (InvalidConfigurationException $e) {
