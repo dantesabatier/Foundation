@@ -313,19 +313,44 @@ function is_ascii(string $string): bool
  */
 function localized_string(string $string, string $domain = "Localizable", string $directory = "", string $comment = ""): string
 {
+    static $cache = [];
     $fileManager = FileManager::default();
-    if (!$fileManager->fileExists($directory, $isDirectory) || !$isDirectory) {
-        $directory = $fileManager->documentRootDirectory->appendingPathComponent("Resources")->path;
+    if ($directory !== "" && $fileManager->fileExists($directory, $isDirectory) && $isDirectory) {
+        $directoryURL = URL::fileURL($directory);
+        $bundleURL = $directoryURL->deletingLastPathComponent();
+        $resourcesURL = $bundleURL->appendingPathComponent("Resources");
+    } else {
+        $resourcesURL = null;
+        $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
+        if (isset($trace[1]["file"])) {
+            $fileURL = URL::fileURL($trace[1]["file"]);
+            $dirURL = $fileURL->deletingLastPathComponent();
+            if ($dirURL->lastPathComponent === "src") {
+                $bundleURL = $dirURL->deletingLastPathComponent();
+                if (!$bundleURL->isEqual(Bundle::main()->bundleURL)) {
+                    $resourcesURL = $bundleURL->appendingPathComponent("Resources");
+                }
+            }
+        }
+        if ($resourcesURL === null) {
+            $frameworks = new Set(Bundle::allFrameworks());
+            $frameworks->append(Bundle::bundleForClass(FileManager::class));
+            foreach ($frameworks as $bundle) {
+                $potentialURL = $bundle->bundleURL->appendingPathComponent("Resources");
+                if ($fileManager->fileExists($potentialURL->path, $isDirectory) && $isDirectory) {
+                    $resourcesURL = $potentialURL;
+                    break;
+                }
+            }
+        }
+        $resourcesURL ??= Bundle::main()->bundleURL->appendingPathComponent("Resources");
     }
-    $directoryURL = URL::fileURL($directory);
-    if ((!$fileManager->fileExists($directoryURL->path, $isDirectory) || !$isDirectory)) {
-        $directoryURL = Bundle::bundleForClass(FileManager::class)->bundleURL;
+    $key = $domain . "|" . $resourcesURL->path;
+    if (!isset($cache[$key])) {
+        $cache[$key] = true;
+        bindtextdomain($domain, $resourcesURL->path);
+        bind_textdomain_codeset($domain, "UTF-8");
     }
-    if (!string_is_equal($directoryURL->lastPathComponent, "Resources")) {
-        $directoryURL = $directoryURL->appendingPathComponent("Resources");
-    }
-    bindtextdomain($domain, $directoryURL->path);
-    bind_textdomain_codeset($domain, "UTF-8");
     textdomain($domain);
     return gettext($string);
 }
