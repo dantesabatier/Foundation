@@ -327,9 +327,7 @@ function localized_string(string $string, string $domain = "Localizable", string
             $dirURL = $fileURL->deletingLastPathComponent();
             if ($dirURL->lastPathComponent === "src") {
                 $bundleURL = $dirURL->deletingLastPathComponent();
-                if (!$bundleURL->isEqual(Bundle::main()->bundleURL)) {
-                    $resourcesURL = $bundleURL->appendingPathComponent("Resources");
-                }
+                $resourcesURL = $bundleURL->appendingPathComponent("Resources");
             }
         }
         if ($resourcesURL === null) {
@@ -345,7 +343,7 @@ function localized_string(string $string, string $domain = "Localizable", string
         }
         $resourcesURL ??= Bundle::main()->bundleURL->appendingPathComponent("Resources");
     }
-    $key = $domain . "|" . $resourcesURL->path;
+    $key = "$domain|$resourcesURL->path";
     if (!isset($cache[$key])) {
         $cache[$key] = true;
         bindtextdomain($domain, $resourcesURL->path);
