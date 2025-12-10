@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-07 21:14-0600\n"
+"POT-Creation-Date: 2025-12-09 16:27-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,8 +17,239 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+msgid "The operation couldn't be completed."
+msgstr "La operación no se pudo completar."
+
+msgid "The file doesn't exist."
+msgstr "El archivo no existe."
+
+msgid "The file couldn't be locked."
+msgstr "No se pudo bloquear el archivo."
+
+msgid "You don't have permission."
+msgstr "No tienes permiso"
+
+msgid "The file name is invalid."
+msgstr "El nombre del archivo no es válido."
+
+msgid "The file isn't in the correct format."
+msgstr "El archivo no está en el formato correcto."
+
+msgid "The specified text encoding isn't applicable."
+msgstr "La codificación de texto especificada no es aplicable."
+
+msgid "The specified URL type isn't supported."
+msgstr "El tipo de URL especificado no es compatible."
+
+msgid "The item is too large."
+msgstr "El artículo es demasiado grande."
+
+msgid "The text encoding of the contents couldn't be determined."
+msgstr "No se pudo determinar la codificación del texto del contenido."
+
+msgid "A file with the same name already exists."
+msgstr "Ya existe un archivo con el mismo nombre."
+
+msgid "There isn't enough space."
+msgstr "No hay suficiente espacio"
+
+msgid "The volume is read only."
+msgstr "El volumen es de sólo lectura."
+
+msgid "The value is invalid."
+msgstr "El valor no es válido."
+
+msgid "The operation was cancelled."
+msgstr "La operación fue cancelada."
+
+msgid "The requested operation is not supported."
+msgstr "La operación solicitada no es compatible."
+
+msgid "The data is not in the correct format."
+msgstr "Los datos no están en el formato correcto."
+
+msgid "The data is in a format that this application doesn't understand."
+msgstr "Los datos están en un formato que esta aplicación no entiende."
+
+msgid "An error occurred in the source of the data."
+msgstr "Se produjo un error en la fuente de los datos."
+
+msgid "An error occurred in the destination for the data."
+msgstr "Se produjo un error en el destino de los datos."
+
+msgid "An error occurred in the content of the data."
+msgstr "Se produjo un error en el contenido de los datos."
+
+msgid "The file is not available on iCloud yet."
+msgstr "El archivo aún no está disponible en iCloud."
+
+msgid "There isn't enough space in your account."
+msgstr "No hay suficiente espacio en tu cuenta."
+
+msgid "The iCloud servers might be unreachable or your settings might be incorrect."
+msgstr "Es posible que los servidores de iCloud no estén disponibles o que su configuración sea incorrecta."
+
+msgid "The data isn't in the correct format."
+msgstr "Los datos no están en el formato correcto."
+
+msgid "The data is missing."
+msgstr "Faltan los datos."
+
+msgid "Cannot find host."
+msgstr "No se puede encontrar el host."
+
+msgid "Network connection lost."
+msgstr "Se perdió la conexión de red."
+
+msgid "Bad server response."
+msgstr "Mala respuesta del servidor."
+
+msgid "Unknown error."
+msgstr "Error desconocido."
+
+msgid "The request timed out."
+msgstr "Se agotó el tiempo de solicitud."
+
+msgid "Too many HTTP redirects."
+msgstr "Demasiadas redirecciones HTTP."
+
+msgid "An unexpected error has occurred"
+msgstr "Se ha producido un error inesperado"
+
+msgid "File system error"
+msgstr "Error del sistema de archivos"
+
+msgid "Resource exceeds maximum size"
+msgstr "El recurso excede el tamaño máximo"
+
+msgid "Continue"
+msgstr "Continuar"
+
+msgid "Switching protocols"
+msgstr "Protocolos de conmutación"
+
+msgid "OK"
+msgstr "OK"
+
+msgid "Created"
+msgstr "Creado"
+
+msgid "Accepted"
+msgstr "Aceptado"
+
+msgid "Non authoritative information"
+msgstr "Información no autorizada"
+
+msgid "No content"
+msgstr "Sin contenido"
+
+msgid "Reset content"
+msgstr "Restablecer contenido"
+
+msgid "Partial content"
+msgstr "Contenido parcial"
+
+msgid "Multiple choices"
+msgstr "Múltiples opciones"
+
+msgid "Moved permanently"
+msgstr "Mudado permanentemente"
+
+msgid "Found"
+msgstr "Encontrado"
+
+msgid "See other"
+msgstr "Ver otro"
+
+msgid "Not modified"
+msgstr "No modificado"
+
+msgid "Temporary redirect"
+msgstr "Redirección temporal"
+
+msgid "Bad request"
+msgstr "Solicitud incorrecta"
+
+msgid "Unauthorized"
+msgstr "No autorizado"
+
+msgid "Payment required"
+msgstr "Se requiere pago"
+
+msgid "Forbidden"
+msgstr "Prohibido"
+
+msgid "Not found"
+msgstr "Extraviado"
+
+msgid "Method not allowed"
+msgstr "Método no permitido"
+
+msgid "Unacceptable"
+msgstr "Inaceptable"
+
+msgid "Proxy authentication required"
+msgstr "Se requiere autenticación de proxy"
+
+msgid "Request time out"
+msgstr "Tiempo de espera de solicitud"
+
+msgid "Conflict"
+msgstr "Conflicto"
+
+msgid "Length required"
+msgstr "Longitud requerida"
+
+msgid "Precondition failed"
+msgstr "La condición previa falló"
+
+msgid "Request too large"
+msgstr "La solicitud es demasiado grande"
+
+msgid "Requested URL too long"
+msgstr "La URL solicitada es demasiado larga"
+
+msgid "Unsupported media type"
+msgstr "Tipo de medio no compatible"
+
+msgid "Requested range not satisfiable"
+msgstr "Rango solicitado no satisfacible"
+
+msgid "Expectation failed"
+msgstr "La expectativa falló"
+
+msgid "Internal server error"
+msgstr "Error Interno del Servidor"
+
+msgid "Not implemented"
+msgstr "No implementado"
+
+msgid "Bad gateway"
+msgstr "Puerta de enlace defectuosa"
+
+msgid "Service unavailable"
+msgstr "Servicio No Disponible"
+
+msgid "Gateway time out"
+msgstr "Tiempo de espera de la puerta de enlace"
+
+msgid "Unsupported version"
+msgstr "Versión no compatible"
+
+msgid "Server Error"
+msgstr "Error del servidor"
+
+msgid "Completion failure"
+msgstr "Fallo de finalización"
+
+msgid "Unsupported URL"
+msgstr "URL no compatible"
+
+msgid "Unexpected message received from server"
+msgstr "Mensaje inesperado recibido del servidor"
+
 msgid "Redo"
-msgstr "Redo"
+msgstr "Rehacer"
 
 msgid "Undo"
-msgstr "Undo"
+msgstr "Deshacer"

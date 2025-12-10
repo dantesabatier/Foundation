@@ -218,7 +218,7 @@ abstract class NativeProtocol extends URLProtocol implements EasyHandleDelegate
                 break;
             case CompletionActionRawValue::failWithError:
                 $this->internalState = InternalState::transferFailed();
-                $error = new Error(URLErrorDomain, $action->errorCode, new Dictionary([LocalizedDescriptionKey => "Completion failure"]));
+                $error = new Error(URLErrorDomain, $action->errorCode, new Dictionary([LocalizedDescriptionKey => localized_string("Completion failure")]));
                 $this->failWithError($error, $request);
                 break;
             case CompletionActionRawValue::redirectWithRequest:
@@ -279,7 +279,7 @@ abstract class NativeProtocol extends URLProtocol implements EasyHandleDelegate
     public function failWithError(Error $error, URLRequest $request): void
     {
         if ($error->domain !== URLErrorDomain) {
-            $error = new Error(URLErrorDomain, $error->code, new Dictionary([UnderlyingErrorKey => $error, URLErrorFailingURLErrorKey => $request->url, LocalizedDescriptionKey => localized_string($error->localizedDescription)]));
+            $error = new Error(URLErrorDomain, $error->code, new Dictionary([UnderlyingErrorKey => $error, URLErrorFailingURLErrorKey => $request->url, LocalizedDescriptionKey => $error->localizedDescription]));
         }
         $this->client?->urlProtocolDidFailWithError($this, $error);
     }

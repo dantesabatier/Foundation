@@ -7,6 +7,7 @@ use Override;
 use Sabatier\Foundation\Dictionary;
 use Sabatier\Foundation\Error;
 use function Sabatier\Foundation\fatal_error;
+use function Sabatier\Foundation\localized_string;
 use const Sabatier\Foundation\LocalizedDescriptionKey;
 use const Sabatier\Foundation\URLErrorDomain;
 use const Sabatier\Foundation\URLErrorUnknown;
@@ -69,7 +70,7 @@ class FTPURLProtocol extends NativeProtocol
             }
         } catch (Exception) {
             $this->internalState = InternalState::transferFailed();
-            $error = new Error(URLErrorDomain, URLErrorUnknown, new Dictionary([LocalizedDescriptionKey => "File system error"]));
+            $error = new Error(URLErrorDomain, URLErrorUnknown, new Dictionary([LocalizedDescriptionKey => localized_string("File system error")]));
             $this->failWithError($error, $request);
             return;
         }

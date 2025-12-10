@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-07 21:30-0600\n"
+"POT-Creation-Date: 2025-12-09 16:27-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,8 +17,242 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+msgid "The operation couldn't be completed."
+msgstr ""
+
+msgid "The file doesn't exist."
+msgstr ""
+
+msgid "The file couldn't be locked."
+msgstr ""
+
+msgid "You don't have permission."
+msgstr ""
+
+msgid "The file name is invalid."
+msgstr ""
+
+msgid "The file isn't in the correct format."
+msgstr ""
+
+msgid "The specified text encoding isn't applicable."
+msgstr ""
+
+msgid "The specified URL type isn't supported."
+msgstr ""
+
+msgid "The item is too large."
+msgstr ""
+
+msgid "The text encoding of the contents couldn't be determined."
+msgstr ""
+
+msgid "A file with the same name already exists."
+msgstr ""
+
+msgid "There isn't enough space."
+msgstr ""
+
+msgid "The volume is read only."
+msgstr ""
+
+msgid "The value is invalid."
+msgstr ""
+
+msgid "The operation was cancelled."
+msgstr ""
+
+msgid "The requested operation is not supported."
+msgstr ""
+
+msgid "The data is not in the correct format."
+msgstr ""
+
+msgid "The data is in a format that this application doesn't understand."
+msgstr ""
+
+msgid "An error occurred in the source of the data."
+msgstr ""
+
+msgid "An error occurred in the destination for the data."
+msgstr ""
+
+msgid "An error occurred in the content of the data."
+msgstr ""
+
+msgid "The file is not available on iCloud yet."
+msgstr ""
+
+msgid "There isn't enough space in your account."
+msgstr ""
+
+msgid "The iCloud servers might be unreachable or your settings might be incorrect."
+msgstr ""
+
+msgid "The data isn't in the correct format."
+msgstr ""
+
+msgid "The data is missing."
+msgstr ""
+
+msgid "Cannot find host."
+msgstr ""
+
+msgid "Network connection lost."
+msgstr ""
+
+msgid "Bad server response."
+msgstr ""
+
+msgid "Unknown error."
+msgstr ""
+
+msgid "The request timed out."
+msgstr ""
+
+msgid "Too many HTTP redirects."
+msgstr ""
+
+msgid "An unexpected error has occurred"
+msgstr ""
+
+msgid "File system error"
+msgstr ""
+
+msgid "Resource exceeds maximum size"
+msgstr ""
+
+msgid "Too many HTTP redirects"
+msgstr ""
+
+msgid "Continue"
+msgstr ""
+
+msgid "Switching protocols"
+msgstr ""
+
+msgid "OK"
+msgstr ""
+
+msgid "Created"
+msgstr ""
+
+msgid "Accepted"
+msgstr ""
+
+msgid "Non authoritative information"
+msgstr ""
+
+msgid "No content"
+msgstr ""
+
+msgid "Reset content"
+msgstr ""
+
+msgid "Partial content"
+msgstr ""
+
+msgid "Multiple choices"
+msgstr ""
+
+msgid "Moved permanently"
+msgstr ""
+
+msgid "Found"
+msgstr ""
+
+msgid "See other"
+msgstr ""
+
+msgid "Not modified"
+msgstr ""
+
+msgid "Temporary redirect"
+msgstr ""
+
+msgid "Bad request"
+msgstr ""
+
+msgid "Unauthorized"
+msgstr ""
+
+msgid "Payment required"
+msgstr ""
+
+msgid "Forbidden"
+msgstr ""
+
+msgid "Not found"
+msgstr ""
+
+msgid "Method not allowed"
+msgstr ""
+
+msgid "Unacceptable"
+msgstr ""
+
+msgid "Proxy authentication required"
+msgstr ""
+
+msgid "Request time out"
+msgstr ""
+
+msgid "Conflict"
+msgstr ""
+
+msgid "Length required"
+msgstr ""
+
+msgid "Precondition failed"
+msgstr ""
+
+msgid "Request too large"
+msgstr ""
+
+msgid "Requested URL too long"
+msgstr ""
+
+msgid "Unsupported media type"
+msgstr ""
+
+msgid "Requested range not satisfiable"
+msgstr ""
+
+msgid "Expectation failed"
+msgstr ""
+
+msgid "Internal server error"
+msgstr ""
+
+msgid "Not implemented"
+msgstr ""
+
+msgid "Bad gateway"
+msgstr ""
+
+msgid "Service unavailable"
+msgstr ""
+
+msgid "Gateway time out"
+msgstr ""
+
+msgid "Unsupported version"
+msgstr ""
+
+msgid "Server Error"
+msgstr ""
+
+msgid "Completion failure"
+msgstr ""
+
+msgid "Unsupported URL"
+msgstr ""
+
+msgid "Unexpected message received from server"
+msgstr ""
+
 msgid "Redo"
-msgstr "Rehacer"
+msgstr ""
 
 msgid "Undo"
-msgstr "Deshacer"
+msgstr ""

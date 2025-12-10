@@ -15,6 +15,7 @@ use Sabatier\Foundation\ProcessInfo;
 use Sabatier\Foundation\URL;
 use Sabatier\Foundation\URLFileTypeMappings;
 use function Sabatier\Foundation\fatal_error;
+use function Sabatier\Foundation\localized_string;
 use function Sabatier\Foundation\string_is_equal;
 use const Sabatier\Foundation\CocoaErrorDomain;
 use const Sabatier\Foundation\LocalizedDescriptionKey;
@@ -132,7 +133,7 @@ class HTTPURLProtocol extends NativeProtocol
         if ($request->httpMethod === HTTPRequestMethod::get && $body->rawValue !== TaskBodyRawValue::none) {
             trigger_error("GET method must not have a body");
             $this->internalState = InternalState::transferFailed();
-            $error = new Error(CocoaErrorDomain, -1, new Dictionary([LocalizedDescriptionKey => "Resource exceeds maximum size", URLErrorFailingURLErrorKey => $request->url]));
+            $error = new Error(CocoaErrorDomain, -1, new Dictionary([LocalizedDescriptionKey => localized_string("Resource exceeds maximum size"), URLErrorFailingURLErrorKey => $request->url]));
             $this->transferCompleted($error);
             return;
         }
@@ -174,7 +175,7 @@ class HTTPURLProtocol extends NativeProtocol
             }
         } catch (Exception) {
             $this->internalState = InternalState::transferFailed();
-            $error = new Error(URLErrorDomain, URLErrorUnknown, new Dictionary([LocalizedDescriptionKey => "File system error"]));
+            $error = new Error(URLErrorDomain, URLErrorUnknown, new Dictionary([LocalizedDescriptionKey => localized_string("File system error")]));
             $this->failWithError($error, $request);
             return;
         }
@@ -234,7 +235,7 @@ class HTTPURLProtocol extends NativeProtocol
         $this->redirectCount += 1;
         if ($this->redirectCount > 16) {
             $this->internalState = InternalState::transferFailed();
-            $error = new Error(URLErrorDomain, URLErrorHTTPTooManyRedirects, new Dictionary([LocalizedDescriptionKey => "Too many HTTP redirects"]));
+            $error = new Error(URLErrorDomain, URLErrorHTTPTooManyRedirects);
             $request = $task->currentRequest ?? fatal_error("In a redirect chain but no current request");
             $this->failWithError($error, $request);
             return;

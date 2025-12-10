@@ -10,6 +10,7 @@ use Sabatier\Foundation\ObjectClass;
 use Sabatier\Foundation\ProcessInfo;
 use Sabatier\Foundation\Progress;
 use function Sabatier\Foundation\fatal_error;
+use function Sabatier\Foundation\localized_string;
 use const Sabatier\Foundation\CocoaErrorDomain;
 use const Sabatier\Foundation\LocalizedDescriptionKey;
 use const Sabatier\Foundation\URLErrorDomain;
@@ -341,7 +342,7 @@ abstract class URLSessionTask extends ObjectClass
                 if ($protocol) {
                     $protocol->startLoading();
                 } elseif ($this->error === null) {
-                    $this->error = new Error(URLErrorDomain, URLErrorUnsupportedURL, new Dictionary([LocalizedDescriptionKey => "Unsupported URL", URLErrorFailingURLErrorKey => $this->originalRequest?->url]));
+                    $this->error = new Error(URLErrorDomain, URLErrorUnsupportedURL, new Dictionary([LocalizedDescriptionKey => localized_string("Unsupported URL"), URLErrorFailingURLErrorKey => $this->originalRequest?->url]));
                     /** @noinspection PhpUnhandledExceptionInspection */
                     new ProtocolClient()->urlProtocolTaskDidFailWithError($this, $this->error);
                 }

@@ -8,6 +8,7 @@ use Sabatier\Foundation\Dictionary;
 use Sabatier\Foundation\Error;
 use function Sabatier\Foundation\fatal_error;
 use function Sabatier\Foundation\in_range;
+use function Sabatier\Foundation\localized_string;
 use function Sabatier\Foundation\substring_from_index;
 use const Sabatier\Foundation\LocalizedDescriptionKey;
 use const Sabatier\Foundation\URLErrorBadServerResponse;
@@ -45,7 +46,7 @@ class WebSocketURLProtocol extends HTTPURLProtocol
         if ($request->httpMethod !== HTTPRequestMethod::get) {
             trigger_error("WebSocket tasks must use GET");
             $this->internalState = InternalState::transferFailed();
-            $error = new Error(URLErrorDomain, URLErrorUnsupportedURL, new Dictionary([LocalizedDescriptionKey => "WebSocket task must use GET httpMethod", URLErrorFailingURLErrorKey => $request->url]));
+            $error = new Error(URLErrorDomain, URLErrorUnsupportedURL, new Dictionary([URLErrorFailingURLErrorKey => $request->url]));
             $this->transferCompleted($error);
             return;
         }
@@ -154,7 +155,7 @@ class WebSocketURLProtocol extends HTTPURLProtocol
             case URLSessionWebSocketOperation::ping:
                 trigger_error("Unexpected message received from server $operation->name: $data");
                 $this->internalState = InternalState::transferFailed();
-                $error = new Error(URLErrorDomain, URLErrorBadServerResponse, new Dictionary([LocalizedDescriptionKey => "Unexpected message received from server", URLErrorFailingURLErrorKey => $this->request->url]));
+                $error = new Error(URLErrorDomain, URLErrorBadServerResponse, new Dictionary([LocalizedDescriptionKey => localized_string("Unexpected message received from server"), URLErrorFailingURLErrorKey => $this->request->url]));
                 $this->transferCompleted($error);
                 break;
         }
