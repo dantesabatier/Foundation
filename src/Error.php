@@ -122,18 +122,6 @@ class Error extends ObjectClass
     #[Override]
     public function jsonSerialize(): Dictionary
     {
-        /** @var Dictionary<mixed> $dictionary */
-        $dictionary = $this->dictionaryWithValues(new ArrayClass(["domain", "code", "localizedDescription", "localizedRecoveryOptions", "localizedRecoverySuggestion", "localizedFailureReason"]));
-        if ($userInfo = $this->userInfo) {
-            $copy = clone $userInfo;
-            $copy->removeAll(fn(mixed $value, string $key): bool => match ($key) {
-                LocalizedDescriptionKey, LocalizedRecoveryOptionsErrorKey, LocalizedRecoverySuggestionErrorKey, LocalizedFailureReasonErrorKey => true,
-                default => false
-            });
-            if (!$copy->isEmpty) {
-                $dictionary["userInfo"] = $copy;
-            }
-        }
-        return $dictionary;
+        return $this->dictionaryWithValues(new ArrayClass(["domain", "code", "localizedDescription", "localizedRecoveryOptions", "localizedRecoverySuggestion", "localizedFailureReason"]));
     }
 }
