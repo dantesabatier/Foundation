@@ -6,7 +6,7 @@ use Throwable;
 
 class ErrorException extends \ErrorException implements CustomDebugStringConvertible
 {
-    public Error $error {
+    private(set) Error $error {
         get => $this->error ??= new Error(CocoaErrorDomain, $this->code, new Dictionary([LocalizedDescriptionKey => localized_string("An unexpected error has occurred"), LocalizedFailureReasonErrorKey => $this->message ?: null]));
     }
     public string $description {
@@ -19,7 +19,7 @@ class ErrorException extends \ErrorException implements CustomDebugStringConvert
     public function __construct(string $message = "", int $code = 0, int $severity = 1, ?string $filename = __FILE__, ?int $line = __LINE__, ?Throwable $previous = null, ?Error $error = null)
     {
         parent::__construct($message, $code, $severity, $filename, $line, $previous);
-        if ($error) {
+        if ($error !== null) {
             $this->error = $error;
         }
     }
