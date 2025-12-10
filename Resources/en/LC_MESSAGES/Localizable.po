@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-10 08:49-0600\n"
+"POT-Creation-Date: 2025-12-10 10:12-0600\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,238 +18,241 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 msgid "The operation couldn't be completed."
-msgstr "La operación no se pudo completar."
+msgstr ""
 
 msgid "The file doesn't exist."
-msgstr "El archivo no existe."
+msgstr ""
 
 msgid "The file couldn't be locked."
-msgstr "No se pudo bloquear el archivo."
+msgstr ""
 
 msgid "You don't have permission."
-msgstr "No tienes permiso"
+msgstr ""
 
 msgid "The file name is invalid."
-msgstr "El nombre del archivo no es válido."
+msgstr ""
 
 msgid "The file isn't in the correct format."
-msgstr "El archivo no está en el formato correcto."
+msgstr ""
 
 msgid "The specified text encoding isn't applicable."
-msgstr "La codificación de texto especificada no es aplicable."
+msgstr ""
 
 msgid "The specified URL type isn't supported."
-msgstr "El tipo de URL especificado no es compatible."
+msgstr ""
 
 msgid "The item is too large."
-msgstr "El artículo es demasiado grande."
+msgstr ""
 
 msgid "The text encoding of the contents couldn't be determined."
-msgstr "No se pudo determinar la codificación del texto del contenido."
+msgstr ""
 
 msgid "A file with the same name already exists."
-msgstr "Ya existe un archivo con el mismo nombre."
+msgstr ""
 
 msgid "There isn't enough space."
-msgstr "No hay suficiente espacio"
+msgstr ""
 
 msgid "The volume is read only."
-msgstr "El volumen es de sólo lectura."
+msgstr ""
 
 msgid "The value is invalid."
-msgstr "El valor no es válido."
+msgstr ""
 
 msgid "The operation was cancelled."
-msgstr "La operación fue cancelada."
+msgstr ""
 
 msgid "The requested operation is not supported."
-msgstr "La operación solicitada no es compatible."
+msgstr ""
 
 msgid "The data is not in the correct format."
-msgstr "Los datos no están en el formato correcto."
+msgstr ""
 
 msgid "The data is in a format that this application doesn't understand."
-msgstr "Los datos están en un formato que esta aplicación no entiende."
+msgstr ""
 
 msgid "An error occurred in the source of the data."
-msgstr "Se produjo un error en la fuente de los datos."
+msgstr ""
 
 msgid "An error occurred in the destination for the data."
-msgstr "Se produjo un error en el destino de los datos."
+msgstr ""
 
 msgid "An error occurred in the content of the data."
-msgstr "Se produjo un error en el contenido de los datos."
+msgstr ""
 
 msgid "The file is not available on iCloud yet."
-msgstr "El archivo aún no está disponible en iCloud."
+msgstr ""
 
 msgid "There isn't enough space in your account."
-msgstr "No hay suficiente espacio en tu cuenta."
+msgstr ""
 
 msgid "The iCloud servers might be unreachable or your settings might be incorrect."
-msgstr "Es posible que los servidores de iCloud no estén disponibles o que su configuración sea incorrecta."
+msgstr ""
 
 msgid "The data isn't in the correct format."
-msgstr "Los datos no están en el formato correcto."
+msgstr ""
 
 msgid "The data is missing."
-msgstr "Faltan los datos."
+msgstr ""
 
 msgid "Cannot find host."
-msgstr "No se puede encontrar el host."
+msgstr ""
 
 msgid "Network connection lost."
-msgstr "Se perdió la conexión de red."
+msgstr ""
 
 msgid "Bad server response."
-msgstr "Mala respuesta del servidor."
+msgstr ""
 
 msgid "Unknown error."
-msgstr "Error desconocido."
+msgstr ""
 
 msgid "The request timed out."
-msgstr "Se agotó el tiempo de solicitud."
+msgstr ""
 
 msgid "Too many HTTP redirects."
-msgstr "Demasiadas redirecciones HTTP."
+msgstr ""
 
 msgid "An unexpected error has occurred"
-msgstr "Se ha producido un error inesperado"
+msgstr ""
 
 msgid "File system error"
-msgstr "Error del sistema de archivos"
+msgstr ""
 
 msgid "Resource exceeds maximum size"
-msgstr "El recurso excede el tamaño máximo"
+msgstr ""
+
+msgid "Too many HTTP redirects"
+msgstr ""
 
 msgid "Continue"
-msgstr "Continuar"
+msgstr ""
 
 msgid "Switching protocols"
-msgstr "Protocolos de conmutación"
+msgstr ""
 
 msgid "OK"
-msgstr "OK"
+msgstr ""
 
 msgid "Created"
-msgstr "Creado"
+msgstr ""
 
 msgid "Accepted"
-msgstr "Aceptado"
+msgstr ""
 
 msgid "Non authoritative information"
-msgstr "Información no autorizada"
+msgstr ""
 
 msgid "No content"
-msgstr "Sin contenido"
+msgstr ""
 
 msgid "Reset content"
-msgstr "Restablecer contenido"
+msgstr ""
 
 msgid "Partial content"
-msgstr "Contenido parcial"
+msgstr ""
 
 msgid "Multiple choices"
-msgstr "Múltiples opciones"
+msgstr ""
 
 msgid "Moved permanently"
-msgstr "Mudado permanentemente"
+msgstr ""
 
 msgid "Found"
-msgstr "Encontrado"
+msgstr ""
 
 msgid "See other"
-msgstr "Ver otro"
+msgstr ""
 
 msgid "Not modified"
-msgstr "No modificado"
+msgstr ""
 
 msgid "Temporary redirect"
-msgstr "Redirección temporal"
+msgstr ""
 
 msgid "Bad request"
-msgstr "Solicitud incorrecta"
+msgstr ""
 
 msgid "Unauthorized"
-msgstr "No autorizado"
+msgstr ""
 
 msgid "Payment required"
-msgstr "Se requiere pago"
+msgstr ""
 
 msgid "Forbidden"
-msgstr "Prohibido"
+msgstr ""
 
 msgid "Not found"
-msgstr "Extraviado"
+msgstr ""
 
 msgid "Method not allowed"
-msgstr "Método no permitido"
+msgstr ""
 
 msgid "Unacceptable"
-msgstr "Inaceptable"
+msgstr ""
 
 msgid "Proxy authentication required"
-msgstr "Se requiere autenticación de proxy"
+msgstr ""
 
 msgid "Request time out"
-msgstr "Tiempo de espera de solicitud"
+msgstr ""
 
 msgid "Conflict"
-msgstr "Conflicto"
+msgstr ""
 
 msgid "Length required"
-msgstr "Longitud requerida"
+msgstr ""
 
 msgid "Precondition failed"
-msgstr "La condición previa falló"
+msgstr ""
 
 msgid "Request too large"
-msgstr "La solicitud es demasiado grande"
+msgstr ""
 
 msgid "Requested URL too long"
-msgstr "La URL solicitada es demasiado larga"
+msgstr ""
 
 msgid "Unsupported media type"
-msgstr "Tipo de medio no compatible"
+msgstr ""
 
 msgid "Requested range not satisfiable"
-msgstr "Rango solicitado no satisfacible"
+msgstr ""
 
 msgid "Expectation failed"
-msgstr "La expectativa falló"
+msgstr ""
 
 msgid "Internal server error"
-msgstr "Error Interno del Servidor"
+msgstr ""
 
 msgid "Not implemented"
-msgstr "No implementado"
+msgstr ""
 
 msgid "Bad gateway"
-msgstr "Puerta de enlace defectuosa"
+msgstr ""
 
 msgid "Service unavailable"
-msgstr "Servicio No Disponible"
+msgstr ""
 
 msgid "Gateway time out"
-msgstr "Tiempo de espera de la puerta de enlace"
+msgstr ""
 
 msgid "Unsupported version"
-msgstr "Versión no compatible"
+msgstr ""
 
 msgid "Server Error"
-msgstr "Error del servidor"
+msgstr ""
 
 msgid "Completion failure"
-msgstr "Fallo de finalización"
+msgstr ""
 
 msgid "Unsupported URL"
-msgstr "URL no compatible"
+msgstr ""
 
 msgid "Unexpected message received from server"
-msgstr "Mensaje inesperado recibido del servidor"
+msgstr ""
 
 msgid "Redo"
-msgstr "Rehacer"
+msgstr ""
 
 msgid "Undo"
-msgstr "Deshacer"
+msgstr ""
