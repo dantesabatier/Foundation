@@ -6,7 +6,7 @@ use Throwable;
 
 class ErrorException extends \ErrorException implements CustomDebugStringConvertible
 {
-    private(set) Error $error {
+    public Error $error {
         get => $this->error ??= new Error(CocoaErrorDomain, $this->code, new Dictionary([LocalizedDescriptionKey => localized_string("An unexpected error has occurred"), LocalizedFailureReasonErrorKey => $this->message ?: null]));
     }
     public string $description {
