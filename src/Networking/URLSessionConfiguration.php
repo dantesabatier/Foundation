@@ -57,6 +57,7 @@ final class URLSessionConfiguration
      */
     public static function ephemeral(): URLSessionConfiguration
     {
+        /** @var URLSessionConfiguration */
         return clone(self::default(), [
             "httpCookieStorage" => HTTPCookieStorage::ephemeralStorage(),
             "urlCredentialStorage" => new URLCredentialStorage(true),

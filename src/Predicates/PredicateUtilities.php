@@ -367,9 +367,15 @@ class PredicateUtilities
         return self::trim($string);
     }
 
+    /**
+     * @param string $subject
+     * @param non-empty-string $pattern
+     * @param string $replace
+     * @return string
+     */
     public static function regexpReplace(string $subject, #[Language("RegExp")] string $pattern, string $replace): string
     {
-        return preg_replace($pattern, $replace, $subject);
+        return (string)preg_replace($pattern, $replace, $subject);
     }
 
     public static function uuid(): UUID

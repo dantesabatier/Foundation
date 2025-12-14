@@ -221,6 +221,7 @@ function string_search(string $string, string $needle, SearchMethod $method = Se
     if (!($options & CompareOptions::quoted)) {
         $needle = preg_quote($needle);
     }
+    /** @var non-empty-string $pattern */
     $pattern = $needle;
     /** @noinspection PhpSuspiciousNameCombinationInspection */
     if (!str_starts_with($needle, "/") && !str_ends_with($needle, "/")) {

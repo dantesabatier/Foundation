@@ -179,7 +179,8 @@ class HTTPCookie extends ObjectClass
         $httpCookies = new ArrayClass();
         $scanner = new Scanner($cookies);
         $scanner->charactersToBeSkipped = "\t\n\r";
-        if ($scanner->scanUpString(";", $pair) && $pair && ($components = self::splitNameValue($pair))) {
+        if ($scanner->scanUpString(";", $pair) && $pair) {
+            $components = self::splitNameValue($pair);
             [$name, $value] = $components;
             /** @var Dictionary<mixed> $properties */
             $properties = new Dictionary();
@@ -188,29 +189,28 @@ class HTTPCookie extends ObjectClass
             $properties[HTTPCookiePropertyKey::originURL] = $url;
             $scanner->scanLocation += 1;
             while ($scanner->scanUpCharacters(";", $pair) && $pair) {
-                if ($components = self::splitNameValue($pair)) {
-                    [$name, $value] = $components;
-                    $name = ucwords((string)$name);
-                    switch ($name) {
-                        case HTTPCookiePropertyKey::secure:
-                        case HTTPCookiePropertyKey::discard:
-                        case HTTPCookiePropertyKey::httpOnly:
-                        case HTTPCookiePropertyKey::sameSitePolicy:
-                            $properties[$name] = "TRUE";
-                            break;
-                        case HTTPCookiePropertyKey::comment:
-                        case HTTPCookiePropertyKey::commentURL:
-                        case HTTPCookiePropertyKey::domain:
-                        case HTTPCookiePropertyKey::maximumAge:
-                        case HTTPCookiePropertyKey::path:
-                        case HTTPCookiePropertyKey::port:
-                        case HTTPCookiePropertyKey::version:
-                        case HTTPCookiePropertyKey::expires:
-                            $properties[$name] = $value;
-                            break;
-                        default:
-                            break;
-                    }
+                $components = self::splitNameValue($pair);
+                [$name, $value] = $components;
+                $name = ucwords($name);
+                switch ($name) {
+                    case HTTPCookiePropertyKey::secure:
+                    case HTTPCookiePropertyKey::discard:
+                    case HTTPCookiePropertyKey::httpOnly:
+                    case HTTPCookiePropertyKey::sameSitePolicy:
+                        $properties[$name] = "TRUE";
+                        break;
+                    case HTTPCookiePropertyKey::comment:
+                    case HTTPCookiePropertyKey::commentURL:
+                    case HTTPCookiePropertyKey::domain:
+                    case HTTPCookiePropertyKey::maximumAge:
+                    case HTTPCookiePropertyKey::path:
+                    case HTTPCookiePropertyKey::port:
+                    case HTTPCookiePropertyKey::version:
+                    case HTTPCookiePropertyKey::expires:
+                        $properties[$name] = $value;
+                        break;
+                    default:
+                        break;
                 }
                 $scanner->scanLocation += 1;
             }
