@@ -13,8 +13,8 @@ use function Sabatier\Foundation\unsupported;
 
 /**
  * An object that coordinates a group of related, network data-transfer tasks.
- * @phpstan-type DataCompletionHandler Closure(string|null, URLResponse|null, Error|null): void
- * @phpstan-type DownloadCompletionHandler Closure(URL|null, URLResponse|null, Error|null): void
+ * @psalm-type DataCompletionHandler Closure(string|null, URLResponse|null, Error|null): void
+ * @psalm-type DownloadCompletionHandler Closure(URL|null, URLResponse|null, Error|null): void
  */
 final class URLSession implements URLSessionProtocol
 {

@@ -11,8 +11,8 @@ use const Sabatier\Foundation\UserCancelledError;
 
 /**
  * @internal
- * @phpstan-import-type DataCompletionHandler from URLSession
- * @phpstan-import-type DownloadCompletionHandler from URLSession
+ * @psalm-import-type DataCompletionHandler from URLSession
+ * @psalm-import-type DownloadCompletionHandler from URLSession
  */
 class ProtocolClient implements URLProtocolClient
 {

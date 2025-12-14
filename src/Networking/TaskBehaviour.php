@@ -6,8 +6,8 @@ use Closure;
 
 /** 
  * @internal
- * @phpstan-import-type DataCompletionHandler from URLSession
- * @phpstan-import-type DownloadCompletionHandler from URLSession
+ * @psalm-import-type DataCompletionHandler from URLSession
+ * @psalm-import-type DownloadCompletionHandler from URLSession
  */
 readonly class TaskBehaviour
 {
