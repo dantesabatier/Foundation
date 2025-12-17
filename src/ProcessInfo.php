@@ -24,14 +24,16 @@ class ProcessInfo extends ObjectClass
                 /** @noinspection PhpUnhandledExceptionInspection */
                 if ($fileManager->fileExists($path) && ($string = $fileManager->contents($path))) {
                     $scanner = new Scanner($string);
-                    $scanner->charactersToBeSkipped = PHP_EOL;
-                    while ($scanner->scanUpCharacters(PHP_EOL, $line) && $line) {
-                        $components = explode("=", $line, 2);
-                        if (count($components) === 2) {
-                            [$key, $value] = $components;
-                            $environment[trim($key)] = trim($value, "\"' ");
-                            $scanner->scanLocation += 1;
+                    $scanner->charactersToBeSkipped = "";
+                    while (!$scanner->isAtEnd) {
+                        if ($scanner->scanUpCharacters(PHP_EOL, $line) && $line) {
+                            $components = explode("=", $line, 2);
+                            if (count($components) === 2) {
+                                [$key, $value] = $components;
+                                $environment[trim($key)] = trim($value, "\"' ");
+                            }
                         }
+                        $scanner->scanLocation += 1;
                     }
                 }
                 $this->environment = $environment;
