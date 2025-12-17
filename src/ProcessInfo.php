@@ -27,10 +27,13 @@ class ProcessInfo extends ObjectClass
                     $scanner->charactersToBeSkipped = "";
                     while (!$scanner->isAtEnd) {
                         if ($scanner->scanUpCharacters(PHP_EOL, $line) && $line) {
-                            $components = explode("=", $line, 2);
-                            if (count($components) === 2) {
-                                [$key, $value] = $components;
-                                $environment[trim($key)] = trim($value, "\"' ");
+                            $line = trim($line);
+                            if ($line !== "" && !str_starts_with($line, "#")) {
+                                $components = explode("=", $line, 2);
+                                if (count($components) === 2) {
+                                    [$key, $value] = $components;
+                                    $environment[trim($key)] = trim($value, "\"' ");
+                                }
                             }
                         }
                         $scanner->scanLocation += 1;
