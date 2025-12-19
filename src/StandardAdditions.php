@@ -73,6 +73,25 @@ function array_remove(array &$array, mixed $element): array
 }
 
 /**
+ * Splits a string by a separator and returns an array of non-empty, trimmed components.
+ *
+ * This function divides the input string using the specified separator, trims
+ * whitespace from each component, and removes any empty results.
+ *
+ * It is intended for parsing simple delimited strings such as configuration
+ * values or environment variables.
+ *
+ * @param string $string The string to split.
+ * @param string $separator The delimiter used to split the string. Defaults to ",".
+ *
+ * @return array<int, string> An array of trimmed, non-empty components.
+ */
+function string_split_trimmed(string $string, string $separator = ","): array
+{
+    return array_values(array_filter(array_map(trim(...), explode($separator, $string)), fn(string $v): bool => $v !== ""));
+}
+
+/**
  * Extracts a substring from the given string starting at the specified index.
  *
  * @param string $string The original string from which the substring is extracted.

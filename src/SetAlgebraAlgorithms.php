@@ -35,7 +35,7 @@ trait SetAlgebraAlgorithms
 
     public function formIntersection(SetAlgebra $other): void
     {
-        foreach ($this as $member) {
+        foreach (clone $this as $member) {
             if (!$other->containsElement($member)) {
                 $this->remove($member);
             }
