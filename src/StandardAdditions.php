@@ -82,7 +82,7 @@ function array_remove(array &$array, mixed $element): array
  * values or environment variables.
  *
  * @param string $string The string to split.
- * @param string $separator The delimiter used to split the string. Defaults to ",".
+ * @param non-empty-string $separator The delimiter used to split the string. Defaults to ",".
  *
  * @return array<int, string> An array of trimmed, non-empty components.
  */
