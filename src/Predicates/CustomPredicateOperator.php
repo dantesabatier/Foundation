@@ -26,11 +26,9 @@ class CustomPredicateOperator extends PredicateOperator
     }
 
     #[Override]
-    public function performPrimitiveOperation(mixed $left, mixed $right): bool
+    protected function performPrimitiveOperation(mixed $left, mixed $right): bool
     {
-        if (!is_object($left)) {
-            fatal_error(sprintf("Invalid argument: expecting \"object\", \"%s\" given", typeof($left)));
-        }
+        is_object($left) ?: fatal_error(sprintf("Invalid argument: expecting \"object\", \"%s\" given", typeof($left)));
         $selector = $this->selector;
         $arguments = [$right];
         return $left->$selector(...$arguments);

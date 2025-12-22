@@ -4,10 +4,10 @@ namespace Sabatier\Foundation;
 
 class KeyValueOperator
 {
-    /** @var string The @avg array operator. */
-    final const string averageKeyValueOperator = "avg";
     /** @var string The @count array operator. */
     final const string countKeyValueOperator = "count";
+    /** @var string The @avg array operator. */
+    final const string averageKeyValueOperator = "avg";
     /** @var string The @median array operator. */
     final const string medianKeyValueOperator = "median";
     /** @var string The @mode array operator. */

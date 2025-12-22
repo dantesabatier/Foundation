@@ -110,7 +110,7 @@ trait CollectionAlgorithms
 
     public function valueForKey(string $key): self
     {
-        return $this->map(fn(mixed $e): mixed => $e?->valueForKey($key));
+        return $this->map(fn(?KeyValueCoding $e): mixed => $e?->valueForKey($key));
     }
 
     public function setValueForKey(mixed $value, string $key): void

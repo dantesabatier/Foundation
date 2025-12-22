@@ -18,7 +18,7 @@ class ComparisonPredicateOperator extends PredicateOperator
     }
 
     #[Override]
-    public function performPrimitiveOperation(mixed $left, mixed $right): bool
+    protected function performPrimitiveOperation(mixed $left, mixed $right): bool
     {
         $variant = $this->variant;
         if ($left === null && $right === null) {

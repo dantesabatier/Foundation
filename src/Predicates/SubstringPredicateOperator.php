@@ -12,11 +12,14 @@ namespace Sabatier\Foundation\Predicates;
 use JetBrains\PhpStorm\ExpectedValues;
 use Override;
 use Sabatier\Foundation\ArrayClass;
+use Sabatier\Foundation\BidirectionalCollection;
 use Sabatier\Foundation\Set;
+use function Sabatier\Foundation\human_readable_value;
 use function Sabatier\Foundation\in_string;
 use function Sabatier\Foundation\string_has_prefix;
 use function Sabatier\Foundation\string_has_suffix;
 use function Sabatier\Foundation\string_is_equal;
+use function Sabatier\Foundation\typeof;
 
 /** @internal */
 class SubstringPredicateOperator extends StringPredicateOperator
@@ -34,10 +37,8 @@ class SubstringPredicateOperator extends StringPredicateOperator
         }
         $options = $this->compareOptions;
         $position = $this->position;
-        if ($left instanceof Set || $left instanceof ArrayClass) {
-            if ($left->isEmpty) {
-                return false;
-            }
+        if ($left instanceof ArrayClass || $left instanceof Set) {
+            assert(!$left->isEmpty, sprintf("invalid argument: the left expression must be an non-empty \"%s\", (%s)%s given", BidirectionalCollection::class, typeof($left), human_readable_value($left)));
             return match ($position) {
                 SubstringPredicateOperatorPosition::beginsWith => string_is_equal($left[0], $right, $options),
                 SubstringPredicateOperatorPosition::endsWith => string_is_equal($left[$left->indexBefore($left->endIndex)], $right, $options),

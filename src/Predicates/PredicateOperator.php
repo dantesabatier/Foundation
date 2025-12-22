@@ -76,35 +76,37 @@ class PredicateOperator extends ObjectClass
         };
     }
 
+    private function evaluate(mixed $left, mixed $right): bool
+    {
+        if ($this->modifier === ComparisonPredicateModifier::direct) {
+            return $this->performPrimitiveOperation($left, $right);
+        }
+        if ($left === null) {
+            return match ($this->modifier) {
+                ComparisonPredicateModifier::all => true,
+                default => false,
+            };
+        }
+        if (!$left instanceof ArrayClass && !$left instanceof Set) {
+            fatal_error(sprintf("Invalid argument: the left hand side for an ALL or ANY modifier must be an %s or a %s, \"%s\" given", ArrayClass::class, Set::class, typeof($left)));
+        }
+        if ($left->isEmpty) {
+            return false;
+        }
+        $predicate = fn(mixed $e): bool => $this->performPrimitiveOperation($e, $right);
+        return match ($this->modifier) {
+            ComparisonPredicateModifier::all => $left->allSatisfy($predicate),
+            default => $left->contains($predicate),
+        };
+    }
+
     public function performOperation(mixed $left, mixed $right): bool
     {
-        $f = function () use ($left, $right): bool {
-            if ($this->modifier === ComparisonPredicateModifier::direct) {
-                return $this->performPrimitiveOperation($left, $right);
-            }
-            if ($left === null) {
-                return match ($this->modifier) {
-                    ComparisonPredicateModifier::all => true,
-                    default => false,
-                };
-            }
-            if (!$left instanceof ArrayClass && !$left instanceof Set) {
-                fatal_error(sprintf("Invalid argument: the left hand side for an ALL or ANY modifier must be an %s or a %s, \"%s\" given", ArrayClass::class, Set::class, typeof($left)));
-            }
-            if ($left->isEmpty) {
-                return false;
-            }
-            $predicate = fn(mixed $e): bool => $this->performPrimitiveOperation($e, $right);
-            return match ($this->modifier) {
-                ComparisonPredicateModifier::all => $left->allSatisfy($predicate),
-                default => $left->contains($predicate),
-            };
-        };
-        $v = $f();
+        $evaluationResult = $this->evaluate($left, $right);
         if (Predicate::$debugDefault) {
-            error_log(sprintf("Foundation: predicate operator %s (%s): (%s)%s %s (%s)%s => %s", $this->operatorType->name, $this->modifier->name, typeof($left), human_readable_value($left), $this->symbol, typeof($right), human_readable_value($right), human_readable_value($v)));
+            error_log(sprintf("Foundation: predicate operator %s (%s): (%s)%s %s (%s)%s => %s", $this->operatorType->name, $this->modifier->name, typeof($left), human_readable_value($left), $this->symbol, typeof($right), human_readable_value($right), human_readable_value($evaluationResult)));
         }
-        return $v;
+        return $evaluationResult;
     }
 
     protected function coerce(mixed &$left, mixed &$right): void
@@ -141,7 +143,7 @@ class PredicateOperator extends ObjectClass
         }
     }
 
-    public function performPrimitiveOperation(mixed $left, mixed $right): bool
+    protected function performPrimitiveOperation(mixed $left, mixed $right): bool
     {
         request_concrete_implementation($this, __FUNCTION__);
     }

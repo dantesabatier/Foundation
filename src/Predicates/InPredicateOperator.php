@@ -20,7 +20,7 @@ use function Sabatier\Foundation\typeof;
 class InPredicateOperator extends PredicateOperator
 {
     #[Override]
-    public function performPrimitiveOperation(mixed $left, mixed $right): bool
+    protected function performPrimitiveOperation(mixed $left, mixed $right): bool
     {
         $options = $this->compareOptions;
         if (is_string($left) && is_string($right)) {

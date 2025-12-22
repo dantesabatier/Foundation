@@ -18,7 +18,7 @@ use function Sabatier\Foundation\typeof;
 class BetweenPredicateOperator extends PredicateOperator
 {
     #[Override]
-    public function performPrimitiveOperation(mixed $left, mixed $right): bool
+    protected function performPrimitiveOperation(mixed $left, mixed $right): bool
     {
         if ($left instanceof ArrayClass) {
             $left = $left->first;
