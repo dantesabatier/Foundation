@@ -37,7 +37,7 @@ class ConstantValueExpression extends Expression
             $value = $value->expressionValue($object, $context);
         }
         if (Predicate::$debugDefault) {
-            error_log(sprintf("Foundation: expression %s: %s", $this->expressionType->name, human_readable_value($value)));
+            error_log(sprintf("Foundation: %s %s: %s", $this->debugDescription, $this->expressionType->name, human_readable_value($value)));
         }
         return $value;
     }

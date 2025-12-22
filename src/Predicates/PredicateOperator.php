@@ -104,7 +104,7 @@ class PredicateOperator extends ObjectClass
     {
         $evaluationResult = $this->evaluate($left, $right);
         if (Predicate::$debugDefault) {
-            error_log(sprintf("Foundation: predicate operator %s (%s): (%s)%s %s (%s)%s => %s", $this->operatorType->name, $this->modifier->name, typeof($left), human_readable_value($left), $this->symbol, typeof($right), human_readable_value($right), human_readable_value($evaluationResult)));
+            error_log(sprintf("Foundation: %s %s (%s): (%s)%s %s (%s)%s => %s", $this->debugDescription, $this->operatorType->name, $this->modifier->name, typeof($left), human_readable_value($left), $this->symbol, typeof($right), human_readable_value($right), human_readable_value($evaluationResult)));
         }
         return $evaluationResult;
     }

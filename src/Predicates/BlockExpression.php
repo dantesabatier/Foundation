@@ -56,7 +56,7 @@ class BlockExpression extends Expression
         $arguments = $this->arguments?->map(fn(Expression $expression): mixed => $expression->expressionValue($object, $context)) ?? new ArrayClass();
         $value = ($this->expressionBlock)($object, $arguments, $context);
         if (Predicate::$debugDefault) {
-            error_log(sprintf("Foundation: expression %s: function(%s) => %s", $this->expressionType->name, $arguments->join(", "), human_readable_value($value)));
+            error_log(sprintf("Foundation: %s %s: function(%s) => %s", $this->debugDescription, $this->expressionType->name, $arguments->join(", "), human_readable_value($value)));
         }
         return $value;
     }

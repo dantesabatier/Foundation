@@ -30,7 +30,7 @@ class SubstringPredicateOperator extends StringPredicateOperator
     }
 
     #[Override]
-    public function performPrimitiveOperation(mixed $left, mixed $right): bool
+    protected function performPrimitiveOperation(mixed $left, mixed $right): bool
     {
         if ($left === null || $right === null) {
             return false;

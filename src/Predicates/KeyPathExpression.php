@@ -52,7 +52,7 @@ class KeyPathExpression extends FunctionExpression
             $arguments = [$this->keyPath];
             $value = $obj->$selector(...$arguments);
             if (Predicate::$debugDefault) {
-                error_log(sprintf("Foundation: expression %s: %s::%s(%s) => %s", $this->expressionType->name, typeof($obj), $selector, implode(", ", $arguments), human_readable_value($value)));
+                error_log(sprintf("Foundation: %s %s: %s::%s(%s) => %s", $this->debugDescription, $this->expressionType->name, typeof($obj), $selector, implode(", ", $arguments), human_readable_value($value)));
             }
             return $value;
         }

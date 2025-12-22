@@ -50,7 +50,7 @@ class SetExpression extends Expression
             $left->formUnion($right);
         }
         if (Predicate::$debugDefault) {
-            error_log(sprintf("Foundation: expression %s %s %s => %s", human_readable_value($left), $expressionType->name, human_readable_value($right), human_readable_value($left)));
+            error_log(sprintf("Foundation: %s %s %s %s => %s", $this->debugDescription, human_readable_value($left), $expressionType->name, human_readable_value($right), human_readable_value($left)));
         }
         return $left;
     }
