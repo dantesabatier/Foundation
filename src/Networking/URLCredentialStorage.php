@@ -78,7 +78,7 @@ final class URLCredentialStorage extends ObjectClass
      * The credential is removed from both persistent and temporary storage.
      * @param URLCredential $credential The credential to remove.
      * @param URLProtectionSpace|string $space The protection space from which to remove the credential.
-     * @param Dictionary|null $options A dictionary containing options to consider when removing the credential.
+     * @param Dictionary<mixed>|null $options A dictionary containing options to consider when removing the credential.
      * @param URLSessionTask|null $task The task using the protection space that you wish to remove the credential for.
      */
     public function remove(/** @noinspection PhpUnusedParameterInspection */ URLCredential $credential, URLProtectionSpace|string $space, ?Dictionary $options = null, ?URLSessionTask $task = null): void

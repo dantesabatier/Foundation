@@ -47,7 +47,7 @@ class HTTPCookie extends ObjectClass
     public readonly ?string $comment;
     /** @var URL|null The cookie's comment URL. */
     public readonly ?URL $commentURL;
-    /** @var Dictionary The cookie's properties. */
+    /** @var Dictionary<mixed> The cookie's properties. */
     public readonly Dictionary $properties;
     public string $description {
         get => sprintf("<HTTPCookie version:%d name:\"%s\" value:\"%s\" expires:%s sessionOnly:%s domain:\"%s\" path:\"%s\" isSecure:%s comment:%s ports:{%s}", $this->version, $this->name, $this->value, human_readable_value($this->expiresDate), human_readable_value($this->isSessionOnly), $this->domain, $this->path, human_readable_value($this->isSecure), human_readable_value($this->comment), $this->portList?->join(",") ?? 0);
@@ -55,7 +55,7 @@ class HTTPCookie extends ObjectClass
 
     /**
      * Creates an HTTP cookie instance with the given cookie properties.
-     * @param Dictionary $properties The properties for the new cookie object, expressed as key-value pairs.
+     * @param Dictionary<mixed> $properties The properties for the new cookie object, expressed as key-value pairs.
      */
     public function __construct(Dictionary $properties)
     {

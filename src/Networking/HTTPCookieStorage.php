@@ -126,7 +126,7 @@ class HTTPCookieStorage extends ObjectClass
         if (!($cookieFileURL = $this->cookieFileURL)) {
             return;
         }
-        /** @var Dictionary<Dictionary> $cookies */
+        /** @var Dictionary<Dictionary<mixed>> $cookies */
         $cookies = PropertyListSerialization::propertyListWithURL($cookieFileURL) ?? new Dictionary();
         foreach ($cookies as $key => $value) {
             $this->allCookies[$key] = $this->createCookie($value);
@@ -139,7 +139,7 @@ class HTTPCookieStorage extends ObjectClass
             return;
         }
         $persistent = $this->allCookies->filter(fn(HTTPCookie $cookie): bool => $cookie->expiresDate !== null && $cookie->expiresDate->timeIntervalSinceNow > 0 && !$cookie->isSessionOnly);
-        /** @var Dictionary<Dictionary> $persistDictionary */
+        /** @var Dictionary<Dictionary<mixed>> $persistDictionary */
         $persistDictionary = $persistent->reduce(new Dictionary(), function (Dictionary $result, HTTPCookie $cookie, string $key): Dictionary {
             $result[$key] = $cookie->properties;
             return $result;

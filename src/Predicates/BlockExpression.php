@@ -33,7 +33,7 @@ class BlockExpression extends Expression
     }
 
     /**
-     * @param Closure(mixed, ArrayClass<Expression>, Dictionary|null): mixed $expressionBlock
+     * @param Closure(mixed, ArrayClass<Expression>, Dictionary<mixed>|null): mixed $expressionBlock
      * @param ArrayClass<Expression>|null $arguments
      */
 
