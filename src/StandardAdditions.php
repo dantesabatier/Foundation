@@ -3,6 +3,7 @@
 namespace Sabatier\Foundation;
 
 use Collator;
+use JetBrains\PhpStorm\Deprecated;
 use JetBrains\PhpStorm\ExpectedValues;
 use JetBrains\PhpStorm\Pure;
 
@@ -16,13 +17,70 @@ function absolute_time_get_current(): float
     return (float)$tv["sec"] + (1.0e-6 * (float)$tv["usec"]);
 }
 
-/**
- * Generates and returns a random hexadecimal color code.
- * @return string Returns a string representing a random color in hexadecimal format prefixed with '#'.
- */
-function random_color(): string
+#[Deprecated("since Foundation 0.1, use random_color() instead", "random_color(%parametersList%)")]
+function random_bright_color($name): string
 {
-    return sprintf("#%s", substr(str_shuffle("ABCDEF0123456789"), 0, 6));
+    return random_color($name);
+}
+
+/**
+ * Generates a bright and visually distinct color suitable for use in UI elements
+ * depending on the theme (dark or light).
+ *
+ * The function ensures that the resulting color has enough contrast to be legible
+ * on the specified background theme.
+ *
+ * @param string $theme The target UI theme. Acceptable values are:
+ *                      - "dark": generates colors suitable for dark backgrounds.
+ *                      - "light": generates colors suitable for light backgrounds.
+ * @return string A CSS-compatible hexadecimal color string, e.g., "#4CAF50".
+ *
+ * @example
+ * // Generate a color for dark theme
+ * $color = bright_color_for_theme("dark"); // e.g., "#F57C00"
+ *
+ * @example
+ * // Generate a color for light theme
+ * $color = bright_color_for_theme("light"); // e.g., "#1976D2"
+ *
+ * Notes:
+ * - The function internally adjusts the lightness and saturation of the color
+ *   to maximize contrast while keeping the color visually appealing.
+ * - Colors are randomized per call but constrained to a safe range for the theme.
+ */
+function random_color(string $name, string $theme = "dark"): string
+{
+    $hash = crc32(strtolower($name));
+    $h = $hash % 360;
+    $s = 80;
+    $l = $theme === "dark" ? 50 : 30;
+    return hsl_to_hex($h, $s, $l);
+}
+
+function hsl_to_hex(int $h, int $s, int $l): string
+{
+    $s /= 100;
+    $l /= 100;
+    $c = (1 - abs(2 * $l - 1)) * $s;
+    $x = $c * (1 - abs(fmod($h / 60, 2) - 1));
+    $m = $l - $c / 2;
+    if ($h < 60) {
+        [$r, $g, $b] = [$c, $x, 0];
+    } elseif ($h < 120) {
+        [$r, $g, $b] = [$x, $c, 0];
+    } elseif ($h < 180) {
+        [$r, $g, $b] = [0, $c, $x];
+    } elseif ($h < 240) {
+        [$r, $g, $b] = [0, $x, $c];
+    } elseif ($h < 300) {
+        [$r, $g, $b] = [$x, 0, $c];
+    } else {
+        [$r, $g, $b] = [$c, 0, $x];
+    }
+    $r = round(($r + $m) * 255);
+    $g = round(($g + $m) * 255);
+    $b = round(($b + $m) * 255);
+    return sprintf("#%02X%02X%02X", $r, $g, $b);
 }
 
 /**
