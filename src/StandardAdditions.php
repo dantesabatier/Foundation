@@ -3,7 +3,6 @@
 namespace Sabatier\Foundation;
 
 use Collator;
-use JetBrains\PhpStorm\Deprecated;
 use JetBrains\PhpStorm\ExpectedValues;
 use JetBrains\PhpStorm\Pure;
 
@@ -15,12 +14,6 @@ function absolute_time_get_current(): float
 {
     $tv = gettimeofday();
     return (float)$tv["sec"] + (1.0e-6 * (float)$tv["usec"]);
-}
-
-#[Deprecated("since Foundation 0.1, use random_color() instead", "random_color(%parametersList%)")]
-function random_bright_color($name): string
-{
-    return random_color($name);
 }
 
 /**
