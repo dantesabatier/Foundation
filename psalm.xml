@@ -14,6 +14,7 @@
         <InaccessibleProperty errorLevel="suppress"/>
         <InvalidArgument>
             <errorLevel type="suppress">
+                <file name="src/BidirectionalCollectionAlgorithms.php"/>
                 <file name="src/Networking/Challenge.php"/>
                 <file name="src/Networking/HTTPCookieStorage.php"/>
                 <file name="src/Predicates/PredicateScanner.php"/>

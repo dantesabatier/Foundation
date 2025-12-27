@@ -58,4 +58,15 @@ interface BidirectionalCollection extends Collection
      * @return BidirectionalCollection<Index, Element> A collection containing the elements of this sequence in reverse order.
      */
     public function reversed(): BidirectionalCollection;
+
+    /**
+     * Returns the difference needed to produce this collection’s ordered elements from the given collection, using the given predicate as an equivalence test.
+     *
+     * This function does not infer element moves. If you need to infer moves, call the inferringMoves() method on the resulting difference.
+     *
+     * @param Collection $other The base state.
+     * @param Closure(Element, Element): bool|null $areEquivalent A closure that returns a Boolean value indicating whether two elements are equivalent.
+     * @return CollectionDifference The difference needed to produce the receiver’s state from the parameter’s state.
+     */
+    public function difference(Collection $other, ?Closure $areEquivalent = null): CollectionDifference;
 }
