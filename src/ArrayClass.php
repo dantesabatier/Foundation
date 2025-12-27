@@ -52,6 +52,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
         joined as private collectionJoined;
         reverse as private bidirectionalCollectionReverse;
         reversed as private bidirectionalCollectionReversed;
+        difference as private bidirectionalCollectionDifference;
         append as private mutableCollectionAppend;
         appendContentsOf as private mutableCollectionAppendContentsOf;
         insert as private mutableCollectionInsert;
@@ -398,6 +399,21 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
     public function reversed(): ArrayClass
     {
         return $this->bidirectionalCollectionReversed();
+    }
+
+    /**
+     * Returns the difference needed to produce this collection’s ordered elements from the given collection, using the given predicate as an equivalence test.
+     *
+     * This function does not infer element moves. If you need to infer moves, call the inferringMoves() method on the resulting difference.
+     *
+     * @param Collection $other The base state.
+     * @param Closure(Element, Element): bool|null $areEquivalent A closure that returns a Boolean value indicating whether two elements are equivalent.
+     * @return CollectionDifference The difference needed to produce the receiver’s state from the parameter’s state.
+     */
+    #[Override]
+    public function difference(Collection $other, ?Closure $areEquivalent = null): CollectionDifference
+    {
+        return $this->bidirectionalCollectionDifference($other, $areEquivalent);
     }
 
     /**
