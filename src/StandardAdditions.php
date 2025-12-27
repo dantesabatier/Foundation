@@ -23,6 +23,7 @@ function absolute_time_get_current(): float
  * The function ensures that the resulting color has enough contrast to be legible
  * on the specified background theme.
  *
+ * @param string $string The input string for which to generate a color.
  * @param string $theme The target UI theme. Acceptable values are:
  *                      - "dark": generates colors suitable for dark backgrounds.
  *                      - "light": generates colors suitable for light backgrounds.
@@ -41,9 +42,9 @@ function absolute_time_get_current(): float
  *   to maximize contrast while keeping the color visually appealing.
  * - Colors are randomized per call but constrained to a safe range for the theme.
  */
-function random_color(string $name, string $theme = "dark"): string
+function random_color(string $string, string $theme = "dark"): string
 {
-    $hash = crc32(strtolower($name));
+    $hash = crc32(strtolower($string));
     $h = $hash % 360;
     $s = 80;
     $l = $theme === "dark" ? 50 : 30;
