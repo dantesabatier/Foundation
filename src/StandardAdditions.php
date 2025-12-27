@@ -432,7 +432,7 @@ function localized_string(string $string, string $domain = "Localizable", string
  */
 function base64_url_encode(string $string): string
 {
-    return rtrim(strtr(base64_encode($string), '+/', '-_'), '=');
+    return rtrim(strtr(base64_encode($string), "+/", "-_"), "=");
 }
 
 /**
