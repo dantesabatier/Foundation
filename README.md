@@ -18,3 +18,33 @@ This project brings the robust, object-oriented architecture and expressive APIs
 ```bash
 composer require sabatier/foundation
 ```
+## 🛠 Usage Example
+### Collections & Functional Algorithms
+
+```php
+use Sabatier\Foundation\ArrayClass;
+
+$array = new ArrayClass([1, 2, 3, 4, 5]);
+$evenSquares = $array
+    ->filter(fn($n) => $n % 2 === 0)
+    ->map(fn($n) => $n * $n);
+
+echo $evenSquares->join(", "); // "4, 16"
+```
+
+### Key-Value Coding Operators
+
+```php
+$totalSize = $files->valueForKeyPath("@sum.attributes.size");
+```
+### File Manager
+
+```php
+$fm = FileManager::default();
+$documents = $fm->url(SearchPathDirectory::documentsDirectory, SearchPathDomainMask::user);
+$configUrl = $documents->appendingPathComponent("config.plist");
+
+if (!$fm->fileExists($configUrl->path)) {
+    // ...
+}
+```
