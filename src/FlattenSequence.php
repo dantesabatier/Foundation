@@ -108,6 +108,7 @@ class FlattenSequence extends ObjectClass implements Sequence, IteratorAggregate
      * @param Closure(Element, int<0, max>=, bool=): bool $isIncluded
      * @return Sequence<int, Element>
      */
+    #[Override]
     public function filter(Closure $isIncluded): Sequence
     {
         return new ($this->base::class)($this)->filter($isIncluded);
@@ -121,6 +122,7 @@ class FlattenSequence extends ObjectClass implements Sequence, IteratorAggregate
      * @return Sequence<int, Element> A new sequence containing the objects in the receiving array for which predicate returns true.
      * Objects in the resulting array appear in the same order as they do in the receiver.
      */
+    #[Override]
     public function filtered(Predicate $predicate): Sequence
     {
         return new ($this->base::class)($this)->filtered($predicate);

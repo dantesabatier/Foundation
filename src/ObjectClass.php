@@ -394,6 +394,7 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
         request_concrete_implementation($this, __FUNCTION__);
     }
 
+    #[Override]
     public function mutableSetValueForKey(string $key): Set
     {
         request_concrete_implementation($this, __FUNCTION__);

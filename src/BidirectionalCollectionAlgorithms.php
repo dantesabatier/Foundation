@@ -77,22 +77,22 @@ trait BidirectionalCollectionAlgorithms
 
     public function difference(Collection $other, ?Closure $areEquivalent = null): CollectionDifference
     {
-        $areEquivalent ??= fn(mixed $e0, mixed $e1): bool => $e0 === $e1;
+        $areEquivalent ??= is_equal(...);
         /** @var ArrayClass<CollectionDifferenceChange> $removals */
         $removals = new ArrayClass();
         /** @var ArrayClass<CollectionDifferenceChange> $insertions */
         $insertions = new ArrayClass();
         foreach ($other as $index => $item) {
-            if (!$this->contains(fn(mixed $change) => $areEquivalent($change, $item))) {
+            if (!$this->contains(fn(mixed $change): bool => $areEquivalent($change, $item))) {
                 $removals->append(new CollectionDifferenceChange(CollectionDifferenceChangeType::remove, $item, $index));
             }
         }
         foreach ($this as $index => $item) {
-            if (!$other->contains(fn(mixed $change) => $areEquivalent($change, $item))) {
+            if (!$other->contains(fn(mixed $change): bool => $areEquivalent($change, $item))) {
                 $insertions->append(new CollectionDifferenceChange(CollectionDifferenceChangeType::insert, $item, $index));
             }
         }
-        $changes = $removals->reversed()->sorted([new SortDescriptor("offset", false)]);
+        $changes = $removals->sorted([new SortDescriptor("offset", false)]);
         $changes->appendContentsOf($insertions->sorted([new SortDescriptor("offset", true)]));
         return new CollectionDifference($changes);
     }

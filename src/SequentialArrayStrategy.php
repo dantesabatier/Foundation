@@ -2,9 +2,12 @@
 
 namespace Sabatier\Foundation;
 
+use Override;
+
 /** @internal */
 class SequentialArrayStrategy implements ArrayConversionStrategy
 {
+    #[Override]
     public function convert(array $array): ArrayClass
     {
         /** @var ArrayClass<mixed> $arrayClass */

@@ -2,9 +2,12 @@
 
 namespace Sabatier\Foundation;
 
+use Override;
+
 /** @internal */
 class AssociativeArrayStrategy implements ArrayConversionStrategy
 {
+    #[Override]
     public function convert(array $array): Dictionary
     {
         /** @var Dictionary<mixed> $dictionary */
