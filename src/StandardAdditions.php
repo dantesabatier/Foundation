@@ -190,6 +190,17 @@ function camelcase(string $string): string
 }
 
 /**
+ * Capitalizes the first character of every word in a UTF-8 encoded string, preserving the remaining characters of each word as-is.
+ *
+ * @param string $string The input string whose words will be capitalized.
+ * @return string The input string with each word capitalized.
+ */
+function capitalize(string $string): string
+{
+    return mb_convert_case($string, MB_CASE_TITLE, "UTF-8");
+}
+
+/**
  * Checks if the string contains a given substring.
  * @param string $string The string to process.
  * @param string $substring The substring to search for.
