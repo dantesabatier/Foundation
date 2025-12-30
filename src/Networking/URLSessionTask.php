@@ -75,7 +75,7 @@ abstract class URLSessionTask extends ObjectClass
     public ?string $taskDescription = null;
     /** @var int An identifier uniquely identifying the task within a given session. This value is unique only within the context of a single session; tasks in other sessions may have the same taskIdentifier value. */
     public readonly int $taskIdentifier;
-    /** @var Error|null An error object that indicates why the task failed. This value is nil if the task is still active or if the transfer is completed successfully. */
+    /** @var Error|null An error object that indicates why the task failed. This value is null if the task is still active or if the transfer is completed successfully. */
     public ?Error $error = null;
     /** @var URLSessionTaskDelegate|null A delegate specific to the task. This task-specific delegate receives messages from the task before the session's delegate receives them. */
     public ?URLSessionTaskDelegate $delegate = null;

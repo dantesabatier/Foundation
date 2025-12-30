@@ -86,7 +86,7 @@ interface KeyValueCoding
     /**
      * Invoked by {@see setValueForKey()} when it's given a null value for a scalar value (such as an int or float).
      * Subclasses can override this method to handle the request in some other way, such as by substituting 0
-     * or a sentinel value for nil and invoking {@see setValueForKey()} again or setting the variable directly.
+     * or a sentinel value for null and invoking {@see setValueForKey()} again or setting the variable directly.
      * The default implementation raises an {@see InvalidArgumentException}.
      * @param string $key The name of one of the receiver's properties.
      */

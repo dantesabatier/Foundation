@@ -50,7 +50,7 @@ final class URLCache extends ObjectClass
      * A disk cache measured in the tens of megabytes is acceptable in most cases.
      * @param int $memoryCapacity The memory capacity of the cache, in bytes.
      * @param int $diskCapacity The disk capacity of the cache, in bytes.
-     * @param URL|null $directory The path to an on-disk directory, where the system stores the on-disk cache. If the directory is nil, the cache uses a default directory.
+     * @param URL|null $directory The path to an on-disk directory, where the system stores the on-disk cache. If the directory is null, the cache uses a default directory.
      */
     public function __construct(public int $memoryCapacity, public int $diskCapacity, ?URL $directory = null)
     {
@@ -215,7 +215,7 @@ final class URLCache extends ObjectClass
      *
      * If you override this method, you should also override {@see getCachedResponse()}.
      * @param URLRequest $request The URL request whose cached response is desired.
-     * @return CachedURLResponse|null The cached URL response for request, or nil if no response has been cached.
+     * @return CachedURLResponse|null The cached URL response for request, or null if no response has been cached.
      */
     public function cachedResponse(URLRequest $request): ?CachedURLResponse
     {
@@ -289,7 +289,7 @@ final class URLCache extends ObjectClass
      * Gets the cached URL response for a data task, passing it to the provided completion handler.
      *
      * @param URLSessionDataTask $dataTask The data task whose cached URL response is desired.
-     * @param Closure(CachedURLResponse|null): void $completionHandler A completion handler that receives the cached URL response for the data task's request or nil if no response is found in the cache.
+     * @param Closure(CachedURLResponse|null): void $completionHandler A completion handler that receives the cached URL response for the data task's request or null if no response is found in the cache.
      */
     public function getCachedResponse(URLSessionDataTask $dataTask, Closure $completionHandler): void
     {

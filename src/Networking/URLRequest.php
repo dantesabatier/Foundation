@@ -95,7 +95,7 @@ class URLRequest extends ObjectClass
 
     /**
      * @param string $field The header field name to use for the lookup (case-insensitive).
-     * @return string|null The value associated with the header field, or nil if there is no corresponding header field.
+     * @return string|null The value associated with the header field, or null if there is no corresponding header field.
      */
     public function valueForHttpHeaderField(string $field): ?string
     {

@@ -28,7 +28,7 @@ abstract class URLProtocol extends ObjectClass
      * Creates a URL protocol instance to handle the request.
      *
      * @param URLSessionTask $task A task containing a URL request to be performed by the protocol.
-     * @param CachedURLResponse|null $cachedResponse A cached response for the request; it may be nil if there is no existing cached response for the request.
+     * @param CachedURLResponse|null $cachedResponse A cached response for the request; it may be null if there is no existing cached response for the request.
      * @param URLProtocolClient|null $client An object that provides an implementation of the {@see URLProtocolClient} protocol that this instance uses to communicate with the URL Loading System. This client object is retained.
      */
     public function __construct(URLSessionTask $task, ?CachedURLResponse $cachedResponse = null, ?URLProtocolClient $client = null)
@@ -51,7 +51,7 @@ abstract class URLProtocol extends ObjectClass
     /**
      * Attempts to register a subclass of URLProtocol, making it visible to the URL loading system.
      *
-     * Register any custom URLProtocol subclasses prior to making URL requests. When the URL loading system begins to load a request, it tries to initialize each registered protocol class with the specified request. The first URLProtocol subclass to return true when sent a {@see canInit()} message is used to load the request. There is no guarantee that all registered protocol classes will be consulted.
+     * Register any custom URLProtocol subclasses before making URL requests. When the URL loading system begins to load a request, it tries to initialize each registered protocol class with the specified request. The first URLProtocol subclass to return true when sent a {@see canInit()} message is used to load the request. There is no guarantee that all registered protocol classes will be consulted.
      * Classes are consulted in the reverse order of their registration. A similar design governs the process to create the canonical form of a request with {@see canonicalRequest()}.
      * @param class-string<URLProtocol> $protocolClass The subclass to register.
      * @return bool true if the registration is successful, false otherwise. The only failure condition is if protocolClass is not a subclass of URLProtocol.
@@ -104,7 +104,7 @@ abstract class URLProtocol extends ObjectClass
     /**
      * Determines whether the protocol subclass can handle the specified request.
      *
-     * A subclass should inspect request and determine whether the implementation can perform a load with that request. This is an abstract method and subclasses must provide an implementation.
+     * A subclass should inspect `$request` and determine whether the implementation can perform a load with that request. This is an abstract method and subclasses must provide an implementation.
      * @param URLRequest $request The request to be handled.
      * @return bool true if the protocol subclass can handle request, otherwise false.
      */
@@ -119,7 +119,7 @@ abstract class URLProtocol extends ObjectClass
      * Use this method to access protocol-specific information associated with {@see URLRequest} objects.
      * @param string $key The key of the desired property.
      * @param URLRequest $request The request whose properties are to be queried.
-     * @return mixed The property associated with key, or nil if no property has been stored for key.
+     * @return mixed The property associated with `$key`, or null if no property has been stored for `$key`.
      */
     public static function property(string $key, URLRequest $request): mixed
     {
@@ -155,7 +155,7 @@ abstract class URLProtocol extends ObjectClass
      * Returns a canonical version of the specified request.
      *
      * It is up to each concrete protocol implementation to define what "canonical" means. A protocol should guarantee that the same input request always yields the same canonical form.
-     * Special consideration should be given when implementing this method, because the canonical form of a request is used to lookup objects in the URL cache, a process which performs equality checks between URLRequest instances.
+     * Special consideration should be given when implementing this method because the canonical form of a request is used to lookup objects in the URL cache, a process which performs equality checks between URLRequest instances.
      * This is an abstract method and subclasses must provide an implementation.
      * @param URLRequest $request The request whose canonical version is desired.
      * @return URLRequest The canonical form of request.
@@ -168,7 +168,7 @@ abstract class URLProtocol extends ObjectClass
     /**
      * A Boolean value indicating whether two requests are equivalent for cache purposes.
      *
-     * Requests are considered equivalent for cache purposes if and only if they would be handled by the same protocol and that protocol declares them equivalent after performing implementation-specific checks.
+     * Requests are considered equivalent for cache purposes if and only if they are handled by the same protocol and that protocol declares them equivalent after performing implementation-specific checks.
      * The URLProtocol implementation of this method compares the URLs of the requests to determine if the requests should be considered equivalent. Subclasses can override this method to provide protocol-specific comparisons.
      * @param URLRequest $a The request to compare with bRequest.
      * @param URLRequest $b The request to compare with aRequest.

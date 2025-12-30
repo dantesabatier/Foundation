@@ -108,7 +108,7 @@ class HTTPURLResponse extends URLResponse
     /**
      * Returns the value that corresponds to the given header field.
      * @param string $field The name of the header field you want to retrieve. The name is case-insensitive.
-     * @return string|null The value associated with the given header field, or nil if no value is associated with the field.
+     * @return string|null The value associated with the given header field, or null if no value is associated with the field.
      */
     public function valueForHttpHeaderField(string $field): ?string
     {

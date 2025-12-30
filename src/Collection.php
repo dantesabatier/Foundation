@@ -60,7 +60,7 @@ interface Collection extends Sequence, ArrayAccess
     /**
      * Returns the first index where the specified value appears in the collection.
      * @param Element $element An element to search for in the collection.
-     * @return Index|null The first index where $element is found. If the element is not found in the collection, it returns nil.
+     * @return Index|null The first index where $element is found. If the element is not found in the collection, it returns null.
      */
     public function indexOf(mixed $element);
 

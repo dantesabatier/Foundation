@@ -36,9 +36,9 @@ final class NotificationCenter
     /**
      * Adds an entry to the notification center to receive notifications that passed to the provided block.
      * @param string $name The name of the notification to register for delivery to the observer block. Specify a notification name to deliver only entries with this notification name.
-     * When nil, the sender doesn't use notification names as criteria for delivery.
+     * When null, the sender doesn't use notification names as criteria for delivery.
      * @param mixed $object The object that sends notifications to the observer block. Specify a sender to deliver only notifications from this sender.
-     * When nil, the notification center doesn't use the sender as criteria for the delivery.
+     * When null, the notification center doesn't use the sender as criteria for the delivery.
      * @param Closure(Notification): void $block The block that executes when receiving a notification.
      * The notification center copies the block. The notification center strongly holds the copied block until you remove the observer registration.
      * The block takes one argument: the notification.
@@ -54,9 +54,9 @@ final class NotificationCenter
     /**
      * Adds an entry to the notification center to call the provided selector with the notification.
      * @param mixed $observer An object to register as an observer.
-     * @param string $selector A selector that specifies the message the receiver sends observer to alert it to the notification posting. The method that $selector specifies must have one and only one argument (an instance of Notification).
-     * @param string $name The name of the notification to register for delivery to the observer. Specify a notification name to deliver only entries with this notification name. When nil, the sender doesn't use notification names as criteria for the delivery.
-     * @param mixed|null $object The object that sends notifications to the observer. Specify a notification sender to deliver only notifications from this sender. When nil, the notification center doesn't use sender names as criteria for delivery.
+     * @param string $selector A selector that specifies the message the receiver sends `$observer` to alert it to the notification posting. The method that $selector specifies must have one and only one argument (an instance of Notification).
+     * @param string $name The name of the notification to register for delivery to the observer. Specify a notification name to deliver only entries with this notification name. When null, the sender doesn't use notification names as criteria for the delivery.
+     * @param mixed|null $object The object that sends notifications to the observer. Specify a notification sender to deliver only notifications from this sender. When null, the notification center doesn't use sender names as criteria for delivery.
      */
     public function addObserver(mixed $observer, string $selector, string $name, mixed $object = null): void
     {
@@ -66,8 +66,8 @@ final class NotificationCenter
     /**
      * Removes matching entries from the notification center's dispatch table.
      * @param mixed $observer The observer to remove from the dispatch table. Specify an observer to remove only entries for this observer.
-     * @param string|null $name The name of the notification to remove from the dispatch table. Specify a notification name to remove only entries with this notification name. When nil, the receiver does not use notification names as criteria for removal.
-     * @param mixed|null $object The sender to remove from the dispatch table. Specify a notification sender to remove only entries with this sender. When nil, the receiver does not use a sender as criteria for removal.
+     * @param string|null $name The name of the notification to remove from the dispatch table. Specify a notification name to remove only entries with this notification name. When null, the receiver does not use notification names as criteria for removal.
+     * @param mixed|null $object The sender to remove from the dispatch table. Specify a notification sender to remove only entries with this sender. When null, the receiver does not use a sender as criteria for removal.
      */
     public function removeObserver(mixed $observer, ?string $name = null, mixed $object = null): void
     {

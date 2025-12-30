@@ -11,27 +11,27 @@ use Sabatier\Foundation\Error;
 final class URLSessionStreamTask extends URLSessionTask
 {
     /**
-     * Asynchronously reads a number of bytes from the stream, and calls a handler upon completion.
+     * Asynchronously reads a number of bytes from the stream and calls a handler upon completion.
      * @param int $minBytes The minimum number of bytes to read.
      * @param int $maxBytes The maximum number of bytes to read.
      * @param float $timeout A timeout for reading bytes. If the read is not completed within the specified interval, the read is canceled and the completionHandler is called with an error. Pass 0 to prevent a read from timing out.
      * @param Closure(string|null, bool, Error|null): void $completionHandler The completion handler to call when all bytes are read, or an error occurs. This handler is executed on the delegate queue.
      * This completion handler takes the following parameters:
      * $data The data read from the stream.
-     * $atEOF Whether or not the stream reached end-of-file (EOF), such that no more data can be read.
-     * $error An error object that indicates why the read failed, or nil if the read was successful.
+     * $atEOF Whether the stream reached end-of-file (EOF), such that no more data can be read.
+     * $error An error object that indicates why the read failed, or null if the read was successful.
      */
     public function readData(int $minBytes, int $maxBytes, float $timeout, Closure $completionHandler): void
     {
     }
 
     /**
-     * Asynchronously writes the specified data to the stream, and calls a handler upon completion.
+     * Asynchronously writes the specified data to the stream and calls a handler upon completion.
      * @param string $data The data to be written.
-     * @param float $timeout A timeout for writing bytes. If the write is not completed within the specified interval, the write is canceled and the completionHandler is called with an error. Pass 0 to prevent a write from timing out.
+     * @param float $timeout A timeout for writing bytes. If the `write` is not completed within the specified interval, the `write` is canceled and the completionHandler is called with an error. Pass 0 to prevent a `write` from timing out.
      * @param Closure(Error|null): void $completionHandler The completion handler to call when all bytes are written, or an error occurs. This handler is executed on the delegate queue.
      * This completion handler takes the following parameter:
-     * $error An error object that indicates why the write failed, or nil if the write was successful.
+     * $error An error object that indicates why the `write` failed, or null if the `write` was successful.
      */
     public function write(string $data, float $timeout, Closure $completionHandler): void
     {
@@ -52,7 +52,7 @@ final class URLSessionStreamTask extends URLSessionTask
     }
 
     /**
-     * Completes any enqueued reads and writes, and then closes the write side of the underlying socket.
+     * Completes any enqueued reads and writes, and then closes the `write` side of the underlying socket.
      */
     public function closeWrite(): void
     {

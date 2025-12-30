@@ -115,7 +115,7 @@ final class IndexPath extends ObjectClass implements MutableCollection, Iterator
 
     /**
      * Returns a Boolean value indicating whether the sequence contains an element that satisfies the given predicate.
-     * @param Closure(int, int<0, max>): bool $predicate A closure that takes an element of the sequence as its argument and returns a Boolean value that indicates whether the passed element represents a match.
+     * @param Closure(int, int): bool $predicate A closure that takes an element of the sequence as its argument and returns a Boolean value that indicates whether the passed element represents a match.
      * @return bool true if the sequence contains an element that satisfies predicate; otherwise, false.
      */
     #[Override]
@@ -163,7 +163,7 @@ final class IndexPath extends ObjectClass implements MutableCollection, Iterator
      * For example, you can use this method on an array of integers to filter adjacent equal entries or count frequencies.
      * @template Result
      * @param Result $initialResult The value to use as the initial accumulating value.
-     * @param Closure(Result, int, int<0, max>=): Result $updateAccumulatingResult A closure that updates the accumulating value with an element of the sequence.
+     * @param Closure(Result, int, int=): Result $updateAccumulatingResult A closure that updates the accumulating value with an element of the sequence.
      * @return Result The final accumulated value. If the sequence has no elements, the result is $initialResult.
      */
     #[Override]
@@ -175,7 +175,7 @@ final class IndexPath extends ObjectClass implements MutableCollection, Iterator
     /**
      * @template Result
      * Returns a Collection containing the results of mapping the given closure over the collection's elements.
-     * @param Closure(int, int<0, max>=): Result $transform
+     * @param Closure(int, int=): Result $transform
      * @return ArrayClass<Result>
      */
     #[Override]
@@ -187,7 +187,7 @@ final class IndexPath extends ObjectClass implements MutableCollection, Iterator
     /**
      * @template Result
      * Returns a Collection containing the non-null results of calling the given transformation with each element of this collection.
-     * @param Closure(int, int<0, max>=): Result $transform
+     * @param Closure(int, int=): Result $transform
      * @return ArrayClass<Result>
      */
     #[Override]
@@ -199,7 +199,7 @@ final class IndexPath extends ObjectClass implements MutableCollection, Iterator
     /**
      * @template Result
      * Returns a Collection containing the concatenated results of calling the given transformation with each element of this collection.
-     * @param Closure(int, int<0, max>=): iterable<Result> $transform
+     * @param Closure(int, int=): iterable<Result> $transform
      * @return ArrayClass<Result>
      */
     #[Override]
@@ -209,8 +209,36 @@ final class IndexPath extends ObjectClass implements MutableCollection, Iterator
     }
 
     /**
+     * Calls the given closure on each element in the sequence in the same order as a for-in loop.
+     *
+     * The two loops in the following example produce the same output:
+     *
+     * <code>
+     * $numberWords = ["one", "two", "three"]
+     * foreach ($numberWords as $word) {
+     *     print "$word\n";
+     * }
+     * // Prints "one"
+     * // Prints "two"
+     * // Prints "three"
+     * $numberWords->forEach(fn(string $word): void => print "$word\n");
+     * // Same as above
+     * </code>
+     *
+     * You cannot use a break or continue statement to exit the current call of the body closure or skip later calls.
+     * @param Closure(int, int=): void $body A closure that takes an element of the sequence as a parameter.
+     */
+    #[Override]
+    public function forEach(Closure $body): void
+    {
+        foreach (clone $this as $i => $e) {
+            $body($e, $i);
+        }
+    }
+
+    /**
      * Returns the first element of the collection that satisfies the given predicate.
-     * @param Closure(int, int<0, max>=): bool|null $where A closure that takes an element of the collection as its argument and returns a Boolean value indicating whether the element is a match.
+     * @param Closure(int, int=): bool|null $where A closure that takes an element of the collection as its argument and returns a Boolean value indicating whether the element is a match.
      * @return int|null The first element of the collection that satisfies $where, or null if there is no element that satisfies $where.
      */
     #[Override]
@@ -221,7 +249,7 @@ final class IndexPath extends ObjectClass implements MutableCollection, Iterator
 
     /**
      * Returns the last element of the collection that satisfies the given predicate.
-     * @param Closure(int, int<0, max>=): bool|null $where A closure that takes an element of the collection as its argument and returns a Boolean value indicating whether the element is a match.
+     * @param Closure(int, int=): bool|null $where A closure that takes an element of the collection as its argument and returns a Boolean value indicating whether the element is a match.
      * @return int|null The last element of the collection that satisfies $where, or null if there is no element that satisfies predicate.
      */
     #[Override]
@@ -232,7 +260,7 @@ final class IndexPath extends ObjectClass implements MutableCollection, Iterator
 
     /**
      * Returns the first index in which an element of the collection satisfies the given predicate.
-     * @param Closure(int, int<0, max>=): bool $where A closure that takes an element as its argument and returns a Boolean value that indicates whether the passed element represents a match.
+     * @param Closure(int, int=): bool $where A closure that takes an element as its argument and returns a Boolean value that indicates whether the passed element represents a match.
      * @return int|null The index of the first element for which $where returns true.
      * If no elements in the collection satisfy the given $where, it returns null.
      */
@@ -244,7 +272,7 @@ final class IndexPath extends ObjectClass implements MutableCollection, Iterator
 
     /**
      * Returns the last index in which an element of the collection satisfies the given predicate.
-     * @param Closure(int, int<0, max>=): bool $where A closure that takes an element as its argument and returns a Boolean value that indicates whether the passed element represents a match.
+     * @param Closure(int, int=): bool $where A closure that takes an element as its argument and returns a Boolean value that indicates whether the passed element represents a match.
      * @return int|null The index of the last element for which $where returns true.
      * If no elements in the collection satisfy the given $where, it returns null.
      */
@@ -278,7 +306,7 @@ final class IndexPath extends ObjectClass implements MutableCollection, Iterator
 
     /**
      * Returns a Collection containing, in order, the elements of the collection that satisfy the given predicate.
-     * @param Closure(int, int<0, max>=, bool=): bool $isIncluded
+     * @param Closure(int, int=, bool=): bool $isIncluded
      * @return IndexPath
      */
     #[Override]
@@ -301,7 +329,7 @@ final class IndexPath extends ObjectClass implements MutableCollection, Iterator
 
     /**
      * Returns a Boolean value indicating whether every element of a sequence satisfies a given predicate.
-     * @param Closure(int, int<0, max>=): bool $predicate A closure that takes an element of the sequence as its argument and returns a Boolean value that indicates whether the passed element satisfies a condition.
+     * @param Closure(int, int=): bool $predicate A closure that takes an element of the sequence as its argument and returns a Boolean value that indicates whether the passed element satisfies a condition.
      * @return bool true if the sequence contains an element that satisfies predicate; otherwise, false.
      */
     #[Override]
@@ -312,7 +340,7 @@ final class IndexPath extends ObjectClass implements MutableCollection, Iterator
 
     /**
      * Sorts the collection in place.
-     * @param Closure(int, int<0, max>=): int|null $by
+     * @param Closure(int, int=): int|null $by
      * @return IndexPath
      */
     #[Override]
@@ -455,7 +483,7 @@ final class IndexPath extends ObjectClass implements MutableCollection, Iterator
 
     /**
      * Removes all the elements that satisfy the given predicate.
-     * @param Closure(int, int<0, max>=): bool|null $where A closure that takes an element of the sequence as its argument and returns a Boolean value indicating whether the element should be removed from the collection.
+     * @param Closure(int, int=): bool|null $where A closure that takes an element of the sequence as its argument and returns a Boolean value indicating whether the element should be removed from the collection.
      */
     #[Override]
     public function removeAll(?Closure $where = null): void
@@ -499,7 +527,7 @@ final class IndexPath extends ObjectClass implements MutableCollection, Iterator
 
     /**
      * Returns a subsequence by skipping elements while predicate returns true and returning the remaining elements.
-     * @param Closure(int, int<0, max>=): bool $while A closure that takes an element of the sequence as its argument and returns true if the element should be skipped or false if it should be included.
+     * @param Closure(int, int=): bool $while A closure that takes an element of the sequence as its argument and returns true if the element should be skipped or false if it should be included.
      * Once the predicate returns false, it will not be called again.
      * @return Slice<int>
      */

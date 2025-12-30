@@ -39,7 +39,7 @@ final class URLCredentialStorage extends ObjectClass
      *
      * If you override this method, also override {@see getDefaultCredential()}.
      * @param URLProtectionSpace $space The URL protection space of interest.
-     * @return URLCredential|null The default credential for space or nil if no default has been set.
+     * @return URLCredential|null The default credential for space or null if no default has been set.
      */
     public function defaultCredential(URLProtectionSpace $space): ?URLCredential
     {
@@ -50,7 +50,7 @@ final class URLCredentialStorage extends ObjectClass
      * Gets the default credential for the specified protection space, which is being accessed by the given task, and passes it to the provided completion handler.
      * @param URLProtectionSpace $space The protection space of interest.
      * @param URLSessionTask $task The task seeking to use the protection space
-     * @param Closure(?URLCredential): void $completionHandler A completion handler that receives the default credential as its argument, or nil if there is no default credential for this combination of protection space and task.
+     * @param Closure(?URLCredential): void $completionHandler A completion handler that receives the default credential as its argument, or null if there is no default credential for this combination of protection space and task.
      */
     public function getDefaultCredential(/** @noinspection PhpUnusedParameterInspection */ URLProtectionSpace $space, URLSessionTask $task, Closure $completionHandler): void
     {
@@ -136,7 +136,7 @@ final class URLCredentialStorage extends ObjectClass
      *
      * @param URLProtectionSpace $space The protection space whose credentials you want to retrieve.
      * @param URLSessionTask|null $task The task accessing the specified protection space.
-     * @param Closure(Dictionary<URLCredential>|null): void $completionHandler A completion handler that receives a single argument with the credentials for the specified protection space and task. The dictionary's keys are username strings, and the corresponding value is a URLCredential. If no credential has been set for this space, the argument to the completion handler is nil.
+     * @param Closure(Dictionary<URLCredential>|null): void $completionHandler A completion handler that receives a single argument with the credentials for the specified protection space and task. The dictionary's keys are username strings, and the corresponding value is a URLCredential. If no credential has been set for this space, the argument to the completion handler is null.
      */
     public function getCredentials(/** @noinspection PhpUnusedParameterInspection */ URLProtectionSpace $space, ?URLSessionTask $task, Closure $completionHandler): void
     {

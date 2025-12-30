@@ -30,7 +30,7 @@ final class URLProtectionSpace extends ObjectClass
             }
         };
     }
-    /** @var mixed A representation of the server's SSL transaction state. This value is nil if the authentication method of the protection space is not server trust. */
+    /** @var mixed A representation of the server's SSL transaction state. This value is null if the authentication method of the protection space is not server trust. */
     public mixed $serverTrust = null;
     public bool $isProxy {
         get => $this->proxyType !== null;
@@ -45,7 +45,7 @@ final class URLProtectionSpace extends ObjectClass
      * @param int $port The port for the protection space object. If port is 0, the default port for the specified protocol is used, for example, port 80 for HTTP. Note that servers can, and do, treat these values differently.
      * @param string|null $proxyType The type of proxy server. The value of proxyType should be set to one of the values specified in ProxyTypes.
      * @param string|null $protocol The protocol for the protection space object. The value of protocol is equivalent to the scheme for a URL in the protection space, for example, "http", "https", "ftp", etc.
-     * @param string|null $realm A string indicating a protocol-specific subdivision of the host. realm may be nil if there is no specified realm or if the protocol doesn't support realms.
+     * @param string|null $realm A string indicating a protocol-specific subdivision of the host. realm may be null if there is no specified realm or if the protocol doesn't support realms.
      * @param string $authenticationMethod The type of authentication to use. authenticationMethod should be set to one of the values in URLProtectionSpace Authentication Method Constants.
      */
     public function __construct(public readonly string $host, public readonly int $port = 0, public readonly ?string $proxyType = null, public readonly ?string $protocol = null, public readonly ?string $realm = null, public readonly string $authenticationMethod = URLAuthenticationMethodDefault)

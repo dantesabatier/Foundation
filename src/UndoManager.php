@@ -352,7 +352,7 @@ final class UndoManager extends ObjectClass
     /**
      * Sets the name of the action associated with the Undo or Redo command.
      *
-     * If actionName is an empty string, the action name currently associated with the menu command is removed. There is no effect if actionName is nil.
+     * If actionName is an empty string, the action name currently associated with the menu command is removed. There is no effect if actionName is null.
      * @param string $actionName The name of the action.
      */
     public function setActionName(string $actionName): void

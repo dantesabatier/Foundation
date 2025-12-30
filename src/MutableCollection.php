@@ -71,7 +71,7 @@ interface MutableCollection extends BidirectionalCollection
      *
      * If an element equal to newElement is already contained in the collection, newElement replaces the existing element.
      * @param Element $element An element to insert into the collection.
-     * @return Element|null An element equal to newElement if the collection already contained such a member; otherwise, nil.
+     * @return Element|null An element equal to newElement if the collection already contained such a member; otherwise, null.
      */
     public function update(mixed $element);
 
@@ -118,7 +118,7 @@ interface MutableCollection extends BidirectionalCollection
      * Removes and returns the first element of the collection.
      *
      * Complexity: O(1)
-     * @return Element|null A member of the collection. If the collection is empty, returns nil.
+     * @return Element|null A member of the collection. If the collection is empty, returns null.
      */
     public function popFirst();
 
@@ -126,7 +126,7 @@ interface MutableCollection extends BidirectionalCollection
      * Removes and returns the last element of the collection.
      *
      * Complexity: O(1)
-     * @return Element|null A member of the collection. If the collection is empty, returns nil.
+     * @return Element|null A member of the collection. If the collection is empty, returns null.
      */
     public function popLast();
 

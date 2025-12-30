@@ -72,7 +72,7 @@ final class HTTPCookieStorage extends ObjectClass
     {
         $sharedCookieStorages = self::sharedCookieStorages();
         if (!($shared = $sharedCookieStorages["shared"])) {
-            $shared = new static("shared");
+            $shared = new HTTPCookieStorage("shared");
             $sharedCookieStorages["shared"] = $shared;
         }
         return $shared;
@@ -148,7 +148,7 @@ final class HTTPCookieStorage extends ObjectClass
     }
 
     /**
-     * Removes cookies that were stored after a given date.
+     * Removes cookies stored after a given date.
      *
      * @param Date $date The date after which cookies should be removed.
      */
@@ -194,13 +194,13 @@ final class HTTPCookieStorage extends ObjectClass
     /**
      * Adds an array of cookies to the cookie storage if the storage's cookie acceptance policy permits.
      *
-     * Cookies in the array will replace existing cookies with the same name, domain, and path in the cookie storage. If the storage has an accept policy of HTTPCookie.AcceptPolicy.never, the cookies are ignored.
+     * Cookies in the array will replace existing cookies with the same name, domain, and path in the cookie storage. If the storage has an acceptance policy of HTTPCookie.AcceptPolicy.never, the cookies are ignored.
      * To store cookies from a set of response headers, an application can use cookies({@see HTTPCookie::cookies()}) passing a header field dictionary and then use this method to store the resulting cookies in accordance with the cookie storage's cookie acceptance policy.
      * If you override this method, also override {@see HTTPCookieStorage::storeCookies()}.
      *
      * @param ArrayClass<HTTPCookie> $cookies The cookies to add.
      * @param URL|null $url The URL associated with the added cookies.
-     * @param URL|null $mainDocumentURL The URL of the main HTML document for the top-level frame, if known. The value can be nil. This URL is used to determine whether the cookie should be accepted if the cookie accept policy is HTTPCookieAcceptPolicy::onlyFromMainDocumentDomain.
+     * @param URL|null $mainDocumentURL The URL of the main HTML document for the top-level frame, if known. The value can be null. This URL is used to determine whether the cookie should be accepted if the cookie accept policy is HTTPCookieAcceptPolicy::onlyFromMainDocumentDomain.
      */
     public function setCookies(ArrayClass $cookies, ?URL $url = null, ?URL $mainDocumentURL = null): void
     {
@@ -211,13 +211,11 @@ final class HTTPCookieStorage extends ObjectClass
             return;
         }
         $cookies = $cookies->filter(fn(HTTPCookie $cookie): bool => str_starts_with($cookie->domain, ".") ? string_has_suffix($host, $cookie->domain, CompareOptions::caseInsensitive) : string_is_equal($cookie->domain, $host, CompareOptions::caseInsensitive));
-        foreach ($cookies as $cookie) {
-            $this->setCookie($cookie);
-        }
+        $cookies->forEach(fn(HTTPCookie $cookie) => $this->setCookie($cookie));
     }
 
     /**
-     * Stores an array of cookies in the cookie storage, on behalf of the provided task, if the cookie accept policy permits.
+     * Stores an array of cookies in the cookie storage, on behalf of the provided task if the cookie accept policy permits.
      *
      * @param ArrayClass<HTTPCookie> $cookies The cookies to add.
      * @param URLSessionTask $task The task that handles the response. Override this method and inspect this parameter if you need to alter your cookie storage strategy based on properties of the task.

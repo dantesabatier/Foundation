@@ -7,7 +7,7 @@ namespace Sabatier\Foundation\Networking;
  */
 enum URLSessionAuthChallengeDisposition: int
 {
-    /** Use the specified credential, which may be nil. */
+    /** Use the specified credential, which may be null. */
     case useCredential = 0;
     /** Use the default handling for the challenge as though this delegate method were not implemented. The provided credential parameter is ignored. */
     case performDefaultHandling = 1;

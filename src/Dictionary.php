@@ -256,7 +256,7 @@ final class Dictionary extends ObjectClass implements Collection, IteratorAggreg
      * @template Result
      * Returns a new dictionary containing only the key-value pairs that have non-null values as the result of transformation by the given closure.
      * @param Closure(Element, string=): Result $transform A closure that transforms a value. $transform accepts each value of the dictionary as its parameter and returns an optional transformed value of the same or of a different type.
-     * @return Dictionary<Result> A dictionary containing the keys and non-nil transformed values of this dictionary.
+     * @return Dictionary<Result> A dictionary containing the keys and non-null transformed values of this dictionary.
      */
     public function compactMapValues(Closure $transform): Dictionary
     {
@@ -289,10 +289,38 @@ final class Dictionary extends ObjectClass implements Collection, IteratorAggreg
     }
 
     /**
+     * Calls the given closure on each element in the sequence in the same order as a for-in loop.
+     *
+     * The two loops in the following example produce the same output:
+     *
+     * <code>
+     * $numberWords = ["one", "two", "three"]
+     * foreach ($numberWords as $word) {
+     *     print "$word\n";
+     * }
+     * // Prints "one"
+     * // Prints "two"
+     * // Prints "three"
+     * $numberWords->forEach(fn(string $word): void => print "$word\n");
+     * // Same as above
+     * </code>
+     *
+     * You cannot use a break or continue statement to exit the current call of the body closure or skip later calls.
+     * @param Closure(Element, string=): void $body A closure that takes an element of the sequence as a parameter.
+     */
+    #[Override]
+    public function forEach(Closure $body): void
+    {
+        foreach (clone $this as $i => $e) {
+            $body($e, $i);
+        }
+    }
+
+    /**
      * Returns the first index in which an element of the collection satisfies the given predicate.
      * @param Closure(Element): bool $where A closure that takes an element as its argument and returns a Boolean value that indicates whether the passed element represents a match.
      * @return string|null The index of the first element for which $where returns true.
-     * If no elements in the collection satisfy the given $where returns nil.
+     * If no elements in the collection satisfy the given $where returns null.
      */
     #[Override]
     public function firstIndex(Closure $where): ?string
@@ -313,7 +341,7 @@ final class Dictionary extends ObjectClass implements Collection, IteratorAggreg
     /**
      * Returns the first index where the specified value appears in the collection.
      * @param Element $element An element to search for in the collection.
-     * @return string|null The first index where $element is found. If the element is not found in the collection, it returns nil.
+     * @return string|null The first index where $element is found. If the element is not found in the collection, it returns null.
      */
     #[Override]
     public function indexOf(mixed $element): ?string
@@ -324,7 +352,7 @@ final class Dictionary extends ObjectClass implements Collection, IteratorAggreg
     /**
      * Returns the first element of the collection that satisfies the given predicate.
      * @param Closure(Element, string=): bool|null $where A closure that takes an element of the collection as its argument and returns a Boolean value indicating whether the element is a match.
-     * @return Element|null The first element of the collection that satisfies predicate or nil if there is no element that satisfies predicate.
+     * @return Element|null The first element of the collection that satisfies predicate or null if there is no element that satisfies predicate.
      */
     #[Override]
     public function first(?Closure $where = null)
@@ -489,7 +517,7 @@ final class Dictionary extends ObjectClass implements Collection, IteratorAggreg
      * Use this method instead of key-based subscripting when you need to know whether the new value supplants the value of an existing key. If the value of an existing key is updated, updateValue() returns the original value.
      * @param Element $value The new value to add to the dictionary.
      * @param string $key The key to associate with value. If $key already exists in the dictionary, $value replaces the existing associated value. If $key isn't already a key of the dictionary, the (key, value) pair is added.
-     * @return Element The $value that was replaced, or nil if a new key-value pair was added.
+     * @return Element The $value that was replaced, or null if a new key-value pair was added.
      */
     public function updateValue(mixed $value, string $key)
     {
@@ -503,7 +531,7 @@ final class Dictionary extends ObjectClass implements Collection, IteratorAggreg
      *
      * If the key is found in the dictionary, this method returns the key's associated value. On removal, this method invalidates all indices with respect to the dictionary.
      * @param string $key The key to remove along with its associated value.
-     * @return Element|null The $value that was removed, or nil if the key was not present in the dictionary.
+     * @return Element|null The $value that was removed, or null if the key was not present in the dictionary.
      */
     public function removeValueForKey(string $key)
     {

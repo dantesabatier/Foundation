@@ -56,7 +56,7 @@ final class URLSessionWebSocketTask extends URLSessionTask
      *
      * If an error occurs while sending the message, any outstanding work also fails.
      * @param URLSessionWebSocketTaskMessage $message The WebSocket message to send to the other endpoint.
-     * @param Closure(Error|null): void $completionHandler A closure that receives an Error that indicates an error encountered while sending, or nil if no error occurred.
+     * @param Closure(Error|null): void $completionHandler A closure that receives an Error that indicates an error encountered while sending, or null if no error occurred.
      */
     public function send(URLSessionWebSocketTaskMessage $message, Closure $completionHandler): void
     {
@@ -68,7 +68,7 @@ final class URLSessionWebSocketTask extends URLSessionTask
      * Reads a WebSocket message once all the frames of the message are available.
      *
      * If the task reaches the {@see maximumMessageSize} while buffering the frames, this call fails with an error.
-     * @param Closure(URLSessionWebSocketTaskMessage|null, Error|null): void $completionHandler A closure that receives two parameters: the WebSocket message and an Error that indicates an error encountered while receiving the message. The error is nil if no error occurred.
+     * @param Closure(URLSessionWebSocketTaskMessage|null, Error|null): void $completionHandler A closure that receives two parameters: the WebSocket message and an Error that indicates an error encountered while receiving the message. The error is null if no error occurred.
      */
     public function receive(Closure $completionHandler): void
     {
@@ -90,7 +90,7 @@ final class URLSessionWebSocketTask extends URLSessionTask
      * Sends a ping frame from the client side, with a closure to receive the pong from the server endpoint.
      *
      * When sending multiple pings, the task always calls pongReceiveHandler in the order it sent the pings.
-     * @param Closure(Error|null): void $pongReceiveHandler A closure called by the task when it receives the pong from the server. The closure receives an Error that indicates a lost connection or other problem, or nil if no error occurred.
+     * @param Closure(Error|null): void $pongReceiveHandler A closure called by the task when it receives the pong from the server. The closure receives an Error that indicates a lost connection or other problem, or null if no error occurred.
      */
     public function sendPing(Closure $pongReceiveHandler): void
     {

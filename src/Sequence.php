@@ -168,4 +168,26 @@ interface Sequence extends Traversable, Countable, Comparable, ExpressibleByArra
      * @return Sequence<Index, Result>
      */
     public function flatMap(Closure $transform): Sequence;
+
+    /**
+     * Calls the given closure on each element in the sequence in the same order as a for-in loop.
+     *
+     * The two loops in the following example produce the same output:
+     *
+     * <code>
+     * $numberWords = ["one", "two", "three"]
+     * foreach ($numberWords as $word) {
+     *     print "$word\n";
+     * }
+     * // Prints "one"
+     * // Prints "two"
+     * // Prints "three"
+     * $numberWords->forEach(fn(string $word): void => print "$word\n");
+     * // Same as above
+     * </code>
+     *
+     * You cannot use a break or continue statement to exit the current call of the body closure or skip later calls.
+     * @param Closure(Element, Index=): void $body A closure that takes an element of the sequence as a parameter.
+     */
+    public function forEach(Closure $body): void;
 }

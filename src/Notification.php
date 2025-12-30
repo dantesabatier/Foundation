@@ -22,10 +22,10 @@ final class Notification implements CustomStringConvertible
 
     /**
      * Initializes a new notification.
-     * The default value for userInfo is nil.
-     * @param string $name The name for the new notification. May not be nil.
+     * The default value for userInfo is null.
+     * @param string $name The name for the new notification. May not be null.
      * @param mixed $object The object for the new notification.
-     * @param Dictionary|null $userInfo The user information dictionary for the new notification. Maybe nil.
+     * @param Dictionary|null $userInfo The user information dictionary for the new notification. Maybe null.
      */
     public function __construct(public string $name, public mixed $object = null, public ?Dictionary $userInfo = null)
     {

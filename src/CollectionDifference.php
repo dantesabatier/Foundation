@@ -150,7 +150,7 @@ final class CollectionDifference extends ObjectClass implements MutableCollectio
 
     /**
      * Returns a Boolean value indicating whether the sequence contains an element that satisfies the given predicate.
-     * @param Closure(CollectionDifferenceChange, int<0, max>): bool $predicate A closure that takes an element of the sequence as its argument and returns a Boolean value that indicates whether the passed element represents a match.
+     * @param Closure(CollectionDifferenceChange, int): bool $predicate A closure that takes an element of the sequence as its argument and returns a Boolean value that indicates whether the passed element represents a match.
      * @return bool true if the sequence contains an element that satisfies predicate; otherwise, false.
      */
     #[Override]
@@ -199,7 +199,7 @@ final class CollectionDifference extends ObjectClass implements MutableCollectio
      * For example, you can use this method on an array of integers to filter adjacent equal entries or count frequencies.
      * @template Result
      * @param Result $initialResult The value to use as the initial accumulating value.
-     * @param Closure(Result, CollectionDifferenceChange, int<0, max>=): Result $updateAccumulatingResult A closure that updates the accumulating value with an element of the sequence.
+     * @param Closure(Result, CollectionDifferenceChange, int=): Result $updateAccumulatingResult A closure that updates the accumulating value with an element of the sequence.
      * @return Result The final accumulated value. If the sequence has no elements, the result is $initialResult.
      */
     #[Override]
@@ -230,7 +230,7 @@ final class CollectionDifference extends ObjectClass implements MutableCollectio
     /**
      * @template Result
      * Returns a Collection containing the results of mapping the given closure over the collection's elements.
-     * @param Closure(CollectionDifferenceChange, int<0, max>): Result $transform
+     * @param Closure(CollectionDifferenceChange, int): Result $transform
      * @return ArrayClass<Result>
      */
     #[Override]
@@ -242,7 +242,7 @@ final class CollectionDifference extends ObjectClass implements MutableCollectio
     /**
      * @template Result
      * Returns a Collection containing the non-null results of calling the given transformation with each element of this collection.
-     * @param Closure(CollectionDifferenceChange, int<0, max>): Result $transform
+     * @param Closure(CollectionDifferenceChange, int): Result $transform
      * @return ArrayClass<Result>
      */
     #[Override]
@@ -254,7 +254,7 @@ final class CollectionDifference extends ObjectClass implements MutableCollectio
     /**
      * @template Result
      * Returns a Collection containing the concatenated results of calling the given transformation with each element of this collection.
-     * @param Closure(CollectionDifferenceChange, int<0, max>=): iterable<Result> $transform
+     * @param Closure(CollectionDifferenceChange, int=): iterable<Result> $transform
      * @return ArrayClass<Result>
      */
     #[Override]
@@ -265,7 +265,7 @@ final class CollectionDifference extends ObjectClass implements MutableCollectio
 
     /**
      * Returns the first element of the collection that satisfies the given predicate.
-     * @param Closure(CollectionDifferenceChange, int<0, max>=): bool|null $where A closure that takes an element of the collection as its argument and returns a Boolean value indicating whether the element is a match.
+     * @param Closure(CollectionDifferenceChange, int=): bool|null $where A closure that takes an element of the collection as its argument and returns a Boolean value indicating whether the element is a match.
      * @return CollectionDifferenceChange|null The first element of the collection that satisfies predicate or null if there is no element that satisfies predicate.
      */
     #[Override]
@@ -276,7 +276,7 @@ final class CollectionDifference extends ObjectClass implements MutableCollectio
 
     /**
      * Returns the last element of the collection that satisfies the given predicate.
-     * @param Closure(CollectionDifferenceChange, int<0, max>=): bool|null $where A closure that takes an element of the collection as its argument and returns a Boolean value indicating whether the element is a match.
+     * @param Closure(CollectionDifferenceChange, int=): bool|null $where A closure that takes an element of the collection as its argument and returns a Boolean value indicating whether the element is a match.
      * @return CollectionDifferenceChange|null The last element of the collection that satisfies predicate or null if there is no element that satisfies predicate.
      */
     #[Override]
@@ -333,7 +333,7 @@ final class CollectionDifference extends ObjectClass implements MutableCollectio
 
     /**
      * Returns a Collection containing, in order, the elements of the collection that satisfy the given predicate.
-     * @param Closure(CollectionDifferenceChange, int<0, max>=, bool=): bool $isIncluded
+     * @param Closure(CollectionDifferenceChange, int=, bool=): bool $isIncluded
      * @return ArrayClass<CollectionDifferenceChange>
      */
     #[Override]
@@ -356,7 +356,7 @@ final class CollectionDifference extends ObjectClass implements MutableCollectio
 
     /**
      * Returns a Boolean value indicating whether every element of a sequence satisfies a given predicate.
-     * @param Closure(CollectionDifferenceChange, int<0, max>=): bool $predicate A closure that takes an element of the sequence as its argument and returns a Boolean value that indicates whether the passed element satisfies a condition.
+     * @param Closure(CollectionDifferenceChange, int=): bool $predicate A closure that takes an element of the sequence as its argument and returns a Boolean value that indicates whether the passed element satisfies a condition.
      * @return bool true if the sequence contains an element that satisfies predicate; otherwise, false.
      */
     #[Override]
@@ -510,7 +510,7 @@ final class CollectionDifference extends ObjectClass implements MutableCollectio
 
     /**
      * Removes all the elements that satisfy the given predicate.
-     * @param Closure(CollectionDifferenceChange, int<0, max>=): bool|null $where A closure that takes an element of the sequence as its argument and returns a Boolean value indicating whether the element should be removed from the collection.
+     * @param Closure(CollectionDifferenceChange, int=): bool|null $where A closure that takes an element of the sequence as its argument and returns a Boolean value indicating whether the element should be removed from the collection.
      */
     #[Override]
     public function removeAll(?Closure $where = null): void

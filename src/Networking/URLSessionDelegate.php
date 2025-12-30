@@ -13,7 +13,7 @@ interface URLSessionDelegate
     /**
      * Tells the URL session that the session has been invalidated. If you invalidate a session by calling its {@see URLSession::finishTasksAndInvalidate()} method, the session waits until after the final task in the session finishes or fails before calling this delegate method. If you call the {@see URLSession::invalidateAndCancel()} method, the session calls this delegate method immediately.
      * @param URLSession $session The session object that was invalidated.
-     * @param Error|null $error The error that caused invalidation, or nil if the invalidation was explicit.
+     * @param Error|null $error The error that caused invalidation, or null if the invalidation was explicit.
      */
     public function urlSessionDidBecomeInvalidWithError(URLSession $session, ?Error $error = null): void;
 

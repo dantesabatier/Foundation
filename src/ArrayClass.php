@@ -133,7 +133,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
 
     /**
      * Returns a Boolean value indicating whether the sequence contains an element that satisfies the given predicate.
-     * @param Closure(Element, int<0, max>): bool $predicate A closure that takes an element of the sequence as its argument and returns a Boolean value that indicates whether the passed element represents a match.
+     * @param Closure(Element, int): bool $predicate A closure that takes an element of the sequence as its argument and returns a Boolean value that indicates whether the passed element represents a match.
      * @return bool true if the sequence contains an element that satisfies predicate; otherwise, false.
      */
     #[Override]
@@ -182,7 +182,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
      * For example, you can use this method on an array of integers to filter adjacent equal entries or count frequencies.
      * @template Result
      * @param Result $initialResult The value to use as the initial accumulating value.
-     * @param Closure(Result, Element, int<0, max>=): Result $updateAccumulatingResult A closure that updates the accumulating value with an element of the sequence.
+     * @param Closure(Result, Element, int=): Result $updateAccumulatingResult A closure that updates the accumulating value with an element of the sequence.
      * @return Result The final accumulated value. If the sequence has no elements, the result is $initialResult.
      */
     #[Override]
@@ -194,7 +194,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
     /**
      * @template Result
      * Returns a Collection containing the results of mapping the given closure over the collection's elements.
-     * @param Closure(Element, int<0, max>): Result $transform
+     * @param Closure(Element, int): Result $transform
      * @return ArrayClass<Result>
      */
     #[Override]
@@ -206,7 +206,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
     /**
      * @template Result
      * Returns a Collection containing the non-null results of calling the given transformation with each element of this collection.
-     * @param Closure(Element, int<0, max>): Result $transform
+     * @param Closure(Element, int): Result $transform
      * @return ArrayClass<Result>
      */
     #[Override]
@@ -218,7 +218,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
     /**
      * @template Result
      * Returns a Collection containing the concatenated results of calling the given transformation with each element of this collection.
-     * @param Closure(Element, int<0, max>=): iterable<Result> $transform
+     * @param Closure(Element, int=): iterable<Result> $transform
      * @return ArrayClass<Result>
      */
     #[Override]
@@ -228,8 +228,36 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
     }
 
     /**
+     * Calls the given closure on each element in the sequence in the same order as a for-in loop.
+     *
+     * The two loops in the following example produce the same output:
+     *
+     * <code>
+     * $numberWords = ["one", "two", "three"]
+     * foreach ($numberWords as $word) {
+     *     print "$word\n";
+     * }
+     * // Prints "one"
+     * // Prints "two"
+     * // Prints "three"
+     * $numberWords->forEach(fn(string $word): void => print "$word\n");
+     * // Same as above
+     * </code>
+     *
+     * You cannot use a break or continue statement to exit the current call of the body closure or skip later calls.
+     * @param Closure(Element, int=): void $body A closure that takes an element of the sequence as a parameter.
+     */
+    #[Override]
+    public function forEach(Closure $body): void
+    {
+        foreach (clone $this as $i => $e) {
+            $body($e, $i);
+        }
+    }
+
+    /**
      * Returns the first element of the collection that satisfies the given predicate.
-     * @param Closure(Element, int<0, max>=): bool|null $where A closure that takes an element of the collection as its argument and returns a Boolean value indicating whether the element is a match.
+     * @param Closure(Element, int=): bool|null $where A closure that takes an element of the collection as its argument and returns a Boolean value indicating whether the element is a match.
      * @return Element|null The first element of the collection that satisfies predicate or null if there is no element that satisfies predicate.
      */
     #[Override]
@@ -240,7 +268,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
 
     /**
      * Returns the last element of the collection that satisfies the given predicate.
-     * @param Closure(Element, int<0, max>=): bool|null $where A closure that takes an element of the collection as its argument and returns a Boolean value indicating whether the element is a match.
+     * @param Closure(Element, int=): bool|null $where A closure that takes an element of the collection as its argument and returns a Boolean value indicating whether the element is a match.
      * @return Element|null The last element of the collection that satisfies predicate or null if there is no element that satisfies predicate.
      */
     #[Override]
@@ -297,7 +325,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
 
     /**
      * Returns a Collection containing, in order, the elements of the collection that satisfy the given predicate.
-     * @param Closure(Element, int<0, max>=, bool=): bool $isIncluded
+     * @param Closure(Element, int=, bool=): bool $isIncluded
      * @return ArrayClass<Element>
      */
     #[Override]
@@ -320,7 +348,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
 
     /**
      * Returns a Boolean value indicating whether every element of a sequence satisfies a given predicate.
-     * @param Closure(Element, int<0, max>=): bool $predicate A closure that takes an element of the sequence as its argument and returns a Boolean value that indicates whether the passed element satisfies a condition.
+     * @param Closure(Element, int=): bool $predicate A closure that takes an element of the sequence as its argument and returns a Boolean value that indicates whether the passed element satisfies a condition.
      * @return bool true if the sequence contains an element that satisfies predicate; otherwise, false.
      */
     #[Override]
@@ -512,7 +540,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
 
     /**
      * Removes all the elements that satisfy the given predicate.
-     * @param Closure(Element, int<0, max>=): bool|null $where A closure that takes an element of the sequence as its argument and returns a Boolean value indicating whether the element should be removed from the collection.
+     * @param Closure(Element, int=): bool|null $where A closure that takes an element of the sequence as its argument and returns a Boolean value indicating whether the element should be removed from the collection.
      */
     #[Override]
     public function removeAll(?Closure $where = null): void

@@ -177,6 +177,13 @@ trait SequenceAlgorithms
         return $instance;
     }
 
+    public function forEach(Closure $body): void
+    {
+        foreach (clone $this as $i => $e) {
+            $body($e, $i);
+        }
+    }
+
     /** @noinspection PhpMixedReturnTypeCanBeReducedInspection */
     #[Override]
     public function jsonSerialize(): mixed

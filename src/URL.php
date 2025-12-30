@@ -422,7 +422,7 @@ final class URL extends ObjectClass
      * @template ResultType
      * Passes the URL's path in the file system representation to a closure.
      * @param Closure(string): ResultType $block A closure to execute, which receives a string as its parameter and returns a value of a type you choose.
-     * The parameter passed to the closure is nil if the URL cannot be represented by the file system. For example, if the URL contains an accented character and the file system only supports ASCII, no file system representation is possible.
+     * The parameter passed to the closure is null if the URL cannot be represented by the file system. For example, if the URL contains an accented character and the file system only supports ASCII, no file system representation is possible.
      * @return ResultType
      */
     public function withUnsafeFileSystemRepresentation(Closure $block)

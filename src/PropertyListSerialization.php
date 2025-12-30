@@ -45,7 +45,7 @@ final class PropertyListSerialization
      * @param PropertyListSerializationFormat|null $format Upon return, contains the format that the property list was stored in.
      * Pass null if you do not need to know the format.
      * @return mixed A property list object corresponding to the representation in data.
-     * If data is not in a supported format, it returns nil.
+     * If data is not in a supported format, it returns null.
      */
     public static function propertyList(string $data, #[ExpectedValues(flagsFromClass: PropertyListSerializationMutabilityOptions::class)] int $options = 0, ?PropertyListSerializationFormat &$format = null): mixed
     {
@@ -58,9 +58,9 @@ final class PropertyListSerialization
      * @param int $options The options used to create the property list.
      * For possible values, see {@see PropertyListSerializationMutabilityOptions}.
      * @param PropertyListSerializationFormat $format Upon return, contains the format that the property list was stored in {@see PropertyListSerializationFormat}.
-     * Pass nil if you do not need to know the format.
+     * Pass null if you do not need to know the format.
      * @return mixed A property list object corresponding to the representation in data.
-     * If data is not in a supported format, it returns nil.
+     * If data is not in a supported format, it returns null.
      */
     public static function propertyListWithURL(URL $url, #[ExpectedValues(flagsFromClass: PropertyListSerializationMutabilityOptions::class)] int $options = 0, PropertyListSerializationFormat $format = PropertyListSerializationFormat::xml): mixed
     {

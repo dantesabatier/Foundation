@@ -20,7 +20,7 @@ interface BidirectionalCollection extends Collection
     /**
      * Returns the last element of the collection that satisfies the given predicate.
      * @param Closure(Element, Index=): bool|null $where A closure that takes an element of the collection as its argument and returns a Boolean value indicating whether the element is a match.
-     * @return Element|null The last element of the collection that satisfies predicate or nil if there is no element that satisfies predicate.
+     * @return Element|null The last element of the collection that satisfies predicate or null if there is no element that satisfies predicate.
      */
     public function last(?Closure $where = null);
 
@@ -41,7 +41,7 @@ interface BidirectionalCollection extends Collection
     /**
      * Returns a random element of the collection, using the given generator as a source for randomness.
      * @param RandomNumberGenerator $generator The random number generator to use when choosing a random element.
-     * @return Element|null A random element from the collection. If the collection is empty, the method returns nil.
+     * @return Element|null A random element from the collection. If the collection is empty, the method returns null.
      */
     public function randomElement(RandomNumberGenerator $generator = new SystemRandomNumberGenerator());
 
@@ -49,7 +49,7 @@ interface BidirectionalCollection extends Collection
      * Returns the last index in which an element of the collection satisfies the given predicate.
      * @param Closure(Element): bool $where A closure that takes an element as its argument and returns a Boolean value that indicates whether the passed element represents a match.
      * @return Index|null The index of the last element for which $where returns true.
-     * If no elements in the collection satisfy the given predicate returns nil.
+     * If no elements in the collection satisfy the given predicate returns null.
      */
     public function lastIndex(Closure $where);
 

@@ -56,7 +56,7 @@ final class FlattenSequence extends ObjectClass implements Sequence, IteratorAgg
      * For example, you can use this method on an array of integers to filter adjacent equal entries or count frequencies.
      * @template Result
      * @param Result $initialResult The value to use as the initial accumulating value.
-     * @param Closure(Result, mixed, int<0, max>=): Result $updateAccumulatingResult A closure that updates the accumulating value with an element of the sequence.
+     * @param Closure(Result, mixed, int=): Result $updateAccumulatingResult A closure that updates the accumulating value with an element of the sequence.
      * @return Result The final accumulated value. If the sequence has no elements, the result is $initialResult.
      */
     #[Override]
@@ -68,7 +68,7 @@ final class FlattenSequence extends ObjectClass implements Sequence, IteratorAgg
     /**
      * @template Result
      * Returns a Collection containing the results of mapping the given closure over the collection's elements.
-     * @param Closure(mixed, int<0, max>=): Result $transform
+     * @param Closure(mixed, int=): Result $transform
      * @return Sequence<int, Result>
      */
     #[Override]
@@ -80,7 +80,7 @@ final class FlattenSequence extends ObjectClass implements Sequence, IteratorAgg
     /**
      * @template Result
      * Returns a Collection containing the non-null results of calling the given transformation with each element of this collection.
-     * @param Closure(mixed, int<0, max>=): Result $transform
+     * @param Closure(mixed, int=): Result $transform
      * @return Sequence<int, Result>
      */
     #[Override]
@@ -92,7 +92,7 @@ final class FlattenSequence extends ObjectClass implements Sequence, IteratorAgg
     /**
      * @template Result
      * Returns a Collection containing the concatenated results of calling the given transformation with each element of this collection.
-     * @param Closure(mixed, int<0, max>=): iterable<Result> $transform
+     * @param Closure(mixed, int=): iterable<Result> $transform
      * @return Sequence<int, Result>
      */
     #[Override]
@@ -102,10 +102,38 @@ final class FlattenSequence extends ObjectClass implements Sequence, IteratorAgg
     }
 
     /**
+     * Calls the given closure on each element in the sequence in the same order as a for-in loop.
+     *
+     * The two loops in the following example produce the same output:
+     *
+     * <code>
+     * $numberWords = ["one", "two", "three"]
+     * foreach ($numberWords as $word) {
+     *     print "$word\n";
+     * }
+     * // Prints "one"
+     * // Prints "two"
+     * // Prints "three"
+     * $numberWords->forEach(fn(string $word): void => print "$word\n");
+     * // Same as above
+     * </code>
+     *
+     * You cannot use a break or continue statement to exit the current call of the body closure or skip later calls.
+     * @param Closure(Element, int=): void $body A closure that takes an element of the sequence as a parameter.
+     */
+    #[Override]
+    public function forEach(Closure $body): void
+    {
+        foreach (clone $this as $i => $e) {
+            $body($e, $i);
+        }
+    }
+
+    /**
      * Returns a Sequence containing, in order, the elements of the sequence that satisfy the given predicate.
      *
      * Complexity: O(n), where n is the length of the sequence.
-     * @param Closure(Element, int<0, max>=, bool=): bool $isIncluded
+     * @param Closure(Element, int=, bool=): bool $isIncluded
      * @return Sequence<int, Element>
      */
     #[Override]

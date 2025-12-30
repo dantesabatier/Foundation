@@ -48,7 +48,7 @@ final class VariableAssignmentExpression extends Expression
     #[Override]
     public function expressionValue(mixed $object = null, ?Dictionary $context = null): mixed
     {
-        assert($context !== null, "Cannot evaluate variable assignment with nil bindings");
+        assert($context !== null, "Cannot evaluate variable assignment with null bindings");
         $value = $this->subexpression->expressionValue($object, $context);
         $context[$this->variable] = $value;
         if (Predicate::$debugDefault) {
