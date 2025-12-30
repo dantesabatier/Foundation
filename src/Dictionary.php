@@ -445,11 +445,11 @@ final class Dictionary extends ObjectClass implements Collection, IteratorAggreg
      *
      * Use the combine closure to select a value to use in the updated dictionary or to combine existing and new values.
      * As the key-values pairs in other are merged with this dictionary, the combine closure is called with the current and new values for any duplicate keys that are encountered.
-     * @param Sequence<string, Element> $other A dictionary to merge.
+     * @param iterable<string, Element> $other An iterable to merge.
      * @param Closure(Element, Element, ?string): Element|null $combine A closure that takes the current and new values for any duplicate keys.
      * The closure returns the desired value for the final dictionary.
      */
-    public function merge(Sequence $other, ?Closure $combine = null): void
+    public function merge(iterable $other, ?Closure $combine = null): void
     {
         foreach ($other as $key => $value) {
             $new = $value;
@@ -465,12 +465,12 @@ final class Dictionary extends ObjectClass implements Collection, IteratorAggreg
 
     /**
      * Creates a dictionary by merging the given dictionary into this dictionary, using a combining closure to determine the value for duplicate keys.
-     * @param Dictionary<Element> $other A dictionary to merge.
+     * @param iterable<string, Element> $other An iterable to merge.
      * @param Closure(Element, Element): Element|null $combine A closure that takes the current and new values for any duplicate keys.
      * The closure returns the desired value for the final dictionary
      * @return Dictionary<Element> A new dictionary with the combined keys and values of this dictionary and other.
      */
-    public function merging(Dictionary $other, ?Closure $combine = null): Dictionary
+    public function merging(iterable $other, ?Closure $combine = null): Dictionary
     {
         $instance = clone $this;
         $instance->merge($other, $combine);
