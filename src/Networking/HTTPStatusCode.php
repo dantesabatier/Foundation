@@ -5,7 +5,7 @@ namespace Sabatier\Foundation\Networking;
 /**
  * This class defines constants for standard HTTP status codes.
  */
-class HTTPStatusCode
+final class HTTPStatusCode
 {
     final const int continue = 100;
     final const int switchingProtocols = 101;

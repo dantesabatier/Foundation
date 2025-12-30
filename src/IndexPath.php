@@ -12,7 +12,7 @@ use Sabatier\Foundation\Predicates\Predicate;
  * @implements MutableCollection<int, int>
  * @implements Iterator<int, int>
  */
-class IndexPath extends ObjectClass implements MutableCollection, Iterator
+final class IndexPath extends ObjectClass implements MutableCollection, Iterator
 {
     use MutableCollectionAlgorithms {
         compare as private sequenceCompare;

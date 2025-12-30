@@ -14,7 +14,7 @@ use const Sabatier\Foundation\UserCancelledError;
  * @psalm-import-type DataCompletionHandler from URLSession
  * @psalm-import-type DownloadCompletionHandler from URLSession
  */
-class ProtocolClient implements URLProtocolClient
+final class ProtocolClient implements URLProtocolClient
 {
     private ?string $cacheableData = null;
     private ?URLResponse $cacheableResponse = null;

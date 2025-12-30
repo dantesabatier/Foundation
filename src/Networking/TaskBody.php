@@ -15,7 +15,7 @@ use const Sabatier\Foundation\URLErrorNoPermissionsToReadFile;
 use const Sabatier\Foundation\URLErrorUnknown;
 
 /** @internal */
-readonly class TaskBody
+final readonly class TaskBody
 {
     private function __construct(public TaskBodyRawValue $rawValue, public ?string $data = null, public ?URL $fileURL = null, public mixed $stream = null)
     {

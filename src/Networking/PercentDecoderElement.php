@@ -3,7 +3,7 @@
 namespace Sabatier\Foundation\Networking;
 
 /** @internal */
-readonly class PercentDecoderElement
+final readonly class PercentDecoderElement
 {
     private function __construct(public PercentDecoderElementRawValue $rawValue, public ?string $character = null, public ?string $byte = null)
     {

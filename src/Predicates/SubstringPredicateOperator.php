@@ -22,7 +22,7 @@ use function Sabatier\Foundation\string_is_equal;
 use function Sabatier\Foundation\typeof;
 
 /** @internal */
-class SubstringPredicateOperator extends StringPredicateOperator
+final class SubstringPredicateOperator extends StringPredicateOperator
 {
     public function __construct(PredicateOperatorType $operatorType, ComparisonPredicateModifier $modifier = ComparisonPredicateModifier::direct, #[ExpectedValues(flagsFromClass: ComparisonPredicateOptions::class)] int $options = ComparisonPredicateOptions::none, public readonly SubstringPredicateOperatorPosition $position = SubstringPredicateOperatorPosition::beginsWith)
     {

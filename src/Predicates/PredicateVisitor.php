@@ -9,7 +9,6 @@
 
 namespace Sabatier\Foundation\Predicates;
 
-/** @internal */
 interface PredicateVisitor
 {
     public function visitPredicate(Predicate $predicate): void;

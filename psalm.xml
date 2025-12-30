@@ -64,7 +64,6 @@
         <InvalidFalsableReturnType errorLevel="suppress"/>
         <UndefinedDocblockClass errorLevel="suppress"/>
         <InvalidOperand errorLevel="suppress"/>
-        <ClassMustBeFinal errorLevel="suppress"/>
         <NoInterfaceProperties errorLevel="suppress"/>
         <TypeDoesNotContainType errorLevel="suppress"/>
         <ForbiddenCode>
@@ -72,5 +71,15 @@
                 <file name="src/StandardAdditions.php"/>
             </errorLevel>
         </ForbiddenCode>
+        <ClassMustBeFinal>
+            <errorLevel type="suppress">
+                <file name="src/ArrayClass.php"/>
+                <file name="src/Error.php"/>
+                <file name="src/InternalInconsistencyException.php"/>
+                <file name="src/Set.php"/>
+                <file name="src/Networking/HTTPURLResponse.php"/>
+                <file name="src/Networking/URLRequest.php"/>
+            </errorLevel>
+        </ClassMustBeFinal>
     </issueHandlers>
 </psalm>

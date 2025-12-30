@@ -6,7 +6,7 @@ use Exception;
 use Override;
 
 /** @internal */
-class UnarchiveFromDataTransformer extends SharedValueTransformer
+final class UnarchiveFromDataTransformer extends SharedValueTransformer
 {
     public string $description {
         get => "<shared UnarchiveFromData transformer>";

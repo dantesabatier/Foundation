@@ -5,7 +5,7 @@ namespace Sabatier\Foundation;
 /**
  * Values representing a file's type attribute {@see FileAttributeKey::type}.
  */
-class FileAttributeType
+final class FileAttributeType
 {
     /** @var string A FIFO special file (a named pipe). */
     final const string fifo = "fifo";

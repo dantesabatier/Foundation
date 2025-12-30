@@ -9,7 +9,7 @@ use function Sabatier\Foundation\human_readable_value;
 use function Sabatier\Foundation\typeof;
 
 /** @internal */
-class KeyPathExpression extends FunctionExpression
+final class KeyPathExpression extends FunctionExpression
 {
     public string $predicateFormat {
         get {

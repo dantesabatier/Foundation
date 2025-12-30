@@ -6,7 +6,7 @@ use Closure;
 use Sabatier\Foundation\ArrayClass;
 
 /** @internal */
-class CacheControlDirectives
+final class CacheControlDirectives
 {
     public ?int $maxAge = null;
     public ?int $sharedMaxAge = null;

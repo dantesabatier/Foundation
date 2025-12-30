@@ -7,7 +7,7 @@ namespace Sabatier\Foundation;
  *
  * These options are used with the {@see FileManager::contentsOfDirectory()} method.
  */
-class DirectoryEnumerationOptions
+final class DirectoryEnumerationOptions
 {
     /** @var int An option to perform a shallow enumeration that doesn't descend into directories. */
     final const int skipsSubdirectoryDescendants = 1 << 0;

@@ -13,7 +13,7 @@ use const Sabatier\Foundation\URLErrorDomain;
 use const Sabatier\Foundation\URLErrorUnknown;
 
 /** @internal */
-class FTPURLProtocol extends NativeProtocol
+final class FTPURLProtocol extends NativeProtocol
 {
     #[Override]
     public static function canInit(URLRequest $request): bool

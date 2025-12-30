@@ -22,7 +22,7 @@ use Traversable;
  * @implements Collection<string, Element>
  * @implements IteratorAggregate<string, Element>
  */
-class Dictionary extends ObjectClass implements Collection, IteratorAggregate
+final class Dictionary extends ObjectClass implements Collection, IteratorAggregate
 {
     use CollectionAlgorithms {
         contains as private sequenceContains;

@@ -2,7 +2,7 @@
 
 namespace Sabatier\Foundation;
 
-class KeyedArchiver
+final class KeyedArchiver
 {
     /**
      * Encodes an object graph with the given root object into a data representation, optionally requiring secure coding.

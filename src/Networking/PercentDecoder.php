@@ -10,7 +10,7 @@ use function Sabatier\Foundation\in_range;
  * @template-implements Iterator<PercentDecoderElement>
  * @internal
  */
-class PercentDecoder implements Iterator
+final class PercentDecoder implements Iterator
 {
     private int $index = 0;
 

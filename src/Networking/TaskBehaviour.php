@@ -9,7 +9,7 @@ use Closure;
  * @psalm-import-type DataCompletionHandler from URLSession
  * @psalm-import-type DownloadCompletionHandler from URLSession
  */
-readonly class TaskBehaviour
+final readonly class TaskBehaviour
 {
     /**
      * @param TaskBehaviourRawValue $rawValue 

@@ -13,7 +13,7 @@ use Sabatier\Foundation\Dictionary;
  * You create a comparison predicate with an operator, a left expression, and a right expression.
  * You represent the expressions using instances of the {@see Expression} class. When you evaluate the predicate, it returns as a BOOL value the result of invoking the operator with the results of evaluating the expressions.
  */
-class ComparisonPredicate extends Predicate
+final class ComparisonPredicate extends Predicate
 {
     private readonly PredicateOperator $predicateOperator;
     /** @var ComparisonPredicateModifier The comparison predicate modifier for the receiver. The default value is {@see ComparisonPredicateModifier::direct}. */

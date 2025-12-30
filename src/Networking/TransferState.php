@@ -6,7 +6,7 @@ use Sabatier\Foundation\URL;
 use function Sabatier\Foundation\fatal_error;
 
 /** @internal */
-class TransferState
+final class TransferState
 {
     public URL $url;
     public ParsedResponseHeader $parsedResponseHeader;

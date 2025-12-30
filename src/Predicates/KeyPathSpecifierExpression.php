@@ -6,7 +6,7 @@ use Override;
 use Sabatier\Foundation\Dictionary;
 
 /** @internal */
-class KeyPathSpecifierExpression extends Expression
+final class KeyPathSpecifierExpression extends Expression
 {
     public string $predicateFormat {
         get {

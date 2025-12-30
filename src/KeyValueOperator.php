@@ -2,7 +2,7 @@
 
 namespace Sabatier\Foundation;
 
-class KeyValueOperator
+final class KeyValueOperator
 {
     /** @var string The @count array operator. */
     final const string countKeyValueOperator = "count";

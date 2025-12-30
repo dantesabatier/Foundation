@@ -10,7 +10,7 @@
 namespace Sabatier\Foundation\Predicates;
 
 /** @internal */
-class PredicateOperatorSymbol
+final class PredicateOperatorSymbol
 {
     final const string lessThan = "<";
     final const string lessThanOrEqualTo = "<=";

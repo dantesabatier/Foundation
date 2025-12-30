@@ -7,7 +7,7 @@ use Sabatier\Foundation\ArrayClass;
 use Sabatier\Foundation\Dictionary;
 
 /** @internal */
-class ExpressionOperator extends Expression
+final class ExpressionOperator extends Expression
 {
     public string $operatorSymbol {
         get => match ($this->operatorType) {

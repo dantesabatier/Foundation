@@ -10,7 +10,7 @@
 namespace Sabatier\Foundation\Predicates;
 
 /** @internal */
-class ExpressionOperatorSymbol
+final class ExpressionOperatorSymbol
 {
     final const string addition = "+";
     final const string subtraction = "-";

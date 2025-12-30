@@ -5,7 +5,7 @@ namespace Sabatier\Foundation;
 /**
  * @internal
  */
-class ArrayConverter
+final class ArrayConverter
 {
     private(set) ArrayClass $array {
         get => $this->array ??= new SequentialArrayStrategy()->convert($this->reserved);

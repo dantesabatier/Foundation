@@ -8,7 +8,7 @@ use Sabatier\Foundation\Dictionary;
 /**
  * A cached response to a URL request.
  */
-class CachedURLResponse
+final class CachedURLResponse
 {
     /** @internal */
     public Date $date;

@@ -2,7 +2,7 @@
 
 namespace Sabatier\Foundation;
 
-class KeyedUnarchiver
+final class KeyedUnarchiver
 {
     /**
      * Decodes a previously archived object graph and returns the root object.

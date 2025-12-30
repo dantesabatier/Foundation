@@ -15,7 +15,7 @@ use Sabatier\Foundation\CompareOptions;
 use function Sabatier\Foundation\string_is_equal;
 
 /** @internal */
-class EqualityPredicateOperator extends PredicateOperator
+final class EqualityPredicateOperator extends PredicateOperator
 {
     public function __construct(PredicateOperatorType $operatorType, ComparisonPredicateModifier $modifier = ComparisonPredicateModifier::direct, #[ExpectedValues(flagsFromClass: ComparisonPredicateOptions::class)] int $options = ComparisonPredicateOptions::none, public readonly bool $isNegation = false)
     {

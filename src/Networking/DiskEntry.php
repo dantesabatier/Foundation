@@ -7,7 +7,7 @@ use Sabatier\Foundation\URL;
 use Sabatier\Foundation\UUID;
 
 /** @internal */
-class DiskEntry
+final class DiskEntry
 {
     final public const string pathExtension = "storedcachedurlresponse";
     private(set) Date $date {

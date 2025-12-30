@@ -5,7 +5,7 @@ namespace Sabatier\Foundation\Networking;
 /**
  * An authentication credential consisting of information specific to the type of credential and the type of persistent storage to use, if any.
  */
-readonly class URLCredential
+final readonly class URLCredential
 {
     /** @var bool A Boolean value that indicates whether the credential has a password. */
     public bool $hasPassword;

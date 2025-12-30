@@ -9,7 +9,7 @@ use function Sabatier\Foundation\human_readable_value;
 use function Sabatier\Foundation\typeof;
 
 /** @internal */
-class VariableAssignmentExpression extends Expression
+final class VariableAssignmentExpression extends Expression
 {
     public string $predicateFormat {
         get => sprintf("%s := %s", $this->assignmentVariable->predicateFormat, $this->subexpression->predicateFormat);

@@ -12,7 +12,7 @@ namespace Sabatier\Foundation;
 /**
  * Keys in dictionaries used to get and set file attributes.
  */
-class FileAttributeKey
+final class FileAttributeKey
 {
     /** @var string The key in a file attribute dictionary whose value indicates whether the file is read-only. */
     final const string appendOnly = "appendOnly";

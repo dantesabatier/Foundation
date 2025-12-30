@@ -17,7 +17,7 @@ use const Sabatier\Foundation\URLErrorFailingURLErrorKey;
 use const Sabatier\Foundation\URLErrorUnsupportedURL;
 
 /** @internal */
-class WebSocketURLProtocol extends HTTPURLProtocol
+final class WebSocketURLProtocol extends HTTPURLProtocol
 {
     #[Override]
     public static function canInit(URLRequest $request): bool

@@ -6,7 +6,7 @@ use CurlHandle;
 use Sabatier\Foundation\OptionSet;
 
 /** @internal */
-class EasyHandlePauseState extends OptionSet
+final class EasyHandlePauseState extends OptionSet
 {
     final const int receivePaused = 1 << 0;
     final const int sendPaused = 1 << 1;

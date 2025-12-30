@@ -10,7 +10,7 @@ use function Sabatier\Foundation\fatal_error;
 use function Sabatier\Foundation\string_compare;
 
 /** @internal */
-class ComparisonPredicateOperator extends PredicateOperator
+final class ComparisonPredicateOperator extends PredicateOperator
 {
     public function __construct(PredicateOperatorType $operatorType, ComparisonPredicateModifier $modifier, #[ExpectedValues(flagsFromClass: ComparisonPredicateOptions::class)] int $options, public readonly PredicateOperatorType $variant)
     {

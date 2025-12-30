@@ -7,7 +7,7 @@ use JetBrains\PhpStorm\ExpectedValues;
 use SplFileInfo;
 
 /** @internal */
-class URLResourceValuesStorage
+final class URLResourceValuesStorage
 {
     private Dictionary $valuesCache;
 

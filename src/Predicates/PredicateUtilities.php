@@ -32,7 +32,7 @@ use function Sabatier\Foundation\substring_to_index;
 use const Sabatier\Foundation\NotFound;
 
 /** @internal */
-class PredicateUtilities
+final class PredicateUtilities
 {
     /** @var Set<string>|null $reservedWords */
     private static ?Set $reservedWords = null;

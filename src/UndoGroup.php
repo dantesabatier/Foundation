@@ -3,7 +3,7 @@
 namespace Sabatier\Foundation;
 
 /** @internal */
-class UndoGroup
+final class UndoGroup
 {
     /** @var ArrayClass<Invocation> */
     private(set) ArrayClass $actions;

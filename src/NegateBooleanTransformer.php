@@ -5,7 +5,7 @@ namespace Sabatier\Foundation;
 use Override;
 
 /** @internal */
-class NegateBooleanTransformer extends SharedValueTransformer
+final class NegateBooleanTransformer extends SharedValueTransformer
 {
     public string $description {
         get => "<shared NegateBoolean transformer>";

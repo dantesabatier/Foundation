@@ -9,7 +9,7 @@ use Override;
  *
  * Number is a subclass of Value that offers a value as any scalar (numeric) type. It defines a set of methods specifically for setting and accessing the value as an int, float, double, or as a BOOL. (Note that number objects do not necessarily preserve the type they are created with.) It also defines a {@see Comparable::compare()} method to determine the ordering of two Number objects.
  */
-class Number extends Value
+final class Number extends Value
 {
     /** @var bool The number object's value expressed as a Boolean value. A 0 value always means false, and any nonzero value is interpreted as true. */
     public bool $boolValue {

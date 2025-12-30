@@ -8,7 +8,7 @@ use Sabatier\Foundation\ObjectClass;
 /**
  * A challenge from a server requiring authentication from the client.
  */
-class URLAuthenticationChallenge extends ObjectClass
+final class URLAuthenticationChallenge extends ObjectClass
 {
     /**
      * Initializes an authentication challenge from parameters you provide.

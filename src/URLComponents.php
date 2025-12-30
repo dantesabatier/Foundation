@@ -5,7 +5,7 @@ namespace Sabatier\Foundation;
 /**
  * A structure that parses URLs into and constructs URLs from their constituent parts.
  */
-class URLComponents extends ObjectClass
+final class URLComponents extends ObjectClass
 {
     /** @var string|null The fragment subcomponent. */
     public ?string $fragment = null;

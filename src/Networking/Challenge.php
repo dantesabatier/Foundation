@@ -10,7 +10,7 @@ use function Sabatier\Foundation\substring_from_index;
 use function Sabatier\Foundation\substring_to_index;
 
 /** @internal */
-class Challenge
+final class Challenge
 {
     public ?string $authenticationMethod {
         get => array_find(URLProtectionSpace::authenticationMethods, fn(string $authenticationMethod): bool => string_has_suffix($authenticationMethod, $this->authScheme, CompareOptions::caseInsensitive));

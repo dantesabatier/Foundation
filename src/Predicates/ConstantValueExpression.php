@@ -8,7 +8,7 @@ use Sabatier\Foundation\Value;
 use function Sabatier\Foundation\human_readable_value;
 
 /** @internal */
-class ConstantValueExpression extends Expression
+final class ConstantValueExpression extends Expression
 {
     public string $predicateFormat {
         get {

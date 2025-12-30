@@ -6,7 +6,7 @@ use Override;
 use Sabatier\Foundation\Dictionary;
 
 /** @internal */
-class SymbolicExpression extends Expression
+final class SymbolicExpression extends Expression
 {
     public string $predicateFormat {
         get => $this->constantValue;

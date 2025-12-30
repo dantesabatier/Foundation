@@ -10,7 +10,7 @@ use JetBrains\PhpStorm\ExpectedValues;
  * The PropertyListSerialization class provides methods that convert a property list to and from several serialized formats.
  * A property list is itself an array or dictionary that contains only data, string, array, dictionary, date, and number objects.
  */
-class PropertyListSerialization
+final class PropertyListSerialization
 {
     /**
      * Returns a Data object containing a given property list in a specified format.

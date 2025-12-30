@@ -7,7 +7,7 @@ namespace Sabatier\Foundation;
  *
  * To request information using one of these keys, pass it to the $keys parameter of the {@see URL::resourceValues()} instance method.
  */
-class URLResourceKey
+final class URLResourceKey
 {
     final const string isApplicationKey = "isApplication";
     /** @var string Key for determining whether the resource is a directory (read-only). */

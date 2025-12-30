@@ -9,7 +9,7 @@
 
 namespace Sabatier\Foundation;
 
-class KeyValueObservedChange
+final class KeyValueObservedChange
 {
     /** @var KeyValueChange A value of KeyValueChange::setting indicates that the observed object has received a setValueForKey() message, or that the key-value-coding-compliant set method for the key has been invoked, or that one of the {@see KeyValueObserving::willChangeValueForKey()} or {@see KeyValueObserving::didChangeValueForKey()} methods has otherwise been invoked. A value of KeyValueChange::insertion, KeyValueChange::removal, or KeyValueChange::replacement indicates that mutating messages have been sent a key-value observing compliant collection proxy, or that one of the key-value-coding-compliant collection mutation methods for the key has been invoked, or a collection will change or did change method has been otherwise been invoked. */
     public KeyValueChange $kind = KeyValueChange::setting;

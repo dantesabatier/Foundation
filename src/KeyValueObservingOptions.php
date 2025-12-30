@@ -14,7 +14,7 @@ namespace Sabatier\Foundation;
  *
  * These constants are passed to {@see KeyValueObserving::addObserver()} and determine the values that are returned as part of the change dictionary passed to an {@see KeyValueObserving::observeValue()}. You can pass 0 if you require no change dictionary values.
  */
-class KeyValueObservingOptions
+final class KeyValueObservingOptions
 {
     /** @var int Indicates that the change dictionary should provide the new attribute value, if applicable. */
     final const int new = 1;

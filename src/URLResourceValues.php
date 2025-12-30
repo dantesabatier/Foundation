@@ -7,7 +7,7 @@ use JetBrains\PhpStorm\ExpectedValues;
 /**
  * The properties supported by file system resources.
  */
-class URLResourceValues extends ObjectClass
+final class URLResourceValues extends ObjectClass
 {
     /** @var bool|null True for directories. */
     public ?bool $isDirectory {

@@ -12,7 +12,7 @@ use Sabatier\Foundation\Predicates\Predicate;
  * @implements MutableCollection<int, CollectionDifferenceChange>
  * @implements Iterator<int, CollectionDifferenceChange>
  */
-class CollectionDifference extends ObjectClass implements MutableCollection, Iterator
+final class CollectionDifference extends ObjectClass implements MutableCollection, Iterator
 {
     use MutableCollectionAlgorithms {
         allSatisfy as private sequenceAllSatisfy;

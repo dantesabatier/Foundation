@@ -3,7 +3,7 @@
 namespace Sabatier\Foundation;
 
 /** @internal */
-readonly class ApplicationPreferences
+final readonly class ApplicationPreferences
 {
     public URL $url;
     public Dictionary $dictionaryRepresentation;

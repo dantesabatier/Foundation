@@ -5,7 +5,7 @@ namespace Sabatier\Foundation;
 /**
  * An interface to the user defaults database, where you store key-value pairs persistently across launches of your app.
  */
-class UserDefaults
+final class UserDefaults
 {
     private static ?UserDefaults $standard = null;
     /** @var Dictionary<ApplicationPreferences>|null */

@@ -5,7 +5,7 @@ namespace Sabatier\Foundation\Networking;
 /**
  * Defines the standard HTTP request methods.
  */
-class HTTPRequestMethod
+final class HTTPRequestMethod
 {
     /** @var string Requests a representation of the specified resource. Requests using GET should only retrieve data. */
     final const string get = "GET";

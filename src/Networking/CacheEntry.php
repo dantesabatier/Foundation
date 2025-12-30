@@ -5,7 +5,7 @@ namespace Sabatier\Foundation\Networking;
 use Sabatier\Foundation\Date;
 
 /** @internal */
-readonly class CacheEntry
+final readonly class CacheEntry
 {
     public Date $date;
     public int $cost;

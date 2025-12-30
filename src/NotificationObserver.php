@@ -10,7 +10,7 @@
 namespace Sabatier\Foundation;
 
 /** @internal */
-class NotificationObserver extends ObjectClass
+final class NotificationObserver extends ObjectClass
 {
     public function __construct(public readonly string $name, public readonly ?object $observer = null, public readonly ?object $observed = null, public readonly mixed $callable = null)
     {

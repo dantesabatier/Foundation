@@ -6,7 +6,7 @@ use Sabatier\Foundation\FileHandle;
 use Sabatier\Foundation\URL;
 
 /** @internal */
-readonly class DataDrain
+final readonly class DataDrain
 {
     private function __construct(public DataDrainRawValue $rawValue = DataDrainRawValue::inMemory, public string $bodyData = "", public ?URL $fileURL = null, public ?FileHandle $fileHandle = null)
     {

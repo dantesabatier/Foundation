@@ -8,7 +8,7 @@ use Sabatier\Foundation\ObjectClass;
 use function Sabatier\Foundation\fatal_error;
 
 /** @internal */
-class URLSessionAuthenticationChallengeSender extends ObjectClass implements URLAuthenticationChallengeSender
+final class URLSessionAuthenticationChallengeSender extends ObjectClass implements URLAuthenticationChallengeSender
 {
     /**
      * @throws Exception

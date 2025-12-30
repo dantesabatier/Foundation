@@ -6,7 +6,7 @@ namespace Sabatier\Foundation\Predicates;
  * These constants describe the possible types of string comparison for {@see ComparisonPredicate}.
  * These options are supported for LIKE as well as all the equality/comparison operators.
  */
-class ComparisonPredicateOptions
+final class ComparisonPredicateOptions
 {
     final const int none = 0;
     /** @var int Case-insensitive. */

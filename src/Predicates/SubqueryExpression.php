@@ -10,7 +10,7 @@ use Sabatier\Foundation\Dictionary;
 use function Sabatier\Foundation\human_readable_value;
 
 /** @internal */
-class SubqueryExpression extends Expression
+final class SubqueryExpression extends Expression
 {
     public string $predicateFormat {
         get => sprintf("SUBQUERY(%s, %s, %s)", $this->collectionExpression->description, $this->variableExpression->description, $this->predicate->description);

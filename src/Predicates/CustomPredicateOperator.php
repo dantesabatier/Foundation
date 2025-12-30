@@ -14,7 +14,7 @@ use function Sabatier\Foundation\fatal_error;
 use function Sabatier\Foundation\typeof;
 
 /** @internal */
-class CustomPredicateOperator extends PredicateOperator
+final class CustomPredicateOperator extends PredicateOperator
 {
     public string $symbol {
         get => $this->selector;

@@ -7,7 +7,7 @@ use Sabatier\Foundation\Dictionary;
 use function Sabatier\Foundation\fatal_error;
 
 /** @internal */
-class AnyKeyExpression extends Expression
+final class AnyKeyExpression extends Expression
 {
     private static ?AnyKeyExpression $default = null;
     public string $predicateFormat {

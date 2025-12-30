@@ -8,7 +8,7 @@ use Override;
 /**
  * An immutable description of how to order a collection of objects based on a property common to all the objects.
  */
-class SortDescriptor extends ObjectClass
+final class SortDescriptor extends ObjectClass
 {
     /** @var SortDescriptor Returns a sort descriptor that reverses the sort order. */
     public SortDescriptor $reversedSortDescriptor {

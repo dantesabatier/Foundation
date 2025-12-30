@@ -10,6 +10,6 @@
 namespace Sabatier\Foundation\Predicates;
 
 /** @internal */
-class LikePredicateOperator extends MatchingPredicateOperator
+final class LikePredicateOperator extends MatchingPredicateOperator
 {
 }

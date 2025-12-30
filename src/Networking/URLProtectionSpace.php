@@ -8,7 +8,7 @@ use function Sabatier\Foundation\human_readable_value;
 /**
  * A server or an area on a server, commonly referred to as a realm, that requires authentication.
  */
-class URLProtectionSpace extends ObjectClass
+final class URLProtectionSpace extends ObjectClass
 {
     final public const array authenticationMethods = [
         URLAuthenticationMethodDefault,

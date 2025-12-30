@@ -9,8 +9,7 @@
 
 namespace Sabatier\Foundation\Predicates;
 
-/** @internal */
-class PredicateVisitorFlags
+final class PredicateVisitorFlags
 {
     final const int expressions = 1;
     final const int operators = 2;

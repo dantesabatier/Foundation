@@ -18,7 +18,7 @@ use Traversable;
  * @implements Collection<int, Element>
  * @implements IteratorAggregate<int, Element>
  */
-class Slice extends ObjectClass implements Collection, IteratorAggregate
+final class Slice extends ObjectClass implements Collection, IteratorAggregate
 {
     use CollectionAlgorithms {
         reduce as private sequenceReduce;

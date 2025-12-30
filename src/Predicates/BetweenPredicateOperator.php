@@ -15,7 +15,7 @@ use function Sabatier\Foundation\in_range;
 use function Sabatier\Foundation\typeof;
 
 /** @internal */
-class BetweenPredicateOperator extends PredicateOperator
+final class BetweenPredicateOperator extends PredicateOperator
 {
     #[Override]
     protected function performPrimitiveOperation(mixed $left, mixed $right): bool

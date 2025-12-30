@@ -6,7 +6,7 @@ use Override;
 use Sabatier\Foundation\Dictionary;
 
 /** @internal */
-class SelfExpression extends Expression
+final class SelfExpression extends Expression
 {
     public string $predicateFormat {
         get => "SELF";

@@ -6,7 +6,7 @@ namespace Sabatier\Foundation;
  * The keys that can appear in the change dictionary.
  * These constants are used as keys in the change dictionary passed to {@see KeyValueObserving::observeValue()}.
  */
-class KeyValueChangeKey
+final class KeyValueChangeKey
 {
     /** @var string If the value of the kindKey entry is KeyValueChange::insertion, KeyValueChange::removal, or KeyValueChange::replacement, the value of this key is an IndexSet object that contains the indexes of the inserted, removed, or replaced objects. */
     final const string indexesKey = "indexesKey";

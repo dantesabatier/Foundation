@@ -5,7 +5,7 @@ namespace Sabatier\Foundation;
 /**
  * A message rendered as an object.
  */
-class Invocation
+final class Invocation
 {
     /** @var string The receiver's selector, or 0 if it hasn't been set. */
     public string $selector = "0";

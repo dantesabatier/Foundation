@@ -10,7 +10,7 @@ use Sabatier\Foundation\Set;
 use function Sabatier\Foundation\human_readable_value;
 
 /** @internal */
-class SetExpression extends Expression
+final class SetExpression extends Expression
 {
     public string $predicateFormat {
         get => $this->left->predicateFormat . match ($this->expressionType) {

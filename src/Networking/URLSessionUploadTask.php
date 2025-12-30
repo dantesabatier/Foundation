@@ -9,6 +9,6 @@
 
 namespace Sabatier\Foundation\Networking;
 
-class URLSessionUploadTask extends URLSessionDataTask
+final class URLSessionUploadTask extends URLSessionDataTask
 {
 }

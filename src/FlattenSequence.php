@@ -18,7 +18,7 @@ use Traversable;
  * @implements Sequence<int, Element>
  * @implements IteratorAggregate<int, Element>
  */
-class FlattenSequence extends ObjectClass implements Sequence, IteratorAggregate
+final class FlattenSequence extends ObjectClass implements Sequence, IteratorAggregate
 {
     use SequenceAlgorithms {
         reduce as private sequenceReduce;

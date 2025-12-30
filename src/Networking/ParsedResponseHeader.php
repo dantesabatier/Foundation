@@ -5,7 +5,7 @@ namespace Sabatier\Foundation\Networking;
 use Closure;
 
 /** @internal */
-readonly class ParsedResponseHeader
+final readonly class ParsedResponseHeader
 {
     private function __construct(public ParsedResponseHeaderRawVale $rawVale, public ResponseHeaderLines $lines)
     {

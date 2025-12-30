@@ -6,7 +6,7 @@ use Closure;
 use Override;
 
 /** @internal */
-class ProgressFraction extends ObjectClass
+final class ProgressFraction extends ObjectClass
 {
     public bool $isIndeterminate {
         get => $this->completed < 0 || $this->total < 0 || ($this->completed == 0 && $this->total == 0);

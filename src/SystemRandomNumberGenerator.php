@@ -9,7 +9,7 @@ use Random\Randomizer;
 /**
  * The system's default source of random data.
  */
-readonly class SystemRandomNumberGenerator implements RandomNumberGenerator
+final readonly class SystemRandomNumberGenerator implements RandomNumberGenerator
 {
     private Randomizer $randomizer;
 

@@ -5,7 +5,7 @@ namespace Sabatier\Foundation\Networking;
 /**
  * Constants for providing task priority hints to a host, used with the {@see URLSessionTask::priority} property.
  */
-class URLSessionTaskPriority
+final class URLSessionTaskPriority
 {
     /** @var float The default URL session task priority, used implicitly for any task you have not prioritized. */
     final const float default = 0.5;

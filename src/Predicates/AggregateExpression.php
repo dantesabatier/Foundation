@@ -9,7 +9,7 @@ use Sabatier\Foundation\Dictionary;
 use function Sabatier\Foundation\human_readable_value;
 
 /** @internal */
-class AggregateExpression extends Expression
+final class AggregateExpression extends Expression
 {
     public string $predicateFormat {
         get => "{{$this->collection->join(", ")}}";

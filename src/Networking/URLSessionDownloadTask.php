@@ -14,7 +14,7 @@ use Closure;
 /**
  * A URL session task that stores downloaded data to a file.
  */
-class URLSessionDownloadTask extends URLSessionTask
+final class URLSessionDownloadTask extends URLSessionTask
 {
     /**
      * Cancels a download and calls a callback with resume data for later use.

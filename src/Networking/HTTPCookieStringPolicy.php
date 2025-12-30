@@ -7,7 +7,7 @@ namespace Sabatier\Foundation\Networking;
  *
  * RFC 6265 defines "same site" as the registerable domain of a URI.
  */
-class HTTPCookieStringPolicy
+final class HTTPCookieStringPolicy
 {
     /** @var string A policy that prohibits a cross-site request from including the cookie. */
     final const string sameSiteStrict = "Strict";

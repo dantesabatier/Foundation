@@ -5,7 +5,7 @@ namespace Sabatier\Foundation;
 /**
  * These values represent the options available to many of the string classes' search and comparison methods.
  */
-class CompareOptions
+final class CompareOptions
 {
     final const int none = 0;
     /** @var int Case-insensitive. */

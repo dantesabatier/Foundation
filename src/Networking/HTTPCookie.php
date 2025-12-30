@@ -19,7 +19,7 @@ use function Sabatier\Foundation\human_readable_value;
  * Version 0: The original cookie format defined by Netscape. Most cookies are in this format.
  * Version 1: The cookie format defined in RFC 6265, HTTP State Management Mechanism.
  */
-class HTTPCookie extends ObjectClass
+final class HTTPCookie extends ObjectClass
 {
     /** @var string The domain of the cookie. If the domain does not start with a dot, then the cookie is only sent to the exact host specified by the domain. If the domain does start with a dot, then the cookie is sent to other hosts in that domain as well, subject to certain restrictions. See RFC 6265 for more detail. */
     public readonly string $domain;

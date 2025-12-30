@@ -77,7 +77,7 @@ abstract class URLSessionTask extends ObjectClass
     public readonly int $taskIdentifier;
     /** @var Error|null An error object that indicates why the task failed. This value is nil if the task is still active or if the transfer is completed successfully. */
     public ?Error $error = null;
-    /** @var URLSessionTaskDelegate|null A delegate specific to the task. This task-specific delegate receives messages from the task before the session's delegate receives them. This is similar to the behavior of the delegate parameter used by the asynchronous methods in URLSession like bytes(for:delegate:) and data(for:delegate:). */
+    /** @var URLSessionTaskDelegate|null A delegate specific to the task. This task-specific delegate receives messages from the task before the session's delegate receives them. */
     public ?URLSessionTaskDelegate $delegate = null;
     /** @var float A best-guess upper bound on the number of bytes the client expects to send. */
     public float $countOfBytesClientExpectsToSend = URLSessionTransferSizeUnknown {

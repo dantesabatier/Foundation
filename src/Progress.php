@@ -11,7 +11,7 @@ use Override;
  * @psalm-type UnpublishingHandler Closure(): void
  * @psalm-type PublishingHandler Closure(Progress): ?UnpublishingHandler
  */
-class Progress extends ObjectClass
+final class Progress extends ObjectClass
 {
     /** @var string A localized description of tracked progress for the receiver. */
     public string $localizedDescription = "";

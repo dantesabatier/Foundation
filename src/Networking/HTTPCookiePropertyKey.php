@@ -5,7 +5,7 @@ namespace Sabatier\Foundation\Networking;
 /**
  * Constants that define the supported keys in a cookie attributes dictionary.
  */
-class HTTPCookiePropertyKey
+final class HTTPCookiePropertyKey
 {
     /** @var string A string containing the comment for the cookie. */
     final const string comment = "Comment";

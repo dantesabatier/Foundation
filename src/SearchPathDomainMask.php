@@ -14,7 +14,7 @@ namespace Sabatier\Foundation;
  *
  * These constants are used by the {@see FileManager::urls()} and {@see FileManager::url()} methods of FileManager.
  */
-class SearchPathDomainMask
+final class SearchPathDomainMask
 {
     /** @var int The user's home directory—the place to install user's personal items (~). */
     final const int user = 1;

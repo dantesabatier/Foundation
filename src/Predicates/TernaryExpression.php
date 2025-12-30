@@ -8,7 +8,7 @@ use Sabatier\Foundation\Dictionary;
 use function Sabatier\Foundation\human_readable_value;
 
 /** @internal */
-class TernaryExpression extends Expression
+final class TernaryExpression extends Expression
 {
     public string $predicateFormat {
         get => sprintf("TERNARY(%s, %s, %s)", $this->predicate, $this->true, $this->false);

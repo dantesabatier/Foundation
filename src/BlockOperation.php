@@ -15,7 +15,7 @@ use Override;
 /**
  * An operation that manages the concurrent execution of one or more blocks.
  */
-class BlockOperation extends Operation
+final class BlockOperation extends Operation
 {
     /** @var ArrayClass<Closure(): void> The blocks associated with the receiver. */
     private(set) ArrayClass $executionBlocks;

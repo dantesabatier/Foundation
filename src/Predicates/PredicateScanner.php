@@ -23,7 +23,7 @@ use function Sabatier\Foundation\substring_to_index;
 use function Sabatier\Foundation\typeof;
 
 /** @internal */
-class PredicateScanner extends Scanner
+final class PredicateScanner extends Scanner
 {
     public ?Predicate $predicate {
         get {

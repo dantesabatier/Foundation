@@ -17,7 +17,7 @@ use function Sabatier\Foundation\string_is_equal;
 use function Sabatier\Foundation\typeof;
 
 /** @internal */
-class InPredicateOperator extends PredicateOperator
+final class InPredicateOperator extends PredicateOperator
 {
     #[Override]
     protected function performPrimitiveOperation(mixed $left, mixed $right): bool

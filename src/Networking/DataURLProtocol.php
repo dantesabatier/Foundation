@@ -11,7 +11,7 @@ use const Sabatier\Foundation\URLErrorBadURL;
 use const Sabatier\Foundation\URLErrorDomain;
 
 /** @internal */
-class DataURLProtocol extends URLProtocol
+final class DataURLProtocol extends URLProtocol
 {
     #[Override]
     public static function canInit(URLRequest $request): bool

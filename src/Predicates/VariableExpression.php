@@ -7,7 +7,7 @@ use Sabatier\Foundation\Dictionary;
 use function Sabatier\Foundation\human_readable_value;
 
 /** @internal */
-class VariableExpression extends Expression
+final class VariableExpression extends Expression
 {
     public string $predicateFormat {
         get => $this->variable;

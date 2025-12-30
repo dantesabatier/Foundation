@@ -8,7 +8,7 @@ use Sabatier\Foundation\ObjectClass;
 use function Sabatier\Foundation\fatal_error;
 
 /** @internal */
-class TaskRegistry extends ObjectClass
+final class TaskRegistry extends ObjectClass
 {
     /** @var Dictionary<URLSessionTask> */
     private(set) Dictionary $allTask;

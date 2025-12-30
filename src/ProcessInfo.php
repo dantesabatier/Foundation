@@ -5,7 +5,7 @@ namespace Sabatier\Foundation;
 /**
  * A collection of information about the current process.
  */
-class ProcessInfo extends ObjectClass
+final class ProcessInfo extends ObjectClass
 {
     private static ?ProcessInfo $processInfo = null;
     /** @var ArrayClass<string> Array of strings with the command-line arguments for the process. This array contains all the information passed in the argv array, including the executable name in the first element. */

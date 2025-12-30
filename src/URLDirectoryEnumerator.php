@@ -16,7 +16,7 @@ use Traversable;
  * @extends DirectoryEnumerator<URL>
  * @internal
  */
-class URLDirectoryEnumerator extends DirectoryEnumerator
+final class URLDirectoryEnumerator extends DirectoryEnumerator
 {
     private readonly RecursiveIteratorIterator $iterator;
     private ?URL $currentURL = null;

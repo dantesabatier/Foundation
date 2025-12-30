@@ -7,7 +7,7 @@ use Sabatier\Foundation\Dictionary;
 use Sabatier\Foundation\URL;
 
 /** @internal */
-class ResponseHeaderLines
+final class ResponseHeaderLines
 {
     public function __construct(private(set) ArrayClass $lines = new ArrayClass())
     {

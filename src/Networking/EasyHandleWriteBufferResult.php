@@ -3,7 +3,7 @@
 namespace Sabatier\Foundation\Networking;
 
 /** @internal */
-readonly class EasyHandleWriteBufferResult
+final readonly class EasyHandleWriteBufferResult
 {
     private function __construct(public EasyHandleWriteBufferResultRawValue $rawValue, public string $bytes = "")
     {

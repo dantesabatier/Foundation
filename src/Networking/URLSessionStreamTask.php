@@ -8,7 +8,7 @@ use Sabatier\Foundation\Error;
 /**
  * A URL session task that is stream-based.
  */
-class URLSessionStreamTask extends URLSessionTask
+final class URLSessionStreamTask extends URLSessionTask
 {
     /**
      * Asynchronously reads a number of bytes from the stream, and calls a handler upon completion.

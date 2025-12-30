@@ -13,7 +13,7 @@ use Traversable;
  * A half-open interval from a lower bound up to, but not including, an upper bound.
  * @implements IteratorAggregate<int, int>
  */
-class Range extends ObjectClass implements ExpressibleByArrayLiteral, IteratorAggregate, Countable
+final class Range extends ObjectClass implements ExpressibleByArrayLiteral, IteratorAggregate, Countable
 {
     /** @var int The number of elements in the collection. */
     public int $count {

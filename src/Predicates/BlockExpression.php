@@ -17,7 +17,7 @@ use Sabatier\Foundation\Dictionary;
 use function Sabatier\Foundation\human_readable_value;
 
 /** @internal */
-class BlockExpression extends Expression
+final class BlockExpression extends Expression
 {
     public string $predicateFormat {
         get {

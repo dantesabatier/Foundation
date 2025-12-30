@@ -5,7 +5,7 @@ namespace Sabatier\Foundation;
 /**
  * The value that indicates that the progress is tracking a file operation.
  */
-class ProgressKindFile extends ProgressKind
+final class ProgressKindFile extends ProgressKind
 {
     /** @var string The progress is tracking the copying of a file from source to destination. */
     final const string copying = "copying";

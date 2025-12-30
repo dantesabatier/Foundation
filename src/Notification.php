@@ -14,7 +14,7 @@ use Override;
 /**
  * A container for information broadcast through a notification center to all registered observers.
  */
-class Notification implements CustomStringConvertible
+final class Notification implements CustomStringConvertible
 {
     public string $description {
         get => sprintf("name = %s object = %s userInfo = %s", $this->name, human_readable_value($this->object), human_readable_value($this->userInfo));

@@ -18,7 +18,7 @@ use const Sabatier\Foundation\URLErrorUnsupportedURL;
 /**
  * A URL session task that communicates over the WebSockets protocol standard.
  */
-class URLSessionWebSocketTask extends URLSessionTask
+final class URLSessionWebSocketTask extends URLSessionTask
 {
     /** @var int The maximum number of bytes to buffer before the receiving call fails with an error. This value includes the sum of all bytes from continuation frames. Receive calls will fail once the task reaches this limit. */
     public int $maximumMessageSize = 1024 * 1024;
@@ -68,7 +68,7 @@ class URLSessionWebSocketTask extends URLSessionTask
      * Reads a WebSocket message once all the frames of the message are available.
      *
      * If the task reaches the {@see maximumMessageSize} while buffering the frames, this call fails with an error.
-     * @param Closure(URLSessionWebSocketTaskMessage|null, Error|null): void $completionHandler A closure that receives two parameters: the WebSocket message, and an Error that indicates an error encountered while receiving the message. The error is nil if no error occurred.
+     * @param Closure(URLSessionWebSocketTaskMessage|null, Error|null): void $completionHandler A closure that receives two parameters: the WebSocket message and an Error that indicates an error encountered while receiving the message. The error is nil if no error occurred.
      */
     public function receive(Closure $completionHandler): void
     {

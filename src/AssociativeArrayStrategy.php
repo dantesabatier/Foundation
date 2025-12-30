@@ -5,7 +5,7 @@ namespace Sabatier\Foundation;
 use Override;
 
 /** @internal */
-class AssociativeArrayStrategy implements ArrayConversionStrategy
+final class AssociativeArrayStrategy implements ArrayConversionStrategy
 {
     #[Override]
     public function convert(array $array): Dictionary

@@ -22,7 +22,7 @@ use const Sabatier\Foundation\kCFBundleNameKey;
 /**
  * A container that manages the storage of cookies.
  */
-class HTTPCookieStorage extends ObjectClass
+final class HTTPCookieStorage extends ObjectClass
 {
     /** @var Dictionary<HTTPCookieStorage>|null */
     private static ?Dictionary $sharedCookieStorages = null;

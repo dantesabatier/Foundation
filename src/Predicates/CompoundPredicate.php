@@ -16,7 +16,7 @@ use function Sabatier\Foundation\fatal_error;
  * An OR predicate with no subpredicates evaluates to false.
  * A compound predicate with one or more subpredicates evaluates to the truth of its subpredicates.
  */
-class CompoundPredicate extends Predicate
+final class CompoundPredicate extends Predicate
 {
     private CompoundPredicateOperator $predicateOperator {
         get => $this->predicateOperator ??= match ($this->compoundPredicateType) {
