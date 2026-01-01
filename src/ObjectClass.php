@@ -358,7 +358,7 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
     public function dictionaryWithValues(ArrayClass $keys): Dictionary
     {
         $reflectionClass = new ReflectionClass($this);
-        $properties = array_reduce(array_filter($reflectionClass->getProperties(ReflectionProperty::IS_PUBLIC), fn(ReflectionProperty $property): bool => (bool)count($property->getAttributes(SensitiveProperty::class))), function (array $initial, ReflectionProperty $property): array {
+        $properties = array_reduce(array_filter($reflectionClass->getProperties(ReflectionProperty::IS_PUBLIC), fn(ReflectionProperty $property): bool => (bool)count($property->getAttributes(Sensitive::class))), function (array $initial, ReflectionProperty $property): array {
             $initial[$property->name] = $property;
             return $initial;
         }, []);
@@ -367,7 +367,7 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
         foreach ($keys as $key) {
             $value = $this->valueForKey($key);
             if (isset($properties[$key])) {
-                $value = new SensitivePropertyValue($value);
+                $value = new SensitiveValue($value);
             }
             $values[$key] = $value;
         }
