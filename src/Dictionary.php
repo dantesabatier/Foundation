@@ -57,7 +57,7 @@ final class Dictionary extends ObjectClass implements Collection, IteratorAggreg
     public Range $indices {
         get => new Range($this->startIndex, $this->endIndex);
     }
-    /** @var Element[] */
+    /** @var array<string, Element> */
     public array $array {
         get => $this->reserved;
     }

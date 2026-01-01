@@ -43,7 +43,7 @@ final class Slice extends ObjectClass implements Collection, IteratorAggregate
     public Range $indices {
         get => $this->bounds;
     }
-    /** @var Element[] */
+    /** @var list<Element> */
     private(set) array $array {
         get => $this->array ??= array_slice($this->base->array, $this->startIndex, $this->endIndex);
     }

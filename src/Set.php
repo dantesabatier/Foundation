@@ -109,7 +109,7 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
     public Range $indices {
         get => new Range($this->startIndex, $this->endIndex);
     }
-    /** @var Element[] */
+    /** @var list<Element> */
     public array $array {
         get => $this->reserved;
     }
@@ -164,7 +164,7 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
 
     /**
      * Returns the maximum element in the sequence.
-     * @return Element|null The sequence's maximum element. If the sequence has no elements, returns null.
+     * @return Element|null The sequence's maximum element. If the sequence has no elements, it returns null.
      */
     #[Override]
     public function max()

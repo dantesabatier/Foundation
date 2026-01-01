@@ -103,7 +103,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
     public Range $indices {
         get => new Range($this->startIndex, $this->endIndex);
     }
-    /** @var Element[] */
+    /** @var list<Element> */
     public array $array {
         get => $this->reserved;
     }

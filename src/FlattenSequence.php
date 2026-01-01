@@ -37,7 +37,7 @@ final class FlattenSequence extends ObjectClass implements Sequence, IteratorAgg
     public mixed $first {
         get => $this->first();
     }
-    /** @var Element[] */
+    /** @var list<Element> */
     public array $array {
         get => iterator_to_array($this);
     }
