@@ -5,7 +5,7 @@ namespace Sabatier\Foundation;
 use JsonSerializable;
 use Override;
 
-class SensitiveValue implements CustomStringConvertible, JsonSerializable
+final class SensitiveValue implements CustomStringConvertible, JsonSerializable
 {
     public string $description {
         get => sprintf("%s(%s)", typeof($this->value), class_name(self::class));
