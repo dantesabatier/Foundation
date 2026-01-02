@@ -105,12 +105,22 @@ function human_readable_value(mixed $value): string
 }
 
 /**
- * Converts a time interval given in seconds into a human-readable string format
- * comprising months, days, hours, minutes, seconds, and milliseconds.
+ * Converts a duration in seconds into a human-readable, comma-separated string of time units.
  *
- * @param float $seconds The time interval in seconds to be converted.
- * @param string $locale The locale to use for number formatting. Defaults to "en_US".
- * @return string A human-readable string describing the given time interval.
+ * This function calculates the duration using a greedy approach, breaking it down from
+ * years to seconds. Any remaining fractional seconds are converted to milliseconds.
+ *
+ * Time definitions used:
+ * - Year: 365 days (31,536,000 seconds)
+ * - Month: 30 days (2,592,000 seconds)
+ *
+ * Note: The primary units (year, month, etc.) are formatted in English (appending 's' for plural),
+ * while the millisecond fallback is currently hardcoded in Spanish ("milisegundos").
+ *
+ * @param float $seconds The time duration in seconds.
+ * @param string $locale The locale used for number formatting within the plural rules (default: "en_US").
+ *
+ * @return string A comma-separated string of time components (e.g., "1 hour, 30 minutes").
  * @throws Exception
  */
 #[Pure]
@@ -128,18 +138,26 @@ function human_readable_time(float $seconds, string $locale = "en_US"): string
     }
     if ($remainder > 0 || $parts === []) {
         $ms = round($remainder * 1000);
-        $parts[] = new MessageFormatter($locale, "{n, plural, =1 {1 milisegundo} other {# milisegundos}}")->format(["n" => $ms]);
+        $parts[] = new MessageFormatter($locale, "{n, plural, =1 {1 millisecond} other {# milliseconds}}")->format(["n" => $ms]);
     }
     return implode(", ", $parts);
 }
 
 /**
- * Converts a size value given in bytes into a human-readable string format
- * comprising bytes, kilobytes, megabytes, or gigabytes.
+ * Converts a size in bytes to a human-readable string.
  *
- * @param float $bytes The size value in bytes to be converted.
- * @param string $locale The locale to use for number formatting. Defaults to "en_US".
- * @return string A human-readable string describing the given size value.
+ * This function calculates the appropriate unit (B, KB, MB, etc.) using a binary base (1024).
+ * It uses PHP's NumberFormatter to ensure the numeric value respects the specific
+ * locale settings (e.g., decimal separators).
+ *
+ * Precision logic:
+ * - Bytes (B): Formatted with 0 decimal places.
+ * - Larger units (KB, MB, etc.): Formatted with fixed 2 decimal places.
+ *
+ * @param float  $bytes  The raw size in bytes to convert.
+ * @param string $locale The locale string used for number formatting (default: "en_US").
+ *
+ * @return string The formatted string including the unit (e.g., "1.50 MB").
  */
 function human_readable_bytes(float $bytes, string $locale = "en_US"): string
 {
@@ -159,6 +177,19 @@ function human_readable_plural(string $string, int|float $number): string
     return sprintf("%s%s", $string, $number === 0 || $number > 1 ? "s" : "");
 }
 
+/**
+ * Pluralizes a given entity string based on the provided count.
+ *
+ * This function uses MessageFormatter to apply pluralization rules.
+ * Note: The current implementation strictly appends an 's' for the plural form
+ * and does not handle irregular plurals (e.g., "child" -> "children").
+ *
+ * @param string $entity The singular name of the entity (e.g., "apple").
+ * @param int|float $count The quantity used to determine whether to pluralize.
+ * @param string $locale The locale string to use for formatting rules (default: "en_US").
+ *
+ * @return string The formatted string (singular or plural).
+ */
 function pluralize(string $entity, int|float $count, string $locale = "en_US"): string
 {
     return MessageFormatter::formatMessage($locale, "{count, plural, one {{$entity}}  other {{$entity}s}}", ["count" => $count]);
