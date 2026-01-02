@@ -4,8 +4,11 @@ namespace Sabatier\Foundation;
 
 use BackedEnum;
 use Closure;
+use Exception;
 use JetBrains\PhpStorm\Deprecated;
 use JetBrains\PhpStorm\Pure;
+use MessageFormatter;
+use NumberFormatter;
 use Stringable;
 
 if (!defined("TARGET_OS_WINDOWS")) {
@@ -105,77 +108,60 @@ function human_readable_value(mixed $value): string
  * Converts a time interval given in seconds into a human-readable string format
  * comprising months, days, hours, minutes, seconds, and milliseconds.
  *
- * @param float $interval The time interval in seconds to be converted.
+ * @param float $seconds The time interval in seconds to be converted.
+ * @param string $locale The locale to use for number formatting. Defaults to "en_US".
  * @return string A human-readable string describing the given time interval.
+ * @throws Exception
  */
 #[Pure]
-function human_readable_time(float $interval): string
+function human_readable_time(float $seconds, string $locale = "en_US"): string
 {
-    $s = (int)$interval % 60;
-    $m = (int)floor(((int)$interval % 3600) / 60);
-    $h = (int)floor(((int)$interval % 86400) / 3600);
-    $d = (int)floor(((int)$interval % 2_592_000) / 86400);
-    $M = (int)floor((int)$interval / 2_592_000);
-    $string = "";
-    if ($M) {
-        $string .= sprintf("%d month%s", $M, ($M > 1) ? "s" : "");
-        $string .= " ";
-        $interval -= $M * 2_592_000;
+    $units = ["year" => 31_536_000, "month" => 2_592_000, "day" => 86400, "hour" => 3600, "minute" => 60, "second" => 1];
+    $parts = [];
+    $remainder = $seconds;
+    foreach ($units as $unit => $value) {
+        if ($remainder >= $value) {
+            $amount = (int)floor($remainder / $value);
+            $remainder -= $amount * $value;
+            $parts[] = new MessageFormatter($locale, "{n, plural, =1 {1 $unit} other {# {$unit}s}}")->format(["n" => $amount]);
+        }
     }
-    if ($d) {
-        $string .= sprintf("%d day%s", $d, ($d > 1) ? "s" : "");
-        $string .= " ";
-        $interval -= $d * 86400;
+    if ($remainder > 0 || $parts === []) {
+        $ms = round($remainder * 1000);
+        $parts[] = new MessageFormatter($locale, "{n, plural, =1 {1 milisegundo} other {# milisegundos}}")->format(["n" => $ms]);
     }
-    if ($h) {
-        $string .= sprintf("%d hour%s", $h, ($h > 1) ? "s" : "");
-        $string .= " ";
-        $interval -= $h * 3600;
-    }
-    if ($m) {
-        $string .= sprintf("%d minute%s", $m, ($m > 1) ? "s" : "");
-        $string .= " ";
-        $interval -= $m * 60;
-    }
-    if ($s) {
-        $string .= sprintf("%d second%s", $s, ($s > 1) ? "s" : "");
-        $string .= " ";
-        $interval -= $s;
-    }
-    return $string . sprintf("%.f milliseconds", $interval);
+    return implode(", ", $parts);
 }
 
 /**
  * Converts a size value given in bytes into a human-readable string format
  * comprising bytes, kilobytes, megabytes, or gigabytes.
  *
- * @param float $value The size value in bytes to be converted.
+ * @param float $bytes The size value in bytes to be converted.
+ * @param string $locale The locale to use for number formatting. Defaults to "en_US".
  * @return string A human-readable string describing the given size value.
  */
-function human_readable_bytes(float $value): string
+function human_readable_bytes(float $bytes, string $locale = "en_US"): string
 {
-    if ($value >= 1 << 30) {
-        return number_format($value / (1 << 30), 2) . " GB";
-    }
-    if ($value >= 1 << 20) {
-        return number_format($value / (1 << 20), 2) . " MB";
-    }
-    if ($value >= 1 << 10) {
-        return number_format($value / (1 << 10), 2) . " KB";
-    }
-    return number_format($value) . " bytes";
+    $units = ["B", "KB", "MB", "GB", "TB", "PB"];
+    $i = $bytes > 0 ? (int)floor(log($bytes, 1024)) : 0;
+    $i = min($i, count($units) - 1);
+    $value = $bytes / pow(1024, $i);
+    $formatter = new NumberFormatter($locale, NumberFormatter::DECIMAL);
+    $formatter->setAttribute(NumberFormatter::MAX_FRACTION_DIGITS, $i === 0 ? 0 : 2);
+    $formatter->setAttribute(NumberFormatter::MIN_FRACTION_DIGITS, $i === 0 ? 0 : 2);
+    return $formatter->format($value) . " " . $units[$i];
 }
 
-/**
- * Converts a string into its plural form based on the provided numeric value.
- *
- * @param string $string The base string to potentially pluralize.
- * @param int|float $number The number that determines whether the string should be pluralized.
- * @return string The string in its appropriate singular or plural form.
- */
+#[Deprecated("since Foundation 0.1, use pluralize() instead", "pluralize(%parametersList%)")]
 function human_readable_plural(string $string, int|float $number): string
 {
     return sprintf("%s%s", $string, $number === 0 || $number > 1 ? "s" : "");
+}
+
+function pluralize(string $entity, int|float $count, string $locale = "en_US"): string
+{
+    return MessageFormatter::formatMessage($locale, "{count, plural, one {{$entity}}  other {{$entity}s}}", ["count" => $count]);
 }
 
 /**
