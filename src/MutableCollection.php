@@ -22,7 +22,7 @@ interface MutableCollection extends BidirectionalCollection
     /**
      * Adds an element to the end of the collection.
      *
-     * Complexity: O(1) on average, over many calls to append() on the same array.
+     * Complexity: O(1), on average, over many calls to append() on the same array.
      * @param Element $element
      */
     public function append(mixed $element): void;
@@ -50,7 +50,7 @@ interface MutableCollection extends BidirectionalCollection
      *
      * Complexity: O(n), where n is the length of the array. If i == endIndex, this method is equivalent to append(_:).
      * @param Element $element The new element to insert into the collection.
-     * @param int $at The position at which to insert the new element. index must be a valid index into the collection.
+     * @param int $at The position at which to insert the new element. `$index` must be a valid index into the collection.
      */
     public function insertAt(mixed $element, int $at): void;
 
@@ -60,9 +60,9 @@ interface MutableCollection extends BidirectionalCollection
      * The new elements are inserted before the element currently at the specified index.
      * If you pass the collection's endIndex property as the index parameter, the new elements are appended to the collection.
      *
-     * Complexity: O(n + m), where n is length of this collection and m is the length of newElements. If i == endIndex, this method is equivalent to appendContentsOf().
+     * Complexity: O(n + m), where n is `count` of this collection and m is the length of newElements. If i == endIndex, this method is equivalent to appendContentsOf().
      * @param iterable<int, Element> $newElements The new elements to insert into the collection.
-     * @param int $at The position at which to insert the new elements. index must be a valid index of the collection.
+     * @param int $at The position at which to insert the new elements. `at` must be a valid index of the collection.
      */
     public function insertContentsOf(iterable $newElements, int $at = NotFound): void;
 
@@ -83,7 +83,7 @@ interface MutableCollection extends BidirectionalCollection
 
     /**
      * Complexity: O(n), where n is the length of the array.
-     * @param int $index The index of the member to remove, position must be a valid index of the collection, and must not be equal to the collection's end index.
+     * @param int $index The index of the member to remove, position must be a valid index of the collection and must not be equal to the collection's end index.
      * @return Element The value that was removed.
      */
     public function removeAt(int $index);
@@ -92,7 +92,7 @@ interface MutableCollection extends BidirectionalCollection
      * Removes the specified number of elements from the beginning of the collection.
      *
      * Complexity: O(n), where n is the length of the collection.
-     * @param int $k The number of elements to remove. k must be greater than or equal to zero, and must be less than or equal to the number of elements in the collection.
+     * @param int $k The number of elements to remove. `k` must be greater than or equal to zero and must be less than or equal to the number of elements in the collection.
      */
     public function removeFirst(int $k): void;
 
@@ -102,7 +102,7 @@ interface MutableCollection extends BidirectionalCollection
      * Attempting to remove more elements than exist in the collection triggers a runtime error.
      *
      * Complexity: O(n), where n is the length of the collection.
-     * @param int $k The number of elements to remove from the collection. k must be greater than or equal to zero and must not exceed the number of elements in the collection.
+     * @param int $k The number of elements to remove from the collection. `k` must be greater than or equal to zero and must not exceed the number of elements in the collection.
      */
     public function removeLast(int $k): void;
 
@@ -118,7 +118,7 @@ interface MutableCollection extends BidirectionalCollection
      * Removes and returns the first element of the collection.
      *
      * Complexity: O(1)
-     * @return Element|null A member of the collection. If the collection is empty, returns null.
+     * @return Element|null A member of the collection. If the collection is empty, it returns null.
      */
     public function popFirst();
 
@@ -126,7 +126,7 @@ interface MutableCollection extends BidirectionalCollection
      * Removes and returns the last element of the collection.
      *
      * Complexity: O(1)
-     * @return Element|null A member of the collection. If the collection is empty, returns null.
+     * @return Element|null A member of the collection. If the collection is empty, it returns null.
      */
     public function popLast();
 
@@ -146,7 +146,7 @@ interface MutableCollection extends BidirectionalCollection
      * If the number of elements to drop exceeds the number of elements in the collection, the result is an empty subsequence.
      *
      * Complexity: O(1) if the collection conforms to RandomAccessCollection; otherwise, O(k), where k is the number of elements to drop from the beginning of the collection.
-     * @param int $k The number of elements to drop from the beginning of the collection. k must be greater than or equal to zero.
+     * @param int $k The number of elements to drop from the beginning of the collection. `k` must be greater than or equal to zero.
      * @return Slice<Element> A subsequence starting after the specified number of elements.
      */
     public function dropFirst(int $k): Slice;
@@ -157,7 +157,7 @@ interface MutableCollection extends BidirectionalCollection
      * If the number of elements to drop exceeds the number of elements in the collection, the result is an empty subsequence.
      *
      * Complexity: O(1) if the collection conforms to RandomAccessCollection; otherwise, O(k), where k is the number of elements to drop.
-     * @param int $k The number of elements to drop off the end of the collection. k must be greater than or equal to zero.
+     * @param int $k The number of elements to drop off the end of the collection. `k` must be greater than or equal to zero.
      * @return Slice<Element> A subsequence that leaves off the specified number of elements at the end.
      */
     public function dropLast(int $k): Slice;

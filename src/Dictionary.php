@@ -9,6 +9,7 @@
 
 namespace Sabatier\Foundation;
 
+use ArrayAccess;
 use ArrayIterator;
 use Closure;
 use IteratorAggregate;
@@ -20,9 +21,10 @@ use Traversable;
  * A collection whose elements are key-value pairs.
  * @template Element
  * @implements Collection<string, Element>
+ * @implements ArrayAccess<string, Element>
  * @implements IteratorAggregate<string, Element>
  */
-final class Dictionary extends ObjectClass implements Collection, IteratorAggregate
+final class Dictionary extends ObjectClass implements Collection, ArrayAccess, IteratorAggregate
 {
     use CollectionAlgorithms {
         contains as private sequenceContains;

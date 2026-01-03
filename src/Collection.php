@@ -9,7 +9,6 @@
 
 namespace Sabatier\Foundation;
 
-use ArrayAccess;
 use Closure;
 
 /**
@@ -17,9 +16,8 @@ use Closure;
  * @template Index of array-key
  * @template Element
  * @template-extends Sequence<Index, Element>
- * @template-extends ArrayAccess<Index, Element>
  */
-interface Collection extends Sequence, ArrayAccess
+interface Collection extends Sequence
 {
     /** @var int The position of the first element in a nonempty collection. */
     public int $startIndex {

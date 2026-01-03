@@ -9,6 +9,7 @@
 
 namespace Sabatier\Foundation;
 
+use ArrayAccess;
 use Closure;
 use Iterator;
 use Override;
@@ -17,10 +18,11 @@ use Sabatier\Foundation\Predicates\Predicate;
 /**
  * An unordered collection of unique elements.
  * @template Element
- * @implements Iterator<int, Element>
  * @implements SetAlgebra<Element>
+ * @implements Iterator<int, Element>
+ * @implements ArrayAccess<int, Element>
  */
-class Set extends ObjectClass implements SetAlgebra, Iterator
+class Set extends ObjectClass implements SetAlgebra, ArrayAccess, Iterator
 {
     use SetAlgebraAlgorithms {
         filter as private sequenceFilter;
@@ -35,10 +37,6 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
         map as private sequenceMap;
         compactMap as private sequenceCompactMap;
         flatMap as private sequenceFlatMap;
-        offsetExists as private collectionOffsetExists;
-        offsetGet as private collectionOffsetGet;
-        offsetSet as private collectionOffsetSet;
-        offsetUnset as private collectionOffsetUnset;
         valueForKey as private collectionValueForKey;
         setValueForKey as private collectionSetValueForKey;
         valueForKeyPath as private collectionValueForKeyPath;
@@ -771,7 +769,7 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
     #[Override]
     public function offsetExists(mixed $offset): bool
     {
-        return $this->collectionOffsetExists($offset);
+        return array_key_exists($offset, $this->reserved);
     }
 
     /**
@@ -781,7 +779,11 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
     #[Override]
     public function offsetGet(mixed $offset): mixed
     {
-        return $this->collectionOffsetGet($offset);
+        assert(is_int($offset), sprintf("Invalid argument: expecting int, \"%s\"(%s) given", human_readable_value($offset), typeof($offset)));
+        if (!$this->offsetExists($offset)) {
+            fatal_error(sprintf("%s %s(%s) index \"%s\" out of bounds [%s...<%s]", $this->debugDescription, __FUNCTION__, $offset, $offset, $this->startIndex, $this->endIndex));
+        }
+        return $this->reserved[$offset];
     }
 
     /**
@@ -791,9 +793,14 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
     #[Override]
     public function offsetSet(mixed $offset, mixed $value): void
     {
-        if (!$this->containsElement($value)) {
-            $this->collectionOffsetSet($offset, $value);
+        if ($this->containsElement($value)) {
+            return;
         }
+        if ($offset === null) {
+            $this->reserved[] = $value;
+            return;
+        }
+        $this->reserved[$offset] = $value;
     }
 
     /**
@@ -802,6 +809,8 @@ class Set extends ObjectClass implements SetAlgebra, Iterator
     #[Override]
     public function offsetUnset(mixed $offset): void
     {
-        $this->collectionOffsetUnset($offset);
+        if ($this->offsetExists($offset)) {
+            unset($this->reserved[$offset]);
+        }
     }
 }

@@ -81,5 +81,13 @@
                 <file name="src/Networking/URLRequest.php"/>
             </errorLevel>
         </ClassMustBeFinal>
+        <RedundantConditionGivenDocblockType>
+            <errorLevel type="suppress">
+                <file name="src/ArrayClass.php"/>
+                <file name="src/CollectionDifference.php"/>
+                <file name="src/IndexPath.php"/>
+                <file name="src/Set.php"/>
+            </errorLevel>
+        </RedundantConditionGivenDocblockType>
     </issueHandlers>
 </psalm>

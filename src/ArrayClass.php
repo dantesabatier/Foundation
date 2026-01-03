@@ -9,6 +9,7 @@
 
 namespace Sabatier\Foundation;
 
+use ArrayAccess;
 use Closure;
 use Hoa\Visitor\Element;
 use Iterator;
@@ -19,9 +20,10 @@ use Sabatier\Foundation\Predicates\Predicate;
  * An ordered, random-access collection.
  * @template Element
  * @implements RangeReplaceableCollection<Element>
+ * @implements ArrayAccess<int, Element>
  * @implements Iterator<int, Element>
  */
-class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iterator
+class ArrayClass extends ObjectClass implements RangeReplaceableCollection, ArrayAccess, Iterator
 {
     use RangeReplaceableCollectionAlgorithms {
         filter as private sequenceFilter;
@@ -36,10 +38,6 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
         map as private sequenceMap;
         compactMap as private sequenceCompactMap;
         flatMap as private sequenceFlatMap;
-        offsetExists as private collectionOffsetExists;
-        offsetGet as private collectionOffsetGet;
-        offsetSet as private collectionOffsetSet;
-        offsetUnset as private collectionOffsetUnset;
         valueForKey as private collectionValueForKey;
         setValueForKey as private collectionSetValueForKey;
         valueForKeyPath as private collectionValueForKeyPath;
@@ -825,7 +823,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
     #[Override]
     public function offsetExists(mixed $offset): bool
     {
-        return $this->collectionOffsetExists($offset);
+        return array_key_exists($offset, $this->reserved);
     }
 
     /**
@@ -835,7 +833,11 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
     #[Override]
     public function offsetGet(mixed $offset): mixed
     {
-        return $this->collectionOffsetGet($offset);
+        assert(is_int($offset), sprintf("Invalid argument: expecting int, \"%s\"(%s) given", human_readable_value($offset), typeof($offset)));
+        if (!$this->offsetExists($offset)) {
+            fatal_error(sprintf("%s %s(%s) index \"%s\" out of bounds [%s...<%s]", $this->debugDescription, __FUNCTION__, $offset, $offset, $this->startIndex, $this->endIndex));
+        }
+        return $this->reserved[$offset];
     }
 
     /**
@@ -845,7 +847,11 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
     #[Override]
     public function offsetSet(mixed $offset, mixed $value): void
     {
-        $this->collectionOffsetSet($offset, $value);
+        if ($offset === null) {
+            $this->reserved[] = $value;
+        } else {
+            $this->reserved[$offset] = $value;
+        }
     }
 
     /**
@@ -854,6 +860,8 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Iter
     #[Override]
     public function offsetUnset(mixed $offset): void
     {
-        $this->collectionOffsetUnset($offset);
+        if ($this->offsetExists($offset)) {
+            unset($this->reserved[$offset]);
+        }
     }
 }

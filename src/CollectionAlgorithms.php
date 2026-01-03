@@ -12,36 +12,6 @@ trait CollectionAlgorithms
 {
     use SequenceAlgorithms;
 
-    public function offsetExists(mixed $offset): bool
-    {
-        return array_key_exists($offset, $this->reserved);
-    }
-
-    public function offsetGet(mixed $offset): mixed
-    {
-        assert(is_int($offset), sprintf("Invalid argument: expecting int, \"%s\"(%s) given", human_readable_value($offset), typeof($offset)));
-        if (!$this->offsetExists($offset)) {
-            fatal_error(sprintf("%s %s(%s) index \"%s\" out of bounds [%s...<%s]", $this->debugDescription, __FUNCTION__, $offset, $offset, $this->startIndex, $this->endIndex));
-        }
-        return $this->reserved[$offset];
-    }
-
-    public function offsetSet(mixed $offset, mixed $value): void
-    {
-        if ($offset === null) {
-            $this->reserved[] = $value;
-        } else {
-            $this->reserved[$offset] = $value;
-        }
-    }
-
-    public function offsetUnset(mixed $offset): void
-    {
-        if ($this->offsetExists($offset)) {
-            unset($this->reserved[$offset]);
-        }
-    }
-
     public function indexAfter(int $i): int
     {
         return $i + 1;

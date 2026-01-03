@@ -6,7 +6,6 @@ use BackedEnum;
 use Closure;
 use Exception;
 use JetBrains\PhpStorm\Deprecated;
-use JetBrains\PhpStorm\Pure;
 use MessageFormatter;
 use NumberFormatter;
 use Stringable;
@@ -123,7 +122,7 @@ function human_readable_value(mixed $value): string
  * @return string A comma-separated string of time components (e.g., "1 hour, 30 minutes").
  * @throws Exception
  */
-#[Pure]
+
 function human_readable_time(float $seconds, string $locale = "en_US"): string
 {
     $units = ["year" => 31_536_000, "month" => 2_592_000, "day" => 86400, "hour" => 3600, "minute" => 60, "second" => 1];
@@ -154,7 +153,7 @@ function human_readable_time(float $seconds, string $locale = "en_US"): string
  * - Bytes (B): Formatted with 0 decimal places.
  * - Larger units (KB, MB, etc.): Formatted with fixed 2 decimal places.
  *
- * @param float  $bytes  The raw size in bytes to convert.
+ * @param float $bytes The raw size in bytes to convert.
  * @param string $locale The locale string used for number formatting (default: "en_US").
  *
  * @return string The formatted string including the unit (e.g., "1.50 MB").
@@ -163,7 +162,7 @@ function human_readable_bytes(float $bytes, string $locale = "en_US"): string
 {
     $units = ["B", "KB", "MB", "GB", "TB", "PB"];
     $i = $bytes > 0 ? (int)floor(log($bytes, 1024)) : 0;
-    $i = min($i, count($units) - 1);
+    $i = max(min($i, count($units) - 1), 0);
     $value = $bytes / pow(1024, $i);
     $formatter = new NumberFormatter($locale, NumberFormatter::DECIMAL);
     $formatter->setAttribute(NumberFormatter::MAX_FRACTION_DIGITS, $i === 0 ? 0 : 2);

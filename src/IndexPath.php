@@ -2,6 +2,7 @@
 
 namespace Sabatier\Foundation;
 
+use ArrayAccess;
 use Closure;
 use Iterator;
 use Override;
@@ -10,9 +11,10 @@ use Sabatier\Foundation\Predicates\Predicate;
 /**
  * A list of indexes that together represent the path to a specific location in a tree of nested arrays.
  * @implements MutableCollection<int, int>
+ * @implements ArrayAccess<int, int>
  * @implements Iterator<int, int>
  */
-final class IndexPath extends ObjectClass implements MutableCollection, Iterator
+final class IndexPath extends ObjectClass implements MutableCollection, ArrayAccess, Iterator
 {
     use MutableCollectionAlgorithms {
         compare as private sequenceCompare;
@@ -24,10 +26,6 @@ final class IndexPath extends ObjectClass implements MutableCollection, Iterator
         min as private sequenceMin;
         max as private sequenceMax;
         reduce as private sequenceReduce;
-        offsetExists as private collectionOffsetExists;
-        offsetGet as private collectionOffsetGet;
-        offsetSet as private collectionOffsetSet;
-        offsetUnset as private collectionOffsetUnset;
         randomElement as private collectionRandomElement;
         firstIndex as private collectionFirstIndex;
         indexOf as private collectionIndexOf;
@@ -612,7 +610,7 @@ final class IndexPath extends ObjectClass implements MutableCollection, Iterator
     #[Override]
     public function offsetExists(mixed $offset): bool
     {
-        return $this->collectionOffsetExists($offset);
+        return array_key_exists($offset, $this->reserved);
     }
 
     /**
@@ -622,7 +620,11 @@ final class IndexPath extends ObjectClass implements MutableCollection, Iterator
     #[Override]
     public function offsetGet(mixed $offset): mixed
     {
-        return $this->collectionOffsetGet($offset);
+        assert(is_int($offset), sprintf("Invalid argument: expecting int, \"%s\"(%s) given", human_readable_value($offset), typeof($offset)));
+        if (!$this->offsetExists($offset)) {
+            fatal_error(sprintf("%s %s(%s) index \"%s\" out of bounds [%s...<%s]", $this->debugDescription, __FUNCTION__, $offset, $offset, $this->startIndex, $this->endIndex));
+        }
+        return $this->reserved[$offset];
     }
 
     /**
@@ -632,7 +634,11 @@ final class IndexPath extends ObjectClass implements MutableCollection, Iterator
     #[Override]
     public function offsetSet(mixed $offset, mixed $value): void
     {
-        $this->collectionOffsetSet($offset, $value);
+        if ($offset === null) {
+            $this->reserved[] = $value;
+        } else {
+            $this->reserved[$offset] = $value;
+        }
     }
 
     /**
@@ -641,7 +647,9 @@ final class IndexPath extends ObjectClass implements MutableCollection, Iterator
     #[Override]
     public function offsetUnset(mixed $offset): void
     {
-        $this->collectionOffsetUnset($offset);
+        if ($this->offsetExists($offset)) {
+            unset($this->reserved[$offset]);
+        }
     }
 
     #[Override]

@@ -2,6 +2,7 @@
 
 namespace Sabatier\Foundation;
 
+use ArrayAccess;
 use Closure;
 use Iterator;
 use Override;
@@ -10,9 +11,10 @@ use Sabatier\Foundation\Predicates\Predicate;
 /**
  * A collection of insertions and removals that describe the difference between two ordered collection states.
  * @implements MutableCollection<int, CollectionDifferenceChange>
+ * @implements ArrayAccess<int, CollectionDifferenceChange>
  * @implements Iterator<int, CollectionDifferenceChange>
  */
-final class CollectionDifference extends ObjectClass implements MutableCollection, Iterator
+final class CollectionDifference extends ObjectClass implements MutableCollection, ArrayAccess, Iterator
 {
     use MutableCollectionAlgorithms {
         allSatisfy as private sequenceAllSatisfy;
@@ -23,10 +25,6 @@ final class CollectionDifference extends ObjectClass implements MutableCollectio
         min as private sequenceMin;
         max as private sequenceMax;
         reduce as private sequenceReduce;
-        offsetExists as private collectionOffsetExists;
-        offsetGet as private collectionOffsetGet;
-        offsetSet as private collectionOffsetSet;
-        offsetUnset as private collectionOffsetUnset;
         randomElement as private collectionRandomElement;
         firstIndex as private collectionFirstIndex;
         lastIndex as private collectionLastIndex;
@@ -606,7 +604,7 @@ final class CollectionDifference extends ObjectClass implements MutableCollectio
     #[Override]
     public function offsetExists(mixed $offset): bool
     {
-        return $this->collectionOffsetExists($offset);
+        return array_key_exists($offset, $this->reserved);
     }
 
     /**
@@ -616,7 +614,11 @@ final class CollectionDifference extends ObjectClass implements MutableCollectio
     #[Override]
     public function offsetGet(mixed $offset): mixed
     {
-        return $this->collectionOffsetGet($offset);
+        assert(is_int($offset), sprintf("Invalid argument: expecting int, \"%s\"(%s) given", human_readable_value($offset), typeof($offset)));
+        if (!$this->offsetExists($offset)) {
+            fatal_error(sprintf("%s %s(%s) index \"%s\" out of bounds [%s...<%s]", $this->debugDescription, __FUNCTION__, $offset, $offset, $this->startIndex, $this->endIndex));
+        }
+        return $this->reserved[$offset];
     }
 
     /**
@@ -626,7 +628,11 @@ final class CollectionDifference extends ObjectClass implements MutableCollectio
     #[Override]
     public function offsetSet(mixed $offset, mixed $value): void
     {
-        $this->collectionOffsetSet($offset, $value);
+        if ($offset === null) {
+            $this->reserved[] = $value;
+        } else {
+            $this->reserved[$offset] = $value;
+        }
     }
 
     /**
@@ -635,7 +641,9 @@ final class CollectionDifference extends ObjectClass implements MutableCollectio
     #[Override]
     public function offsetUnset(mixed $offset): void
     {
-        $this->collectionOffsetUnset($offset);
+        if ($this->offsetExists($offset)) {
+            unset($this->reserved[$offset]);
+        }
     }
 
     #[Override]
