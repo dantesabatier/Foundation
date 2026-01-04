@@ -78,25 +78,18 @@ trait BidirectionalCollectionAlgorithms
     public function difference(Collection $other, ?Closure $areEquivalent = null): CollectionDifference
     {
         $areEquivalent ??= is_equal(...);
-        /** @var ArrayClass<CollectionDifferenceChange> $removals */
-        $removals = new ArrayClass();
-        /** @var ArrayClass<CollectionDifferenceChange> $insertions */
-        $insertions = new ArrayClass();
+        /** @var ArrayClass<CollectionDifferenceChange> $changes */
+        $changes = new ArrayClass();
         foreach ($other as $index => $item) {
-            if (!$this->contains(fn(mixed $change): bool => $areEquivalent($change, $item))) {
-                $removals[] = new CollectionDifferenceChange(CollectionDifferenceChangeType::remove, $item, $index);
+            if (!$this->contains(fn(mixed $element): bool => $areEquivalent($element, $item))) {
+                $changes[] = new CollectionDifferenceChange(CollectionDifferenceChangeType::remove, $item, $index);
             }
         }
         foreach ($this as $index => $item) {
-            if (!$other->contains(fn(mixed $change): bool => $areEquivalent($change, $item))) {
-                $insertions[] = new CollectionDifferenceChange(CollectionDifferenceChangeType::insert, $item, $index);
+            if (!$other->contains(fn(mixed $element): bool => $areEquivalent($element, $item))) {
+                $changes[] = new CollectionDifferenceChange(CollectionDifferenceChangeType::insert, $item, $index);
             }
         }
-        $insertions->sort(fn(CollectionDifferenceChange $a, CollectionDifferenceChange $b): int => $a->offset <=> $b->offset);
-        $removals->sort(fn(CollectionDifferenceChange $a, CollectionDifferenceChange $b): int => $b->offset <=> $a->offset);
-        foreach ($insertions as $item) {
-            $removals[] = $item;
-        }
-        return new CollectionDifference($removals);
+        return new CollectionDifference($changes);
     }
 }
