@@ -545,7 +545,7 @@ class Set extends ObjectClass implements SetAlgebra, ArrayAccess, Iterator
      *
      * If an element equal to newElement is already contained in the collection, this method has no effect.
      * @param Element $newElement An element to insert into the collection.
-     * @return array{inserted: bool, elementAfterInsert: Element} (true, newElement) if newElement was not contained in the collection. If an element equal to newElement was already contained in the collection, the method returns (false, oldElement), where oldElement is the element that was equal to newElement. In some cases, oldElement may be distinguishable from newElement by identity comparison or some other means.
+     * @return array{inserted: bool, elementAfterInsert: Element} (true, newElement) if `newElement` was not contained in the collection. If an element equal to `newElement` was already contained in the collection, the method returns (false, oldElement), where oldElement is the element that was equal to `newElement`. In some cases, oldElement may be distinguishable from `newElement` by identity comparison or some other means.
      */
     #[Override]
     public function insert(mixed $newElement): array
@@ -555,9 +555,10 @@ class Set extends ObjectClass implements SetAlgebra, ArrayAccess, Iterator
 
     /**
      * Inserts the given element into the collection unconditionally.
-     * If an element equal to newElement is already contained in the collection, newElement replaces the existing element.
+     *
+     * If an element equal to `element` is already contained in the collection, `element` replaces the existing element.
      * @param Element $element An element to insert into the collection.
-     * @return Element|null An element equal to newElement if the collection already contained such a member; otherwise, null.
+     * @return Element|null An element equal to `element` if the collection already contained such a member; otherwise, null.
      */
     #[Override]
     public function update(mixed $element)
