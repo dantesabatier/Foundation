@@ -567,7 +567,7 @@ class Set extends ObjectClass implements SetAlgebra, ArrayAccess, Iterator
 
     /**
      * Removes the given element and any elements subsumed by the given element.
-     * 
+     *
      * @param Element $element
      */
     #[Override]
