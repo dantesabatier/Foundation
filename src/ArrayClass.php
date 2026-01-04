@@ -27,11 +27,11 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Arra
 {
     use RangeReplaceableCollectionAlgorithms {
         filter as private sequenceFilter;
+        filtered as private sequenceFiltered;
         allSatisfy as private sequenceAllSatisfy;
         contains as private sequenceContains;
         containsElement as private sequenceContainsElement;
         first as private sequenceFirst;
-        last as private sequenceLast;
         min as private sequenceMin;
         max as private sequenceMax;
         reduce as private sequenceReduce;
@@ -41,14 +41,14 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Arra
         valueForKey as private collectionValueForKey;
         setValueForKey as private collectionSetValueForKey;
         valueForKeyPath as private collectionValueForKeyPath;
-        randomElement as private collectionRandomElement;
         firstIndex as private collectionFirstIndex;
-        lastIndex as private collectionLastIndex;
         indexOf as private collectionIndexOf;
-        filtered as private collectionFiltered;
         sort as private collectionSort;
         sorted as private collectionSorted;
         joined as private collectionJoined;
+        last as private bidirectionalCollectionLast;
+        lastIndex as private bidirectionalCollectionLastIndex;
+        randomElement as private bidirectionalCollectionRandomElement;
         reverse as private bidirectionalCollectionReverse;
         reversed as private bidirectionalCollectionReversed;
         difference as private bidirectionalCollectionDifference;
@@ -272,7 +272,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Arra
     #[Override]
     public function last(?Closure $where = null)
     {
-        return $this->sequenceLast($where);
+        return $this->bidirectionalCollectionLast($where);
     }
 
     /**
@@ -296,7 +296,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Arra
     #[Override]
     public function lastIndex(Closure $where): ?int
     {
-        return $this->collectionLastIndex($where);
+        return $this->bidirectionalCollectionLastIndex($where);
     }
 
     /**
@@ -318,7 +318,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Arra
     #[Override]
     public function randomElement(RandomNumberGenerator $generator = new SystemRandomNumberGenerator())
     {
-        return $this->collectionRandomElement($generator);
+        return $this->bidirectionalCollectionRandomElement($generator);
     }
 
     /**
@@ -341,7 +341,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Arra
     #[Override]
     public function filtered(Predicate $predicate): ArrayClass
     {
-        return $this->collectionFiltered($predicate);
+        return $this->sequenceFiltered($predicate);
     }
 
     /**

@@ -30,7 +30,6 @@ class Set extends ObjectClass implements SetAlgebra, ArrayAccess, Iterator
         contains as private sequenceContains;
         containsElement as private sequenceContainsElement;
         first as private sequenceFirst;
-        last as private sequenceLast;
         min as private sequenceMin;
         max as private sequenceMax;
         reduce as private sequenceReduce;
@@ -40,14 +39,15 @@ class Set extends ObjectClass implements SetAlgebra, ArrayAccess, Iterator
         valueForKey as private collectionValueForKey;
         setValueForKey as private collectionSetValueForKey;
         valueForKeyPath as private collectionValueForKeyPath;
-        randomElement as private collectionRandomElement;
         firstIndex as private collectionFirstIndex;
-        lastIndex as private collectionLastIndex;
         indexOf as private collectionIndexOf;
-        filtered as private collectionFiltered;
+        filtered as private sequenceFiltered;
         sort as private collectionSort;
         sorted as private collectionSorted;
         joined as private collectionJoined;
+        last as private bidirectionalCollectionLast;
+        lastIndex as private bidirectionalCollectionLastIndex;
+        randomElement as private bidirectionalCollectionRandomElement;
         reverse as private bidirectionalCollectionReverse;
         reversed as private bidirectionalCollectionReversed;
         append as private mutableCollectionAppend;
@@ -268,7 +268,7 @@ class Set extends ObjectClass implements SetAlgebra, ArrayAccess, Iterator
     #[Override]
     public function last(?Closure $where = null)
     {
-        return $this->sequenceLast($where);
+        return $this->bidirectionalCollectionLast($where);
     }
 
     /**
@@ -292,7 +292,7 @@ class Set extends ObjectClass implements SetAlgebra, ArrayAccess, Iterator
     #[Override]
     public function lastIndex(Closure $where): ?int
     {
-        return $this->collectionLastIndex($where);
+        return $this->bidirectionalCollectionLastIndex($where);
     }
 
     /**
@@ -314,7 +314,7 @@ class Set extends ObjectClass implements SetAlgebra, ArrayAccess, Iterator
     #[Override]
     public function randomElement(RandomNumberGenerator $generator = new SystemRandomNumberGenerator())
     {
-        return $this->collectionRandomElement($generator);
+        return $this->bidirectionalCollectionRandomElement($generator);
     }
 
     /**
@@ -337,7 +337,7 @@ class Set extends ObjectClass implements SetAlgebra, ArrayAccess, Iterator
     #[Override]
     public function filtered(Predicate $predicate): Set
     {
-        return $this->collectionFiltered($predicate);
+        return $this->sequenceFiltered($predicate);
     }
 
     /**

@@ -27,14 +27,14 @@ use Traversable;
 final class Dictionary extends ObjectClass implements Collection, ArrayAccess, IteratorAggregate
 {
     use CollectionAlgorithms {
+        filter as private sequenceFilter;
+        filtered as private sequenceFiltered;
         contains as private sequenceContains;
         containsElement as private sequenceContainsElement;
         first as private sequenceFirst;
         min as private sequenceMin;
         max as private sequenceMax;
         reduce as private sequenceReduce;
-        filter as private sequenceFilter;
-        filtered as private collectionFiltered;
         sorted as private collectionSorted;
         allSatisfy as private sequenceAllSatisfy;
         joined as private collectionJoined;
@@ -393,7 +393,7 @@ final class Dictionary extends ObjectClass implements Collection, ArrayAccess, I
     #[Override]
     public function filtered(Predicate $predicate): Dictionary
     {
-        return $this->collectionFiltered($predicate);
+        return $this->sequenceFiltered($predicate);
     }
 
     /**

@@ -26,15 +26,15 @@ final class IndexPath extends ObjectClass implements MutableCollection, ArrayAcc
         min as private sequenceMin;
         max as private sequenceMax;
         reduce as private sequenceReduce;
-        randomElement as private collectionRandomElement;
         firstIndex as private collectionFirstIndex;
         indexOf as private collectionIndexOf;
-        filtered as private collectionFiltered;
+        filtered as private sequenceFiltered;
         sort as private collectionSort;
         sorted as private collectionSorted;
         joined as private collectionJoined;
         lastIndex as private bidirectionalCollectionLastIndex;
         last as private bidirectionalCollectionLast;
+        randomElement as private bidirectionalCollectionRandomElement;
         reverse as private bidirectionalCollectionReverse;
         reversed as private bidirectionalCollectionReversed;
         append as private mutableCollectionAppend;
@@ -299,7 +299,7 @@ final class IndexPath extends ObjectClass implements MutableCollection, ArrayAcc
     #[Override]
     public function randomElement(RandomNumberGenerator $generator = new SystemRandomNumberGenerator()): ?int
     {
-        return $this->collectionRandomElement($generator);
+        return $this->bidirectionalCollectionRandomElement($generator);
     }
 
     /**
@@ -322,7 +322,7 @@ final class IndexPath extends ObjectClass implements MutableCollection, ArrayAcc
     #[Override]
     public function filtered(Predicate $predicate): IndexPath
     {
-        return $this->collectionFiltered($predicate);
+        return $this->sequenceFiltered($predicate);
     }
 
     /**
