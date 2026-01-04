@@ -70,12 +70,38 @@ function typeof(mixed $value): string
 }
 
 /**
- * Converts a given value to a human-readable string representation.
+ * Converts any value to a human-readable string representation.
  *
- * @param mixed $value The value to be converted can be of any type (e.g., scalar, array, object, null, etc.).
- * @return string A string representation of the provided value in a human-readable format.
+ * This function recursively converts values of any type into a string format
+ * suitable for debugging and logging purposes. It handles primitives, arrays,
+ * objects, and special types with appropriate formatting.
+ *
+ * @param mixed $value The value to convert to a readable string
+ * @param int $depth Current recursion depth (used internally for nested structures)
+ * @param int $maxDepth Maximum recursion depth to prevent stack overflow (default: 10)
+ *
+ * @return string A human-readable string representation of the value
+ *
+ * Type-specific behavior:
+ * - null: Returns "null"
+ * - bool: Returns "true" or "false"
+ * - string: Returns the string as-is
+ * - int/float: Converts to string representation
+ * - array: Formats as "[key1: value1, key2: value2, ...]" (recursive)
+ * - Stringable objects: Uses the __toString() method
+ * - BackedEnum: Returns "ClassName::CASE_NAME"
+ * - Other objects: Returns the class name
+ * - Resources/other: Returns the debug type name
+ *
+ * <code>
+ *  human_readable_value(null); // "null"
+ *  human_readable_value(true); // "true"
+ *  human_readable_value([1, 2, 3]); // "[0: 1, 1: 2, 2: 3]"
+ *  human_readable_value(["a" => "b"]); // "[a: b]"
+ *  human_readable_value(Status::Active); // "Status::Active"
+ * </code>
  */
-function human_readable_value(mixed $value): string
+function human_readable_value(mixed $value, int $depth = 0, int $maxDepth = 10): string
 {
     if (is_string($value)) {
         return $value;
@@ -86,11 +112,11 @@ function human_readable_value(mixed $value): string
     if (is_bool($value)) {
         return $value ? "true" : "false";
     }
-    if (is_array($value)) {
-        return "[" . implode(", ", array_map(fn(mixed $index, mixed $element): string => sprintf("%s: %s", $index, human_readable_value($element)), array_keys($value), array_values($value))) . "]";
-    }
-    if (is_scalar($value)) {
+    if (is_numeric($value)) {
         return (string)$value;
+    }
+    if (is_array($value)) {
+        return human_readable_array($value, $depth, $maxDepth);
     }
     if (is_object($value)) {
         if ($value instanceof Stringable) {
@@ -101,6 +127,41 @@ function human_readable_value(mixed $value): string
         }
     }
     return typeof($value);
+}
+
+
+/**
+ * Converts an array to a human-readable string representation.
+ *
+ * This is a helper function for human_readable_value() that handles array
+ * formatting specifically. It recursively processes nested arrays up to
+ * the specified maximum depth.
+ *
+ * @param array $value The array to convert
+ * @param int $depth Current recursion depth
+ * @param int $maxDepth Maximum recursion depth allowed
+ *
+ * @return string Formatted `array` as "[key1: value1, key2: value2, ...]"
+ *
+ * Special cases:
+ * - Empty arrays: Returns "[]"
+ * - Max depth reached: Returns "[max depth]"
+ * - Nested arrays: Recursively formats with incremented depth
+ * Examples:
+ * <code>
+ *  human_readable_array([]); // "[]"
+ *  human_readable_array([1, 2]); // "[0: 1, 1: 2]"
+ *  human_readable_array(["x" => ["y" => 1]]); // "[x: [y: 1]]"
+ * </code>
+ *
+ * @internal This function is primarily used by human_readable_value()
+ */
+function human_readable_array(array $value, int $depth, int $maxDepth): string
+{
+    if (empty($value)) {
+        return "[]";
+    }
+    return "[" . implode(", ", array_map(fn(mixed $key, mixed $element): string => sprintf("%s: %s", is_string($key) ? $key : (string)$key, human_readable_value($element, $depth + 1, $maxDepth)), array_keys($value), array_values($value))) . "]";
 }
 
 /**
