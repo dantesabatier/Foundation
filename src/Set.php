@@ -626,11 +626,11 @@ class Set extends ObjectClass implements SetAlgebra, ArrayAccess, Iterator
 
     /**
      * Returns a new set with the elements of both this and the given set.
-     * @param SetAlgebra<Element> $other A sequence of elements. $other must be finite.
+     * @param iterable<Element> $other A sequence of elements. $other must be finite.
      * @return Set<Element> A new set with the unique elements of this set and other.
      */
     #[Override]
-    public function union(SetAlgebra $other): Set
+    public function union(iterable $other): Set
     {
         return $this->setAlgebraUnion($other);
     }
@@ -639,10 +639,10 @@ class Set extends ObjectClass implements SetAlgebra, ArrayAccess, Iterator
      * Inserts the elements of the given sequence into the set.
      * If the set already contains one or more elements that are also in other, the existing members are kept.
      * If $other contains multiple instances of equivalent elements, only the first instance is kept.
-     * @param SetAlgebra<Element> $other A sequence of elements. $other must be finite.
+     * @param iterable<Element> $other A sequence of elements. $other must be finite.
      */
     #[Override]
-    public function formUnion(SetAlgebra $other): void
+    public function formUnion(iterable $other): void
     {
         $this->setAlgebraFormUnion($other);
     }

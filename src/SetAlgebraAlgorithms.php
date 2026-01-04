@@ -36,16 +36,18 @@ trait SetAlgebraAlgorithms
         return $this->first(fn(mixed $e): bool => is_equal($e, $element));
     }
 
-    public function union(SetAlgebra $other): self
+    public function union(iterable $other): self
     {
         $instance = clone $this;
         $instance->formUnion($other);
         return $instance;
     }
 
-    public function formUnion(SetAlgebra $other): void
+    public function formUnion(iterable $other): void
     {
-        $this->appendContentsOf($other);
+        foreach ($other as $element) {
+            $this->append($element);
+        }
     }
 
     public function intersection(SetAlgebra $other): self
