@@ -50,10 +50,7 @@ class Set extends ObjectClass implements SetAlgebra, ArrayAccess, Iterator
         randomElement as private bidirectionalCollectionRandomElement;
         reverse as private bidirectionalCollectionReverse;
         reversed as private bidirectionalCollectionReversed;
-        insert as private mutableCollectionInsert;
         insertAt as private mutableCollectionInsertAt;
-        update as private mutableCollectionUpdate;
-        remove as private mutableCollectionRemove;
         removeAt as private mutableCollectionRemoveAt;
         removeFirst as private mutableCollectionRemoveFirst;
         removeLast as private mutableCollectionRemoveLast;
@@ -63,6 +60,9 @@ class Set extends ObjectClass implements SetAlgebra, ArrayAccess, Iterator
         dropLast as private mutableCollectionDropLast;
         popFirst as private mutableCollectionPopFirst;
         popLast as private mutableCollectionPopLast;
+        insert as private setAlgebraInsert;
+        update as private setAlgebraUpdate;
+        remove as private setAlgebraRemove;
         member as private setAlgebraMember;
         union as private setAlgebraUnion;
         formUnion as private setAlgebraFormUnion;
@@ -433,19 +433,6 @@ class Set extends ObjectClass implements SetAlgebra, ArrayAccess, Iterator
     }
 
     /**
-     * Inserts the given element in the collection if it is not already present.
-     *
-     * If an element equal to newElement is already contained in the collection, this method has no effect.
-     * @param Element $newElement An element to insert into the collection.
-     * @return array{inserted: bool, elementAfterInsert: Element} (true, newElement) if newElement was not contained in the collection. If an element equal to newElement was already contained in the collection, the method returns (false, oldElement), where oldElement is the element that was equal to newElement. In some cases, oldElement may be distinguishable from newElement by identity comparison or some other means.
-     */
-    #[Override]
-    public function insert(mixed $newElement): array
-    {
-        return $this->mutableCollectionInsert($newElement);
-    }
-
-    /**
      * Inserts the value into the collection at the specified position.
      *
      * The new element is inserted before the element currently at the specified index.
@@ -459,28 +446,6 @@ class Set extends ObjectClass implements SetAlgebra, ArrayAccess, Iterator
         if (!$this->containsElement($element)) {
             $this->mutableCollectionInsertAt($element, $at);
         }
-    }
-
-    /**
-     * Inserts the given element into the collection unconditionally.
-     * If an element equal to newElement is already contained in the collection, newElement replaces the existing element.
-     * @param Element $element An element to insert into the collection.
-     * @return Element|null An element equal to newElement if the collection already contained such a member; otherwise, null.
-     */
-    #[Override]
-    public function update(mixed $element)
-    {
-        return $this->mutableCollectionUpdate($element);
-    }
-
-    /**
-     * Removes the given element and any elements subsumed by the given element.
-     * @param Element $element
-     */
-    #[Override]
-    public function remove(mixed $element): void
-    {
-        $this->mutableCollectionRemove($element);
     }
 
     /**
@@ -573,6 +538,41 @@ class Set extends ObjectClass implements SetAlgebra, ArrayAccess, Iterator
     public function dropLast(int $k): Slice
     {
         return $this->mutableCollectionDropLast($k);
+    }
+
+    /**
+     * Inserts the given element in the collection if it is not already present.
+     *
+     * If an element equal to newElement is already contained in the collection, this method has no effect.
+     * @param Element $newElement An element to insert into the collection.
+     * @return array{inserted: bool, elementAfterInsert: Element} (true, newElement) if newElement was not contained in the collection. If an element equal to newElement was already contained in the collection, the method returns (false, oldElement), where oldElement is the element that was equal to newElement. In some cases, oldElement may be distinguishable from newElement by identity comparison or some other means.
+     */
+    #[Override]
+    public function insert(mixed $newElement): array
+    {
+        return $this->setAlgebraInsert($newElement);
+    }
+
+    /**
+     * Inserts the given element into the collection unconditionally.
+     * If an element equal to newElement is already contained in the collection, newElement replaces the existing element.
+     * @param Element $element An element to insert into the collection.
+     * @return Element|null An element equal to newElement if the collection already contained such a member; otherwise, null.
+     */
+    #[Override]
+    public function update(mixed $element)
+    {
+        return $this->setAlgebraUpdate($element);
+    }
+
+    /**
+     * Removes the given element and any elements subsumed by the given element.
+     * @param Element $element
+     */
+    #[Override]
+    public function remove(mixed $element): void
+    {
+        $this->setAlgebraRemove($element);
     }
 
     /**
