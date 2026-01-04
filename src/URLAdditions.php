@@ -3,14 +3,44 @@
 namespace Sabatier\Foundation;
 
 /**
- * Validates if a given URL matches allowed schemes.
+ * Checks if a string looks like a valid URL with a supported scheme.
  *
- * @param string $url The URL to be validated.
- * @return bool Returns true if the URL matches the allowed schemes, otherwise false.
+ * This is a lightweight pre-validation check to determine if a string
+ * is worth parsing as a URL. It only validates that the string starts
+ * with a recognized URL scheme followed by "://".
+ *
+ * This does NOT perform full URL validation - use parse_url() or your
+ * URL object constructor after this check passes to validate the
+ * complete URL structure.
+ *
+ * @param string $url The string to check
+ *
+ * @return bool True if the string starts with a supported scheme
+ *
+ * Supported schemes:
+ *  - Web: http, https, ws, wss
+ *  - File transfer: ftp, ftps, sftp, ssh, file
+ *  - Data: data
+ *  - Databases: sql, redis, mongodb, postgresql, mysql
+ *  - Network: tcp, ssl
+ *  - Message queues: amqp, amqps
+ *  - Directory services: ldap, ldaps
+ *  - Version control: git
+ *  - PHP streams: php
+ *  - Platform-specific: x-coredata (macOS/iOS Core Data)
+ *
+ * <code>
+ *  is_parseable_url("https://example.com"); // true
+ *  is_parseable_url("sql://localhost:3306"); // true
+ *  is_parseable_url("php://input"); // true
+ *  is_parseable_url("x-coredata://data"); // true
+ *  is_parseable_url("not-a-url"); // false
+ *  is_parseable_url("javascript:alert(1)"); // false
+ * </code>
  */
-function url_validate(string $url): bool
+function is_parseable_url(string $url): bool
 {
-    return preg_match("/^(https?|file|data|sql|ssl|tcp|ftps?|wss?|php|x-coredata):\/\//", $url) === 1;
+    return preg_match("/^(https?|ftps?|wss?|sftp|ssh|file|data|sql|redis|mongodb|postgresql|mysql|ssl|tcp|amqps?|ldaps?|php|git|x-coredata):\\/\\//", $url) === 1;
 }
 
 /**
