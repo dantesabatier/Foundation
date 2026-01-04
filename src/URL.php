@@ -188,7 +188,7 @@ final class URL extends ObjectClass
                     $string = $proposed;
                 }
             }
-            if (!url_validate($string)) {
+            if (!is_parseable_url($string)) {
                 fatal_error("Invalid argument: expecting url string, \"$string\" given");
             }
         }
