@@ -11,31 +11,10 @@ trait MutableCollectionAlgorithms
 {
     use BidirectionalCollectionAlgorithms;
 
-    public function append(mixed $element): void
-    {
-        $this->reserved[] = $element;
-    }
-
-    public function appendContentsOf(iterable $newElements): void
-    {
-        $this->insertContentsOf($newElements);
-    }
-
     public function insertAt(mixed $element, int $at): void
     {
         array_splice($this->reserved, $at, 0, [$element]);
         ksort($this->reserved);
-    }
-
-    public function insertContentsOf(iterable $newElements, int $at = NotFound): void
-    {
-        foreach ($newElements as $idx => $element) {
-            if ($at !== NotFound) {
-                $this->insertAt($element, $at + $idx);
-            } else {
-                $this->append($element);
-            }
-        }
     }
 
     public function remove(mixed $element): void

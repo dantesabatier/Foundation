@@ -52,10 +52,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Arra
         reverse as private bidirectionalCollectionReverse;
         reversed as private bidirectionalCollectionReversed;
         difference as private bidirectionalCollectionDifference;
-        append as private mutableCollectionAppend;
-        appendContentsOf as private mutableCollectionAppendContentsOf;
         insertAt as private mutableCollectionInsertAt;
-        insertContentsOf as private mutableCollectionInsertContentsOf;
         remove as private mutableCollectionRemove;
         removeAt as private mutableCollectionRemoveAt;
         removeFirst as private mutableCollectionRemoveFirst;
@@ -444,22 +441,44 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Arra
 
     /**
      * Adds an element to the end of the collection.
+     *
+     * Complexity: O(1), on average, over many calls to append() on the same array.
      * @param Element $element
      */
-    #[Override]
     public function append(mixed $element): void
     {
-        $this->mutableCollectionAppend($element);
+        $this->reserved[] = $element;
+    }
+
+    /**
+     * Inserts the elements of a sequence into the collection at the specified position.
+     *
+     * The new elements are inserted before the element currently at the specified index.
+     * If you pass the collection's endIndex property as the index parameter, the new elements are appended to the collection.
+     *
+     * Complexity: O(n + m), where n is `count` of this collection and m is the length of newElements. If i == endIndex, this method is equivalent to appendContentsOf().
+     * @param iterable<int, Element> $newElements The new elements to insert into the collection.
+     * @param int $at The position at which to insert the new elements. `at` must be a valid index of the collection.
+     */
+    public function insertContentsOf(iterable $newElements, int $at = NotFound): void
+    {
+        foreach ($newElements as $idx => $element) {
+            if ($at !== NotFound) {
+                $this->insertAt($element, $at + $idx);
+            } else {
+                $this->append($element);
+            }
+        }
     }
 
     /**
      * Adds the elements of a sequence or collection to the end of this collection.
+     *
      * @param iterable<Element> $newElements
      */
-    #[Override]
     public function appendContentsOf(iterable $newElements): void
     {
-        $this->mutableCollectionAppendContentsOf($newElements);
+        $this->insertContentsOf($newElements);
     }
 
     /**
@@ -484,19 +503,6 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Arra
     public function insertAt(mixed $element, int $at): void
     {
         $this->mutableCollectionInsertAt($element, $at);
-    }
-
-    /**
-     * Inserts the elements of a sequence into the collection at the specified position.
-     * The new elements are inserted before the element currently at the specified index.
-     * If you pass the collection's endIndex property as the index parameter, the new elements are appended to the collection.
-     * @param iterable<int, Element> $newElements The new elements to insert into the collection.
-     * @param int $at The position at which to insert the new elements. $at must be a valid index of the collection.
-     */
-    #[Override]
-    public function insertContentsOf(iterable $newElements, int $at = NotFound): void
-    {
-        $this->mutableCollectionInsertContentsOf($newElements, $at);
     }
 
     /**

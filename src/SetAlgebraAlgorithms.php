@@ -46,7 +46,7 @@ trait SetAlgebraAlgorithms
     public function formUnion(iterable $other): void
     {
         foreach ($other as $element) {
-            $this->append($element);
+            $this->insert($element);
         }
     }
 
@@ -79,7 +79,7 @@ trait SetAlgebraAlgorithms
             if ($this->containsElement($member)) {
                 $this->remove($member);
             } else {
-                $this->append($member);
+                $this->insert($member);
             }
         }
     }

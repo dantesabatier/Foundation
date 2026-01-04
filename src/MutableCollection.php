@@ -20,20 +20,6 @@ use Closure;
 interface MutableCollection extends BidirectionalCollection
 {
     /**
-     * Adds an element to the end of the collection.
-     *
-     * Complexity: O(1), on average, over many calls to append() on the same array.
-     * @param Element $element
-     */
-    public function append(mixed $element): void;
-
-    /**
-     * Adds the elements of a sequence or collection to the end of this collection.
-     * @param iterable<Element> $newElements
-     */
-    public function appendContentsOf(iterable $newElements): void;
-
-    /**
      * Inserts the value into the collection at the specified position.
      *
      * The new element is inserted before the element currently at the specified index.
@@ -44,18 +30,6 @@ interface MutableCollection extends BidirectionalCollection
      * @param int $at The position at which to insert the new element. `$index` must be a valid index into the collection.
      */
     public function insertAt(mixed $element, int $at): void;
-
-    /**
-     * Inserts the elements of a sequence into the collection at the specified position.
-     *
-     * The new elements are inserted before the element currently at the specified index.
-     * If you pass the collection's endIndex property as the index parameter, the new elements are appended to the collection.
-     *
-     * Complexity: O(n + m), where n is `count` of this collection and m is the length of newElements. If i == endIndex, this method is equivalent to appendContentsOf().
-     * @param iterable<int, Element> $newElements The new elements to insert into the collection.
-     * @param int $at The position at which to insert the new elements. `at` must be a valid index of the collection.
-     */
-    public function insertContentsOf(iterable $newElements, int $at = NotFound): void;
 
     /**
      * Removes the given element and any elements subsumed by the given element.

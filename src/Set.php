@@ -50,11 +50,8 @@ class Set extends ObjectClass implements SetAlgebra, ArrayAccess, Iterator
         randomElement as private bidirectionalCollectionRandomElement;
         reverse as private bidirectionalCollectionReverse;
         reversed as private bidirectionalCollectionReversed;
-        append as private mutableCollectionAppend;
-        appendContentsOf as private mutableCollectionAppendContentsOf;
         insert as private mutableCollectionInsert;
         insertAt as private mutableCollectionInsertAt;
-        insertContentsOf as private mutableCollectionInsertContentsOf;
         update as private mutableCollectionUpdate;
         remove as private mutableCollectionRemove;
         removeAt as private mutableCollectionRemoveAt;
@@ -123,7 +120,7 @@ class Set extends ObjectClass implements SetAlgebra, ArrayAccess, Iterator
         if ($elements instanceof Set) {
             $this->reserved = $elements->array;
         } else {
-            $this->appendContentsOf($elements);
+            $this->formUnion($elements);
         }
     }
 
@@ -436,28 +433,6 @@ class Set extends ObjectClass implements SetAlgebra, ArrayAccess, Iterator
     }
 
     /**
-     * Adds an element to the end of the collection.
-     * @param Element $element
-     */
-    #[Override]
-    public function append(mixed $element): void
-    {
-        if (!$this->containsElement($element)) {
-            $this->mutableCollectionAppend($element);
-        }
-    }
-
-    /**
-     * Adds the elements of a sequence or collection to the end of this collection.
-     * @param iterable<Element> $newElements
-     */
-    #[Override]
-    public function appendContentsOf(iterable $newElements): void
-    {
-        $this->mutableCollectionAppendContentsOf($newElements);
-    }
-
-    /**
      * Inserts the given element in the collection if it is not already present.
      *
      * If an element equal to newElement is already contained in the collection, this method has no effect.
@@ -484,19 +459,6 @@ class Set extends ObjectClass implements SetAlgebra, ArrayAccess, Iterator
         if (!$this->containsElement($element)) {
             $this->mutableCollectionInsertAt($element, $at);
         }
-    }
-
-    /**
-     * Inserts the elements of a sequence into the collection at the specified position.
-     * The new elements are inserted before the element currently at the specified index.
-     * If you pass the collection's endIndex property as the index parameter, the new elements are appended to the collection.
-     * @param iterable<int, Element> $newElements The new elements to insert into the collection.
-     * @param int $at The position at which to insert the new elements. $at must be a valid index of the collection.
-     */
-    #[Override]
-    public function insertContentsOf(iterable $newElements, int $at = NotFound): void
-    {
-        $this->mutableCollectionInsertContentsOf($newElements, $at);
     }
 
     /**

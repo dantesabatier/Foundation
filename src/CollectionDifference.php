@@ -35,10 +35,7 @@ final class CollectionDifference extends ObjectClass implements MutableCollectio
         randomElement as private bidirectionalCollectionRandomElement;
         reverse as private bidirectionalCollectionReverse;
         reversed as private bidirectionalCollectionReversed;
-        append as private mutableCollectionAppend;
-        appendContentsOf as private mutableCollectionAppendContentsOf;
         insertAt as private mutableCollectionInsertAt;
-        insertContentsOf as private mutableCollectionInsertContentsOf;
         remove as private mutableCollectionRemove;
         removeAt as private mutableCollectionRemoveAt;
         removeFirst as private mutableCollectionRemoveFirst;
@@ -104,7 +101,9 @@ final class CollectionDifference extends ObjectClass implements MutableCollectio
         } elseif (is_array($elements)) {
             $this->reserved = is_sequential($elements) ? $elements : array_values($elements);
         } else {
-            $this->appendContentsOf($elements);
+            foreach ($elements as $element) {
+                $this->append($element);
+            }
         }
     }
 
@@ -416,20 +415,9 @@ final class CollectionDifference extends ObjectClass implements MutableCollectio
      * Adds an element to the end of the collection.
      * @param CollectionDifferenceChange $element
      */
-    #[Override]
     public function append(mixed $element): void
     {
-        $this->mutableCollectionAppend($element);
-    }
-
-    /**
-     * Adds the elements of a sequence or collection to the end of this collection.
-     * @param iterable<CollectionDifferenceChange> $newElements
-     */
-    #[Override]
-    public function appendContentsOf(iterable $newElements): void
-    {
-        $this->mutableCollectionAppendContentsOf($newElements);
+        $this->reserved[] = $element;
     }
 
     /**
@@ -454,19 +442,6 @@ final class CollectionDifference extends ObjectClass implements MutableCollectio
     public function insertAt(mixed $element, int $at): void
     {
         $this->mutableCollectionInsertAt($element, $at);
-    }
-
-    /**
-     * Inserts the elements of a sequence into the collection at the specified position.
-     * The new elements are inserted before the element currently at the specified index.
-     * If you pass the collection's endIndex property as the index parameter, the new elements are appended to the collection.
-     * @param iterable<int, CollectionDifferenceChange> $newElements The new elements to insert into the collection.
-     * @param int $at The position at which to insert the new elements. $at must be a valid index of the collection.
-     */
-    #[Override]
-    public function insertContentsOf(iterable $newElements, int $at = NotFound): void
-    {
-        $this->mutableCollectionInsertContentsOf($newElements, $at);
     }
 
     /**
