@@ -40,7 +40,7 @@ trait SequenceAlgorithms
         if (!$other instanceof Sequence) {
             fatal_error(sprintf("Invalid argument: expecting %s, \"%s\" given", Sequence::class, typeof($other)));
         }
-        return ComparisonResult::from($this->count() <=> $other->count());
+        return ComparisonResult::from($this->count <=> $other->count);
     }
 
     #[Override]
@@ -101,10 +101,13 @@ trait SequenceAlgorithms
 
     public function first(?Closure $where = null): mixed
     {
-        foreach (clone $this as $i => $e) {
-            if ($where === null) {
+        if ($where === null) {
+            foreach (clone $this as $e) {
                 return $e;
             }
+            return null;
+        }
+        foreach (clone $this as $i => $e) {
             if ($where($e, $i)) {
                 return $e;
             }
