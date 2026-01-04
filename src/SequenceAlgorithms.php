@@ -151,7 +151,7 @@ trait SequenceAlgorithms
     {
         $instance = new self();
         foreach (clone $this as $i => $e) {
-            $instance->append($transform($e, $i));
+            $instance[] = $transform($e, $i);
         }
         return $instance;
     }
@@ -162,7 +162,7 @@ trait SequenceAlgorithms
         foreach (clone $this as $i => $e) {
             $r = $transform($e, $i);
             if ($r !== null) {
-                $instance->append($r);
+                $instance[] = $r;
             }
         }
         return $instance;
@@ -172,7 +172,9 @@ trait SequenceAlgorithms
     {
         $instance = new self();
         foreach (clone $this as $i => $e) {
-            $instance->appendContentsOf($transform($e, $i));
+            foreach ($transform($e, $i) as $item) {
+                $instance[] = $item;
+            }
         }
         return $instance;
     }

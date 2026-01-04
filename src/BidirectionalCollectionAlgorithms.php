@@ -84,16 +84,19 @@ trait BidirectionalCollectionAlgorithms
         $insertions = new ArrayClass();
         foreach ($other as $index => $item) {
             if (!$this->contains(fn(mixed $change): bool => $areEquivalent($change, $item))) {
-                $removals->append(new CollectionDifferenceChange(CollectionDifferenceChangeType::remove, $item, $index));
+                $removals[] = new CollectionDifferenceChange(CollectionDifferenceChangeType::remove, $item, $index);
             }
         }
         foreach ($this as $index => $item) {
             if (!$other->contains(fn(mixed $change): bool => $areEquivalent($change, $item))) {
-                $insertions->append(new CollectionDifferenceChange(CollectionDifferenceChangeType::insert, $item, $index));
+                $insertions[] = new CollectionDifferenceChange(CollectionDifferenceChangeType::insert, $item, $index);
             }
         }
-        $changes = $removals->sorted([new SortDescriptor("offset", false)]);
-        $changes->appendContentsOf($insertions->sorted([new SortDescriptor("offset", true)]));
-        return new CollectionDifference($changes);
+        $insertions->sort(fn(CollectionDifferenceChange $a, CollectionDifferenceChange $b): int => $a->offset <=> $b->offset);
+        $removals->sort(fn(CollectionDifferenceChange $a, CollectionDifferenceChange $b): int => $b->offset <=> $a->offset);
+        foreach ($insertions as $item) {
+            $removals[] = $item;
+        }
+        return new CollectionDifference($removals);
     }
 }

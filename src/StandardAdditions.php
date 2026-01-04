@@ -414,7 +414,7 @@ function localized_string(string $string, string $domain = "Localizable", string
         }
         if ($resourcesURL === null) {
             $frameworks = new Set(Bundle::allFrameworks());
-            $frameworks->append(Bundle::bundleForClass(FileManager::class));
+            $frameworks->insert(Bundle::bundleForClass(FileManager::class));
             foreach ($frameworks as $bundle) {
                 $potentialURL = $bundle->bundleURL->appendingPathComponent("Resources");
                 if ($fileManager->fileExists($potentialURL->path, $isDirectory) && $isDirectory) {
