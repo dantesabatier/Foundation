@@ -9,6 +9,28 @@ trait SetAlgebraAlgorithms
 {
     use MutableCollectionAlgorithms;
 
+    public function insert(mixed $newElement): array
+    {
+        $oldElement = $this->first(fn(mixed $e): bool => is_equal($e, $newElement));
+        if ($oldElement === null) {
+            $this[] = $newElement;
+            return ["inserted" => true, "elementAfterInsert" => $newElement];
+        }
+        return ["inserted" => false, "elementAfterInsert" => $oldElement];
+    }
+
+    public function update(mixed $element)
+    {
+        $index = $this->indexOf($element);
+        if ($index !== null) {
+            $member = $this[$index];
+            $this->reserved[$index] = $element;
+            return $member;
+        }
+        $this[] = $element;
+        return null;
+    }
+
     public function member(mixed $element): mixed
     {
         return $this->first(fn(mixed $e): bool => is_equal($e, $element));

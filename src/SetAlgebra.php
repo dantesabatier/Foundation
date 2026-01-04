@@ -17,6 +17,24 @@ namespace Sabatier\Foundation;
 interface SetAlgebra extends MutableCollection
 {
     /**
+     * Inserts the given element in the collection if it is not already present.
+     *
+     * If an element equal to newElement is already contained in the collection, this method has no effect.
+     * @param Element $newElement An element to insert into the collection.
+     * @return array{inserted: bool, elementAfterInsert: Element} (true, newElement) if newElement was not contained in the collection. If an element equal to newElement was already contained in the collection, the method returns (false, oldElement), where oldElement is the element that was equal to newElement. In some cases, oldElement may be distinguishable from newElement by identity comparison or some other means.
+     */
+    public function insert(mixed $newElement): array;
+
+    /**
+     * Inserts the given element into the collection unconditionally.
+     *
+     * If an element equal to newElement is already contained in the collection, newElement replaces the existing element.
+     * @param Element $element An element to insert into the collection.
+     * @return Element|null An element equal to newElement if the collection already contained such a member; otherwise, null.
+     */
+    public function update(mixed $element);
+
+    /**
      * Returns a new set with the elements of both this and the given set.
      *
      * Complexity: O(n + m), where n is the length of this set and m is the length of `$other`.

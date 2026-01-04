@@ -21,16 +21,6 @@ trait MutableCollectionAlgorithms
         $this->insertContentsOf($newElements);
     }
 
-    public function insert(mixed $newElement): array
-    {
-        $oldElement = $this->first(fn(mixed $e): bool => is_equal($e, $newElement));
-        if ($oldElement === null) {
-            $this[] = $newElement;
-            return ["inserted" => true, "elementAfterInsert" => $newElement];
-        }
-        return ["inserted" => false, "elementAfterInsert" => $oldElement];
-    }
-
     public function insertAt(mixed $element, int $at): void
     {
         array_splice($this->reserved, $at, 0, [$element]);
@@ -46,18 +36,6 @@ trait MutableCollectionAlgorithms
                 $this->append($element);
             }
         }
-    }
-
-    public function update(mixed $element)
-    {
-        $index = $this->indexOf($element);
-        if ($index !== null) {
-            $member = $this[$index];
-            $this->reserved[$index] = $element;
-            return $member;
-        }
-        $this[] = $element;
-        return null;
     }
 
     public function remove(mixed $element): void

@@ -4,6 +4,6 @@ namespace Sabatier\Foundation;
 
 use RuntimeException;
 
-class GenericException extends RuntimeException
+final class GenericException extends RuntimeException
 {
 }

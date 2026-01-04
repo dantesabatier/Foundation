@@ -37,10 +37,8 @@ final class CollectionDifference extends ObjectClass implements MutableCollectio
         reversed as private bidirectionalCollectionReversed;
         append as private mutableCollectionAppend;
         appendContentsOf as private mutableCollectionAppendContentsOf;
-        insert as private mutableCollectionInsert;
         insertAt as private mutableCollectionInsertAt;
         insertContentsOf as private mutableCollectionInsertContentsOf;
-        update as private mutableCollectionUpdate;
         remove as private mutableCollectionRemove;
         removeAt as private mutableCollectionRemoveAt;
         removeFirst as private mutableCollectionRemoveFirst;
@@ -445,19 +443,6 @@ final class CollectionDifference extends ObjectClass implements MutableCollectio
     }
 
     /**
-     * Inserts the given element in the collection if it is not already present.
-     *
-     * If an element equal to newElement is already contained in the collection, this method has no effect.
-     * @param CollectionDifferenceChange $newElement An element to insert into the collection.
-     * @return array{inserted: bool, elementAfterInsert: CollectionDifferenceChange} (true, newElement) if newElement was not contained in the collection. If an element equal to newElement was already contained in the collection, the method returns (false, oldElement), where oldElement is the element that was equal to newElement. In some cases, oldElement may be distinguishable from newElement by identity comparison or some other means.
-     */
-    #[Override]
-    public function insert(mixed $newElement): array
-    {
-        return $this->mutableCollectionInsert($newElement);
-    }
-
-    /**
      * Inserts the value into the collection at the specified position.
      *
      * The new element is inserted before the element currently at the specified index.
@@ -482,18 +467,6 @@ final class CollectionDifference extends ObjectClass implements MutableCollectio
     public function insertContentsOf(iterable $newElements, int $at = NotFound): void
     {
         $this->mutableCollectionInsertContentsOf($newElements, $at);
-    }
-
-    /**
-     * Inserts the given element into the collection unconditionally.
-     * If an element equal to newElement is already contained in the collection, newElement replaces the existing element.
-     * @param CollectionDifferenceChange $element An element to insert into the collection.
-     * @return CollectionDifferenceChange|null An element equal to newElement if the collection already contained such a member; otherwise, null.
-     */
-    #[Override]
-    public function update(mixed $element)
-    {
-        return $this->mutableCollectionUpdate($element);
     }
 
     /**
