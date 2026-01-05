@@ -598,7 +598,7 @@ function is_serialized(mixed $value, bool $strict = true): bool
  */
 function is_password(#[SensitiveParameter] string $string): bool
 {
-    return password_get_info($string)["algo"] !== 0;
+    return !empty(password_get_info($string)["algo"]);
 }
 
 /**
