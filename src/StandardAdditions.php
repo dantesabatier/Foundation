@@ -3,6 +3,7 @@
 namespace Sabatier\Foundation;
 
 use Collator;
+use JetBrains\PhpStorm\Deprecated;
 use JetBrains\PhpStorm\ExpectedValues;
 use JetBrains\PhpStorm\Pure;
 use SensitiveParameter;
@@ -596,6 +597,7 @@ function is_serialized(mixed $value, bool $strict = true): bool
  * @see password_hash()
  * @see password_verify()
  */
+#[Deprecated]
 function is_password(#[SensitiveParameter] string $string): bool
 {
     return !empty(password_get_info($string)["algo"]);

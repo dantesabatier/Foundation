@@ -345,12 +345,11 @@ function unsafe_value(Closure $block)
 function class_name(string $class, ?string &$namespace = null): string
 {
     if (str_contains($class, "\\")) {
-        $components = new ArrayClass(explode("\\", $class));
-        /** @var string $class */
-        $class = $components->popLast();
+        $lastPos = strrpos($class, "\\");
         if (func_num_args() > 1) {
-            $namespace = $components->join("\\");
+            $namespace = substr($class, 0, $lastPos);
         }
+        return substr($class, $lastPos + 1);
     }
     return $class;
 }
