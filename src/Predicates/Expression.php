@@ -51,7 +51,7 @@ class Expression extends ObjectClass
     }
     /** @internal */
     private(set) bool $usesKVC {
-        get => $this->usesKVC ??= str_contains((string)$this, "@");
+        get => $this->usesKVC ??= str_contains($this->description, "@");
     }
 
     /**
