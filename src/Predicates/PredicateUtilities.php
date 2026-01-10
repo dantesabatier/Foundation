@@ -364,7 +364,7 @@ final class PredicateUtilities
 
     public static function trim(string $string): string
     {
-        return self::trim($string);
+        return trim($string);
     }
 
     /**
