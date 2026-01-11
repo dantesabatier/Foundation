@@ -49,10 +49,6 @@ class Expression extends ObjectClass
     public string $description {
         get => $this->predicateFormat;
     }
-    /** @internal */
-    private(set) bool $usesKVC {
-        get => $this->usesKVC ??= str_contains($this->description, "@");
-    }
 
     /**
      * Initializes the expression with the specified expression type.
