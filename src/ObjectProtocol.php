@@ -24,9 +24,9 @@ interface ObjectProtocol extends CustomDebugStringConvertible, Equatable
     }
 
     /**
-     * Returns a Boolean value that indicates whether the receiver is an instance of given class or an instance of any class that inherits from that class.
+     * Returns a Boolean value that indicates whether the receiver is an instance of a given `$class` or an instance of any class that inherits from that class.
      * @param class-string $class A class to be tested.
-     * @return bool true if the receiver is an instance of class or an instance of any class that inherits from class, otherwise false.
+     * @return bool true if the receiver is an instance of `$class` or an instance of any class that inherits from `$class`, otherwise false.
      */
     public function isKind(string $class): bool;
 
@@ -38,14 +38,16 @@ interface ObjectProtocol extends CustomDebugStringConvertible, Equatable
     public function isMember(string $class): bool;
 
     /**
-     * Returns a Boolean value that indicates whether the receiving class is a subclass of, or identical to, a given class.
+     * Returns a Boolean value that indicates whether the receiving class is a subclass of or identical to, a given class.
      * @param class-string $class
-     * @return bool true if the receiver is a subclass of class, otherwise false.
+     * @return bool true if the receiver is a subclass of `$class`, otherwise false.
      */
     public function isSubclass(string $class): bool;
 
     /**
      * Returns a Boolean value that indicates whether the receiver implements or inherits a method that can respond to a specified message.
+     *
+     * The application is responsible for determining whether a `NO` response should be considered an error.
      * @param string $selector A selector that identifies a message.
      * @return bool true if instances of the receiver are capable of responding to selector messages, otherwise false.
      */
