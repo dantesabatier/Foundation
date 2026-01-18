@@ -44,10 +44,7 @@ final class TransferState
             fatal_error();
         }
         if ($header->rawVale === ParsedResponseHeaderRawVale::complete) {
-            if (!($response = $header->lines->createURLResponse($this->url, $contentLength))) {
-                fatal_error();
-            }
-            return new TransferState($this->url, $this->parsedResponseHeader, $response, $this->bodyDataDrain);
+            return new TransferState($this->url, $this->parsedResponseHeader, $header->lines->createURLResponse($this->url, $contentLength), $this->bodyDataDrain);
         }
         return new TransferState($this->url, $header, $this->response, $this->bodyDataDrain);
     }

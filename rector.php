@@ -12,6 +12,7 @@ use Rector\DeadCode\Rector\ClassMethod\RemoveEmptyClassMethodRector;
 use Rector\DeadCode\Rector\ClassMethod\RemoveUnusedPrivateMethodParameterRector;
 use Rector\DeadCode\Rector\ClassMethod\RemoveUnusedPrivateMethodRector;
 use Rector\DeadCode\Rector\ClassMethod\RemoveUnusedPromotedPropertyRector;
+use Rector\DeadCode\Rector\ClassMethod\RemoveUnusedPublicMethodParameterRector;
 use Rector\DeadCode\Rector\ClassMethod\RemoveUselessParamTagRector;
 use Rector\DeadCode\Rector\ClassMethod\RemoveUselessReturnTagRector;
 use Rector\DeadCode\Rector\If_\RemoveAlwaysTrueIfConditionRector;
@@ -54,9 +55,8 @@ try {
             ReadOnlyPropertyRector::class,
             ClassOnThisVariableObjectRector::class,
             ClassOnObjectRector::class,
-            RemoveEmptyClassMethodRector::class => [
-                __DIR__ . "/src/ArrayConverter.php"
-            ],
+            RemoveEmptyClassMethodRector::class,
+            RemoveUnusedPublicMethodParameterRector::class,
             RemoveUnusedPromotedPropertyRector::class => [
                 __DIR__ . "/src/ArrayConverter.php"
             ],
@@ -68,7 +68,7 @@ try {
             ],
             NewInInitializerRector::class => [
                 __DIR__ . "/src/Progress.php"
-            ]
+            ],
         ])->withPreparedSets(deadCode: true, codeQuality: true, earlyReturn: true);
 } catch (InvalidConfigurationException $e) {
     error_log($e->getMessage());

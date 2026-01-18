@@ -13,7 +13,7 @@ final class ResponseHeaderLines
     {
     }
 
-    public function createURLResponse(URL $url, int $contentLength): ?URLResponse
+    public function createURLResponse(URL $url, int $contentLength): URLResponse
     {
         return new URLResponse($url, expectedContentLength: $contentLength);
     }

@@ -158,7 +158,7 @@ function human_readable_value(mixed $value, int $depth = 0, int $maxDepth = 10):
  */
 function human_readable_array(array $value, int $depth, int $maxDepth): string
 {
-    if (empty($value)) {
+    if ($value === []) {
         return "[]";
     }
     return "[" . implode(", ", array_map(fn(mixed $key, mixed $element): string => sprintf("%s: %s", is_string($key) ? $key : (string)$key, human_readable_value($element, $depth + 1, $maxDepth)), array_keys($value), array_values($value))) . "]";
@@ -224,7 +224,7 @@ function human_readable_bytes(float $bytes, string $locale = "en_US"): string
     $units = ["B", "KB", "MB", "GB", "TB", "PB"];
     $i = $bytes > 0 ? (int)floor(log($bytes, 1024)) : 0;
     $i = max(min($i, count($units) - 1), 0);
-    $value = $bytes / pow(1024, $i);
+    $value = $bytes / 1024 ** $i;
     $formatter = new NumberFormatter($locale, NumberFormatter::DECIMAL);
     $formatter->setAttribute(NumberFormatter::MAX_FRACTION_DIGITS, $i === 0 ? 0 : 2);
     $formatter->setAttribute(NumberFormatter::MIN_FRACTION_DIGITS, $i === 0 ? 0 : 2);
@@ -349,7 +349,7 @@ function class_name(string $class, ?string &$namespace = null): string
         if (func_num_args() > 1) {
             $namespace = substr($class, 0, $lastPos);
         }
-        return substr($class, $lastPos + 1);
+        return substr($class, (int)$lastPos + 1);
     }
     return $class;
 }

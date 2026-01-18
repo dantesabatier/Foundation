@@ -228,7 +228,7 @@ final class Dictionary extends ObjectClass implements Collection, ArrayAccess, I
     {
         $array = new ArrayClass();
         foreach ($this as $key => $value) {
-            $array[] = $transform($value, $key);
+            $array->append($transform($value, $key));
         }
         return $array;
     }
@@ -418,6 +418,17 @@ final class Dictionary extends ObjectClass implements Collection, ArrayAccess, I
     public function sorted(iterable $descriptors): Dictionary
     {
         return $this->collectionSorted($descriptors);
+    }
+
+    /**
+     * Returns a new string by concatenating the elements of the sequence, adding the given separator between each element.
+     * @param string $separator A string to insert between each of the elements in this sequence. The default separator is an empty string.
+     * @return string A single, concatenated string.
+     */
+    #[Override]
+    public function join(string $separator): string
+    {
+        return implode($separator, $this->map(fn(mixed $value): string => human_readable_value($value))->array);
     }
 
     /**
