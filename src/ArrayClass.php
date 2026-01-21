@@ -779,6 +779,30 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Arra
     }
 
     /**
+     * Returns a subsequence, up to the specified maximum length, containing the initial elements of the collection.
+     *
+     * If the maximum length exceeds the number of elements in the collection, the result contains all the elements in the collection.
+     * @param int $maxLength The maximum number of elements to return. maxLength must be greater than or equal to zero.
+     * @return Slice A subsequence starting at the beginning of this collection with at most maxLength elements.
+     */
+    public function prefix(int $maxLength): Slice
+    {
+        return new Slice($this, new Range(0, min($maxLength, $this->count)));
+    }
+
+    /**
+     * Returns a subsequence, up to the given maximum length, containing the final elements of the collection.
+     *
+     * If the maximum length exceeds the number of elements in the collection, the result contains the entire collection.
+     * @param int $maxLength The maximum number of elements to return. maxLength must be greater than or equal to zero.
+     * @return Slice A subsequence terminating at the end of the collection with at most maxLength elements.
+     */
+    public function suffix(int $maxLength): Slice
+    {
+        return new Slice($this, new Range($this->count - $maxLength, $this->count));
+    }
+
+    /**
      * @param ArrayClass<Element> $array
      */
     public function setArray(ArrayClass $array): void

@@ -26,7 +26,7 @@ final class Range extends ObjectClass implements ExpressibleByArrayLiteral, Iter
     public string $description {
         get => "[$this->lowerBound...<$this->upperBound]";
     }
-    /** @var int[] */
+    /** @var list<int> */
     private(set) array $array {
         get => $this->array ??= range($this->lowerBound, $this->upperBound - 1);
     }
@@ -37,7 +37,7 @@ final class Range extends ObjectClass implements ExpressibleByArrayLiteral, Iter
      */
     public function __construct(public readonly int $lowerBound, public readonly int $upperBound)
     {
-        $this->upperBound >= $this->lowerBound ?: fatal_error("Range error: lower bound cannot be grater that the upper bound");
+        $upperBound >= $lowerBound ?: fatal_error("Range error: lower bound cannot be greater that the upper bound");
     }
 
     #[Override]
