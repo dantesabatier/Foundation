@@ -245,7 +245,7 @@ final class Bundle extends ObjectClass
             /** @var string $extension */
             $extension = pathinfo($name, PATHINFO_EXTENSION);
             if ($extension) {
-                $extensions[] = $extension;
+                $extensions->append($extension);
             }
         }
         $languages ??= new ArrayClass([""]);

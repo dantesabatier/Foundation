@@ -228,19 +228,23 @@ function in_string(string $string, string $substring, #[ExpectedValues(flagsFrom
  */
 function string_compare(string $string, string $other, #[ExpectedValues(flagsFromClass: CompareOptions::class)] int $options = CompareOptions::none): int
 {
+    static $collator = null;
     if ($options !== CompareOptions::none) {
-        if (class_exists("Collator") && ($collator = Collator::create("root"))) {
-            $collator->setAttribute(Collator::STRENGTH, Collator::PRIMARY);
-            if (!($options & CompareOptions::diacriticInsensitive)) {
-                $collator->setAttribute(Collator::STRENGTH, Collator::SECONDARY);
+        if (class_exists("Collator")) {
+            $collator ??= Collator::create("root");
+            if ($collator) {
+                $collator->setAttribute(Collator::STRENGTH, Collator::PRIMARY);
+                if (!($options & CompareOptions::diacriticInsensitive)) {
+                    $collator->setAttribute(Collator::STRENGTH, Collator::SECONDARY);
+                }
+                if (!($options & CompareOptions::caseInsensitive)) {
+                    $collator->setAttribute(Collator::STRENGTH, Collator::TERTIARY);
+                }
+                if (($options & CompareOptions::caseInsensitive) && ($options & CompareOptions::diacriticInsensitive) && !($options & CompareOptions::normalized)) {
+                    $collator->setAttribute(Collator::NORMALIZATION_MODE, Collator::ON);
+                }
+                return $collator->compare($string, $other);
             }
-            if (!($options & CompareOptions::caseInsensitive)) {
-                $collator->setAttribute(Collator::STRENGTH, Collator::TERTIARY);
-            }
-            if (($options & CompareOptions::caseInsensitive) && ($options & CompareOptions::diacriticInsensitive) && !($options & CompareOptions::normalized)) {
-                $collator->setAttribute(Collator::NORMALIZATION_MODE, Collator::ON);
-            }
-            return $collator->compare($string, $other);
         }
         $string = string_with_options($string, $options);
         $other = string_with_options($other, $options);

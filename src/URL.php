@@ -241,9 +241,7 @@ final class URL extends ObjectClass
         if (!str_starts_with($path, "/")) {
             $path = "/$path";
         }
-        if (TARGET_OS_WINDOWS) {
-            $path = str_replace("\\", "/", $path);
-        }
+        $path = str_replace("\\", "/", $path);
         return new URL("file://$path", $base);
     }
 
@@ -309,10 +307,7 @@ final class URL extends ObjectClass
      */
     public function deleteLastPathComponent(): URL
     {
-        $this->string = str_replace($this->lastPathComponent, "", $this->string);
-        if ($this->pathComponents->count > 1) {
-            $this->string = rtrim($this->string, "/.");
-        }
+        $this->string = preg_replace("#/[^/]+/?\$#", "", rtrim($this->string, "/."));
         return $this;
     }
 

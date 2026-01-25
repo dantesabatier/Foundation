@@ -23,7 +23,7 @@ function pn(string|int|float|Number $n): int|float
 /** @internal */
 function string_with_options(string $string, #[ExpectedValues(flagsFromClass: CompareOptions::class)] int $options): string
 {
-    if (($options & CompareOptions::caseInsensitive) && ($options & CompareOptions::diacriticInsensitive)) {
+    if ($options & CompareOptions::diacriticInsensitive || $options & CompareOptions::normalized) {
         if (function_exists("transliterator_transliterate")) :
             $string = transliterator_transliterate("Any-Latin; Latin-ASCII;", $string);
             if ($string === false) {
