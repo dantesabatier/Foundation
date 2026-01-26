@@ -405,7 +405,7 @@ final class Bundle extends ObjectClass
         if ($this->loadedClasses->containsElement($class)) {
             return;
         }
-        $this->loadedClasses[] = $class;
+        $this->loadedClasses->append($class);
         NotificationCenter::default()->postNotificationName(self::didLoadNotification, $this, new Dictionary([LoadedClasses => $this->loadedClasses]));
     }
 
