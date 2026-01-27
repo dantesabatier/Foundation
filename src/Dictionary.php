@@ -470,9 +470,7 @@ final class Dictionary extends ObjectClass implements Collection, ArrayAccess, I
             if (($current !== null) && ($combine !== null)) {
                 $new = $combine($current, $value, $key);
             }
-            if ($new !== null) {
-                $this[$key] = $new;
-            }
+            $this[$key] = $new;
         }
     }
 
