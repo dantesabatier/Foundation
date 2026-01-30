@@ -307,7 +307,7 @@ final class URL extends ObjectClass
      */
     public function deleteLastPathComponent(): URL
     {
-        $this->string = preg_replace("#/[^/]+/?\$#", "", rtrim($this->string, "/."));
+        $this->string = (string)preg_replace("#/[^/]+/?\$#", "", rtrim($this->string, "/."));
         return $this;
     }
 
