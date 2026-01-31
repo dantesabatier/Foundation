@@ -576,7 +576,7 @@ final class Dictionary extends ObjectClass implements Collection, ArrayAccess, I
     public function isEqual(mixed $other): bool
     {
         if ($other instanceof Dictionary) {
-            return $this->keys->isEqual($other->keys) && $this->values->isEqual($other->values);
+            return $this->allSatisfy(fn(mixed $e, string $k): bool => is_equal($e, $other[$k]));
         }
         return false;
     }
