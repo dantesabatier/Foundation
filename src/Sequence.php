@@ -154,7 +154,7 @@ interface Sequence extends Traversable, Countable, Comparable, ExpressibleByArra
      * Returns a sequence containing the non-null results of calling the given transformation with each element of this sequence.
      *
      * Complexity: O(n), where n is the length of the sequence.
-     * @param Closure(Element, Index=): Result $transform
+     * @param Closure(Element, Index=): ?Result $transform
      * @return Sequence<Index, Result>
      */
     public function compactMap(Closure $transform): Sequence;

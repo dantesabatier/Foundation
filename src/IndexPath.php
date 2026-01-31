@@ -180,7 +180,8 @@ final class IndexPath extends ObjectClass implements MutableCollection, ArrayAcc
     /**
      * @template Result
      * Returns a Collection containing the non-null results of calling the given transformation with each element of this collection.
-     * @param Closure(int, int=): Result $transform
+     *
+     * @param Closure(int, int=): ?Result $transform
      * @return ArrayClass<Result>
      */
     #[Override]

@@ -89,5 +89,18 @@
                 <file name="src/Set.php"/>
             </errorLevel>
         </RedundantConditionGivenDocblockType>
+        <InternalClass>
+            <errorLevel type="suppress">
+                <file name="src/Plugins/CompactMapReturnTypeProvider.php"/>
+            </errorLevel>
+        </InternalClass>
+        <InternalMethod>
+            <errorLevel type="suppress">
+                <file name="src/Plugins/CompactMapReturnTypeProvider.php"/>
+            </errorLevel>
+        </InternalMethod>
     </issueHandlers>
+    <plugins>
+        <pluginClass class="Sabatier\Foundation\Plugins\Plugin"/>
+    </plugins>
 </psalm>

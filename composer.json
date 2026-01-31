@@ -26,7 +26,8 @@
     "ext-intl": "*",
     "ext-gettext": "*",
     "ext-dom": "*",
-    "ext-ctype": "*"
+    "ext-ctype": "*",
+    "ext-simplexml": "*"
   },
   "config": {
     "platform": {

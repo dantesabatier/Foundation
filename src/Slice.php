@@ -98,7 +98,8 @@ final class Slice extends ObjectClass implements Collection, IteratorAggregate
     /**
      * @template Result
      * Returns a Collection containing the non-null results of calling the given transformation with each element of this collection.
-     * @param Closure(mixed, int=): Result $transform
+     *
+     * @param Closure(mixed, int=): ?Result $transform
      * @return Collection<int, Result>
      * @psalm-suppress LessSpecificReturnStatement, MoreSpecificReturnType
      */

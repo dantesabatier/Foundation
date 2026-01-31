@@ -237,7 +237,7 @@ final class Dictionary extends ObjectClass implements Collection, ArrayAccess, I
      * @template Result
      * Returns an array containing the non-null results of calling the given transformation with each element of this sequence.
      * Use this method to receive an array of non-optional values when your transformation produces an optional value.
-     * @param Closure(Element, string=): Result $transform A closure that accepts an element of this sequence as its argument and returns an optional value.
+     * @param Closure(Element, string=): ?Result $transform A closure that accepts an element of this sequence as its argument and returns an optional value.
      * @return ArrayClass<Result> An array of the non-null results of calling transform with each element of the sequence.
      * @psalm-suppress ImplementedReturnTypeMismatch
      */

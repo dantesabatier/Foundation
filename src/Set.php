@@ -197,7 +197,8 @@ class Set extends ObjectClass implements SetAlgebra, ArrayAccess, Iterator
     /**
      * @template Result
      * Returns a Collection containing the non-null results of calling the given transformation with each element of this collection.
-     * @param Closure(Element, int=): Result $transform
+     *
+     * @param Closure(Element, int=): ?Result $transform
      * @return Set<Result>
      */
     #[Override]

@@ -237,7 +237,8 @@ final class CollectionDifference extends ObjectClass implements MutableCollectio
     /**
      * @template Result
      * Returns a Collection containing the non-null results of calling the given transformation with each element of this collection.
-     * @param Closure(CollectionDifferenceChange, int): Result $transform
+     *
+     * @param Closure(CollectionDifferenceChange, int): ?Result $transform
      * @return ArrayClass<Result>
      */
     #[Override]

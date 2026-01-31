@@ -80,7 +80,8 @@ final class FlattenSequence extends ObjectClass implements Sequence, IteratorAgg
     /**
      * @template Result
      * Returns a Collection containing the non-null results of calling the given transformation with each element of this collection.
-     * @param Closure(mixed, int=): Result $transform
+     *
+     * @param Closure(mixed, int=): ?Result $transform
      * @return Sequence<int, Result>
      */
     #[Override]

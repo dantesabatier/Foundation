@@ -199,7 +199,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Arra
     /**
      * @template Result
      * Returns a Collection containing the non-null results of calling the given transformation with each element of this collection.
-     * @param Closure(Element, int): Result $transform
+     * @param Closure(Element, int): ?Result $transform
      * @return ArrayClass<Result>
      */
     #[Override]
