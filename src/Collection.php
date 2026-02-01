@@ -91,10 +91,4 @@ interface Collection extends Sequence
      * @return string A single, concatenated string.
      */
     public function join(string $separator): string;
-
-    /**
-     * Returns the elements of this sequence of sequences, concatenated.
-     * @return FlattenSequence A flattened view of the elements of this sequence of sequences.
-     */
-    public function joined(): FlattenSequence;
 }

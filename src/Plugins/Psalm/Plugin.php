@@ -7,6 +7,7 @@ use Psalm\Plugin\PluginEntryPointInterface;
 use Psalm\Plugin\RegistrationInterface;
 use Sabatier\Foundation\Plugins\Psalm\Hooks\CompactMapReturnTypeProvider;
 use Sabatier\Foundation\Plugins\Psalm\Hooks\CovariantCollectionIssueHandler;
+use Sabatier\Foundation\Plugins\Psalm\Hooks\JoinedReturnTypeProvider;
 use SimpleXMLElement;
 
 final class Plugin implements PluginEntryPointInterface
@@ -15,6 +16,7 @@ final class Plugin implements PluginEntryPointInterface
     private const array hooks = [
         CompactMapReturnTypeProvider::class,
         CovariantCollectionIssueHandler::class,
+        JoinedReturnTypeProvider::class,
     ];
 
     #[Override]

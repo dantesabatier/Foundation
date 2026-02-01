@@ -25,11 +25,11 @@ final class CollectionDifference extends ObjectClass implements MutableCollectio
         min as private sequenceMin;
         max as private sequenceMax;
         reduce as private sequenceReduce;
+        joined as private sequenceJoined;
         firstIndex as private collectionFirstIndex;
         indexOf as private collectionIndexOf;
         sort as private collectionSort;
         sorted as private collectionSorted;
-        joined as private collectionJoined;
         last as private bidirectionalCollectionLast;
         lastIndex as private bidirectionalCollectionLastIndex;
         randomElement as private bidirectionalCollectionRandomElement;
@@ -390,7 +390,7 @@ final class CollectionDifference extends ObjectClass implements MutableCollectio
     #[Override]
     public function joined(): FlattenSequence
     {
-        return $this->collectionJoined();
+        return $this->sequenceJoined();
     }
 
     /**

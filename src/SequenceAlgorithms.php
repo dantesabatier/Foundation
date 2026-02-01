@@ -185,6 +185,11 @@ trait SequenceAlgorithms
         return $instance;
     }
 
+    public function joined(): FlattenSequence
+    {
+        return new FlattenSequence($this);
+    }
+
     public function forEach(Closure $body): void
     {
         foreach (clone $this as $i => $e) {

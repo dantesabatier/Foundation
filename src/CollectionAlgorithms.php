@@ -73,11 +73,6 @@ trait CollectionAlgorithms
         return implode($separator, $this->map(human_readable_value(...))->array);
     }
 
-    public function joined(): FlattenSequence
-    {
-        return new FlattenSequence($this);
-    }
-
     public function valueForKey(string $key): self
     {
         return $this->map(fn(?KeyValueCoding $e): mixed => $e?->valueForKey($key));

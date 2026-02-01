@@ -26,12 +26,12 @@ final class IndexPath extends ObjectClass implements MutableCollection, ArrayAcc
         min as private sequenceMin;
         max as private sequenceMax;
         reduce as private sequenceReduce;
+        joined as private sequenceJoined;
         firstIndex as private collectionFirstIndex;
         indexOf as private collectionIndexOf;
         filtered as private sequenceFiltered;
         sort as private collectionSort;
         sorted as private collectionSorted;
-        joined as private collectionJoined;
         lastIndex as private bidirectionalCollectionLastIndex;
         last as private bidirectionalCollectionLast;
         randomElement as private bidirectionalCollectionRandomElement;
@@ -361,7 +361,7 @@ final class IndexPath extends ObjectClass implements MutableCollection, ArrayAcc
     #[Override]
     public function joined(): FlattenSequence
     {
-        return $this->collectionJoined();
+        return $this->sequenceJoined();
     }
 
     /**

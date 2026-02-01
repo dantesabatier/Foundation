@@ -170,6 +170,13 @@ interface Sequence extends Traversable, Countable, Comparable, ExpressibleByArra
     public function flatMap(Closure $transform): Sequence;
 
     /**
+     * Returns the elements of this sequence of sequences, concatenated.
+     *
+     * @return FlattenSequence A flattened view of the elements of this sequence of sequences.
+     */
+    public function joined(): FlattenSequence;
+
+    /**
      * Calls the given closure on each element in the sequence in the same order as a for-in loop.
      *
      * The two loops in the following example produce the same output:

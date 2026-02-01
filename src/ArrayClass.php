@@ -38,6 +38,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Arra
         map as private sequenceMap;
         compactMap as private sequenceCompactMap;
         flatMap as private sequenceFlatMap;
+        joined as private sequenceJoined;
         valueForKey as private collectionValueForKey;
         setValueForKey as private collectionSetValueForKey;
         valueForKeyPath as private collectionValueForKeyPath;
@@ -45,7 +46,6 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Arra
         indexOf as private collectionIndexOf;
         sort as private collectionSort;
         sorted as private collectionSorted;
-        joined as private collectionJoined;
         last as private bidirectionalCollectionLast;
         lastIndex as private bidirectionalCollectionLastIndex;
         randomElement as private bidirectionalCollectionRandomElement;
@@ -379,7 +379,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Arra
     #[Override]
     public function joined(): FlattenSequence
     {
-        return $this->collectionJoined();
+        return $this->sequenceJoined();
     }
 
     /**

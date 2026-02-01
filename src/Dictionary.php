@@ -35,9 +35,9 @@ final class Dictionary extends ObjectClass implements Collection, ArrayAccess, I
         min as private sequenceMin;
         max as private sequenceMax;
         reduce as private sequenceReduce;
-        sorted as private collectionSorted;
         allSatisfy as private sequenceAllSatisfy;
-        joined as private collectionJoined;
+        joined as private sequenceJoined;
+        sorted as private collectionSorted;
     }
 
     public int $count {
@@ -450,7 +450,7 @@ final class Dictionary extends ObjectClass implements Collection, ArrayAccess, I
     #[Override]
     public function joined(): FlattenSequence
     {
-        return $this->collectionJoined();
+        return $this->sequenceJoined();
     }
 
     /**

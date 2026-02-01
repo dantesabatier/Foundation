@@ -44,6 +44,7 @@ final class FlattenSequence extends ObjectClass implements Sequence, IteratorAgg
 
     /**
      * Creates a view into the given collection that allows access to elements within the specified range.
+     *
      * @param Sequence $base The collection to create a view into.
      */
     public function __construct(public readonly Sequence $base)
