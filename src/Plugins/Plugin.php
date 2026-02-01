@@ -13,6 +13,8 @@ final class Plugin implements PluginEntryPointInterface
     public function __invoke(RegistrationInterface $registration, ?SimpleXMLElement $config = null): void
     {
         class_exists(CompactMapReturnTypeProvider::class);
+        class_exists(CovariantCollectionIssueHandler::class);
         $registration->registerHooksFromClass(CompactMapReturnTypeProvider::class);
+        $registration->registerHooksFromClass(CovariantCollectionIssueHandler::class);
     }
 }
