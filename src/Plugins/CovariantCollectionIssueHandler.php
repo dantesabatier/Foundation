@@ -14,10 +14,12 @@ use Sabatier\Foundation\Slice;
 
 final class CovariantCollectionIssueHandler implements BeforeAddIssueInterface
 {
-    private static function getCovariantClasses(): array
-    {
-        return [ArrayClass::class, Dictionary::class, Set::class, Slice::class];
-    }
+    private const array covariantClases = [
+        ArrayClass::class,
+        Dictionary::class,
+        Set::class,
+        Slice::class,
+    ];
 
     #[Override]
     public static function beforeAddIssue(BeforeAddIssueEvent $event): ?bool
@@ -27,8 +29,15 @@ final class CovariantCollectionIssueHandler implements BeforeAddIssueInterface
             return null;
         }
         $message = $issue->message;
-        if (array_any(self::getCovariantClasses(), fn($class) => str_contains($message, $class))) {
-            return false;
+        foreach (self::covariantClases as $class) {
+            if (!str_contains($message, $class)) {
+                continue;
+            }
+            $quotedClass = preg_quote($class, "/");
+            $pattern = "/$quotedClass.*?(?:but|provided|assigned).*?$quotedClass/i";
+            if (preg_match($pattern, $message)) {
+                return false;
+            }
         }
         return null;
     }
