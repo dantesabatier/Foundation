@@ -25,7 +25,7 @@ use Sabatier\Foundation\FlattenSequence;
 use Sabatier\Foundation\Set;
 use Sabatier\Foundation\Slice;
 
-class JoinedReturnTypeProvider implements MethodReturnTypeProviderInterface
+final class JoinedReturnTypeProvider implements MethodReturnTypeProviderInterface
 {
     /**
      * @var list<class-string>
@@ -46,6 +46,7 @@ class JoinedReturnTypeProvider implements MethodReturnTypeProviderInterface
         return self::baseSequenceClases;
     }
 
+    #[Override]
     public static function getMethodReturnType(MethodReturnTypeProviderEvent $event): ?Union
     {
         $methodName = $event->getMethodNameLowercase();
@@ -88,7 +89,7 @@ class JoinedReturnTypeProvider implements MethodReturnTypeProviderInterface
     private static function getValueType(Atomic $atomic): ?Union
     {
         if ($atomic instanceof TGenericObject) {
-            return array_values(array_slice($atomic->type_params, -1))[0] ?? null;
+            return array_slice($atomic->type_params, -1)[0] ?? null;
         }
         if ($atomic instanceof TArray) {
             return $atomic->type_params[1] ?? null;
