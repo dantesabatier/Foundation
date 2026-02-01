@@ -82,12 +82,12 @@ trait BidirectionalCollectionAlgorithms
         $changes = new ArrayClass();
         foreach ($other as $index => $item) {
             if (!$this->contains(fn(mixed $element): bool => $areEquivalent($element, $item))) {
-                $changes[] = new CollectionDifferenceChange(CollectionDifferenceChangeType::remove, $item, $index);
+                $changes->append(new CollectionDifferenceChange(CollectionDifferenceChangeType::remove, $item, $index));
             }
         }
         foreach ($this as $index => $item) {
             if (!$other->contains(fn(mixed $element): bool => $areEquivalent($element, $item))) {
-                $changes[] = new CollectionDifferenceChange(CollectionDifferenceChangeType::insert, $item, $index);
+                $changes->append(new CollectionDifferenceChange(CollectionDifferenceChangeType::insert, $item, $index));
             }
         }
         return new CollectionDifference($changes);

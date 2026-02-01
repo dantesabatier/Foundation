@@ -46,7 +46,10 @@ trait SequenceAlgorithms
     #[Override]
     public function isEqual(mixed $other): bool
     {
-        return $this->elementsEqual($other);
+        if ($other instanceof Sequence) {
+            return $this->elementsEqual($other);
+        }
+        return false;
     }
 
     public function filter(Closure $isIncluded): self
