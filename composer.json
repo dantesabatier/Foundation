@@ -58,6 +58,9 @@
   "extra": {
     "branch-alias": {
       "dev-master": "1.0-dev"
+    },
+    "psalm": {
+      "pluginClass": "Sabatier\\Foundation\\Plugins\\Psalm\\Plugin"
     }
   },
   "scripts": {

@@ -1,6 +1,6 @@
 <?php
 
-namespace Sabatier\Foundation\Plugins;
+namespace Sabatier\Foundation\Plugins\Psalm\Hooks;
 
 use Override;
 use Psalm\Issue\InvalidArgument;
@@ -14,6 +14,7 @@ use Sabatier\Foundation\Slice;
 
 final class CovariantCollectionIssueHandler implements BeforeAddIssueInterface
 {
+    /** @var list<class-string> */
     private const array covariantClases = [
         ArrayClass::class,
         Dictionary::class,

@@ -91,16 +91,16 @@
         </RedundantConditionGivenDocblockType>
         <InternalClass>
             <errorLevel type="suppress">
-                <file name="src/Plugins/CompactMapReturnTypeProvider.php"/>
+                <file name="src/Plugins/Psalm/Hooks/CompactMapReturnTypeProvider.php"/>
             </errorLevel>
         </InternalClass>
         <InternalMethod>
             <errorLevel type="suppress">
-                <file name="src/Plugins/CompactMapReturnTypeProvider.php"/>
+                <file name="src/Plugins/Psalm/Hooks/CompactMapReturnTypeProvider.php"/>
             </errorLevel>
         </InternalMethod>
     </issueHandlers>
     <plugins>
-        <pluginClass class="Sabatier\Foundation\Plugins\Plugin"/>
+        <pluginClass class="Sabatier\Foundation\Plugins\Psalm\Plugin"/>
     </plugins>
 </psalm>

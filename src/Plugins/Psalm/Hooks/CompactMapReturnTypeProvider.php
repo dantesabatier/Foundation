@@ -2,7 +2,7 @@
 
 /** @noinspection PhpInternalEntityUsedInspection */
 
-namespace Sabatier\Foundation\Plugins;
+namespace Sabatier\Foundation\Plugins\Psalm\Hooks;
 
 use Override;
 use Psalm\Internal\MethodIdentifier;
@@ -22,6 +22,9 @@ use Sabatier\Foundation\Slice;
 
 final class CompactMapReturnTypeProvider implements MethodReturnTypeProviderInterface
 {
+    /**
+     * @return list<class-string>
+     */
     #[Override]
     public static function getClassLikeNames(): array
     {
