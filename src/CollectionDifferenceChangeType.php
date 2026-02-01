@@ -2,9 +2,9 @@
 
 namespace Sabatier\Foundation;
 
-enum CollectionDifferenceChangeType
+enum CollectionDifferenceChangeType: int
 {
-    case insert;
-    case remove;
-    case move;
+    case insert = 0;
+    case remove = 1;
+    case move = 2;
 }
