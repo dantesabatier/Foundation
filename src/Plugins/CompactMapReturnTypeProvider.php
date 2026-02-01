@@ -14,15 +14,18 @@ use Psalm\Type\Atomic\TGenericObject;
 use Psalm\Type\Atomic\TNull;
 use Psalm\Type\Union;
 use Sabatier\Foundation\ArrayClass;
+use Sabatier\Foundation\CollectionDifference;
 use Sabatier\Foundation\Dictionary;
+use Sabatier\Foundation\IndexPath;
 use Sabatier\Foundation\Set;
+use Sabatier\Foundation\Slice;
 
 final class CompactMapReturnTypeProvider implements MethodReturnTypeProviderInterface
 {
     #[Override]
     public static function getClassLikeNames(): array
     {
-        return [ArrayClass::class, Set::class, Dictionary::class];
+        return [ArrayClass::class, CollectionDifference::class, Dictionary::class, IndexPath::class, Set::class, Slice::class];
     }
 
     #[Override]

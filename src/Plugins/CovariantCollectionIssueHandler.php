@@ -10,12 +10,13 @@ use Psalm\Plugin\EventHandler\Event\BeforeAddIssueEvent;
 use Sabatier\Foundation\ArrayClass;
 use Sabatier\Foundation\Dictionary;
 use Sabatier\Foundation\Set;
+use Sabatier\Foundation\Slice;
 
 final class CovariantCollectionIssueHandler implements BeforeAddIssueInterface
 {
     private static function getCovariantClasses(): array
     {
-        return [ArrayClass::class, Set::class, Dictionary::class];
+        return [ArrayClass::class, Dictionary::class, Set::class, Slice::class];
     }
 
     #[Override]
