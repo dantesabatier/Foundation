@@ -622,7 +622,13 @@ function is_equal(mixed $a, mixed $b): bool
     if ($b instanceof Equatable) {
         return $b->isEqual($a);
     }
-    return $a === $b;
+    if ($a === $b) {
+        return true;
+    }
+    if ((is_int($a) || is_float($a)) && (is_int($b) || is_float($b))) {
+        return $a == $b;
+    }
+    return false;
 }
 
 /**
