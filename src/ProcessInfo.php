@@ -2,6 +2,8 @@
 
 namespace Sabatier\Foundation;
 
+use Exception;
+
 /**
  * A collection of information about the current process.
  */
@@ -14,35 +16,10 @@ final class ProcessInfo extends ObjectClass
     }
     /** @var Dictionary<string> The variable names (keys) and their values in the environment from which the process was launched. */
     private(set) Dictionary $environment {
-        get {
-            if (!isset($this->environment)) {
-                /** @var Dictionary<string> $environment */
-                $environment = new Dictionary();
-                $fileManager = FileManager::default();
-                $url = $fileManager->documentRootDirectory->appendingPathComponent(".env");
-                $path = $url->path;
-                /** @noinspection PhpUnhandledExceptionInspection */
-                if ($fileManager->fileExists($path) && ($string = $fileManager->contents($path))) {
-                    $scanner = new Scanner($string);
-                    $scanner->charactersToBeSkipped = "";
-                    while (!$scanner->isAtEnd) {
-                        if ($scanner->scanUpCharacters(PHP_EOL, $line) && $line) {
-                            $line = trim($line);
-                            if ($line !== "" && !str_starts_with($line, "#")) {
-                                $components = explode("=", $line, 2);
-                                if (count($components) === 2) {
-                                    [$key, $value] = $components;
-                                    $environment[trim($key)] = trim($value, "\"' ");
-                                }
-                            }
-                        }
-                        $scanner->scanLocation += 1;
-                    }
-                }
-                $this->environment = $environment;
-            }
-            return $this->environment;
-        }
+        /**
+         * @throws Exception
+         */
+        get => $this->environment ??= Dictionary::dictionaryWithArray(parse_env_file(FileManager::default()->documentRootDirectory->appendingPathComponent(".env")->path));
     }
     /** @var string Global unique identifier for the process. */
     private(set) string $globallyUniqueString {

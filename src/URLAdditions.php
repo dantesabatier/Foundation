@@ -31,7 +31,7 @@ namespace Sabatier\Foundation;
  *
  * <code>
  *  is_parseable_url("https://example.com"); // true
- *  is_parseable_url("sql://localhost:3306"); // true
+ *  is_parseable_url("sql://database"); // true
  *  is_parseable_url("php://input"); // true
  *  is_parseable_url("x-coredata://data"); // true
  *  is_parseable_url("not-a-url"); // false

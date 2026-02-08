@@ -46,6 +46,7 @@
       "src/ErrorCodes.php",
       "src/ErrorDomains.php",
       "src/ErrorUserInfoKey.php",
+      "src/ENVAdditions.php",
       "src/KeyValueCodingInternal.php",
       "src/StandardAdditions.php",
       "src/URLAdditions.php",
