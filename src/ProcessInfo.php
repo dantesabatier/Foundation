@@ -2,8 +2,6 @@
 
 namespace Sabatier\Foundation;
 
-use Exception;
-
 /**
  * A collection of information about the current process.
  */
@@ -16,9 +14,6 @@ final class ProcessInfo extends ObjectClass
     }
     /** @var Dictionary<string> The variable names (keys) and their values in the environment from which the process was launched. */
     private(set) Dictionary $environment {
-        /**
-         * @throws Exception
-         */
         get => $this->environment ??= Dictionary::dictionaryWithArray(parse_env_file(FileManager::default()->documentRootDirectory->appendingPathComponent(".env")->path));
     }
     /** @var string Global unique identifier for the process. */
