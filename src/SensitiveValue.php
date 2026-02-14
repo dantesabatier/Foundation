@@ -11,7 +11,7 @@ final class SensitiveValue implements CustomStringConvertible, JsonSerializable
         get => sprintf("%s(%s)", typeof($this->value), class_name(self::class));
     }
 
-    public function __construct(public mixed $value)
+    public function __construct(private readonly mixed $value)
     {
     }
 
