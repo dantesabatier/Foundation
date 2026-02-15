@@ -126,11 +126,11 @@ final class URL extends ObjectClass
             /** @var ArrayClass<string> $components */
             $components = new ArrayClass();
             if (str_starts_with($path, "/")) {
-                $components[] = "/";
+                $components->append("/");
             }
             $components->appendContentsOf(new ArrayClass(explode("/", $path))->filter(fn(string $component): bool => !empty($component)));
             if ($components->count > 1 && str_ends_with($path, "/")) {
-                $components[] = "/";
+                $components->append("/");
             }
             return $components;
         }

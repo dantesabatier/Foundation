@@ -189,7 +189,7 @@ class HTTPURLProtocol extends NativeProtocol
         $names = $customHeaders->keys;
         foreach (["Connection", "User-Agent", "Accept-Language"] as $name) {
             if (!$names->contains(fn(string $e): bool => string_is_equal($name, $e, CompareOptions::caseInsensitive))) {
-                $names[] = $name;
+                $names->append($name);
                 $customHeaders[$name] = match ($name) {
                     "Connection" => "keep-alive",
                     "User-Agent" => sprintf("%s (unknown version) curl/%s %s/%s (%s)", ProcessInfo::processInfo()->processName, curl_version()["version"], php_uname("s"), php_uname("r"), php_uname("m")),
@@ -201,7 +201,7 @@ class HTTPURLProtocol extends NativeProtocol
             /** @noinspection PhpForeachOverSingleElementArrayLiteralInspection */
             foreach (["Expect"] as $name) {
                 if (!$names->contains(fn(string $e): bool => string_is_equal($name, $e, CompareOptions::caseInsensitive))) {
-                    $names[] = $name;
+                    $names->append($name);
                     $customHeaders[$name] = "";
                 }
             }

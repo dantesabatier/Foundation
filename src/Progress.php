@@ -220,7 +220,7 @@ final class Progress extends ObjectClass
     {
         $child->parent === null ?: fatal_error("The Progress was already the child of another Progress");
         $child->setParent($this, $unitCount);
-        $this->children[] = $child;
+        $this->children->insert($child);
         if ($this->isCancelled) {
             $child->cancel();
         }

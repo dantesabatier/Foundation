@@ -47,6 +47,6 @@ final class BlockOperation extends Operation
      */
     public function addExecutionBlock(Closure $block): void
     {
-        $this->executionBlocks[] = $block;
+        $this->executionBlocks->append($block);
     }
 }

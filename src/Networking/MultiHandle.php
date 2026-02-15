@@ -53,7 +53,7 @@ final class MultiHandle
             return;
         }
         $needsTimeout = $this->easyHandles->isEmpty;
-        $this->easyHandles[] = $handle;
+        $this->easyHandles->append($handle);
         curl_multi_add_handle($this->rawHandle, $handle->rawHandle);
         if ($needsTimeout) {
             $this->timeoutTimerFired();

@@ -154,7 +154,7 @@ final class URLCache extends ObjectClass
         /** @var ArrayClass<DiskEntry> $entries */
         $entries = new ArrayClass();
         $this->enumerateDiskEntries(function (DiskEntry $entry) use ($entries): void {
-            $entries[] = $entry;
+            $entries->append($entry);
         }, $keys);
         return $entries;
     }
@@ -263,7 +263,7 @@ final class URLCache extends ObjectClass
         $entry = new CacheEntry($identifier, $cachedResponse, $serialized);
         if ($inMemory && $entry->cost < $this->memoryCapacity) {
             $this->evictFromMemoryCacheAssumingLockHeld($this->memoryCapacity - $entry->cost);
-            $this->inMemoryCacheOrder[] = $identifier;
+            $this->inMemoryCacheOrder->append($identifier);
             $this->inMemoryCacheContents[$identifier] = $entry;
         }
         if ($onDisk && $serialized && $entry->cost < $this->diskCapacity) {
@@ -362,7 +362,7 @@ final class URLCache extends ObjectClass
         /** @var CacheEntry $entry */
         foreach ($this->inMemoryCacheContents as $identifier => $entry) {
             if ($entry->date->timeIntervalSinceReferenceDate > $date->timeIntervalSinceReferenceDate) {
-                $identifiersToRemove[] = $identifier;
+                $identifiersToRemove->insert($identifier);
             }
         }
         foreach ($identifiersToRemove as $identifier) {

@@ -101,11 +101,9 @@ final class OperationQueue extends ObjectClass
                     fatal_error();
                 }
                 Fiber::suspend();
-                $this->operations[] = $operation;
+                $this->operations->append($operation);
                 $this->operations->sort(fn(Operation $op0, Operation $op1): int => ComparisonResult::orderedAscending->value * ($op0->queuePriority->value <=> $op1->queuePriority->value));
-                /** @psalm-suppress UndefinedVariable */
-                $observation = $operation->observe("isFinished", KeyValueObservingOptions::new, function (Operation $operation, KeyValueObservedChange $change) use (&$observation): void {
-                    $observation->invalidate();
+                $operation->observe("isFinished", KeyValueObservingOptions::new, function (Operation $operation, KeyValueObservedChange $change): void {
                     if ($change->newValue) {
                         $this->operations->remove($operation);
                     }
@@ -115,8 +113,7 @@ final class OperationQueue extends ObjectClass
                     $operation->start();
                     return;
                 }
-                $observation = $operation->observe("isReady", KeyValueObservingOptions::new, function (Operation $operation, KeyValueObservedChange $change) use (&$observation): void {
-                    $observation->invalidate();
+                $operation->observe("isReady", KeyValueObservingOptions::new, function (Operation $operation, KeyValueObservedChange $change): void {
                     if ($change->newValue) {
                         $operation->start();
                     }

@@ -232,7 +232,7 @@ final class HTTPCookie extends ObjectClass
             if (!($path = $properties[HTTPCookiePropertyKey::path]) || !str_starts_with((string)$path, "/")) {
                 $properties[HTTPCookiePropertyKey::path] = "/";
             }
-            $httpCookies[] = new HTTPCookie($properties);
+            $httpCookies->append(new HTTPCookie($properties));
         }
         return $httpCookies;
     }

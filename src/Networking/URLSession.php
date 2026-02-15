@@ -286,11 +286,11 @@ final class URLSession implements URLSessionProtocol
             $downloadTasks = new ArrayClass();
             foreach ($tasks as $task) {
                 if ($task instanceof URLSessionUploadTask) {
-                    $uploadTasks[] = $task;
+                    $uploadTasks->append($task);
                 } elseif ($task instanceof URLSessionDownloadTask) {
-                    $downloadTasks[] = $task;
+                    $downloadTasks->append($task);
                 } elseif ($task instanceof URLSessionDataTask) {
-                    $dataTasks[] = $task;
+                    $dataTasks->append($task);
                 }
             }
             $completionHandler($dataTasks, $uploadTasks, $downloadTasks);

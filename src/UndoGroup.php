@@ -16,7 +16,7 @@ final class UndoGroup
 
     public function addInvocation(Invocation $invocation): void
     {
-        $this->actions[] = $invocation;
+        $this->actions->append($invocation);
     }
 
     public function perform(): void

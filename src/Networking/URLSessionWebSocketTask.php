@@ -60,7 +60,7 @@ final class URLSessionWebSocketTask extends URLSessionTask
      */
     public function send(URLSessionWebSocketTaskMessage $message, Closure $completionHandler): void
     {
-        $this->sendBuffer[] = [$message, $completionHandler];
+        $this->sendBuffer->append([$message, $completionHandler]);
         $this->doPendingWork();
     }
 
@@ -72,7 +72,7 @@ final class URLSessionWebSocketTask extends URLSessionTask
      */
     public function receive(Closure $completionHandler): void
     {
-        $this->receiveCompletionHandlers[] = $completionHandler;
+        $this->receiveCompletionHandlers->append($completionHandler);
         $this->getProtocol(function (?URLProtocol $protocol) use ($completionHandler): void {
             if ($protocol instanceof WebSocketURLProtocol) {
                 try {
@@ -94,7 +94,7 @@ final class URLSessionWebSocketTask extends URLSessionTask
      */
     public function sendPing(Closure $pongReceiveHandler): void
     {
-        $this->pongCompletionHandlers[] = $pongReceiveHandler;
+        $this->pongCompletionHandlers->append($pongReceiveHandler);
         $this->getProtocol(function (?URLProtocol $protocol) use ($pongReceiveHandler): void {
             if ($protocol instanceof WebSocketURLProtocol) {
                 try {
@@ -144,7 +144,7 @@ final class URLSessionWebSocketTask extends URLSessionTask
     /** @internal */
     public function appendReceivedMessage(URLSessionWebSocketTaskMessage $message): void
     {
-        $this->receiveBuffer[] = $message;
+        $this->receiveBuffer->append($message);
         $this->doPendingWork();
     }
 

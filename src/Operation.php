@@ -140,7 +140,7 @@ abstract class Operation extends ObjectClass
                 $this->removeDependency($operation);
             }
         });
-        $this->dependencies[] = $operation;
+        $this->dependencies->append($operation);
     }
 
     /**

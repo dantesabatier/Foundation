@@ -106,7 +106,7 @@ final class UndoManager extends ObjectClass
         $invocation = new Invocation();
         $invocation->target = $target;
         $invocation->selector = $selector;
-        $invocation->arguments[] = $object;
+        $invocation->arguments->append($object);
         $group->addInvocation($invocation);
         if (!$this->isUndoing && !$this->isRedoing) {
             $this->redoStack->removeAll();
@@ -163,7 +163,7 @@ final class UndoManager extends ObjectClass
             $groupToUndo = $oldGroup;
             $oldGroup = $groupToUndo->parent;
             $groupToUndo->parent = null;
-            $this->redoStack[] = $groupToUndo;
+            $this->redoStack->append($groupToUndo);
         } else {
             $groupToUndo = $this->undoStack->popLast();
         }
@@ -247,14 +247,14 @@ final class UndoManager extends ObjectClass
                     $this->redoStack->removeAt(0);
                 }
                 if (!$group->actions->isEmpty) {
-                    $this->redoStack[] = $group;
+                    $this->redoStack->append($group);
                 }
             } else {
                 if ($this->levelsOfUndo === $this->undoStack->count && !$group->actions->isEmpty) {
                     $this->undoStack->removeAt(0);
                 }
                 if (!$group->actions->isEmpty) {
-                    $this->undoStack[] = $group;
+                    $this->undoStack->append($group);
                 }
             }
         } else {

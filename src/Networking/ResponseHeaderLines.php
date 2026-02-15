@@ -37,7 +37,7 @@ final class ResponseHeaderLines
 
     public function byAppending(string $line): ResponseHeaderLines
     {
-        $this->lines[] = $line;
+        $this->lines->append($line);
         return new ResponseHeaderLines($this->lines);
     }
 

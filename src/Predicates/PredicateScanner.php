@@ -83,12 +83,12 @@ final class PredicateScanner extends Scanner
                     $left->subpredicates->appendContentsOf($right->subpredicates);
                 } else {
                     assert($left instanceof Predicate);
-                    $right->subpredicates[] = $left;
+                    $right->subpredicates->append($left);
                     $left = $right;
                 }
             } elseif ($left instanceof CompoundPredicate && ($left->compoundPredicateType === CompoundPredicateLogicalType::and)) {
                 assert($right instanceof Predicate);
-                $left->subpredicates[] = $right;
+                $left->subpredicates->append($right);
             } else {
                 assert($left instanceof Predicate && $right instanceof Predicate);
                 $left = CompoundPredicate::andPredicateWithSubpredicates(new ArrayClass([$left, $right]));
@@ -132,12 +132,12 @@ final class PredicateScanner extends Scanner
                     $left->subpredicates->appendContentsOf($right->subpredicates);
                 } else {
                     assert($left instanceof Predicate);
-                    $right->subpredicates[] = $left;
+                    $right->subpredicates->append($left);
                     $left = $right;
                 }
             } elseif ($left instanceof CompoundPredicate && ($left->compoundPredicateType === CompoundPredicateLogicalType::or)) {
                 assert($right instanceof Predicate);
-                $left->subpredicates[] = $right;
+                $left->subpredicates->append($right);
             } else {
                 assert($left instanceof Predicate && $right instanceof Predicate);
                 $left = CompoundPredicate::orPredicateWithSubpredicates(new ArrayClass([$left, $right]));
@@ -258,11 +258,11 @@ final class PredicateScanner extends Scanner
             }
             $expression = $this->parseExpression();
             assert($expression instanceof Expression);
-            $subexpressions[] = $expression;
+            $subexpressions->append($expression);
             while ($this->scanString(",")) {
                 $expression = $this->parseExpression();
                 assert($expression instanceof Expression);
-                $subexpressions[] = $expression;
+                $subexpressions->append($expression);
             }
             $this->scanString("}") ?: fatal_error("Invalid argument: missing closing \"}\" at index $this->scanLocation");
             return Expression::expressionForAggregate($subexpressions);
@@ -389,10 +389,10 @@ final class PredicateScanner extends Scanner
             /** @var ArrayClass<Expression> $arguments */
             $arguments = new ArrayClass();
             $argument = $this->parseExpression() ?? fatal_error("Invalid argument: expecting expression at index $this->scanLocation");
-            $arguments[] = $argument;
+            $arguments->append($argument);
             while ($this->scanString(",")) {
                 $argument = $this->parseExpression() ?? fatal_error("Invalid argument: expecting expression at index $this->scanLocation");
-                $arguments[] = $argument;
+                $arguments->append($argument);
             }
             $this->scanString(")") ?: fatal_error("Invalid argument: missing closing \")\" at index $this->scanLocation");
             $operand = $arguments[0];
@@ -464,11 +464,11 @@ final class PredicateScanner extends Scanner
                 if (!$this->scanString(")")) {
                     $expression = $this->parseExpression();
                     assert($expression instanceof Expression);
-                    $subexpressions[] = $expression;
+                    $subexpressions->append($expression);
                     while ($this->scanString(",")) {
                         $expression = $this->parseExpression();
                         assert($expression instanceof Expression);
-                        $subexpressions[] = $expression;
+                        $subexpressions->append($expression);
                     }
                     $this->scanString(")") ?: fatal_error("Invalid argument: missing closing \")\" at index $this->scanLocation");
                 }

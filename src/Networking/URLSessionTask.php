@@ -185,7 +185,7 @@ abstract class URLSessionTask extends ObjectClass
                 if ($this instanceof URLSessionDataTask && ($cache = $this->session->configuration->urlCache)) {
                     /** @var Bag<Closure(URLProtocol|null):void> $bag */
                     $bag = new Bag();
-                    $bag->values[] = $callback;
+                    $bag->values->append($callback);
                     $this->protocolStorage = ProtocolState::awaitingCacheReply($bag);
                     $cache->getCachedResponse($this, function (?CachedURLResponse $cachedResponse) use ($protocolClass): void {
                         $protocol = new $protocolClass($this, $cachedResponse);
@@ -200,7 +200,7 @@ abstract class URLSessionTask extends ObjectClass
             case ProtocolStateRawValue::awaitingCacheReply:
                 /** @var Bag<Closure(URLProtocol|null):void> $bag */
                 $bag = $ps->bag;
-                $bag->values[] = $callback;
+                $bag->values->append($callback);
                 break;
             case ProtocolStateRawValue::existing:
                 $callback($ps->protocol);

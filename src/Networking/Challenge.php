@@ -62,7 +62,7 @@ final class Challenge
             });
             $challenge = new Challenge($authScheme, $authParameters);
             if ($challenge->parameter("realm") !== null) {
-                $challenges[] = $challenge;
+                $challenges->append($challenge);
             }
             if (!($commaIndex = strpos($authenticateView, ","))) {
                 break;

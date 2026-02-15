@@ -57,7 +57,7 @@ final class URLResourceValuesStorage
             if ($value !== null) {
                 $result[$key] = $value;
             } else {
-                $keysToFetch[] = $key;
+                $keysToFetch->insert($key);
             }
         }
         if (!$keysToFetch->isEmpty) {
