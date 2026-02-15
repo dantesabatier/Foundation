@@ -3,7 +3,7 @@
 namespace Sabatier\Foundation;
 
 /**
- * @phpstan-require-implements SetAlgebra
+ * @psalm-require-implements SetAlgebra
  */
 trait SetAlgebraAlgorithms
 {

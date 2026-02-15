@@ -3,7 +3,7 @@
 namespace Sabatier\Foundation;
 
 /**
- * @phpstan-require-implements RangeReplaceableCollection
+ * @psalm-require-implements RangeReplaceableCollection
  */
 trait RangeReplaceableCollectionAlgorithms
 {

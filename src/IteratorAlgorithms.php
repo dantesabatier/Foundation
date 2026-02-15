@@ -6,8 +6,8 @@ use ArrayAccess;
 use Iterator;
 
 /**
- * @phpstan-require-implements ArrayAccess
- * @phpstan-require-implements Iterator
+ * @psalm-require-implements ArrayAccess
+ * @psalm-require-implements Iterator
  */
 trait IteratorAlgorithms
 {

@@ -6,7 +6,7 @@ use Closure;
 use Sabatier\Foundation\Predicates\PredicateUtilities;
 
 /**
- * @phpstan-require-implements Collection
+ * @psalm-require-implements Collection
  */
 trait CollectionAlgorithms
 {
