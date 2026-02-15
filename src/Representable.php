@@ -2,16 +2,15 @@
 
 namespace Sabatier\Foundation;
 
-use Sabatier\Foundation\Dictionary;
-
+/**
+ * Defines a contract for objects that can provide a default representation.
+ */
 interface Representable
 {
     /**
-     * Returns a dictionary defining the default structural representation
-     * of the object.
+     * Provides the default representation of the object as a Dictionary.
      *
-     * This representation serves as a safe fallback when no explicit
-     * serialization configuration is provided.
+     * @return Dictionary<mixed> The default representation of the object.
      */
     public static function defaultRepresentation(): Dictionary;
 }
