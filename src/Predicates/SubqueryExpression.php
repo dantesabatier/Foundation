@@ -20,6 +20,7 @@ final class SubqueryExpression extends Expression
     {
         parent::__construct(ExpressionType::subquery);
         $this->variable = $this->variableExpression->variable;
+        $this->collection = $this->collectionExpression->expressionValue() ?? new ArrayClass();
     }
 
     #[Override]
@@ -36,6 +37,7 @@ final class SubqueryExpression extends Expression
         if (Predicate::$debugDefault) {
             error_log(sprintf("Foundation: %s %s: %s %s => %s", $this->debugDescription, $this->expressionType->name, $collection->join(", "), $predicate->predicateFormat, human_readable_value($value)));
         }
+        $this->collection = $collection;
         return $value;
     }
 
