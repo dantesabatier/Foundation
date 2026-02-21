@@ -283,7 +283,7 @@ function fatal_error(string $message = "", string $file = "", int $line = 0): ne
  */
 function unimplemented(object|string $objectOrClass, string $fn): never
 {
-    fatal_error(sprintf("%s %s() is not yet implemented", is_object($objectOrClass) ? $objectOrClass::class : $objectOrClass, $fn));
+    fatal_error(sprintf("%s %s is not yet implemented", is_object($objectOrClass) ? $objectOrClass::class : $objectOrClass, $fn));
 }
 
 /**
@@ -295,7 +295,7 @@ function unimplemented(object|string $objectOrClass, string $fn): never
  */
 function unsupported(object|string $objectOrClass, string $fn): never
 {
-    fatal_error(sprintf("%s %s() is not supported", is_object($objectOrClass) ? $objectOrClass::class : $objectOrClass, $fn));
+    fatal_error(sprintf("%s %s is not supported", is_object($objectOrClass) ? $objectOrClass::class : $objectOrClass, $fn));
 }
 
 /**
@@ -307,7 +307,7 @@ function unsupported(object|string $objectOrClass, string $fn): never
  */
 function request_concrete_implementation(object|string $objectOrClass, string $fn): never
 {
-    fatal_error(sprintf("%s %s() requires a subclass implementation", is_object($objectOrClass) ? $objectOrClass::class : $objectOrClass, $fn));
+    fatal_error(sprintf("%s %s requires a subclass implementation", is_object($objectOrClass) ? $objectOrClass::class : $objectOrClass, $fn));
 }
 
 /**

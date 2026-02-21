@@ -24,9 +24,7 @@ class Expression extends ObjectClass
         get => $this->collection ??= request_concrete_implementation($this, __PROPERTY__);
     }
     /** @var mixed The constant value of the expression. */
-    protected(set) mixed $constantValue {
-        get => $this->constantValue ??= request_concrete_implementation($this, __PROPERTY__);
-    }
+    protected(set) mixed $constantValue = null;
     /** @var string The function for the expression. Accessing this property raises an exception if it is not applicable to the expression. */
     protected(set) string $function {
         get => $this->function ??= request_concrete_implementation($this, __PROPERTY__);

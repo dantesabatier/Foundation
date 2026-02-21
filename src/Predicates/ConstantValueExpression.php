@@ -10,6 +10,9 @@ use function Sabatier\Foundation\human_readable_value;
 /** @internal */
 final class ConstantValueExpression extends Expression
 {
+    public string $keyPath {
+        get => $this->keyPath ??= $this->predicateFormat;
+    }
     public string $predicateFormat {
         get {
             $constantValue = $this->constantValue;
@@ -18,9 +21,6 @@ final class ConstantValueExpression extends Expression
             }
             return human_readable_value($constantValue);
         }
-    }
-    public string $keyPath {
-        get => $this->keyPath ??= $this->predicateFormat;
     }
 
     public function __construct(mixed $value)
