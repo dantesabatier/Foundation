@@ -15,10 +15,8 @@ use function Sabatier\Foundation\request_concrete_implementation;
  */
 class Expression extends ObjectClass
 {
-    /** @var ArrayClass<Expression>|null The arguments for the expression. An expression's arguments are the array of expressions that will be passed as parameters during invocation of the selector on the operand of a function expression. Accessing this property raises an exception if it is not applicable to the expression. */
-    protected(set) ?ArrayClass $arguments {
-        get => $this->arguments ??= request_concrete_implementation($this, __PROPERTY__);
-    }
+    /** @var ArrayClass<Expression>|null The arguments for the expression. An expression's arguments are the array of expressions that will be passed as parameters during invocation of the selector on the operand of a function expression. */
+    protected(set) ?ArrayClass $arguments = null;
     /** @var mixed The collection of expressions in an aggregate expression, or the collection element of a subquery expression. Accessing this property raises an exception if it is not applicable to the expression. */
     protected(set) mixed $collection {
         get => $this->collection ??= request_concrete_implementation($this, __PROPERTY__);
