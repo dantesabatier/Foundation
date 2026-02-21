@@ -32,9 +32,7 @@ class Expression extends ObjectClass
         get => $this->keyPath ??= request_concrete_implementation($this, __PROPERTY__);
     }
     /** @var Expression|null The operand for the expression. Accessing this property raises an exception if it is not applicable to the expression. The operand for an expression is the object on which the expression's selector or block will be invoked. The object is the result of evaluating a key path or one of the defined functions. */
-    protected(set) ?Expression $operand {
-        get => $this->operand ??= request_concrete_implementation($this, __PROPERTY__);
-    }
+    protected(set) ?Expression $operand = null;
     /** @var Predicate The predicate of a subquery expression. Accessing this property raises an exception if it is not applicable to the expression. */
     protected(set) Predicate $predicate {
         get => $this->predicate ??= request_concrete_implementation($this, __PROPERTY__);
