@@ -16,7 +16,7 @@ final class SubqueryExpression extends Expression
         get => sprintf("SUBQUERY(%s, %s, %s)", $this->collectionExpression->description, $this->variableExpression->description, $this->predicate->description);
     }
 
-    public function __construct(public Expression $collectionExpression, public readonly Expression $variableExpression, public Predicate $predicate)
+    public function __construct(public readonly Expression $collectionExpression, public readonly Expression $variableExpression, protected(set) Predicate $predicate)
     {
         parent::__construct(ExpressionType::subquery);
         $this->variable = $this->variableExpression->variable;
