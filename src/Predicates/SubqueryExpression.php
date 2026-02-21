@@ -12,13 +12,18 @@ use function Sabatier\Foundation\human_readable_value;
 /** @internal */
 final class SubqueryExpression extends Expression
 {
+    public readonly Expression $collectionExpression;
+    public readonly Expression $variableExpression;
     public string $predicateFormat {
         get => sprintf("SUBQUERY(%s, %s, %s)", $this->collectionExpression->description, $this->variableExpression->description, $this->predicate->description);
     }
 
-    public function __construct(public readonly Expression $collectionExpression, public readonly Expression $variableExpression, protected(set) Predicate $predicate)
+    public function __construct(Expression $collectionExpression, Expression $variableExpression, Predicate $predicate)
     {
         parent::__construct(ExpressionType::subquery);
+        $this->predicate = $predicate;
+        $this->variableExpression = $variableExpression;
+        $this->collectionExpression = $collectionExpression;
         $this->variable = $this->variableExpression->variable;
         $this->collection = $this->collectionExpression->expressionValue() ?? new ArrayClass();
     }

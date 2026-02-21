@@ -16,32 +16,57 @@ use function Sabatier\Foundation\request_concrete_implementation;
 class Expression extends ObjectClass
 {
     /** @var ArrayClass<Expression>|null The arguments for the expression. An expression's arguments are the array of expressions that will be passed as parameters during invocation of the selector on the operand of a function expression. Accessing this property raises an exception if it is not applicable to the expression. */
-    protected(set) ?ArrayClass $arguments = null;
+    protected(set) ?ArrayClass $arguments {
+        get => $this->arguments ??= request_concrete_implementation($this, __PROPERTY__);
+    }
     /** @var mixed The collection of expressions in an aggregate expression, or the collection element of a subquery expression. Accessing this property raises an exception if it is not applicable to the expression. */
-    protected(set) mixed $collection;
+    protected(set) mixed $collection {
+        get => $this->collection ??= request_concrete_implementation($this, __PROPERTY__);
+    }
     /** @var mixed The constant value of the expression. */
-    protected(set) mixed $constantValue = null;
+    protected(set) mixed $constantValue {
+        get => $this->constantValue ??= request_concrete_implementation($this, __PROPERTY__);
+    }
     /** @var string The function for the expression. Accessing this property raises an exception if it is not applicable to the expression. */
-    protected(set) string $function;
-    protected(set) string $keyPath;
+    protected(set) string $function {
+        get => $this->function ??= request_concrete_implementation($this, __PROPERTY__);
+    }
+    /** @var string The key path for the expression. Accessing this property raises an exception if it is not applicable to the expression. */
+    protected(set) string $keyPath {
+        get => $this->keyPath ??= request_concrete_implementation($this, __PROPERTY__);
+    }
     /** @var Expression|null The operand for the expression. Accessing this property raises an exception if it is not applicable to the expression. The operand for an expression is the object on which the expression's selector or block will be invoked. The object is the result of evaluating a key path or one of the defined functions. */
-    protected(set) ?Expression $operand = null;
+    protected(set) ?Expression $operand {
+        get => $this->operand ??= request_concrete_implementation($this, __PROPERTY__);
+    }
     /** @var Predicate The predicate of a subquery expression. Accessing this property raises an exception if it is not applicable to the expression. */
-    protected(set) Predicate $predicate;
-
+    protected(set) Predicate $predicate {
+        get => $this->predicate ??= request_concrete_implementation($this, __PROPERTY__);
+    }
     /** @var Expression The left expression of an aggregate expression. Accessing this property raises an exception if it is not applicable to the expression. */
-    protected(set) Expression $left;
+    protected(set) Expression $left {
+        get => $this->left ??= request_concrete_implementation($this, __PROPERTY__);
+    }
     /** @var Expression The right expression of an aggregate expression. Accessing this property raises an exception if it is not applicable to the expression. */
-    protected(set) Expression $right;
+    protected(set) Expression $right {
+        get => $this->right ??= request_concrete_implementation($this, __PROPERTY__);
+    }
     /** @var string The variable for the expression. Accessing this property raises an exception if it is not applicable to the expression. */
-    protected(set) string $variable;
+    protected(set) string $variable {
+        get => $this->variable ??= request_concrete_implementation($this, __PROPERTY__);
+    }
     /** @var Closure(mixed, ArrayClass<Expression>, Dictionary<mixed>|null): mixed Accessing this property raises an exception if it is not applicable to the expression. */
-    protected(set) Closure $expressionBlock;
-
+    protected(set) Closure $expressionBlock {
+        get => $this->expressionBlock ??= request_concrete_implementation($this, __PROPERTY__);
+    }
     /** @var Expression Accessing this property raises an exception if it is not applicable to the expression. */
-    protected(set) Expression $true;
+    protected(set) Expression $true {
+        get => $this->true ??= request_concrete_implementation($this, __PROPERTY__);
+    }
     /** @var Expression Accessing this property raises an exception if it is not applicable to the expression. */
-    protected(set) Expression $false;
+    protected(set) Expression $false {
+        get => $this->false ??= request_concrete_implementation($this, __PROPERTY__);
+    }
     /** @internal */
     public string $predicateFormat {
         get => request_concrete_implementation($this, __PROPERTY__);
