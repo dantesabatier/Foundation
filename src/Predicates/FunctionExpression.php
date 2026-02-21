@@ -35,7 +35,7 @@ class FunctionExpression extends Expression
             return $format . ")";
         }
     }
-    public string $selector;
+    public readonly string $selector;
 
     /**
      * @param ExpressionType $expressionType
