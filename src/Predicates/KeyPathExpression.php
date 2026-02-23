@@ -11,7 +11,7 @@ use function Sabatier\Foundation\typeof;
 /** @internal */
 final class KeyPathExpression extends FunctionExpression
 {
-    #[\Override]
+    #[Override]
     public string $predicateFormat {
         get {
             $format = "";

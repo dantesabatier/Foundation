@@ -10,7 +10,7 @@ use function Sabatier\Foundation\fatal_error;
 final class AnyKeyExpression extends Expression
 {
     private static ?AnyKeyExpression $default = null;
-    #[\Override]
+    #[Override]
     public string $predicateFormat {
         get => "ANYKEY";
     }

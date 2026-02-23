@@ -14,7 +14,7 @@ final class SubqueryExpression extends Expression
 {
     public readonly Expression $collectionExpression;
     public readonly Expression $variableExpression;
-    #[\Override]
+    #[Override]
     public string $predicateFormat {
         get => sprintf("SUBQUERY(%s, %s, %s)", $this->collectionExpression->description, $this->variableExpression->description, $this->predicate->description);
     }

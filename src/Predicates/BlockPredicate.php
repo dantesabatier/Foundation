@@ -17,7 +17,7 @@ use Sabatier\Foundation\Dictionary;
 /** @internal */
 final class BlockPredicate extends Predicate
 {
-    #[\Override]
+    #[Override]
     public string $predicateFormat {
         get => "BLOCKPREDICATE()";
     }

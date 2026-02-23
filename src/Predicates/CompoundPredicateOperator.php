@@ -10,6 +10,7 @@
 namespace Sabatier\Foundation\Predicates;
 
 use JetBrains\PhpStorm\ExpectedValues;
+use Override;
 use Sabatier\Foundation\ArrayClass;
 use Sabatier\Foundation\Dictionary;
 
@@ -22,7 +23,7 @@ final class CompoundPredicateOperator extends PredicateOperator
     public CompoundPredicateLogicalType $compoundPredicateType {
         get => CompoundPredicateLogicalType::from($this->operatorType->value);
     }
-    #[\Override]
+    #[Override]
     public string $symbol {
         get => strtoupper($this->compoundPredicateType->name);
     }

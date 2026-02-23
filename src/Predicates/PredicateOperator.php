@@ -11,6 +11,7 @@ namespace Sabatier\Foundation\Predicates;
 
 use BackedEnum;
 use JetBrains\PhpStorm\ExpectedValues;
+use Override;
 use Sabatier\Foundation\ArrayClass;
 use Sabatier\Foundation\CompareOptions;
 use Sabatier\Foundation\ObjectClass;
@@ -47,7 +48,7 @@ class PredicateOperator extends ObjectClass
     public string $predicateFormat {
         get => $this->symbol;
     }
-    #[\Override]
+    #[Override]
     public string $description {
         get => $this->predicateFormat;
     }

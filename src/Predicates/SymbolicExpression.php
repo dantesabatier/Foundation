@@ -8,7 +8,7 @@ use Sabatier\Foundation\Dictionary;
 /** @internal */
 final class SymbolicExpression extends Expression
 {
-    #[\Override]
+    #[Override]
     public string $predicateFormat {
         get => $this->constantValue;
     }

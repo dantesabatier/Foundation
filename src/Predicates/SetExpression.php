@@ -12,7 +12,7 @@ use function Sabatier\Foundation\human_readable_value;
 /** @internal */
 final class SetExpression extends Expression
 {
-    #[\Override]
+    #[Override]
     public string $predicateFormat {
         get => $this->left->predicateFormat . match ($this->expressionType) {
                 ExpressionType::minusSet => " MINUS ",

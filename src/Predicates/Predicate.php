@@ -21,7 +21,7 @@ class Predicate extends ObjectClass
     public string $predicateFormat {
         get => request_concrete_implementation($this, __PROPERTY__);
     }
-    #[\Override]
+    #[Override]
     public string $description {
         get => $this->predicateFormat;
     }

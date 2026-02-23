@@ -25,7 +25,7 @@ final class CompoundPredicate extends Predicate
             CompoundPredicateLogicalType::or => CompoundPredicateOperator::orPredicateOperator(),
         };
     }
-    #[\Override]
+    #[Override]
     public string $predicateFormat {
         get {
             $type = $this->compoundPredicateType;

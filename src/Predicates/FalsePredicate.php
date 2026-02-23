@@ -17,7 +17,7 @@ use Sabatier\Foundation\Dictionary;
 final class FalsePredicate extends Predicate
 {
     private static ?FalsePredicate $default = null;
-    #[\Override]
+    #[Override]
     public string $predicateFormat {
         get => "FALSEPREDICATE";
     }

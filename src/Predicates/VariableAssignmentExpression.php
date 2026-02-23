@@ -11,7 +11,7 @@ use function Sabatier\Foundation\typeof;
 /** @internal */
 final class VariableAssignmentExpression extends Expression
 {
-    #[\Override]
+    #[Override]
     public string $predicateFormat {
         get => sprintf("%s := %s", $this->assignmentVariable->predicateFormat, $this->subexpression->predicateFormat);
     }
