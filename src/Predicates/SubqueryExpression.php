@@ -34,6 +34,7 @@ final class SubqueryExpression extends Expression
         /** @var ArrayClass $collection */
         $collection = $this->collectionExpression->expressionValue($object, $context) ?? new ArrayClass();
         assert($collection instanceof Collection);
+        $this->collection = $collection;
         $context ??= new Dictionary();
         /** @psalm-suppress InvalidArgument */
         $context[$this->variable] ??= Expression::expressionForEvaluatedObject();
@@ -42,7 +43,6 @@ final class SubqueryExpression extends Expression
         if (Predicate::$debugDefault) {
             error_log(sprintf("Foundation: %s %s: %s %s => %s", $this->debugDescription, $this->expressionType->name, $collection->join(", "), $predicate->predicateFormat, human_readable_value($value)));
         }
-        $this->collection = $collection;
         return $value;
     }
 
