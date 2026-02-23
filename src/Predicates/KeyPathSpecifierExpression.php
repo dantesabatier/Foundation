@@ -8,6 +8,7 @@ use Sabatier\Foundation\Dictionary;
 /** @internal */
 final class KeyPathSpecifierExpression extends Expression
 {
+    #[\Override]
     public string $predicateFormat {
         get {
             $format = "";

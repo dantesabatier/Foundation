@@ -23,6 +23,7 @@ final class ComparisonPredicate extends Predicate
     public readonly int $options;
     /** @var PredicateOperatorType The predicate type for the receiver. */
     public readonly PredicateOperatorType $predicateOperatorType;
+    #[\Override]
     public string $predicateFormat {
         get {
             $modifierDescription = "";

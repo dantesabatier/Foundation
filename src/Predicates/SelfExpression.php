@@ -8,6 +8,7 @@ use Sabatier\Foundation\Dictionary;
 /** @internal */
 final class SelfExpression extends Expression
 {
+    #[\Override]
     public string $predicateFormat {
         get => "SELF";
     }

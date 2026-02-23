@@ -70,6 +70,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Arra
         current as private iteratorCurrent;
     }
 
+    #[Override]
     public string $description {
         get => "[{$this->join(", ")}]";
     }

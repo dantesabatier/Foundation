@@ -10,9 +10,11 @@ use function Sabatier\Foundation\human_readable_value;
 /** @internal */
 final class ConstantValueExpression extends Expression
 {
+    #[\Override]
     public string $keyPath {
         get => $this->keyPath ??= $this->predicateFormat;
     }
+    #[\Override]
     public string $predicateFormat {
         get {
             $constantValue = $this->constantValue;

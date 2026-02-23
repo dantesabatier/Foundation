@@ -24,6 +24,7 @@ final class FlattenSequence extends ObjectClass implements Sequence, IteratorAgg
         reduce as private sequenceReduce;
     }
 
+    #[Override]
     public string $description {
         get => sprintf("<%s %s <%s>>", $this->class, $this->base::class, human_readable_value($this->base));
     }

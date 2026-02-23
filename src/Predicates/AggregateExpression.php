@@ -11,6 +11,7 @@ use function Sabatier\Foundation\human_readable_value;
 /** @internal */
 final class AggregateExpression extends Expression
 {
+    #[\Override]
     public string $predicateFormat {
         get => "{{$this->collection->join(", ")}}";
     }

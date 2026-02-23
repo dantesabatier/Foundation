@@ -21,6 +21,7 @@ final class URLDirectoryEnumerator extends DirectoryEnumerator
     private readonly RecursiveIteratorIterator $iterator;
     private ?URL $currentURL = null;
     private bool $shouldContinue = false;
+    #[Override]
     public ?Dictionary $directoryAttributes {
         get {
             try {
@@ -30,6 +31,7 @@ final class URLDirectoryEnumerator extends DirectoryEnumerator
             }
         }
     }
+    #[Override]
     public ?Dictionary $fileAttributes {
         get {
             if (!($currentURL = $this->currentURL)) {
@@ -42,9 +44,11 @@ final class URLDirectoryEnumerator extends DirectoryEnumerator
             }
         }
     }
+    #[Override]
     public int $level {
         get => $this->iterator->getDepth();
     }
+    #[Override]
     private(set) bool $isEnumeratingDirectoryPostOrder = false;
 
     public function __construct(private readonly URL $url, private readonly ?ArrayClass $keys = null, #[ExpectedValues(flagsFromClass: DirectoryEnumerationOptions::class)] private readonly int $options = DirectoryEnumerationOptions::skipsHiddenFiles, private readonly ?Closure $errorHandler = null)

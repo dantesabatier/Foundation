@@ -7,6 +7,7 @@ use Override;
 /** @internal */
 final class NegateBooleanTransformer extends SharedValueTransformer
 {
+    #[Override]
     public string $description {
         get => "<shared NegateBoolean transformer>";
     }

@@ -17,6 +17,7 @@ use Sabatier\Foundation\Dictionary;
 final class TruePredicate extends Predicate
 {
     private static ?TruePredicate $default = null;
+    #[\Override]
     public string $predicateFormat {
         get => "TRUEPREDICATE";
     }

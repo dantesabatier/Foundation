@@ -48,6 +48,7 @@ final class Slice extends ObjectClass implements Collection, IteratorAggregate
     private(set) array $array {
         get => $this->array ??= array_slice($this->base->array, $this->startIndex, $this->endIndex);
     }
+    #[Override]
     public string $description {
         get => sprintf("<%s %s [%s...<%s]>", typeof($this->base), human_readable_value($this->base), $this->startIndex, $this->endIndex);
     }

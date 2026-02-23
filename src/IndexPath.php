@@ -54,6 +54,7 @@ final class IndexPath extends ObjectClass implements MutableCollection, ArrayAcc
         current as private iteratorCurrent;
     }
 
+    #[Override]
     public string $description {
         get => "[{$this->join(", ")}]";
     }

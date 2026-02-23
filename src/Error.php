@@ -76,6 +76,7 @@ class Error extends ObjectClass
     public ?ErrorRecoveryAttempting $recoveryAttempter {
         get => $this->userInfo?->valueForKey(RecoveryAttempterErrorKey);
     }
+    #[Override]
     public string $description {
         get => sprintf("Error Domain=%s Code=%s %s UserInfo=%s", $this->domain, $this->code, $this->localizedDescription, human_readable_value($this->userInfo));
     }

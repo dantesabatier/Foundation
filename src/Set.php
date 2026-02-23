@@ -108,6 +108,7 @@ class Set extends ObjectClass implements SetAlgebra, ArrayAccess, Iterator
     public array $array {
         get => $this->reserved;
     }
+    #[Override]
     public string $description {
         get => "[{$this->join(", ")}]";
     }

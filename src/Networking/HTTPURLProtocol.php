@@ -91,7 +91,7 @@ class HTTPURLProtocol extends NativeProtocol
             return false;
         }
         switch ($response->statusCode) {
-            case HTTPStatusCode::ok;
+            case HTTPStatusCode::ok:
             case HTTPStatusCode::nonAuthoritativeInformation:
             case HTTPStatusCode::noContent:
             case HTTPStatusCode::partialContent:

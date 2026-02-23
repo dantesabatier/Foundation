@@ -11,6 +11,7 @@ namespace Sabatier\Foundation;
 
 use Closure;
 use Fiber;
+use Override;
 use Throwable;
 
 /**
@@ -69,6 +70,7 @@ abstract class Operation extends ObjectClass
     public int $pid = NotFound;
     /** @internal */
     public OperationQueue $queue;
+    #[Override]
     public string $description {
         get => sprintf("<%s %s>", $this->class, $this->name ?? $this->hash);
     }

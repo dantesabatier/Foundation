@@ -3,6 +3,7 @@
 namespace Sabatier\Foundation\Networking;
 
 use JetBrains\PhpStorm\ExpectedValues;
+use Override;
 use Sabatier\Foundation\CompareOptions;
 use Sabatier\Foundation\Dictionary;
 use Sabatier\Foundation\Number;
@@ -23,6 +24,7 @@ class HTTPURLResponse extends URLResponse
     private(set) int $statusCode;
     /** @var Dictionary<mixed> All HTTP header fields of the response. */
     private(set) Dictionary $allHeaderFields;
+    #[Override]
     public string $description {
         get => sprintf("<HTTPURLResponse %s> { URL: %s }{ status: %d, headers {\n%s} }", $this->hash, $this->url->absoluteString, $this->statusCode, $this->allHeaderFields->mapValues(fn(mixed $value, string $key): string => is_string($value) ? "\"$key\" = \"$value\";\n" : sprintf("\"%s\" = %s;\n", $key, human_readable_value($value)))->values->join(""));
     }

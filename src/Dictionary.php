@@ -63,6 +63,7 @@ final class Dictionary extends ObjectClass implements Collection, ArrayAccess, I
     public array $array {
         get => $this->reserved;
     }
+    #[Override]
     public string $description {
         get => sprintf("[%s]", $this->isEmpty ? ":" : $this->mapValues(fn(mixed $value, string $key): string => sprintf("%s: %s", $key, human_readable_value($value)))->values->join(", "));
     }

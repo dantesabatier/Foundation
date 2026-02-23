@@ -10,6 +10,7 @@ use function Sabatier\Foundation\human_readable_value;
 /** @internal */
 final class TernaryExpression extends Expression
 {
+    #[\Override]
     public string $predicateFormat {
         get => sprintf("TERNARY(%s, %s, %s)", $this->predicate, $this->true, $this->false);
     }

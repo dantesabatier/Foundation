@@ -16,6 +16,7 @@ use function Sabatier\Foundation\typeof;
 /** @internal */
 final class CustomPredicateOperator extends PredicateOperator
 {
+    #[\Override]
     public string $symbol {
         get => $this->selector;
     }

@@ -14,6 +14,7 @@ final class SortDescriptor extends ObjectClass
     public SortDescriptor $reversedSortDescriptor {
         get => $this->reversedSortDescriptor ??= new SortDescriptor($this->key, !$this->ascending, $this->comparator);
     }
+    #[Override]
     public string $description {
         get => sprintf("%s %s", $this->key, human_readable_value($this->ascending));
     }

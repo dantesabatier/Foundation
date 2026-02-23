@@ -11,6 +11,7 @@ namespace Sabatier\Foundation;
 
 use Closure;
 use Fiber;
+use Override;
 use Throwable;
 
 /**
@@ -37,6 +38,7 @@ final class OperationQueue extends ObjectClass
     public ?string $name = null;
     /** @internal */
     public bool $isCurrentQueue = false;
+    #[Override]
     public string $description {
         get => sprintf("<%s %s>", $this->class, $this->name ?? $this->hash);
     }

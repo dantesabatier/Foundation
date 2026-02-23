@@ -47,6 +47,7 @@ class PredicateOperator extends ObjectClass
     public string $predicateFormat {
         get => $this->symbol;
     }
+    #[\Override]
     public string $description {
         get => $this->predicateFormat;
     }

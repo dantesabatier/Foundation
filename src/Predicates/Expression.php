@@ -65,6 +65,7 @@ class Expression extends ObjectClass
     public string $predicateFormat {
         get => request_concrete_implementation($this, __PROPERTY__);
     }
+    #[Override]
     public string $description {
         get => $this->predicateFormat;
     }

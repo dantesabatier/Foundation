@@ -52,6 +52,7 @@ final class CollectionDifference extends ObjectClass implements MutableCollectio
         current as private iteratorCurrent;
     }
 
+    #[Override]
     public string $description {
         get => "[{$this->join(", ")}]";
     }

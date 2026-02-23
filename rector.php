@@ -33,7 +33,7 @@ try {
     return RectorConfig::configure()
         ->withPaths([
             __DIR__ . "/src",
-        ])->withPhpSets(php84: true)->withSkip([
+        ])->withPhpSets()->withSkip([
             SensitiveConstantNameRector::class,
             ClassPropertyAssignToConstructorPromotionRector::class,
             ExplicitBoolCompareRector::class,

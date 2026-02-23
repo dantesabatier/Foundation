@@ -15,6 +15,7 @@ use function Sabatier\Foundation\fatal_error;
 /** @internal */
 class StringPredicateOperator extends PredicateOperator
 {
+    #[\Override]
     public string $symbol {
         get {
             $symbol = parent::$symbol::get();

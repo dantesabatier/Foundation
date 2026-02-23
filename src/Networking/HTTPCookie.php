@@ -2,6 +2,7 @@
 
 namespace Sabatier\Foundation\Networking;
 
+use Override;
 use Sabatier\Foundation\ArrayClass;
 use Sabatier\Foundation\Date;
 use Sabatier\Foundation\Dictionary;
@@ -49,6 +50,7 @@ final class HTTPCookie extends ObjectClass
     public readonly ?URL $commentURL;
     /** @var Dictionary<mixed> The cookie's properties. */
     public readonly Dictionary $properties;
+    #[Override]
     public string $description {
         get => sprintf("<HTTPCookie version:%d name:\"%s\" value:\"%s\" expires:%s sessionOnly:%s domain:\"%s\" path:\"%s\" isSecure:%s comment:%s ports:{%s}", $this->version, $this->name, $this->value, human_readable_value($this->expiresDate), human_readable_value($this->isSessionOnly), $this->domain, $this->path, human_readable_value($this->isSecure), human_readable_value($this->comment), $this->portList?->join(",") ?? 0);
     }

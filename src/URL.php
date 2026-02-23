@@ -169,6 +169,7 @@ final class URL extends ObjectClass
     private URLResourceValuesStorage $storage {
         get => $this->storage ??= new URLResourceValuesStorage();
     }
+    #[Override]
     public string $description {
         get => $this->absoluteString;
     }

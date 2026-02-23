@@ -2,6 +2,7 @@
 
 namespace Sabatier\Foundation\Networking;
 
+use Override;
 use Sabatier\Foundation\ObjectClass;
 use function Sabatier\Foundation\human_readable_value;
 
@@ -35,6 +36,7 @@ final class URLProtectionSpace extends ObjectClass
     public bool $isProxy {
         get => $this->proxyType !== null;
     }
+    #[Override]
     public string $description {
         get => sprintf("<URLProtectionSpace %s>: Host:%s, Server:%s, Auth-Scheme:%s, Realm:%s, Port:%d, Proxy:%s, Proxy-Type:%s", $this->hash, $this->host, human_readable_value($this->protocol), in_array($this->authenticationMethod, self::authenticationMethods) ? $this->authenticationMethod : URLAuthenticationMethodDefault, human_readable_value($this->realm), $this->port, strtoupper(human_readable_value($this->isProxy)), human_readable_value($this->proxyType));
     }

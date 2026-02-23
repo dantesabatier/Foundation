@@ -3,6 +3,7 @@
 namespace Sabatier\Foundation\Networking;
 
 use JetBrains\PhpStorm\ExpectedValues;
+use Override;
 use Sabatier\Foundation\Dictionary;
 use Sabatier\Foundation\ObjectClass;
 use Sabatier\Foundation\URL;
@@ -31,6 +32,7 @@ class URLRequest extends ObjectClass
     public URLRequestAttribution $attribution = URLRequestAttribution::developer;
     /** @internal */
     public Dictionary $protocolProperties;
+    #[Override]
     public string $description {
         get => "<URLRequest $this->hash> { URL: $this->url }";
     }

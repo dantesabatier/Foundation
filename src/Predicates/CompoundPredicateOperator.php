@@ -22,6 +22,7 @@ final class CompoundPredicateOperator extends PredicateOperator
     public CompoundPredicateLogicalType $compoundPredicateType {
         get => CompoundPredicateLogicalType::from($this->operatorType->value);
     }
+    #[\Override]
     public string $symbol {
         get => strtoupper($this->compoundPredicateType->name);
     }

@@ -23,6 +23,7 @@ final class Range extends ObjectClass implements ExpressibleByArrayLiteral, Iter
     public bool $isEmpty {
         get => $this->lowerBound === $this->upperBound;
     }
+    #[Override]
     public string $description {
         get => "[$this->lowerBound...<$this->upperBound]";
     }

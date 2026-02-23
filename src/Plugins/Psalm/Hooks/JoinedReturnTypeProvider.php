@@ -1,7 +1,5 @@
 <?php
 
-/** @noinspection PhpInternalEntityUsedInspection */
-
 namespace Sabatier\Foundation\Plugins\Psalm\Hooks;
 
 use Override;

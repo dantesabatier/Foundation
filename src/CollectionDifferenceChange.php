@@ -2,6 +2,8 @@
 
 namespace Sabatier\Foundation;
 
+use Override;
+
 /**
  * A single change to a collection.
  */
@@ -11,6 +13,7 @@ final class CollectionDifferenceChange extends ObjectClass
     {
     }
 
+    #[Override]
     public string $description {
         get => sprintf("CollectionDifferenceChange %s(offset: %d, element: %s, associatedWith: %s)", $this->type->name, $this->offset, human_readable_value($this->element), human_readable_value($this->targetOffset));
     }

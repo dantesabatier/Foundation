@@ -35,6 +35,7 @@ final class HTTPCookieStorage extends ObjectClass
     public ArrayClass $cookies {
         get => $this->allCookies->values;
     }
+    #[\Override]
     public string $description {
         get => ($this->isEphemeral ? "Ephemeral" : "") . "<HTTPCookieStorage cookies count:({$this->allCookies->count})>";
     }

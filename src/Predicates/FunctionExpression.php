@@ -12,6 +12,7 @@ use function Sabatier\Foundation\typeof;
 /** @internal */
 class FunctionExpression extends Expression
 {
+    #[\Override]
     public string $predicateFormat {
         get {
             $format = "";

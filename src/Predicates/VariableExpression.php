@@ -9,6 +9,7 @@ use function Sabatier\Foundation\human_readable_value;
 /** @internal */
 final class VariableExpression extends Expression
 {
+    #[\Override]
     public string $predicateFormat {
         get => $this->variable;
     }

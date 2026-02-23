@@ -8,6 +8,7 @@ use Override;
 /** @internal */
 final class UnarchiveFromDataTransformer extends SharedValueTransformer
 {
+    #[Override]
     public string $description {
         get => "<shared UnarchiveFromData transformer>";
     }

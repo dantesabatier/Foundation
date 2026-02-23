@@ -15,9 +15,11 @@ class Value extends ObjectClass
     public readonly mixed $value;
     /** @var string The type of the value */
     public readonly string $type;
+    #[Override]
     public string $description {
         get => human_readable_value($this->value);
     }
+    #[Override]
     public string $debugDescription {
         get => sprintf("<%s %s> (%s)%s", $this->class, $this->hash, $this->type, $this->description);
     }

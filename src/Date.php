@@ -24,9 +24,11 @@ final class Date extends ObjectClass
     public float $timeIntervalSince1970 {
         get => $this->timeIntervalSinceReferenceDate - self::timeIntervalBetween1970AndReferenceDate;
     }
+    #[Override]
     public string $description {
         get => $this->format();
     }
+    #[Override]
     public string $debugDescription {
         get => sprintf("<%s %s>", $this->class, $this->description);
     }

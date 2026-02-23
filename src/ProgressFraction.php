@@ -25,6 +25,7 @@ final class ProgressFraction extends ObjectClass
             return ($this->completed / $this->total);
         }
     }
+    #[Override]
     public string $debugDescription {
         get => "$this->completed / $this->total ($this->fractionCompleted)";
     }

@@ -12,6 +12,7 @@
 namespace Sabatier\Foundation\Predicates;
 
 use Exception;
+use Override;
 use Sabatier\Foundation\ArrayClass;
 use Sabatier\Foundation\InternalInconsistencyException;
 use Sabatier\Foundation\Scanner;
@@ -38,6 +39,7 @@ final class PredicateScanner extends Scanner
             }
         }
     }
+    #[Override]
     public string $charactersToBeSkipped = " \r\n";
 
     public function __construct(string $format, private readonly ArrayClass $arguments)

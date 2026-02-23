@@ -87,6 +87,7 @@ final class ExpressionOperator extends Expression
             default => false
         };
     }
+    #[\Override]
     public string $predicateFormat {
         get {
             $arguments = $this->arguments?->compactMap(function (Expression $expression): ?string {
