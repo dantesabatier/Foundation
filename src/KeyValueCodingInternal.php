@@ -7,7 +7,6 @@ function components_from_key_path(string $keyPath): KeyPathComponents
     $remainderPath = null;
     $idx = strpos($keyPath, ".");
     if ($idx !== false) {
-        $remainderPath = "";
         $subKey = substring_to_index($keyPath, $idx);
         if ($idx < (strlen($keyPath) - 1)) {
             $remainderPath = substring_from_index($keyPath, $idx + 1);
