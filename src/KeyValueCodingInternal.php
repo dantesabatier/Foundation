@@ -4,16 +4,10 @@ namespace Sabatier\Foundation;
 
 function components_from_key_path(string $keyPath): KeyPathComponents
 {
-    $remainderPath = null;
-    $idx = strpos($keyPath, ".");
-    if ($idx !== false) {
-        $subKey = substring_to_index($keyPath, $idx);
-        if ($idx < (strlen($keyPath) - 1)) {
-            $remainderPath = substring_from_index($keyPath, $idx + 1);
-        }
-        $keyPath = $subKey;
-    }
-    return new KeyPathComponents($keyPath, $remainderPath);
+    $parts = explode(".", $keyPath, 2);
+    $key = $parts[0];
+    $remainder = (isset($parts[1]) && $parts[1] !== "") ? $parts[1] : null;
+    return new KeyPathComponents($key, $remainder);
 }
 
 function kvc_operator_from_key(string $key): ?string
@@ -35,18 +29,21 @@ function kvc_operator_from_key(string $key): ?string
 function kvc_components(string $keyPath): array
 {
     $idx = strpos($keyPath, "@");
-    if ($idx === false) {
-        return [];
+    if ($idx !== false) {
+        $pathPart = substring_to_index($keyPath, $idx);
+        $operatorPart = substring_from_index($keyPath, $idx + 1);
+    } else {
+        $pathPart = $keyPath;
+        $operatorPart = "";
     }
     $collection = "";
     $keyPathToProperty = "";
-    $components = preg_split(sprintf("/%s/", preg_quote(".", "/")), substring_to_index($keyPath, $idx), -1, PREG_SPLIT_NO_EMPTY);
-    $numberOfComponents = count($components);
-    if ($numberOfComponents) {
+    $components = string_split_trimmed($pathPart, ".");
+    if (!empty($components)) {
         $collection = array_shift($components);
-        if ($numberOfComponents > 1) {
+        if (!empty($components)) {
             $keyPathToProperty = implode(".", $components);
         }
     }
-    return [(string)$collection, substring_from_index($keyPath, $idx + 1), $keyPathToProperty];
+    return [(string)$collection, $operatorPart, $keyPathToProperty];
 }
