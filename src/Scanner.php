@@ -95,13 +95,11 @@ class Scanner extends ObjectClass
             return false;
         }
         $substring = substr($this->string, $this->scanLocation, strlen($string));
-        if ((!string_is_equal($substring, $string, $this->caseSensitive ? CompareOptions::none : CompareOptions::caseInsensitive))) {
+        if (!string_is_equal($substring, $string, $this->caseSensitive ? CompareOptions::none : CompareOptions::caseInsensitive)) {
             return false;
         }
         $this->scanLocation += strlen($substring);
-        if (func_num_args() > 1) {
-            $into = $substring;
-        }
+        $into = $substring;
         return true;
     }
 
@@ -125,9 +123,7 @@ class Scanner extends ObjectClass
         }
         $substring = substr($this->string, $this->scanLocation, $location);
         $this->scanLocation += strlen($substring);
-        if (func_num_args() > 1) {
-            $into = $substring;
-        }
+        $into = $substring;
         return true;
     }
 
