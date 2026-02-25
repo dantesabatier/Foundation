@@ -24,7 +24,7 @@ function kvc_operator_from_key(string $key): ?string
 
 /**
  * @param string $keyPath
- * @return string[]
+ * @return array{string, string, string}
  */
 function kvc_components(string $keyPath): array
 {
