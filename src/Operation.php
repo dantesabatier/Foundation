@@ -67,7 +67,7 @@ abstract class Operation extends ObjectClass
         get => $this->dependencies ??= new ArrayClass();
     }
     /** @internal */
-    public int $pid = NotFound;
+    public ?Fiber $fiber = null;
     /** @internal */
     public OperationQueue $queue;
     #[Override]
@@ -83,27 +83,20 @@ abstract class Operation extends ObjectClass
         if ($this->isCancelled || $this->isExecuting || $this->isFinished) {
             return;
         }
-        try {
-            $fiber = new Fiber(function (): void {
-                Fiber::suspend();
-                $this->queue->isCurrentQueue = true;
-                $this->isExecuting = true;
-                $this->main();
-                $this->isExecuting = false;
-                if ($completionBlock = $this->completionBlock) {
-                    $completionBlock();
-                }
-                $this->isFinished = true;
-                $this->queue->isCurrentQueue = false;
-            });
-            $fiber->start();
-            if (!$fiber->isTerminated()) {
-                $fiber->resume();
+        $this->fiber = new Fiber(function (): void {
+            $this->queue->isCurrentQueue = true;
+            $this->isExecuting = true;
+            $this->main();
+            $this->isExecuting = false;
+            if ($completionBlock = $this->completionBlock) {
+                $completionBlock();
             }
-        } catch (Throwable) {
-        }
+            $this->isFinished = true;
+            $this->queue->isCurrentQueue = false;
+        });
+        $this->fiber->start();
     }
-
+    
     /**
      * Performs the receiver's non-concurrent task.
      *
