@@ -32,7 +32,7 @@ final class OperationQueue extends ObjectClass
         get => $this->operations ??= new ArrayClass();
     }
     /** @var int The maximum number of queued operations that can run at the same time. */
-    public int $maxConcurrentOperationCount;
+    public int $maxConcurrentOperationCount = self::defaultMaxConcurrentOperationCount;
     /** @var string|null The name of the operation queue. */
     public ?string $name = null;
     /** @internal */
@@ -44,7 +44,6 @@ final class OperationQueue extends ObjectClass
 
     public function __construct()
     {
-        $this->maxConcurrentOperationCount = self::defaultMaxConcurrentOperationCount;
         self::allQueues()->append($this);
     }
 

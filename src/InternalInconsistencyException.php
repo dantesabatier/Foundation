@@ -2,9 +2,34 @@
 
 namespace Sabatier\Foundation;
 
+use ErrorException;
+use Throwable;
+
 /**
  * An exception that occurs when an internal assertion fails and implies an unexpected condition within the called code.
  */
-class InternalInconsistencyException extends ErrorException
+class InternalInconsistencyException extends ErrorException implements CustomDebugStringConvertible
 {
+    public Error $error {
+        get => $this->error ??= new Error(CocoaErrorDomain, $this->code, new Dictionary([LocalizedDescriptionKey => localized_string("An unexpected error has occurred"), LocalizedFailureReasonErrorKey => $this->message ?: null]));
+    }
+    public string $description {
+        get => sprintf("<%s %s> code=%d severity=%d, file=%s line=%d error=%s", class_name(get_class($this)), spl_object_id($this), $this->code, $this->severity, $this->file, $this->line, $this->error->description);
+    }
+    public string $debugDescription {
+        get => $this->description;
+    }
+
+    public function __construct(string $message = "", int $code = 0, int $severity = 1, ?string $filename = __FILE__, ?int $line = __LINE__, ?Throwable $previous = null, ?Error $error = null)
+    {
+        parent::__construct($message, $code, $severity, $filename, $line, $previous);
+        if ($error !== null) {
+            $this->error = $error;
+        }
+    }
+
+    public function __toString(): string
+    {
+        return $this->description;
+    }
 }

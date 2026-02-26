@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Rector\CodeQuality\Rector\Catch_\ThrowWithPreviousExceptionRector;
 use Rector\CodeQuality\Rector\Class_\ConvertStaticToSelfRector;
 use Rector\CodeQuality\Rector\ClassMethod\ExplicitReturnNullRector;
 use Rector\CodeQuality\Rector\ClassMethod\LocallyCalledStaticMethodToNonStaticRector;
@@ -72,6 +73,9 @@ try {
             ],
             UseIdenticalOverEqualWithSameTypeRector::class => [
                 __DIR__ . "/src/StandardAdditions.php"
+            ],
+            ThrowWithPreviousExceptionRector::class => [
+                __DIR__ . "/src/Predicates/PredicateScanner.php"
             ]
         ])->withPreparedSets(deadCode: true, codeQuality: true, earlyReturn: true);
 } catch (InvalidConfigurationException $e) {

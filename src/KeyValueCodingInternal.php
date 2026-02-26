@@ -39,11 +39,11 @@ function kvc_components(string $keyPath): array
     $collection = "";
     $keyPathToProperty = "";
     $components = string_split_trimmed($pathPart, ".");
-    if (!empty($components)) {
+    if ($components !== []) {
         $collection = array_shift($components);
-        if (!empty($components)) {
+        if ($components !== []) {
             $keyPathToProperty = implode(".", $components);
         }
     }
-    return [(string)$collection, $operatorPart, $keyPathToProperty];
+    return [$collection, $operatorPart, $keyPathToProperty];
 }
