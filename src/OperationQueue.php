@@ -136,8 +136,7 @@ final class OperationQueue extends ObjectClass
                 $executing++;
             }
         }
-        $hasSuspended = $this->operations->contains(fn(Operation $op): bool => $op->fiber?->isSuspended() ?? false);
-        if ($hasSuspended) {
+        if ($this->operations->contains(fn(Operation $operation): bool => $operation->fiber?->isSuspended() === true)) {
             $this->schedule();
         }
     }
