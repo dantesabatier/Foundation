@@ -127,13 +127,15 @@ final class OperationQueue extends ObjectClass
             }
         }
         $executing = $this->operations->filter(fn(Operation $op): bool => $op->isExecuting)->count;
-        foreach ($this->operations as $operation) {
-            if ($executing >= $this->maxConcurrentOperationCount) {
-                break;
-            }
-            if ($operation->isReady && !$operation->isExecuting && !$operation->isFinished && !$operation->isCancelled) {
-                $operation->start();
-                $executing++;
+        if ($executing < $this->maxConcurrentOperationCount) {
+            foreach ($this->operations as $operation) {
+                if ($operation->isReady && !$operation->isExecuting && !$operation->isFinished && !$operation->isCancelled) {
+                    $operation->start();
+                    $executing++;
+                    if ($executing >= $this->maxConcurrentOperationCount) {
+                        break;
+                    }
+                }
             }
         }
         if ($this->operations->contains(fn(Operation $operation): bool => $operation->fiber?->isSuspended() === true)) {
