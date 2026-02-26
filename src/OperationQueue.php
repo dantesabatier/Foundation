@@ -116,7 +116,6 @@ final class OperationQueue extends ObjectClass
             });
             $this->addOperations($operation->dependencies);
         }
-        $this->schedule();
     }
 
     /**
@@ -124,11 +123,6 @@ final class OperationQueue extends ObjectClass
      */
     private function schedule(): void
     {
-        foreach ($this->operations as $operation) {
-            if ($operation->isExecuting && $operation->fiber?->isSuspended()) {
-                $operation->fiber->resume();
-            }
-        }
         $executing = $this->operations->filter(fn(Operation $op): bool => $op->isExecuting)->count;
         if ($executing < $this->maxConcurrentOperationCount) {
             foreach ($this->operations as $operation) {
@@ -141,8 +135,12 @@ final class OperationQueue extends ObjectClass
                 }
             }
         }
-        if ($this->operations->contains(fn(Operation $operation): bool => $operation->fiber?->isSuspended() === true)) {
-            $this->schedule();
+        while ($this->operations->contains(fn(Operation $op): bool => $op->fiber?->isSuspended() === true)) {
+            foreach ($this->operations as $operation) {
+                if ($operation->isExecuting && $operation->fiber?->isSuspended()) {
+                    $operation->fiber->resume();
+                }
+            }
         }
     }
 
@@ -161,6 +159,7 @@ final class OperationQueue extends ObjectClass
         foreach ($operations as $operation) {
             $this->addOperation($operation);
         }
+        $this->schedule();
         if ($waitUntilFinished) {
             $this->waitUntilAllOperationsAreFinished();
         }
