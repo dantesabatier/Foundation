@@ -98,7 +98,7 @@ final class OperationQueue extends ObjectClass
      */
     public function addOperation(Operation $operation): void
     {
-        $operation->isExecuting && $operation->isFinished) ?: fatal_error("Operation is already executing or finished.");
+        !$operation->isExecuting && !$operation->isFinished) ?: fatal_error("Operation is already executing or finished.");
         $this->operations->append($operation);
         $this->operations->sort(fn(Operation $op0, Operation $op1): int => $op0->queuePriority->value <=> $op1->queuePriority->value);
         $operation->observe("isFinished", KeyValueObservingOptions::new, function (Operation $operation, KeyValueObservedChange $change): void {
