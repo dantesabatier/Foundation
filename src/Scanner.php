@@ -190,7 +190,7 @@ class Scanner extends ObjectClass
             return false;
         }
         $value = $matches[0];
-        $intValue = hexdec($value);
+        $intValue = hexdec((string)$value);
         $int = (int)$intValue;
         $this->scanLocation += mb_strlen((string)$value);
         return true;
@@ -238,9 +238,9 @@ class Scanner extends ObjectClass
         $intVal = $intPartHex !== "" ? hexdec($intPartHex) : 0;
         $fracVal = 0;
         if ($fracPartHex !== "") {
-            $fracVal = hexdec($fracPartHex) / pow(16, strlen($fracPartHex));
+            $fracVal = hexdec($fracPartHex) / 16 ** strlen($fracPartHex);
         }
-        $float = $sign * ($intVal + $fracVal) * pow(2, $exponent);
+        $float = $sign * ($intVal + $fracVal) * 2 ** $exponent;
         $this->scanLocation += mb_strlen((string)$value);
         return true;
     }
