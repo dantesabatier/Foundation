@@ -175,6 +175,7 @@ final class OperationQueue extends ObjectClass
     public function addOperationWithBlock(Closure $block): void
     {
         $this->addOperation(new BlockOperation($block));
+        $this->schedule();
     }
 
     /**
