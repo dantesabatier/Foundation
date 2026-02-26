@@ -10,7 +10,6 @@
 namespace Sabatier\Foundation;
 
 use Closure;
-use Fiber;
 use Override;
 use Throwable;
 
@@ -95,6 +94,7 @@ final class OperationQueue extends ObjectClass
      *
      * Once added, the specified operation remains in the queue until it finishes executing.
      * @param Operation $operation The operation to be added to the queue.
+     * @throws Throwable
      */
     public function addOperation(Operation $operation): void
     {
@@ -118,7 +118,10 @@ final class OperationQueue extends ObjectClass
         }
         $this->schedule();
     }
-    
+
+    /**
+     * @throws Throwable
+     */
     private function schedule(): void
     {
         foreach ($this->operations as $operation) {
@@ -168,6 +171,7 @@ final class OperationQueue extends ObjectClass
      * This method adds a single block to the receiver by first wrapping it in an operation object.
      * You should not attempt to get a reference to the newly created operation object or determine its type information.
      * @param Closure(): void $block The block to execute from the operation. The block takes no parameters and has no return value.
+     * @throws Throwable
      */
     public function addOperationWithBlock(Closure $block): void
     {
@@ -188,6 +192,7 @@ final class OperationQueue extends ObjectClass
 
     /**
      * Blocks the current thread until all the receiver's queued and executing operations finish executing.
+     * @throws Throwable
      */
     public function waitUntilAllOperationsAreFinished(): void
     {

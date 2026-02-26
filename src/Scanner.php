@@ -9,7 +9,7 @@ class Scanner extends ObjectClass
 {
     /** @var int The character position at which the receiver will begin its next scanning operation. This property is useful for backing up to rescan after an error. Rather than setting the scan location directly to skip known sequences of characters, use {@see scanString()} or {@see scanCharacters()}, which allow you to verify that the expected substring (or set of characters) is in fact present. */
     public int $scanLocation = 0 {
-        set => min(max($value, 0), strlen($this->string));
+        set => min(max($value, 0), mb_strlen($this->string));
     }
     /** @var bool Flag that indicates whether the receiver distinguishes the case in the characters it scans. */
     public bool $caseSensitive = false;
@@ -18,7 +18,7 @@ class Scanner extends ObjectClass
     public string $charactersToBeSkipped = " ";
     /** @var bool Flag that indicates whether the receiver has exhausted all significant characters. */
     public bool $isAtEnd {
-        get => $this->scanLocation >= strlen($this->string);
+        get => $this->scanLocation >= mb_strlen($this->string);
     }
 
     /**
@@ -36,9 +36,9 @@ class Scanner extends ObjectClass
         }
         $substring = null;
         $scanLocation = $this->scanLocation;
-        $length = strlen($this->string);
+        $length = mb_strlen($this->string);
         while ($scanLocation !== $length) {
-            $character = $this->string[$scanLocation];
+            $character = mb_substr($this->string, $scanLocation, 1);
             if (in_string($characters, $character) === $stop) {
                 break;
             }
@@ -73,7 +73,6 @@ class Scanner extends ObjectClass
      * @param string $characters The set of characters up to which to scan.
      * @param string|null $into Upon return, contains the characters scanned.
      * @return bool true if the receiver scanned any characters, otherwise false.
-     * If the only scanned characters are in the {@see charactersToBeSkipped} character set (which is the whitespace and newline character set by default), then returns false.
      */
     public function scanUpCharacters(string $characters, ?string &$into = null): bool
     {
@@ -94,11 +93,12 @@ class Scanner extends ObjectClass
         if ($this->isAtEnd) {
             return false;
         }
-        $substring = substr($this->string, $this->scanLocation, strlen($string));
+        $length = mb_strlen($string);
+        $substring = mb_substr($this->string, $this->scanLocation, $length);
         if (!string_is_equal($substring, $string, $this->caseSensitive ? CompareOptions::none : CompareOptions::caseInsensitive)) {
             return false;
         }
-        $this->scanLocation += strlen($substring);
+        $this->scanLocation += $length;
         $into = $substring;
         return true;
     }
@@ -108,7 +108,6 @@ class Scanner extends ObjectClass
      * @param string $string The string to scan up to.
      * @param string|null $into Upon return, contains any characters that were scanned.
      * @return bool true if the receiver scans any characters, otherwise false.
-     * If the only scanned characters are in the {@see charactersToBeSkipped} character set (which by default is the whitespace and newline character set), then this method returns false.
      */
     public function scanUpString(string $string, ?string &$into = null): bool
     {
@@ -116,13 +115,15 @@ class Scanner extends ObjectClass
         if ($this->isAtEnd) {
             return false;
         }
-        $substring = substring_from_index($this->string, $this->scanLocation);
-        $location = $this->caseSensitive ? strpos($substring, $string) : stripos($substring, $string);
+        $substring = mb_substr($this->string, $this->scanLocation);
+        $location = $this->caseSensitive
+            ? mb_strpos($substring, $string)
+            : mb_stripos($substring, $string);
         if ($location === false) {
             return false;
         }
-        $substring = substr($this->string, $this->scanLocation, $location);
-        $this->scanLocation += strlen($substring);
+        $substring = mb_substr($this->string, $this->scanLocation, $location);
+        $this->scanLocation += $location;
         $into = $substring;
         return true;
     }
@@ -139,7 +140,7 @@ class Scanner extends ObjectClass
         if ($this->isAtEnd) {
             return false;
         }
-        $substring = substring_from_index($this->string, $this->scanLocation);
+        $substring = mb_substr($this->string, $this->scanLocation);
         if (!string_search($substring, $isInt ? "[1-9]+[0-9]*" : "[0-9]*\.?[0-9]+([eE][0-9]+)?", SearchMethod::beginsWith, CompareOptions::quoted, $matches)) {
             return false;
         }
@@ -148,7 +149,7 @@ class Scanner extends ObjectClass
         }
         $value = $matches[0];
         $number = filter_var($value, $isInt ? FILTER_VALIDATE_INT : FILTER_VALIDATE_FLOAT);
-        $this->scanLocation = (int)strpos($this->string, (string)$value, $this->scanLocation) + strlen((string)$value);
+        $this->scanLocation += mb_strlen((string)$value);
         return true;
     }
 
@@ -177,8 +178,10 @@ class Scanner extends ObjectClass
     private function skipCharacters(): void
     {
         $scanLocation = $this->scanLocation;
-        while ($scanLocation < strlen($this->string)) {
-            if (!in_string($this->charactersToBeSkipped, $this->string[$scanLocation], $this->caseSensitive ? CompareOptions::none : CompareOptions::caseInsensitive)) {
+        $length = mb_strlen($this->string);
+        while ($scanLocation < $length) {
+            $char = mb_substr($this->string, $scanLocation, 1);
+            if (!in_string($this->charactersToBeSkipped, $char, $this->caseSensitive ? CompareOptions::none : CompareOptions::caseInsensitive)) {
                 break;
             }
             $scanLocation++;

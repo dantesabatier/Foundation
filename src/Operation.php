@@ -77,6 +77,7 @@ abstract class Operation extends ObjectClass
 
     /**
      * Begins the execution of the operation.
+     * @throws Throwable
      */
     public function start(): void
     {
@@ -96,7 +97,7 @@ abstract class Operation extends ObjectClass
         });
         $this->fiber->start();
     }
-    
+
     /**
      * Performs the receiver's non-concurrent task.
      *
@@ -155,6 +156,7 @@ abstract class Operation extends ObjectClass
      *
      * An operation object must never call this method on itself and should avoid calling it on any operations submitted to the same operation queue as itself. Doing so can cause the operation to deadlock. Instead, other parts of your app may call this method as needed to prevent other tasks from completing until the target operation object finishes. It is generally safe to call this method on an operation that is in a different operation queue, although it is still possible to create deadlocks if each operation waits on the other.
      * A typical use for this method would be to call it from the code that created the operation in the first place. After submitting the operation to a queue, you would call this method to wait until that operation finished executing.
+     * @throws Throwable
      */
     public function waitUntilFinished(): void
     {
