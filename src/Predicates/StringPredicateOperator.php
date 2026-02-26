@@ -10,12 +10,13 @@
 namespace Sabatier\Foundation\Predicates;
 
 use JetBrains\PhpStorm\ExpectedValues;
+use Override;
 use function Sabatier\Foundation\fatal_error;
 
 /** @internal */
 class StringPredicateOperator extends PredicateOperator
 {
-    #[\Override]
+    #[Override]
     public string $symbol {
         get {
             $symbol = parent::$symbol::get();

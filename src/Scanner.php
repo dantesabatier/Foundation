@@ -130,11 +130,23 @@ class Scanner extends ObjectClass
         return true;
     }
 
+    /**
+     * Scans for an int value from a decimal representation, returning a found value by reference.
+     * @param int $int Upon return, contains the scanned value.
+     * @param-out int|float $int
+     * @return bool true if the receiver finds a valid decimal integer representation, otherwise false.
+     */
     public function scanInt(int &$int): bool
     {
         return $this->scanNumber($int);
     }
 
+    /**
+     * Scans for a float value, returning a found value by reference.
+     * @param float $float Upon return, contains the scanned value.
+     * @param-out float $float
+     * @return bool true if the receiver finds a valid floating-point representation, otherwise false.
+     */
     public function scanFloat(float &$float): bool
     {
         return $this->scanNumber($float, false);
@@ -162,9 +174,6 @@ class Scanner extends ObjectClass
         }
         $value = $matches[0];
         $number = filter_var($value, $isInt ? FILTER_VALIDATE_INT : FILTER_VALIDATE_FLOAT);
-        if ($number === false) {
-            return false;
-        }
         $this->scanLocation += mb_strlen((string)$value);
         return true;
     }
@@ -218,6 +227,7 @@ class Scanner extends ObjectClass
             return false;
         }
         $value = $matches[0];
+        /** @var string $cleanValue */
         $cleanValue = str_replace(["p", "P"], "p", $value);
         $parts = explode("p", $cleanValue);
         $mantissaPart = $parts[0];
