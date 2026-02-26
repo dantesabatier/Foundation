@@ -130,6 +130,16 @@ class Scanner extends ObjectClass
         return true;
     }
 
+    public function scanInt(int &$int): bool
+    {
+        return $this->scanNumber($int);
+    }
+
+    public function scanFloat(float &$float): bool
+    {
+        return $this->scanNumber($float, false);
+    }
+
     /**
      * @param float|int $number
      * @param-out float|int $number
@@ -159,14 +169,80 @@ class Scanner extends ObjectClass
         return true;
     }
 
-    public function scanInt(int &$int): bool
+    /**
+     * Scans for a hexadecimal int value (e.g., "0xFF", "A1").
+     *
+     * @param-out int $int
+     * @return bool true if the receiver finds a valid hex int representation.
+     */
+    public function scanHexInt(int &$int): bool
     {
-        return $this->scanNumber($int);
+        $this->skipCharacters();
+        if ($this->isAtEnd) {
+            return false;
+        }
+        $substring = mb_substr($this->string, $this->scanLocation);
+        $pattern = "(?:0[xX])?[0-9a-fA-F]+";
+        if (!string_search($substring, $pattern, SearchMethod::beginsWith, CompareOptions::quoted, $matches)) {
+            return false;
+        }
+        if (empty($matches)) {
+            return false;
+        }
+        $value = $matches[0];
+        $intValue = hexdec($value);
+        $int = (int)$intValue;
+        $this->scanLocation += mb_strlen((string)$value);
+        return true;
     }
 
-    public function scanFloat(float &$float): bool
+    /**
+     * Scans for a hexadecimal float value (e.g., "0x1.fp3", "0xABC.8").
+     * Supports C99/IEEE 754 hex float strings.
+     *
+     * @param float $float Upon return, contains the scanned value.
+     * @return bool true if the receiver finds a valid hex float representation.
+     */
+    public function scanHexFloat(float &$float): bool
     {
-        return $this->scanNumber($float, false);
+        $this->skipCharacters();
+        if ($this->isAtEnd) {
+            return false;
+        }
+        $substring = mb_substr($this->string, $this->scanLocation);
+        $pattern = "[-+]?0[xX](?:[0-9a-fA-F]+(?:\.[0-9a-fA-F]*)?|\.[0-9a-fA-F]+)(?:[pP][-+]?[0-9]+)?";
+        if (!string_search($substring, $pattern, SearchMethod::beginsWith, CompareOptions::quoted, $matches)) {
+            return false;
+        }
+        if (empty($matches)) {
+            return false;
+        }
+        $value = $matches[0];
+        $cleanValue = str_replace(["p", "P"], "p", $value);
+        $parts = explode("p", $cleanValue);
+        $mantissaPart = $parts[0];
+        $exponent = isset($parts[1]) ? (int)$parts[1] : 0;
+        $sign = 1;
+        if (str_starts_with($mantissaPart, "-")) {
+            $sign = -1;
+            $mantissaPart = substr($mantissaPart, 1);
+        } elseif (str_starts_with($mantissaPart, "+")) {
+            $mantissaPart = substr($mantissaPart, 1);
+        }
+        if (str_starts_with(strtolower($mantissaPart), "0x")) {
+            $mantissaPart = substr($mantissaPart, 2);
+        }
+        $hexParts = explode(".", $mantissaPart);
+        $intPartHex = $hexParts[0] ?? "0";
+        $fracPartHex = $hexParts[1] ?? "";
+        $intVal = $intPartHex !== "" ? hexdec($intPartHex) : 0;
+        $fracVal = 0;
+        if ($fracPartHex !== "") {
+            $fracVal = hexdec($fracPartHex) / pow(16, strlen($fracPartHex));
+        }
+        $float = $sign * ($intVal + $fracVal) * pow(2, $exponent);
+        $this->scanLocation += mb_strlen((string)$value);
+        return true;
     }
 
     private function skipCharacters(): void
