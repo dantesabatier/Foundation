@@ -67,9 +67,9 @@ abstract class Operation extends ObjectClass
         get => $this->dependencies ??= new ArrayClass();
     }
     /** @internal */
-    public ?Fiber $fiber = null;
-    /** @internal */
     public OperationQueue $queue;
+    /** @internal */
+    private(set) ?Fiber $fiber = null;
     #[Override]
     public string $description {
         get => sprintf("<%s %s>", $this->class, $this->name ?? $this->hash);
