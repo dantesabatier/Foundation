@@ -158,5 +158,10 @@ abstract class Operation extends ObjectClass
      */
     public function waitUntilFinished(): void
     {
+        while (!$this->isFinished) {
+            if ($this->fiber?->isSuspended()) {
+                $this->fiber->resume();
+            }
+        }
     }
 }
