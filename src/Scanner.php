@@ -22,7 +22,6 @@ class Scanner extends ObjectClass
     }
     /** @var int Cached length of the string to avoid O(n) calculation in the property hook. */
     private int $length;
-
     /** @var array<string> Optimization: Array of characters for O(1) access inside loops. */
     private array $chars;
 
@@ -34,29 +33,6 @@ class Scanner extends ObjectClass
     {
         $this->length = mb_strlen($string);
         $this->chars = mb_str_split($string);
-    }
-
-    private function scanSet(string $characters, ?string &$into = null, bool $stop = false): bool
-    {
-        $this->skipCharacters();
-        if ($this->isAtEnd) {
-            return false;
-        }
-        $scanLocation = $this->scanLocation;
-        $startLocation = $scanLocation;
-        while ($scanLocation < $this->length) {
-            $character = $this->chars[$scanLocation];
-            if (in_string($characters, $character) === $stop) {
-                break;
-            }
-            $scanLocation++;
-        }
-        if ($scanLocation === $startLocation) {
-            return false;
-        }
-        $into = mb_substr($this->string, $startLocation, $scanLocation - $startLocation);
-        $this->scanLocation = $scanLocation;
-        return true;
     }
 
     /**
@@ -80,7 +56,30 @@ class Scanner extends ObjectClass
     {
         return $this->scanSet($characters, $into, true);
     }
-
+    
+    private function scanSet(string $characters, ?string &$into = null, bool $stop = false): bool
+    {
+        $this->skipCharacters();
+        if ($this->isAtEnd) {
+            return false;
+        }
+        $scanLocation = $this->scanLocation;
+        $startLocation = $scanLocation;
+        while ($scanLocation < $this->length) {
+            $character = $this->chars[$scanLocation];
+            if (in_string($characters, $character) === $stop) {
+                break;
+            }
+            $scanLocation++;
+        }
+        if ($scanLocation === $startLocation) {
+            return false;
+        }
+        $into = mb_substr($this->string, $startLocation, $scanLocation - $startLocation);
+        $this->scanLocation = $scanLocation;
+        return true;
+    }
+    
     /**
      * Scans a given string, returning an equivalent string object by reference if a match is found.
      *
