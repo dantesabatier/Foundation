@@ -20,8 +20,20 @@ class InternalInconsistencyException extends ErrorException implements CustomDeb
         get => $this->description;
     }
 
-    public function __construct(string $message = "", int $code = 0, int $severity = 1, ?string $filename = __FILE__, ?int $line = __LINE__, ?Throwable $previous = null, ?Error $error = null)
+    public function __construct(string $message = "", int $code = 0, int $severity = E_ERROR, ?string $filename = null, ?int $line = null, ?Throwable $previous = null, ?Error $error = null)
     {
+        if ($filename === null || $line === null) {
+            $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+            $caller = $trace[0];
+            foreach ($trace as $frame) {
+                if (isset($frame["file"], $frame["line"]) &&  ($frame["function"] ?? "") !== "__construct") {
+                    $caller = $frame;
+                    break;
+                }
+            }
+            $filename ??= $caller["file"] ?? "unknown";
+            $line ??= $caller["line"] ?? 0;
+        }
         parent::__construct($message, $code, $severity, $filename, $line, $previous);
         if ($error !== null) {
             $this->error = $error;

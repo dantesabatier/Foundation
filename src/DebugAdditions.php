@@ -263,15 +263,11 @@ function pluralize(string $entity, int|float $count, string $locale = "en_US"): 
 function fatal_error(string $message = "", string $file = "", int $line = 0): never
 {
     if (!$file || !$line) {
-        $backtrace = debug_backtrace()[0] ?? [];
-        if (isset($backtrace["file"])) {
-            $file = $backtrace["file"];
-        }
-        if (isset($backtrace["line"])) {
-            $line = $backtrace["line"];
-        }
+        $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1] ?? [];
+        $file = $file ?: ($trace["file"] ?? "unknown");
+        $line = $line ?: ($trace["line"] ?? 0);
     }
-    throw new InternalInconsistencyException($message, 0, 0, $file, $line);
+    throw new InternalInconsistencyException($message, 0, E_ERROR, $file, $line);
 }
 
 /**
