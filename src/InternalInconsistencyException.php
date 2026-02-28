@@ -10,7 +10,7 @@ use Throwable;
  */
 class InternalInconsistencyException extends ErrorException implements CustomDebugStringConvertible
 {
-    public Error $error {
+    protected(set) Error $error {
         get => $this->error ??= new Error(CocoaErrorDomain, $this->code, new Dictionary([LocalizedDescriptionKey => localized_string("An unexpected error has occurred"), LocalizedFailureReasonErrorKey => $this->message ?: null]));
     }
     public string $description {
