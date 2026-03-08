@@ -101,7 +101,10 @@ function getallheaders(): array
         if (str_starts_with($key, "HTTP_")) {
             $key = substring_from_index($key, 5);
             if (!isset($copy_server[$key]) || !isset($_SERVER[$key])) {
-                $key = str_replace(" ", "-", ucwords(strtolower(str_replace("_", " ", $key))));
+                $key = str_replace("_", " ", $key)
+                        |> strtolower(...)
+                        |> ucwords(...)
+                        |> (fn($x) => str_replace(" ", "-", $x));
                 assert(is_string($value), sprintf("Invalid argument: expecting string, \"%s\" given", typeof($value)));
                 $headers[$key] = $value;
             }

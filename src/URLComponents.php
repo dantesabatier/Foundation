@@ -90,7 +90,9 @@ final class URLComponents extends ObjectClass
                 return null;
             }
             return new ArrayClass($components)->map(function (string $pair): URLQueryItem {
-                $components = preg_split(sprintf("/%s/", preg_quote("=", "/")), $pair, -1, PREG_SPLIT_NO_EMPTY);
+                $components = preg_quote("=", "/")
+                        |> (fn($x) => sprintf("/%s/", $x))
+                        |> (fn($x) => preg_split($x, $pair, -1, PREG_SPLIT_NO_EMPTY));
                 [$name, $value] = $components;
                 if ($value) {
                     $value = htmlspecialchars(urldecode($value), ENT_QUOTES);

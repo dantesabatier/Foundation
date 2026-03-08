@@ -139,7 +139,10 @@ function array_remove(array &$array, mixed $element): array
  */
 function string_split_trimmed(string $string, string $separator = ","): array
 {
-    return array_values(array_filter(array_map(trim(...), explode($separator, $string)), fn(string $v): bool => $v !== ""));
+    return explode($separator, $string)
+            |> (fn($x) => array_map(trim(...), $x))
+            |> (fn($x) => array_filter($x, fn(string $v): bool => $v !== ""))
+            |> array_values(...);
 }
 
 /**
@@ -248,10 +251,14 @@ function string_compare(string $string, string $other, #[ExpectedValues(flagsFro
         $string = string_with_options($string, $options);
         $other = string_with_options($other, $options);
         if ($options & CompareOptions::caseInsensitive) {
-            return max(min(strcasecmp($string, $other), ComparisonResult::orderedDescending->value), ComparisonResult::orderedAscending->value);
+            return strcasecmp($string, $other)
+                    |> (fn($x) => min($x, ComparisonResult::orderedDescending->value))
+                    |> (fn($x) => max($x, ComparisonResult::orderedAscending->value));
         }
     }
-    return max(min(strcmp($string, $other), ComparisonResult::orderedDescending->value), ComparisonResult::orderedAscending->value);
+    return strcmp($string, $other)
+            |> (fn($x) => min($x, ComparisonResult::orderedDescending->value))
+            |> (fn($x) => max($x, ComparisonResult::orderedAscending->value));
 }
 
 /**
@@ -275,7 +282,10 @@ function string_is_equal(string $string, string $other, #[ExpectedValues(flagsFr
  */
 function string_has_prefix(string $string, string $prefix, #[ExpectedValues(flagsFromClass: CompareOptions::class)] int $options = CompareOptions::none): bool
 {
-    return string_is_equal(substring_to_index($string, strlen($prefix)), $prefix, $options);
+    return $prefix
+            |> strlen(...)
+            |> (fn($x) => substring_to_index($string, $x))
+            |> (fn($x) => string_is_equal($x, $prefix, $options));
 }
 
 /**
@@ -446,7 +456,10 @@ function localized_string(string $string, string $domain = "Localizable", string
  */
 function base64_url_encode(string $string): string
 {
-    return rtrim(strtr(base64_encode($string), "+/", "-_"), "=");
+    return $string
+            |> base64_encode(...)
+            |> (fn($x) => strtr($x, "+/", "-_"))
+            |> (fn($x) => rtrim($x, "="));
 }
 
 /**

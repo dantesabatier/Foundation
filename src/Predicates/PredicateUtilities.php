@@ -219,7 +219,10 @@ final class PredicateUtilities
             "bool", "boolean" => new Number($value)->boolValue,
             Date::class => new Date(new Number($value)->floatValue),
             Number::class => new Number($value),
-            default => fatal_error(sprintf("Do not know how to cast %s to type %s", human_readable_value($value), $type))
+            default => $value
+                    |> human_readable_value(...)
+                    |> (fn($x) => sprintf("Do not know how to cast %s to type %s", $x, $type))
+                    |> fatal_error(...)
         };
     }
 

@@ -37,7 +37,10 @@ final class VariableExpression extends Expression
     {
         $value = $this->withSubstitutionVariables($context ?? new Dictionary())->expressionValue($object, $context);
         if (Predicate::$debugDefault) {
-            error_log(sprintf("Foundation: %s %s: %s", $this->debugDescription, $this->expressionType->name, human_readable_value($value)));
+            $value
+                |> human_readable_value(...)
+                |> (fn($x) => sprintf("Foundation: %s %s: %s", $this->debugDescription, $this->expressionType->name, $x))
+                |> error_log(...);
         }
         return $value;
     }

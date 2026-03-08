@@ -38,7 +38,10 @@ trait SequenceAlgorithms
     public function compare(mixed $other): ComparisonResult
     {
         if (!$other instanceof Sequence) {
-            fatal_error(sprintf("Invalid argument: expecting %s, \"%s\" given", Sequence::class, typeof($other)));
+            $other
+                |> typeof(...)
+                |> (fn($x) => sprintf("Invalid argument: expecting %s, \"%s\" given", Sequence::class, $x))
+                |> fatal_error(...);
         }
         return ComparisonResult::from($this->count <=> $other->count);
     }

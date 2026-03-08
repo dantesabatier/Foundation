@@ -25,7 +25,10 @@ final class NotificationObserver extends ObjectClass
         }
         $observer = $this->observer ?? fatal_error();
         if (!method_exists($observer, $callable)) {
-            fatal_error(sprintf("%s %s() unrecognized selector sent to instance", human_readable_value($observer), $callable));
+            $observer
+                |> human_readable_value(...)
+                |> (fn($x) => sprintf("%s %s() unrecognized selector sent to instance", $x, $callable))
+                |> fatal_error(...);
         }
         $observer->$callable($notification);
     }

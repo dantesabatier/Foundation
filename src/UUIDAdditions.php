@@ -75,7 +75,10 @@ function uuid_generate_random(): string
     $out = read_random(16);
     $out[6] = chr(ord($out[6]) & 0x0f | 0x40);
     $out[8] = chr(ord($out[8]) & 0x3f | 0x80);
-    return vsprintf("%s%s-%s-%s-%s-%s%s%s", str_split(bin2hex($out), 4));
+    return $out
+            |> bin2hex(...)
+            |> (fn($x) => str_split($x, 4))
+            |> (fn($x) => vsprintf("%s%s-%s-%s-%s-%s%s%s", $x));
 }
 
 /**
