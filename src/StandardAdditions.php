@@ -14,8 +14,7 @@ use SensitiveParameter;
  */
 function absolute_time_get_current(): float
 {
-    $tv = gettimeofday();
-    return (float)$tv["sec"] + (1.0e-6 * (float)$tv["usec"]);
+    return microtime(true);
 }
 
 /**
