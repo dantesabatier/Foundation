@@ -13,7 +13,6 @@ use BackedEnum;
 use JetBrains\PhpStorm\ExpectedValues;
 use Override;
 use Sabatier\Foundation\ArrayClass;
-use Sabatier\Foundation\Collection;
 use Sabatier\Foundation\CompareOptions;
 use Sabatier\Foundation\ObjectClass;
 use Sabatier\Foundation\Sequence;
