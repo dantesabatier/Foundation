@@ -28,8 +28,8 @@ final class DiskEntry
         }
         /** @var string[] $parts */
         $parts = preg_quote(".", "/")
-                |> (fn($x) => sprintf("/%s/", $x))
-                |> (fn($x) => preg_split($x, $url->deletingPathExtension()->lastPathComponent, -1, PREG_SPLIT_NO_EMPTY));
+                |> (fn(string $x): string => sprintf("/%s/", $x))
+                |> (fn(string $x): array => preg_split($x, $url->deletingPathExtension()->lastPathComponent, -1, PREG_SPLIT_NO_EMPTY));
         if (count($parts) !== 3) {
             return null;
         }

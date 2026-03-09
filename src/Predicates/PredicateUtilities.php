@@ -221,7 +221,7 @@ final class PredicateUtilities
             Number::class => new Number($value),
             default => $value
                     |> human_readable_value(...)
-                    |> (fn($x) => sprintf("Do not know how to cast %s to type %s", $x, $type))
+                    |> (fn(string $x): string => sprintf("Do not know how to cast %s to type %s", $x, $type))
                     |> fatal_error(...)
         };
     }

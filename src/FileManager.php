@@ -308,7 +308,7 @@ final class FileManager extends ObjectClass
             while ($this->fileExists($directoryURL->appendingPathComponent($name)->appendingPathExtension($extension)->path)) {
                 $name = preg_replace("/\d+/u", "", $name)
                         |> human_readable_value(...)
-                        |> (fn($x) => sprintf("%s%d", $x, $index));
+                        |> (fn(string $x): string => sprintf("%s%d", $x, $index));
                 $index++;
             }
             return "$name.$extension";

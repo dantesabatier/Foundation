@@ -104,7 +104,7 @@ function getallheaders(): array
                 $key = str_replace("_", " ", $key)
                         |> strtolower(...)
                         |> ucwords(...)
-                        |> (fn($x) => str_replace(" ", "-", $x));
+                        |> (fn(string $x): string => str_replace(" ", "-", $x));
                 assert(is_string($value), sprintf("Invalid argument: expecting string, \"%s\" given", typeof($value)));
                 $headers[$key] = $value;
             }

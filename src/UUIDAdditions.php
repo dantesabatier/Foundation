@@ -77,8 +77,8 @@ function uuid_generate_random(): string
     $out[8] = chr(ord($out[8]) & 0x3f | 0x80);
     return $out
             |> bin2hex(...)
-            |> (fn($x) => str_split($x, 4))
-            |> (fn($x) => vsprintf("%s%s-%s-%s-%s-%s%s%s", $x));
+            |> (fn(string $x): array => str_split($x, 4))
+            |> (fn(array $x): string => vsprintf("%s%s-%s-%s-%s-%s%s%s", $x));
 }
 
 /**
@@ -103,7 +103,10 @@ function uuid_generate_time(): string
     $out[7] = chr((int)$time >> 48);
     $out[6] = chr((ord($out[6]) & 0x0f) | 0x10);
     $out[8] = chr((ord($out[8]) & 0x3f) | 0x80);
-    return vsprintf("%s%s-%s-%s-%s-%s%s%s", str_split(bin2hex($out), 4));
+    return $out
+            |> bin2hex(...)
+            |> (fn(string $x): array => str_split($x, 4))
+            |> (fn(array $x): string => vsprintf("%s%s-%s-%s-%s-%s%s%s", $x));
 }
 
 /**

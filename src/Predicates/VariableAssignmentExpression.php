@@ -55,7 +55,7 @@ final class VariableAssignmentExpression extends Expression
         if (Predicate::$debugDefault) {
             $value
                 |> human_readable_value(...)
-                |> (fn($x) => sprintf("Foundation: %s %s: %s", $this->debugDescription, $this->expressionType->name, $x))
+                |> (fn(string $x): string => sprintf("Foundation: %s %s: %s", $this->debugDescription, $this->expressionType->name, $x))
                 |> error_log(...);
         }
         return $value;

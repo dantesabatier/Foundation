@@ -140,8 +140,8 @@ function array_remove(array &$array, mixed $element): array
 function string_split_trimmed(string $string, string $separator = ","): array
 {
     return explode($separator, $string)
-            |> (fn($x) => array_map(trim(...), $x))
-            |> (fn($x) => array_filter($x, fn(string $v): bool => $v !== ""))
+            |> (fn(array $x): array => array_map(trim(...), $x))
+            |> (fn(array $x): array => array_filter($x, fn(string $v): bool => $v !== ""))
             |> array_values(...);
 }
 
@@ -252,13 +252,13 @@ function string_compare(string $string, string $other, #[ExpectedValues(flagsFro
         $other = string_with_options($other, $options);
         if ($options & CompareOptions::caseInsensitive) {
             return strcasecmp($string, $other)
-                    |> (fn($x) => min($x, ComparisonResult::orderedDescending->value))
-                    |> (fn($x) => max($x, ComparisonResult::orderedAscending->value));
+                    |> (fn(int $x): int => min($x, ComparisonResult::orderedDescending->value))
+                    |> (fn(int $x): int => max($x, ComparisonResult::orderedAscending->value));
         }
     }
     return strcmp($string, $other)
-            |> (fn($x) => min($x, ComparisonResult::orderedDescending->value))
-            |> (fn($x) => max($x, ComparisonResult::orderedAscending->value));
+            |> (fn(int $x): int => min($x, ComparisonResult::orderedDescending->value))
+            |> (fn(int $x): int => max($x, ComparisonResult::orderedAscending->value));
 }
 
 /**
@@ -284,8 +284,8 @@ function string_has_prefix(string $string, string $prefix, #[ExpectedValues(flag
 {
     return $prefix
             |> strlen(...)
-            |> (fn($x) => substring_to_index($string, $x))
-            |> (fn($x) => string_is_equal($x, $prefix, $options));
+            |> (fn(int $x): string => substring_to_index($string, $x))
+            |> (fn(string $x): bool => string_is_equal($x, $prefix, $options));
 }
 
 /**
@@ -458,8 +458,8 @@ function base64_url_encode(string $string): string
 {
     return $string
             |> base64_encode(...)
-            |> (fn($x) => strtr($x, "+/", "-_"))
-            |> (fn($x) => rtrim($x, "="));
+            |> (fn(string $x): string => strtr($x, "+/", "-_"))
+            |> (fn(string $x): string => rtrim($x, "="));
 }
 
 /**
