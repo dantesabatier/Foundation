@@ -37,12 +37,10 @@ trait SequenceAlgorithms
     #[Override]
     public function compare(mixed $other): ComparisonResult
     {
-        if (!$other instanceof Sequence) {
-            $other
+        $other instanceof Sequence ?: $other
                 |> typeof(...)
                 |> (fn(string $x): string => sprintf("Invalid argument: expecting %s, \"%s\" given", Sequence::class, $x))
                 |> fatal_error(...);
-        }
         return ComparisonResult::from($this->count <=> $other->count);
     }
 

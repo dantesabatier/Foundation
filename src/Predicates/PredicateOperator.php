@@ -13,6 +13,7 @@ use BackedEnum;
 use JetBrains\PhpStorm\ExpectedValues;
 use Override;
 use Sabatier\Foundation\ArrayClass;
+use Sabatier\Foundation\Collection;
 use Sabatier\Foundation\CompareOptions;
 use Sabatier\Foundation\ObjectClass;
 use Sabatier\Foundation\Sequence;
@@ -89,12 +90,10 @@ class PredicateOperator extends ObjectClass
                 default => false,
             };
         }
-        if (!$left instanceof ArrayClass && !$left instanceof Set) {
-            $left
+        $left instanceof Sequence ?: $left
                 |> typeof(...)
                 |> (fn(string $x): string => sprintf("Invalid argument: the left hand side for an ALL or ANY modifier must be an %s or a %s, \"%s\" given", ArrayClass::class, Set::class, $x))
                 |> fatal_error(...);
-        }
         if ($left->isEmpty) {
             return false;
         }
