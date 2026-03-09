@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use Psalm\Issue\RedundantCondition;
 use Rector\CodeQuality\Rector\Catch_\ThrowWithPreviousExceptionRector;
 use Rector\CodeQuality\Rector\Class_\ConvertStaticToSelfRector;
 use Rector\CodeQuality\Rector\ClassMethod\ExplicitReturnNullRector;
@@ -73,9 +72,6 @@ try {
                 __DIR__ . "/src/Progress.php"
             ],
             UseIdenticalOverEqualWithSameTypeRector::class => [
-                __DIR__ . "/src/StandardAdditions.php"
-            ],
-            RedundantCondition::class => [
                 __DIR__ . "/src/StandardAdditions.php"
             ],
             ThrowWithPreviousExceptionRector::class => [

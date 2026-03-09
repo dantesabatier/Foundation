@@ -27,6 +27,7 @@
         <RedundantCondition>
             <errorLevel type="suppress">
                 <file name="src/Predicates/PredicateScanner.php"/>
+                <file name="src/StandardAdditions.php"/>
             </errorLevel>
         </RedundantCondition>
         <PossiblyNullReference>
