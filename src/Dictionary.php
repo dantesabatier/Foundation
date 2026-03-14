@@ -97,6 +97,7 @@ final class Dictionary extends ObjectClass implements Collection, ArrayAccess, I
     }
 
     /**
+     * @template T
      * Creates a new dictionary whose keys are the groupings returned by the given closure and whose values are arrays of the elements that returned each key.
      *
      * The arrays in the "values" position of the new dictionary each contain at least one element, with the elements in the same order as the source sequence.
@@ -107,9 +108,9 @@ final class Dictionary extends ObjectClass implements Collection, ArrayAccess, I
      * // ["E": ["Efua"], "K": ["Kofi", "Kweku"], "A": ["Abena", "Akosua"]]
      * </code>
      * The new studentsByLetter dictionary has three entries, with students' names grouped by the keys "E", "K", and "A".
-     * @param Sequence<string, mixed> $values A sequence of values to group into a dictionary.
-     * @param Closure(mixed): string $by A closure that returns a key for each element in values.
-     * @return Dictionary<ArrayClass<Dictionary>>
+     * @param Sequence<array-key, T> $values A sequence of values to group into a dictionary.
+     * @param Closure(T): string $by A closure that returns a key for each element in values.
+     * @return Dictionary<ArrayClass<T>>
      */
     public static function grouping(Sequence $values, Closure $by): Dictionary
     {
