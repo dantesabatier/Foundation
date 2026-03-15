@@ -11,6 +11,7 @@ namespace Sabatier\Foundation\Predicates;
 
 use Override;
 use Sabatier\Foundation\ArrayClass;
+use function Sabatier\Foundation\fatal_error;
 use function Sabatier\Foundation\in_range;
 use function Sabatier\Foundation\typeof;
 
@@ -26,7 +27,10 @@ final class BetweenPredicateOperator extends PredicateOperator
         if ($left === null || $right === null) {
             return false;
         }
-        assert($right instanceof ArrayClass && $right->count === 2, sprintf("Invalid argument: the right expression must be a \"%s\" with exactly two elements, \"%s\" given", ArrayClass::class, typeof($right)));
+        $right instanceof ArrayClass && $right->count === 2 ?: $right
+                |> typeof(...)
+                |> (fn(string $x): string => sprintf("Invalid argument: the right expression must be a \"%s\" with exactly two elements, \"%s\" given", ArrayClass::class, $x))
+                |> fatal_error(...);
         return in_range($left, $right->first, $right->last);
     }
 }

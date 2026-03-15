@@ -580,7 +580,10 @@ final class PredicateScanner extends Scanner
                 if (!($right = $this->parseAdditionExpression())) {
                     fatal_error("Invalid argument: expecting expression after :=");
                 }
-                assert($left instanceof VariableExpression, sprintf("Invalid argument: expecting \"%s\", \"%s\" given", VariableExpression::class, typeof($left)));
+                $left instanceof VariableExpression ?: $left
+                        |> typeof(...)
+                        |> (fn(string $x): string => sprintf("Invalid argument: expecting \"%s\", \"%s\" given", VariableExpression::class, $x))
+                        |> fatal_error(...);
                 $left = new VariableAssignmentExpression($left, $right);
             } else {
                 return $left;

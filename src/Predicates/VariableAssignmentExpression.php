@@ -5,6 +5,7 @@ namespace Sabatier\Foundation\Predicates;
 use JetBrains\PhpStorm\ExpectedValues;
 use Override;
 use Sabatier\Foundation\Dictionary;
+use function Sabatier\Foundation\fatal_error;
 use function Sabatier\Foundation\human_readable_value;
 use function Sabatier\Foundation\typeof;
 
@@ -42,7 +43,10 @@ final class VariableAssignmentExpression extends Expression
     public function withSubstitutionVariables(Dictionary $variables): Expression
     {
         $assignmentVariable = $this->assignmentVariable->withSubstitutionVariables($variables);
-        assert($assignmentVariable instanceof VariableExpression, sprintf("Invalid argument: expecting \"%s\", \"%s\" given", VariableExpression::class, typeof($assignmentVariable)));
+        $assignmentVariable instanceof VariableExpression ?: $assignmentVariable
+                |> typeof(...)
+                |> (fn(string $x): string => sprintf("Invalid argument: expecting \"%s\", \"%s\" given", VariableExpression::class, $x))
+                |> fatal_error(...);
         return new VariableAssignmentExpression($assignmentVariable, $this->subexpression->withSubstitutionVariables($variables));
     }
 

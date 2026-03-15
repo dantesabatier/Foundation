@@ -41,7 +41,10 @@ final class SortDescriptor extends ObjectClass
         if ($comparator) {
             return $comparator($object1, $object2);
         }
-        assert($object1 instanceof KeyValueCoding && $object2 instanceof KeyValueCoding, sprintf("Invalid arguments, sort descriptors are meant to be used with %s objects exclusively, %s given", KeyValueCoding::class, human_readable_value([$object1, $object2])));
+        $object1 instanceof KeyValueCoding && $object2 instanceof KeyValueCoding ?: [$object1, $object2]
+                |> human_readable_value(...)
+                |> (fn(string $x): string => sprintf("Invalid arguments, sort descriptors are meant to be used with %s objects exclusively, %s given", KeyValueCoding::class, $x))
+                |> fatal_error(...);
         return ComparisonResult::from(($this->ascending ? ComparisonResult::orderedAscending->value : ComparisonResult::orderedDescending->value) * ($object1->valueForKeyPath($this->key) <=> $object2->valueForKeyPath($this->key)));
     }
 

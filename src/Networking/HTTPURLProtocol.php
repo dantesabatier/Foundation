@@ -87,7 +87,9 @@ class HTTPURLProtocol extends NativeProtocol
             }
             $hasCacheControl = true;
         }
-        if (!$hasCacheControl && $cacheControl !== null && in_array("no-cache", array_map(fn(string $part): string => strtolower(trim($part)), explode(",", $cacheControl)))) {
+        if (!$hasCacheControl && $cacheControl !== null && explode(",", $cacheControl)
+                |> (fn(array $x): array => array_map(fn(string $part): string => strtolower(trim($part)), $x))
+                |> (fn(array $x): bool => in_array("no-cache", $x))) {
             return false;
         }
         switch ($response->statusCode) {

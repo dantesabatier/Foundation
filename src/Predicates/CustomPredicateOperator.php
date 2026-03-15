@@ -29,7 +29,10 @@ final class CustomPredicateOperator extends PredicateOperator
     #[Override]
     protected function performPrimitiveOperation(mixed $left, mixed $right): bool
     {
-        is_object($left) ?: fatal_error(sprintf("Invalid argument: expecting \"object\", \"%s\" given", typeof($left)));
+        is_object($left) ?: $left
+                |> typeof(...)
+                |> (fn(string $x): string => sprintf("Invalid argument: expecting \"object\", \"%s\" given", $x))
+                |> fatal_error(...);
         $selector = $this->selector;
         $arguments = [$right];
         return $left->$selector(...$arguments);
