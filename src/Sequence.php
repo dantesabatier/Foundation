@@ -189,7 +189,7 @@ interface Sequence extends Traversable, Countable, Comparable, ExpressibleByArra
      * // Prints "one"
      * // Prints "two"
      * // Prints "three"
-     * $numberWords->forEach(fn(string $word): void => print "$word\n");
+     * $numberWords->forEach(fn(string $word) => print "$word\n");
      * // Same as above
      * </code>
      *
