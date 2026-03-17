@@ -258,9 +258,7 @@ final class UndoManager extends ObjectClass
                 }
             }
         } else {
-            foreach ($group->actions as $action) {
-                $parent->addInvocation($action);
-            }
+            $group->actions->forEach(fn(Invocation $action) => $parent->addInvocation($action));
         }
     }
 

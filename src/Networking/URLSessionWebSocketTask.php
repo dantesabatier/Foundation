@@ -178,9 +178,7 @@ final class URLSessionWebSocketTask extends URLSessionTask
                 $handler($taskError);
             }
             $this->sendBuffer->removeAll();
-            foreach ($this->receiveCompletionHandlers as $receiveCompletionHandler) {
-                $receiveCompletionHandler(null, $taskError);
-            }
+            $this->receiveCompletionHandlers->forEach(fn(Closure $receiveCompletionHandler) => $receiveCompletionHandler(null, $taskError));
             $this->receiveCompletionHandlers->removeAll();
             $this->getProtocol(function (?URLProtocol $protocol): void {
                 if ($this->handshakeCompleted && $protocol instanceof WebSocketURLProtocol) {

@@ -153,9 +153,7 @@ final class OperationQueue extends ObjectClass
      */
     public function addOperations(ArrayClass $operations, bool $waitUntilFinished = false): void
     {
-        foreach ($operations as $operation) {
-            $this->addOperation($operation);
-        }
+        $operations->forEach(fn(Operation $operation) => $this->addOperation($operation));
         $this->schedule();
         if ($waitUntilFinished) {
             $this->waitUntilAllOperationsAreFinished();
@@ -182,9 +180,7 @@ final class OperationQueue extends ObjectClass
      */
     public function cancelAllOperations(): void
     {
-        foreach ($this->operations as $operation) {
-            $operation->cancel();
-        }
+        $this->operations->forEach(fn(Operation $operation) => $operation->cancel());
     }
 
     /**

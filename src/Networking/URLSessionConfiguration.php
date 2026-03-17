@@ -69,9 +69,7 @@ final class URLSessionConfiguration
     public function configure(URLRequest $request): URLRequest
     {
         if ($httpAdditionalHeaders = $this->httpAdditionalHeaders) {
-            foreach ($httpAdditionalHeaders as $key => $value) {
-                $request->setValueForHttpHeaderField($value, $key);
-            }
+            $httpAdditionalHeaders->forEach(fn(string $value, string $key) => $request->setValueForHttpHeaderField($value, $key));
         }
         if ($this->httpShouldSetCookies && ($cookies = $this->httpCookieStorage?->cookies($request->url))) {
             $cookiesHeaderFields = HTTPCookie::requestHeaderFields($cookies);

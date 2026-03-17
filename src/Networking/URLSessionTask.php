@@ -159,9 +159,7 @@ abstract class URLSessionTask extends ObjectClass
                 $this->protocolStorage = ProtocolState::existing($protocol);
                 /** @var Bag<Closure(URLProtocol|null):void> $bag */
                 $bag = $ps->bag;
-                foreach ($bag->values as $callback) {
-                    $callback($protocol);
-                }
+                $bag->values->forEach(fn(Closure $callback) => $callback($protocol));
                 break;
             case ProtocolStateRawValue::existing:
             case ProtocolStateRawValue::invalidated:

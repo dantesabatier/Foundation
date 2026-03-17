@@ -276,9 +276,7 @@ final class URLCache extends ObjectClass
                 if ($identifier = $locators?->identifier) {
                     $entriesToRemove = $this->diskEntries()->filter(fn(DiskEntry $entry): bool => $entry->identifier === $identifier)->sort(fn(DiskEntry $e0, DiskEntry $e1): int => compare($e0->date, $e1->date));
                     $entriesToRemove->popFirst();
-                    foreach ($entriesToRemove as $entry) {
-                        FileManager::default()->removeItem($entry->url);
-                    }
+                    $entriesToRemove->forEach(fn(DiskEntry $entry) => FileManager::default()->removeItem($entry->url));
                 }
             } catch (Exception) {
             }
@@ -365,15 +363,11 @@ final class URLCache extends ObjectClass
                 $identifiersToRemove->insert($identifier);
             }
         }
-        foreach ($identifiersToRemove as $identifier) {
-            $this->inMemoryCacheContents->removeValueForKey($identifier);
-        }
+        $identifiersToRemove->forEach(fn(string $identifier) => $this->inMemoryCacheContents->removeValueForKey($identifier));
         $this->inMemoryCacheOrder->removeAll($identifiersToRemove->containsElement(...));
         try {
             $entriesToRemove = $this->diskEntries()->filter(fn(DiskEntry $e): bool => $e->date->timeIntervalSinceReferenceDate > $date->timeIntervalSinceReferenceDate);
-            foreach ($entriesToRemove as $entry) {
-                FileManager::default()->removeItem($entry->url);
-            }
+            $entriesToRemove->forEach(fn(DiskEntry $entry) => FileManager::default()->removeItem($entry->url));
         } catch (Exception) {
         }
     }

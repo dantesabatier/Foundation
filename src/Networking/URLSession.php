@@ -5,6 +5,7 @@ namespace Sabatier\Foundation\Networking;
 use Closure;
 use Override;
 use Sabatier\Foundation\ArrayClass;
+use Sabatier\Foundation\Dictionary;
 use Sabatier\Foundation\Error;
 use Sabatier\Foundation\OperationQueue;
 use Sabatier\Foundation\URL;
@@ -247,11 +248,7 @@ final class URLSession implements URLSessionProtocol
     {
         $this->configuration->urlCache?->removeAllCachedResponses();
         if ($storage = $this->configuration->urlCredentialStorage) {
-            foreach ($storage->allCredentials as $space => $credentialEntry) {
-                foreach ($credentialEntry as $credential) {
-                    $storage->remove($credential, $space);
-                }
-            }
+            $storage->allCredentials->forEach(fn(Dictionary $credentialEntry, string $space) => $credentialEntry->forEach(fn(URLCredential $credential) => $storage->remove($credential, $space)));
         }
         $this->flush($completionHandler);
     }
@@ -343,9 +340,7 @@ final class URLSession implements URLSessionProtocol
             return;
         }
         $this->invalidated = true;
-        foreach ($this->taskRegistry->allTask as $task) {
-            $task->cancel();
-        }
+        $this->taskRegistry->allTask->forEach(fn(URLSessionTask $task) => $task->cancel());
         if (!$sessionDelegate = $this->delegate) {
             return;
         }

@@ -21,9 +21,7 @@ final class UndoGroup
 
     public function perform(): void
     {
-        foreach ($this->actions as $action) {
-            $action->invoke();
-        }
+        $this->actions->forEach(fn(Invocation $action) => $action->invoke());
     }
 
     public function removeActions(?object $target): bool
