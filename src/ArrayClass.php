@@ -11,7 +11,6 @@ namespace Sabatier\Foundation;
 
 use ArrayAccess;
 use Closure;
-use Hoa\Visitor\Element;
 use Iterator;
 use Override;
 use Sabatier\Foundation\Predicates\Predicate;
