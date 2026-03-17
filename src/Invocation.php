@@ -26,7 +26,7 @@ final class Invocation
     {
         $target = $this->target ?? fatal_error("Invalid argument: target cannot be null");
         $selector = $this->selector;
-        assert(method_exists($target, $selector), sprintf("<%s %s> %s() unrecognized selector sent to instance", class_name($target::class), spl_object_id($target), $selector));
+        method_exists($target, $selector) ?: fatal_error(sprintf("<%s %s> %s() unrecognized selector sent to instance", class_name($target::class), spl_object_id($target), $selector));
         $this->returnValue = $target->$selector(...$this->arguments->array);
     }
 

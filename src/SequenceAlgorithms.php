@@ -198,6 +198,11 @@ trait SequenceAlgorithms
         }
     }
 
+    public function makeObjectsPerformSelector(string $selector, mixed $argument): void
+    {
+        $this->forEach(fn(mixed $e) => $e->$selector($argument));
+    }
+
     /** @noinspection PhpMixedReturnTypeCanBeReducedInspection */
     #[Override]
     public function jsonSerialize(): mixed

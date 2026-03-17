@@ -270,14 +270,9 @@ final class UndoManager extends ObjectClass
         if (!$this->isUndoRegistrationEnabled) {
             return;
         }
-        $nextTarget = $this->nextTarget;
-        if ($nextTarget === null) {
-            fatal_error("forwardInvocation() without preparation");
-        }
+        $nextTarget = $this->nextTarget ?? fatal_error("forwardInvocation() without preparation");
         if ($this->group === null) {
-            if (!$this->groupsByEvent) {
-                fatal_error("forwardInvocation() without beginUndoGrouping()");
-            }
+            $this->groupsByEvent ?: fatal_error("forwardInvocation() without beginUndoGrouping()");
             $this->begin();
         }
         /** @var UndoGroup $group */
@@ -307,9 +302,7 @@ final class UndoManager extends ObjectClass
      */
     public function enableUndoRegistration(): void
     {
-        if ($this->isUndoRegistrationEnabled) {
-            fatal_error();
-        }
+        !$this->isUndoRegistrationEnabled ?: fatal_error();
         $this->isUndoRegistrationEnabled = true;
     }
 

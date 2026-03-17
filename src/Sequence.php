@@ -197,4 +197,12 @@ interface Sequence extends Traversable, Countable, Comparable, ExpressibleByArra
      * @param Closure(Element, Index=): void $body A closure that takes an element of the sequence as a parameter.
      */
     public function forEach(Closure $body): void;
+
+    /**
+     * Calls the given selector on each object in the sequence, passing the given argument to the selector.
+     *
+     * @param string $selector The selector to call on each object.
+     * @param mixed $argument The argument to pass to the selector.
+     */
+    public function makeObjectsPerformSelector(string $selector, mixed $argument): void;
 }
