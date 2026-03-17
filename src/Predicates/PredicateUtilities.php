@@ -42,7 +42,7 @@ final class PredicateUtilities
      */
     private static function reservedWords(): Set
     {
-        self::$reservedWords ??= new Set(["all", "and", "any", "anykey", "apply", "beginswith", "between", "cast", "contains", "endswith", "false", "falsepredicate", "first", "function", "in", "intersection", "last", "like", "matches", "minus", "null", "no", "none", "not", "null", "or", "self", "size", "some", "subquery", "tokenmatches", "true", "truepredicate", "union", "yes"]);
+        self::$reservedWords ??= new Set(["all", "and", "any", "anykey", "apply", "beginswith", "between", "cast", "contains", "endswith", "false", "falsepredicate", "first", "function", "in", "intersection", "last", "like", "matches", "minus", "null", "no", "none", "not", "or", "self", "size", "some", "subquery", "tokenmatches", "true", "truepredicate", "union", "yes"]);
         return self::$reservedWords;
     }
 
