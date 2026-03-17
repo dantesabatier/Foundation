@@ -80,9 +80,7 @@ trait CollectionAlgorithms
 
     public function setValueForKey(mixed $value, string $key): void
     {
-        foreach (clone $this as $e) {
-            $e?->setValueForKey($value, $key);
-        }
+        $this->forEach(fn(mixed $e) => $e?->setValueForKey($value, $key));
     }
 
     public function valueForKeyPath(string $keyPath): mixed
