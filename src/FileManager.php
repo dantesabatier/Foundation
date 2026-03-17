@@ -43,8 +43,7 @@ final class FileManager extends ObjectClass
      */
     public static function default(): FileManager
     {
-        self::$default ??= new FileManager();
-        return self::$default;
+        return self::$default ??= new FileManager();
     }
 
     /**

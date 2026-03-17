@@ -62,8 +62,7 @@ final class OperationQueue extends ObjectClass
      */
     private static function allQueues(): ArrayClass
     {
-        self::$queues ??= new ArrayClass();
-        return self::$queues;
+        return self::$queues ??= new ArrayClass();
     }
 
     /**
@@ -72,8 +71,7 @@ final class OperationQueue extends ObjectClass
      */
     public static function main(): OperationQueue
     {
-        self::$main ??= new OperationQueue();
-        return self::$main;
+        return self::$main ??= new OperationQueue();
     }
 
     /**

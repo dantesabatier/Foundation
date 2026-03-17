@@ -29,8 +29,7 @@ final class NotificationCenter
      */
     public static function default(): NotificationCenter
     {
-        self::$default ??= new NotificationCenter();
-        return self::$default;
+        return self::$default ??= new NotificationCenter();
     }
 
     /**

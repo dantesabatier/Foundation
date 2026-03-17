@@ -42,8 +42,7 @@ final class PredicateUtilities
      */
     private static function reservedWords(): Set
     {
-        self::$reservedWords ??= new Set(["all", "and", "any", "anykey", "apply", "beginswith", "between", "cast", "contains", "endswith", "false", "falsepredicate", "first", "function", "in", "intersection", "last", "like", "matches", "minus", "null", "no", "none", "not", "or", "self", "size", "some", "subquery", "tokenmatches", "true", "truepredicate", "union", "yes"]);
-        return self::$reservedWords;
+        return self::$reservedWords ??= new Set(["all", "and", "any", "anykey", "apply", "beginswith", "between", "cast", "contains", "endswith", "false", "falsepredicate", "first", "function", "in", "intersection", "last", "like", "matches", "minus", "null", "no", "none", "not", "or", "self", "size", "some", "subquery", "tokenmatches", "true", "truepredicate", "union", "yes"]);
     }
 
     public static function isReserved(string $word): bool
@@ -53,10 +52,7 @@ final class PredicateUtilities
 
     public static function average(ArrayClass|Set $values): Number
     {
-        if ($values->isEmpty) {
-            return new Number(0);
-        }
-        return new Number($values->sum() / $values->count());
+        return $values->isEmpty ? new Number(0) : new Number($values->sum() / $values->count());
     }
 
     public static function avg(ArrayClass|Set $values): Number
@@ -233,63 +229,42 @@ final class PredicateUtilities
 
     public static function year(?Date $date): ?Number
     {
-        if (!$date instanceof Date) {
-            return null;
-        }
-        return new Number($date->format("Y"));
+        return $date ? new Number($date->format("Y")) : null;
     }
 
     public static function month(?Date $date): ?Number
     {
-        if (!$date instanceof Date) {
-            return null;
-        }
-        return new Number($date->format("n"));
+        return $date ? new Number($date->format("n")) : null;
     }
 
     public static function week(?Date $date): ?Number
     {
-        if (!$date instanceof Date) {
-            return null;
-        }
-        return new Number($date->format("W"));
+        return $date ? new Number($date->format("W")) : null;
     }
 
     public static function day(?Date $date): ?Number
     {
-        if (!$date instanceof Date) {
-            return null;
-        }
-        return new Number($date->format("j"));
+        return $date ? new Number($date->format("j")) : null;
     }
 
     public static function hour(?Date $date): ?Number
     {
-        if (!$date instanceof Date) {
-            return null;
-        }
-        return new Number($date->format("G"));
+        return $date ? new Number($date->format("G")) : null;
     }
 
     public static function minute(?Date $date): ?Number
     {
-        if (!$date instanceof Date) {
-            return null;
-        }
-        return new Number($date->format("i"));
+        return $date ? new Number($date->format("i")) : null;
     }
 
     public static function second(?Date $date): ?Number
     {
-        if (!$date instanceof Date) {
-            return null;
-        }
-        return new Number($date->format("s"));
+        return $date ? new Number($date->format("s")) : null;
     }
 
     public static function date(?Date $date): ?string
     {
-        return self::dateFormat($date, "Y-m-d");
+        return $date ? self::dateFormat($date, "Y-m-d") : null;
     }
 
     public static function currentDate(): ?string
@@ -299,10 +274,7 @@ final class PredicateUtilities
 
     public static function dateFormat(?Date $date, string $format = "Y-m-d H:i:s"): ?string
     {
-        if (!$date instanceof Date) {
-            return null;
-        }
-        return $date->format($format);
+        return $date?->format($format);
     }
 
     /**

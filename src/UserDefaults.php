@@ -35,8 +35,7 @@ final class UserDefaults
      */
     private function standardUserPreferences(): Dictionary
     {
-        self::$standardUserPreferences ??= new Dictionary();
-        return self::$standardUserPreferences;
+        return self::$standardUserPreferences ??= new Dictionary();
     }
 
     /**
@@ -54,8 +53,7 @@ final class UserDefaults
      */
     public static function standard(): UserDefaults
     {
-        self::$standard ??= new UserDefaults();
-        return self::$standard;
+        return self::$standard ??= new UserDefaults();
     }
 
     /**

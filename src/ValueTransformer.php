@@ -16,12 +16,11 @@ abstract class ValueTransformer extends ObjectClass
      */
     private static function valueTransformers(): Dictionary
     {
-        static::$valueTransformers ??= new Dictionary([
+        return static::$valueTransformers ??= new Dictionary([
             NegateBooleanTransformerName => new NegateBooleanTransformer(),
             UnarchiveFromDataTransformerName => new UnarchiveFromDataTransformer(),
             SecureUnarchiveFromDataTransformerName => new UnarchiveFromDataTransformer()
         ]);
-        return static::$valueTransformers;
     }
 
     /**

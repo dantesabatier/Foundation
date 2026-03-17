@@ -79,9 +79,7 @@ final class URLSession implements URLSessionProtocol
 
     private function dataTask(URLRequest $request, TaskRegistryBehaviour $behaviour): URLSessionDataTask
     {
-        if ($this->invalidated) {
-            fatal_error("Session invalidated");
-        }
+        !$this->invalidated ?: fatal_error("Session invalidated");
         $task = new URLSessionDataTask($this, $this->createConfiguredRequest($request), $this->createNextTaskIdentifier());
         $this->taskRegistry->add($task, $behaviour);
         return $task;
@@ -89,9 +87,7 @@ final class URLSession implements URLSessionProtocol
 
     private function uploadTask(URLRequest $request, TaskBody $body, TaskRegistryBehaviour $behaviour): URLSessionUploadTask
     {
-        if ($this->invalidated) {
-            fatal_error("Session invalidated");
-        }
+        !$this->invalidated ?: fatal_error("Session invalidated");
         $task = new URLSessionUploadTask($this, $this->createConfiguredRequest($request), $this->createNextTaskIdentifier(), $body);
         $this->taskRegistry->add($task, $behaviour);
         return $task;
@@ -99,9 +95,7 @@ final class URLSession implements URLSessionProtocol
 
     private function downloadTask(URLRequest $request, TaskRegistryBehaviour $behaviour): URLSessionDownloadTask
     {
-        if ($this->invalidated) {
-            fatal_error("Session invalidated");
-        }
+        !$this->invalidated ?: fatal_error("Session invalidated");
         $task = new URLSessionDownloadTask($this, $this->createConfiguredRequest($request), $this->createNextTaskIdentifier());
         $this->taskRegistry->add($task, $behaviour);
         return $task;
@@ -109,9 +103,7 @@ final class URLSession implements URLSessionProtocol
 
     private function webSocketTask(URLRequest $request, TaskRegistryBehaviour $behaviour): URLSessionWebSocketTask
     {
-        if ($this->invalidated) {
-            fatal_error("Session invalidated");
-        }
+        !$this->invalidated ?: fatal_error("Session invalidated");
         $task = new URLSessionWebSocketTask($this, $this->createConfiguredRequest($request), $this->createNextTaskIdentifier());
         $this->taskRegistry->add($task, $behaviour);
         return $task;

@@ -59,7 +59,6 @@ final class ProcessInfo extends ObjectClass
      */
     public static function processInfo(): ProcessInfo
     {
-        self::$processInfo ??= new ProcessInfo();
-        return self::$processInfo;
+        return self::$processInfo ??= new ProcessInfo();
     }
 }

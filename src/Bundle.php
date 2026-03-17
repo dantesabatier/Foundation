@@ -122,8 +122,7 @@ final class Bundle extends ObjectClass
      */
     private static function loadedBundles(): Dictionary
     {
-        self::$loadedBundles ??= new Dictionary();
-        return self::$loadedBundles;
+        return self::$loadedBundles ??= new Dictionary();
     }
 
     /**
