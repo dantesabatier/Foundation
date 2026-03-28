@@ -72,7 +72,6 @@ function url_encode(string $url, string $endpoint, array $parameters = []): stri
  */
 function request_url(): string
 {
-    /** @var string[] $elements */
     $elements = explode("?", $_SERVER["REQUEST_URI"] ?? "");
     $components = new URLComponents();
     $components->scheme = isset($_SERVER["HTTPS"]) ? "https" : "http";
