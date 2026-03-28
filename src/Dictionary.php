@@ -114,7 +114,7 @@ final class Dictionary extends ObjectClass implements Collection, ArrayAccess, I
      */
     public static function grouping(Sequence $values, Closure $by): Dictionary
     {
-        /** @var Dictionary<ArrayClass<Dictionary>> $instance */
+        /** @var Dictionary<ArrayClass<T>> $instance */
         $instance = new Dictionary();
         foreach ($values as $e) {
             $k = $by($e);
