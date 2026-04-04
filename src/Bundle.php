@@ -50,6 +50,12 @@ final class Bundle extends ObjectClass
     private(set) ?URL $sharedSupportURL {
         get => $this->sharedSupportURL ??= $this->directoryURL($this->bundleURL, "SharedSupport");
     }
+    private(set) ?URL $vendorURL {
+        get => $this->vendorURL ??= $this->directoryURL($this->bundleURL, "vendor");
+    }
+    private(set) ?URL $nodeModulesURL {
+        get => $this->nodeModulesURL ??= $this->directoryURL($this->bundleURL, "node_modules");
+    }
     /** @var string|null The receiver's bundle identifier. */
     public ?string $bundleIdentifier {
         get => $this->object(kCFBundleIdentifierKey);
