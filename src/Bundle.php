@@ -50,9 +50,11 @@ final class Bundle extends ObjectClass
     private(set) ?URL $sharedSupportURL {
         get => $this->sharedSupportURL ??= $this->directoryURL($this->bundleURL, "SharedSupport");
     }
+    /** @var URL|null The file URL of the bundle's vendor subdirectory (Composer PHP dependencies). */
     private(set) ?URL $vendorURL {
         get => $this->vendorURL ??= $this->directoryURL($this->bundleURL, "vendor");
     }
+    /** @var URL|null The file URL of the bundle's node_modules subdirectory (npm/yarn/pnpm JavaScript packages). */
     private(set) ?URL $nodeModulesURL {
         get => $this->nodeModulesURL ??= $this->directoryURL($this->bundleURL, "node_modules");
     }
