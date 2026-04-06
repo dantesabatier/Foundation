@@ -540,7 +540,6 @@ final class FileManager extends ObjectClass
      * @param string $path The path of the file whose contents you want.
      * @return string|null A Data object with the contents of the file.
      * If $path specifies a directory, or if some other error occurs, this method returns null.
-     * @throws Exception
      */
     public function contents(string $path): ?string
     {
