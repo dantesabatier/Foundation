@@ -362,24 +362,26 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
             $initial[$property->name] = $property;
             return $initial;
         }, []);
-        /** @var Dictionary<mixed> $values */
-        $values = new Dictionary();
-        foreach ($keys as $key) {
-            $value = $this->valueForKey($key);
-            if (isset($properties[$key])) {
-                $value = new SensitiveValue($value);
-            }
-            $values[$key] = $value;
-        }
-        return $values;
+        return $keys->reduce(new Dictionary(),
+            /**
+             * @param Dictionary<mixed> $values
+             * @param string $key
+             * @return Dictionary<mixed>
+             */
+            function (Dictionary $values, string $key) use ($properties): Dictionary {
+                $value = $this->valueForKey($key);
+                if (isset($properties[$key])) {
+                    $value = new SensitiveValue($value);
+                }
+                $values[$key] = $value;
+                return $values;
+            });
     }
 
     #[Override]
     public function setValuesForKeys(Dictionary $keyedValues): void
     {
-        foreach ($keyedValues as $key => $value) {
-            $this->setValueForKeyPath($value, $key);
-        }
+        $keyedValues->forEach(fn(mixed $value, string $key) => $this->setValueForKey($value, $key));
     }
 
     #[Override]
