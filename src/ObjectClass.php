@@ -44,6 +44,9 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
     public string $debugDescription {
         get => sprintf("<%s %s>", $this->class, $this->hash);
     }
+    public string $canonicalDescription {
+        get => $this->class;
+    }
 
     /**
      * Initializes the class before it receives its first message.
