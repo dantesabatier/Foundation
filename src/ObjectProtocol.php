@@ -12,7 +12,7 @@ namespace Sabatier\Foundation;
 /**
  * The group of methods that are fundamental to all Foundation objects.
  */
-interface ObjectProtocol extends CustomDebugStringConvertible, Equatable
+interface ObjectProtocol extends CustomDebugStringConvertible, CanonicalStringConvertible, Equatable
 {
     /** @var int Returns an integer that can be used as a table address in a hash table structure. */
     public int $hash {
