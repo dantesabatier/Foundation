@@ -7,5 +7,7 @@ namespace Sabatier\Foundation;
  */
 interface CanonicalStringConvertible
 {
-    public string $canonicalDescription { get; }
+    public string $canonicalDescription {
+        get;
+    }
 }

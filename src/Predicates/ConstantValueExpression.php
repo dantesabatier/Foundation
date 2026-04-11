@@ -3,6 +3,7 @@
 namespace Sabatier\Foundation\Predicates;
 
 use Override;
+use Sabatier\Foundation\CanonicalStringConvertible;
 use Sabatier\Foundation\Dictionary;
 use Sabatier\Foundation\Value;
 use function Sabatier\Foundation\human_readable_value;
@@ -22,6 +23,16 @@ final class ConstantValueExpression extends Expression
                 return "'$constantValue'";
             }
             return human_readable_value($constantValue);
+        }
+    }
+    #[Override]
+    public string $canonicalDescription {
+        get {
+            $constantValue = $this->constantValue;
+            if ($constantValue instanceof CanonicalStringConvertible) {
+                return $constantValue->canonicalDescription;
+            }
+            return $this->predicateFormat;
         }
     }
 

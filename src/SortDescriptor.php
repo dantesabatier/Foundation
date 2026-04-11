@@ -18,6 +18,10 @@ final class SortDescriptor extends ObjectClass
     public string $description {
         get => sprintf("%s %s", $this->key, human_readable_value($this->ascending));
     }
+    #[Override]
+    public string $canonicalDescription {
+        get => sprintf("%s:%s:%s", $this->key, $this->ascending ? "asc" : "desc", $this->comparator ? "cmp" : "nocmp");
+    }
 
     /**
      * Initializes a sort descriptor with a given key path and ordering, and a comparator block.

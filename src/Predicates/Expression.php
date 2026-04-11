@@ -69,6 +69,10 @@ class Expression extends ObjectClass
     public string $description {
         get => $this->predicateFormat;
     }
+    #[Override]
+    public string $canonicalDescription {
+        get => $this->predicateFormat;
+    }
 
     /**
      * Initializes the expression with the specified expression type.

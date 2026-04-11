@@ -25,6 +25,10 @@ class Predicate extends ObjectClass
     public string $description {
         get => $this->predicateFormat;
     }
+    #[Override]
+    public string $canonicalDescription {
+        get => $this->predicateFormat;
+    }
 
     /**
      * Initializes a predicate by substituting the values in a given array into a format string and parsing the result.
