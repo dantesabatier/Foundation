@@ -63,10 +63,4 @@ final class SortDescriptor extends ObjectClass
         }
         return false;
     }
-
-    #[Override]
-    public function jsonSerialize(): mixed
-    {
-        return ["key" => $this->key, "ascending" => $this->ascending];
-    }
 }
