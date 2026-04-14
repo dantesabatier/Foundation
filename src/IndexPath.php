@@ -231,6 +231,12 @@ final class IndexPath extends ObjectClass implements MutableCollection, ArrayAcc
         }
     }
 
+    #[Override]
+    public function makeObjectsPerformSelector(string $selector, mixed $argument): void
+    {
+        unsupported($this, __FUNCTION__);
+    }
+
     /**
      * Returns the first element of the collection that satisfies the given predicate.
      * @param Closure(int, int=): bool|null $where A closure that takes an element of the collection as its argument and returns a Boolean value indicating whether the element is a match.
