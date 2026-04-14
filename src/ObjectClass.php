@@ -361,10 +361,16 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
     public function dictionaryWithValues(ArrayClass $keys): Dictionary
     {
         $reflectionClass = new ReflectionClass($this);
-        $properties = new ArrayClass($reflectionClass->getProperties(ReflectionProperty::IS_PUBLIC))->filter(fn(ReflectionProperty $property): bool => (bool)count($property->getAttributes(Sensitive::class)))->reduce(new Dictionary(), function (Dictionary $initial, ReflectionProperty $property): Dictionary {
-            $initial[$property->name] = $property;
-            return $initial;
-        });
+        $properties = new ArrayClass($reflectionClass->getProperties(ReflectionProperty::IS_PUBLIC))->filter(fn(ReflectionProperty $property): bool => (bool)count($property->getAttributes(Sensitive::class)))->reduce(new Dictionary(),
+            /**
+             * @param Dictionary<mixed> $initial
+             * @param ReflectionProperty $property
+             * @return Dictionary<mixed>
+             */
+            function (Dictionary $initial, ReflectionProperty $property): Dictionary {
+                $initial[$property->name] = $property;
+                return $initial;
+            });
         return $keys->reduce(new Dictionary(),
             /**
              * @param Dictionary<mixed> $values
