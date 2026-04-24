@@ -43,6 +43,7 @@ final class HTTPStatusCode
     final const int unsupportedMediaType = 415;
     final const int requestedRangeNotSatisfiable = 416;
     final const int expectationFailed = 417;
+    final const int tooManyRequests = 429;
     final const int internalServerError = 500;
     final const int unimplemented = 501;
     final const int badGateway = 502;

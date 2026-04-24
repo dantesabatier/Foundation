@@ -160,6 +160,7 @@ class HTTPURLResponse extends URLResponse
             HTTPStatusCode::unsupportedMediaType => localized_string("Unsupported media type"),
             HTTPStatusCode::requestedRangeNotSatisfiable => localized_string("Requested range not satisfiable"),
             HTTPStatusCode::expectationFailed => localized_string("Expectation failed"),
+            HTTPStatusCode::tooManyRequests => localized_string("Too many requests"),
             HTTPStatusCode::internalServerError => localized_string("Internal server error"),
             HTTPStatusCode::unimplemented => localized_string("Not implemented"),
             HTTPStatusCode::badGateway => localized_string("Bad gateway"),
