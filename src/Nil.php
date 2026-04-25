@@ -19,7 +19,6 @@ final class Nil extends Value
      */
     public static function nil(): Nil
     {
-        self::$nil ??= new Nil();
-        return self::$nil;
+        return self::$nil ??= new Nil();
     }
 }
