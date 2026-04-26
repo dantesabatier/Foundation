@@ -73,12 +73,12 @@ final class Bundle extends ObjectClass
     /** @var ArrayClass<string> $preferredLocalizations An ordered list of preferred localizations contained in the bundle. An array of string objects containing language IDs for localizations in the bundle. The strings are ordered according to the user's language preferences and available localizations */
     private(set) ArrayClass $preferredLocalizations {
         get {
-            if (!isset($this->preferredLocalizations)) {
-                $preferredLocalizations = clone $this->localizations;
-                $preferredLocalizations->partition(fn(string $localization): bool => $localization !== Locale::getPrimaryLanguage(Locale::getDefault()));
-                $this->preferredLocalizations = $preferredLocalizations;
+            if (isset($this->preferredLocalizations)) {
+                return $this->preferredLocalizations;
             }
-            return $this->preferredLocalizations;
+            $preferredLocalizations = clone $this->localizations;
+            $preferredLocalizations->partition(fn(string $localization): bool => $localization !== Locale::getPrimaryLanguage(Locale::getDefault()));
+            return $this->preferredLocalizations = $preferredLocalizations;
         }
     }
     /** @var string|null The localization for the development language.
@@ -90,15 +90,20 @@ final class Bundle extends ObjectClass
     public ?Dictionary $localizedInfoDictionary {
         get => $this->infoDictionary;
     }
+    private bool $isPrincipalClassResolved = false;
     /** @var class-string|null $principalClass The bundle's principal class. */
     private(set) ?string $principalClass {
         get {
-            if (!isset($this->principalClass)) {
-                /** @var class-string|null $principalClass */
-                $principalClass = $this->object(kCFBundlePrincipalClassKey);
-                $this->principalClass = empty($principalClass) ? null : $this->classNamed($principalClass);
+            if ($this->isPrincipalClassResolved) {
+                return $this->principalClass;
             }
-            return $this->principalClass;
+            $this->isPrincipalClassResolved = true;
+            /** @var class-string|null $principalClass */
+            $principalClass = $this->object(kCFBundlePrincipalClassKey);
+            if (!$principalClass) {
+                return $this->principalClass = null;
+            }
+            return $this->principalClass = $this->classNamed($principalClass);
         }
     }
 
