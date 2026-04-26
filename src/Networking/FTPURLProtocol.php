@@ -25,9 +25,7 @@ final class FTPURLProtocol extends NativeProtocol
     #[Override]
     public function didReceiveHeaderData(string $data, int $contentLength): EasyHandleAction
     {
-        if ($this->internalState->rawValue !== InternalStateRawValue::transferInProgress) {
-            fatal_error("Received header data, but no transfer in progress.");
-        }
+        $this->internalState->rawValue === InternalStateRawValue::transferInProgress ?: fatal_error("Received header data, but no transfer in progress.");
         $this->task->countOfBytesReceived = $contentLength ?: URLSessionTransferSizeUnknown;
         try {
             /** @var TransferState $ts */
@@ -79,12 +77,8 @@ final class FTPURLProtocol extends NativeProtocol
 
     public function didReceiveResponse(): void
     {
-        if ($this->internalState->rawValue !== InternalStateRawValue::transferInProgress) {
-            fatal_error("Received header data, but no transfer in progress.");
-        }
-        if (!($response = $this->internalState->transferState?->response)) {
-            fatal_error("Header complete, but not URL response.");
-        }
+        $this->internalState->rawValue === InternalStateRawValue::transferInProgress ?: fatal_error("Received header data, but no transfer in progress.");
+        $response = $this->internalState->transferState?->response ?? fatal_error("Header complete, but not URL response.");
         $session = $this->task->session;
         $behaviour = $session->behaviour($this->task);
         switch ($behaviour->rawValue) {
