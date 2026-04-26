@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Sabatier\Foundation;
 
 /** @var string A filesystem operation was attempted on a non-existent file. */

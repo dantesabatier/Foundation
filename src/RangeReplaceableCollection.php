@@ -1,12 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Created by PhpStorm.
  * User: dante
  * Date: 19/07/20
  * Time: 09:58
  */
-
 namespace Sabatier\Foundation;
 
 /**

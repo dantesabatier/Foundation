@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Sabatier\Foundation\Networking;
 
 /** The response length cannot be determined in advance of receiving the data from the server. For example, URLResponseUnknownLength is returned when the server HTTP response does not include a Content-Length header. */

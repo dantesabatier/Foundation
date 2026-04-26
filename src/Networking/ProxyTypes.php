@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Sabatier\Foundation;
 
 /** @var string The proxy type for HTTP proxies. */

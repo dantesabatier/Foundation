@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Sabatier\Foundation\Predicates;
 
 use function Sabatier\Foundation\fatal_error;

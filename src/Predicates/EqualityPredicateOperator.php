@@ -1,12 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Created by PhpStorm.
  * User: dante
  * Date: 24/07/20
  * Time: 11:44
  */
-
 namespace Sabatier\Foundation\Predicates;
 
 use JetBrains\PhpStorm\ExpectedValues;

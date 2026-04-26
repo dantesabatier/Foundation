@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Sabatier\Foundation;
 
 function components_from_key_path(string $keyPath): KeyPathComponents

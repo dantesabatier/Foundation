@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Sabatier\Foundation;
 
 /** @var string The corresponding value is a localized string representation of the error that, if present, will be returned by {@see Error::localizedDescription}. */
