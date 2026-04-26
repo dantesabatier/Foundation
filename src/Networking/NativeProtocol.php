@@ -274,9 +274,7 @@ abstract class NativeProtocol extends URLProtocol implements EasyHandleDelegate
     {
         $task = $this->task;
         $task->error = $error;
-        if ($this->internalState->rawValue !== InternalStateRawValue::transferFailed) {
-            fatal_error("Trying to complete the task, but its transfer isn't complete / failed.");
-        }
+        $this->internalState->rawValue === InternalStateRawValue::transferFailed ?: fatal_error("Trying to complete the task, but its transfer isn't complete / failed.");
         $this->internalState = InternalState::taskCompleted();
         $task->session->remove($this->easyHandle);
     }
@@ -295,9 +293,7 @@ abstract class NativeProtocol extends URLProtocol implements EasyHandleDelegate
             return;
         }
         $task = $this->task;
-        if (!$task instanceof URLSessionDataTask) {
-            fatal_error();
-        }
+        $task instanceof URLSessionDataTask ?: fatal_error();
         /** @var TransferState $ts */
         $ts = $this->internalState->transferState;
         $this->internalState = InternalState::waitingForResponseCompletionHandler($ts);
