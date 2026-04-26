@@ -30,8 +30,7 @@ final class URLCredentialStorage extends ObjectClass
      */
     public static function shared(): URLCredentialStorage
     {
-        self::$shared ??= new URLCredentialStorage();
-        return self::$shared;
+        return self::$shared ??= new URLCredentialStorage();
     }
 
     /**

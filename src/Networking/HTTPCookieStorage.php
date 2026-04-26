@@ -61,8 +61,7 @@ final class HTTPCookieStorage extends ObjectClass
      */
     private static function sharedCookieStorages(): Dictionary
     {
-        self::$sharedCookieStorages ??= new Dictionary();
-        return self::$sharedCookieStorages;
+        return self::$sharedCookieStorages ??= new Dictionary();
     }
 
     /**

@@ -48,8 +48,7 @@ final class URLSessionConfiguration
      */
     public static function default(): URLSessionConfiguration
     {
-        self::$default ??= new URLSessionConfiguration();
-        return self::$default;
+        return self::$default ??= new URLSessionConfiguration();
     }
 
     /**

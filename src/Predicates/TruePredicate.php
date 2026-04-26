@@ -24,8 +24,7 @@ final class TruePredicate extends Predicate
 
     public static function default(): TruePredicate
     {
-        TruePredicate::$default ??= new TruePredicate();
-        return TruePredicate::$default;
+        return self::$default ??= new TruePredicate();
     }
 
     #[Override]

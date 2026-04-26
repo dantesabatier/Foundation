@@ -206,8 +206,7 @@ final class URLCache extends ObjectClass
      */
     public static function shared(): URLCache
     {
-        self::$shared ??= new URLCache(4 * 1024 * 1024, 20 * 1024 * 1024);
-        return self::$shared;
+        return self::$shared ??= new URLCache(4 * 1024 * 1024, 20 * 1024 * 1024);
     }
 
     /**

@@ -24,8 +24,7 @@ final class AnyKeyExpression extends Expression
 
     public static function default(): AnyKeyExpression
     {
-        AnyKeyExpression::$default ??= new AnyKeyExpression();
-        return AnyKeyExpression::$default;
+        return self::$default ??= new AnyKeyExpression();
     }
 
     /** @noinspection PhpMixedReturnTypeCanBeReducedInspection */

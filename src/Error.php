@@ -26,7 +26,6 @@ class Error extends ObjectClass
     }
     /** @var string|null A string containing the localized explanation of the reason for the error. The object in the user info dictionary for the key {@see LocalizedFailureReasonErrorKey}. */
     public ?string $localizedFailureReason {
-        /** @noinspection SpellCheckingInspection */
         get => $this->userInfo?->valueForKey(LocalizedFailureReasonErrorKey) ?? match ($this->domain) {
             CocoaErrorDomain => match ($this->code) {
                 4, 260 => localized_string("The file doesn't exist."),
@@ -96,8 +95,7 @@ class Error extends ObjectClass
      */
     private static function userInfoProviders(): Dictionary
     {
-        self::$userInfoProviders ??= new Dictionary();
-        return self::$userInfoProviders;
+        return self::$userInfoProviders ??= new Dictionary();
     }
 
     /**

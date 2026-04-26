@@ -44,8 +44,7 @@ abstract class URLProtocol extends ObjectClass
      */
     private static function registeredProtocolClasses(): ArrayClass
     {
-        self::$registeredProtocolClasses ??= new ArrayClass();
-        return self::$registeredProtocolClasses;
+        return  self::$registeredProtocolClasses ??= new ArrayClass();
     }
 
     /**

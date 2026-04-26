@@ -24,8 +24,7 @@ final class FalsePredicate extends Predicate
 
     public static function default(): FalsePredicate
     {
-        FalsePredicate::$default ??= new FalsePredicate();
-        return FalsePredicate::$default;
+        return self::$default ??= new FalsePredicate();
     }
 
     #[Override]

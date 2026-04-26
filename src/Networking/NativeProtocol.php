@@ -13,6 +13,7 @@ use Sabatier\Foundation\SearchPathDirectory;
 use Sabatier\Foundation\SearchPathDomainMask;
 use Sabatier\Foundation\SystemRandomNumberGenerator;
 use Sabatier\Foundation\URL;
+use Throwable;
 use function Sabatier\Foundation\fatal_error;
 use function Sabatier\Foundation\in_range;
 use function Sabatier\Foundation\localized_string;
@@ -37,10 +38,11 @@ abstract class NativeProtocol extends URLProtocol implements EasyHandleDelegate
     private URL $tempFileURL {
         /** @noinspection PhpUnhandledExceptionInspection */
         get {
-            if (!isset($this->tempFileURL)) {
-                $this->tempFileURL = FileManager::default()->url(SearchPathDirectory::cachesDirectory, SearchPathDomainMask::local, null, true)->appendingPathComponent(uniqid((string)new SystemRandomNumberGenerator()->next(), true))->appendPathExtension($this->task->originalRequest?->url?->pathExtension ?? "");
-                FileManager::default()->createFile($this->tempFileURL->path, null);
+            if (isset($this->tempFileURL)) {
+                return $this->tempFileURL;
             }
+            $this->tempFileURL = FileManager::default()->url(SearchPathDirectory::cachesDirectory, SearchPathDomainMask::local, null, true)->appendingPathComponent(uniqid((string)new SystemRandomNumberGenerator()->next(), true))->appendPathExtension($this->task->originalRequest?->url?->pathExtension ?? "");
+            FileManager::default()->createFile($this->tempFileURL->path, null);
             return $this->tempFileURL;
         }
     }
@@ -245,6 +247,9 @@ abstract class NativeProtocol extends URLProtocol implements EasyHandleDelegate
         return null;
     }
 
+    /**
+     * @throws Throwable
+     */
     public function notifyDelegateAboutUploadedData(int $count): void
     {
         $task = $this->task;
