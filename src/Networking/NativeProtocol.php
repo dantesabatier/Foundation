@@ -125,9 +125,7 @@ abstract class NativeProtocol extends URLProtocol implements EasyHandleDelegate
     public function resume(): void
     {
         if ($this->internalState->rawValue === InternalStateRawValue::initial) {
-            if (!($request = $this->task->originalRequest)) {
-                fatal_error("Task has no original request.");
-            }
+            $request = $this->task->originalRequest ?? fatal_error("Task has no original request.");
             if (($cachedResponse = $this->cachedResponse) && $this->canRespondFromCache($cachedResponse)) {
                 $this->internalState = InternalState::fulfillingFromCache($cachedResponse);
                 $this->client?->urlProtocolCachedResponseIsValid($this, $cachedResponse);
@@ -162,9 +160,7 @@ abstract class NativeProtocol extends URLProtocol implements EasyHandleDelegate
     #[Override]
     public function didReceiveData(string $data): EasyHandleAction
     {
-        if ($this->internalState->rawValue !== InternalStateRawValue::transferInProgress) {
-            fatal_error("Received body data, but no transfer in progress.");
-        }
+        $this->internalState->rawValue === InternalStateRawValue::transferInProgress ?: fatal_error("Received body data, but no transfer in progress.");
         /** @var TransferState $ts */
         $ts = $this->internalState->transferState;
         if ($response = $this->validateHeaderComplete($ts)) {
@@ -184,9 +180,7 @@ abstract class NativeProtocol extends URLProtocol implements EasyHandleDelegate
     #[Override]
     public function fill(mixed $buffer): EasyHandleWriteBufferResult
     {
-        if ($this->internalState->rawValue !== InternalStateRawValue::transferInProgress) {
-            fatal_error("Requested to fill write buffer, but transfer isn't in progress.");
-        }
+        $this->internalState->rawValue === InternalStateRawValue::transferInProgress ?: fatal_error("Requested to fill buffer, but transfer isn't in progress.");
         return EasyHandleWriteBufferResult::bytes(fgets($buffer));
     }
 
@@ -198,20 +192,14 @@ abstract class NativeProtocol extends URLProtocol implements EasyHandleDelegate
             $this->failWithError($error, $this->request);
             return;
         }
-        if ($this->internalState->rawValue !== InternalStateRawValue::transferInProgress) {
-            fatal_error("Transfer completed, but it wasn't in progress.");
-        }
-        if (!($request = $this->task->currentRequest)) {
-            fatal_error("Transfer completed, but there's no current request.");
-        }
+        $this->internalState->rawValue === InternalStateRawValue::transferInProgress ?: fatal_error("Transfer completed, but it wasn't in progress.");
+        $request = $this->task->currentRequest ?? fatal_error("Transfer completed, but there's no current request.");
         /** @var TransferState $ts */
         $ts = $this->internalState->transferState;
         if ($response = $this->task->response) {
             $ts->response = $response;
         }
-        if (!($response = $ts->response)) {
-            fatal_error("Transfer completed, but there's no response.");
-        }
+        $response = $ts->response ?? fatal_error("Transfer completed, but there's no response.");
         $this->internalState = InternalState::transferCompleted($response, $ts->bodyDataDrain);
         $action = $this->completionAction($request, $response);
         switch ($action->rawValue) {
@@ -241,9 +229,7 @@ abstract class NativeProtocol extends URLProtocol implements EasyHandleDelegate
 
     public function validateHeaderComplete(TransferState $transferState): ?URLResponse
     {
-        if (!$transferState->isHeaderComplete()) {
-            fatal_error("Received body data, but the header is not complete, yet.");
-        }
+        $transferState->isHeaderComplete() ?: fatal_error("Received body data, but the header is not complete, yet.");
         return null;
     }
 
@@ -332,9 +318,7 @@ abstract class NativeProtocol extends URLProtocol implements EasyHandleDelegate
 
     public function completeTask(): void
     {
-        if ($this->internalState->rawValue !== InternalStateRawValue::transferCompleted) {
-            fatal_error("Received body data, but no transfer in progress.");
-        }
+        $this->internalState->rawValue === InternalStateRawValue::transferCompleted ?: fatal_error("Trying to complete the task, but its transfer is already complete.");
         $task = $this->task;
         $task->response = $this->internalState->response;
         /** @var DataDrain $bodyDataDrain */
