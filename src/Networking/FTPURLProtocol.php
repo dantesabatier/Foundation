@@ -18,8 +18,10 @@ final class FTPURLProtocol extends NativeProtocol
     #[Override]
     public static function canInit(URLRequest $request): bool
     {
-        // TODO: Implement sftp and ftps
-        return $request->url->scheme === "ftp";
+        return match ($request->url->scheme) {
+            "ftp", "ftps", "sftp" => true,
+            default => false,
+        };
     }
 
     #[Override]
@@ -47,23 +49,43 @@ final class FTPURLProtocol extends NativeProtocol
     {
         $easyHandle = $this->easyHandle;
         $easyHandle->setVerboseModeOn(self::enableLibcurlDebugOutput());
+        $easyHandle->setPassHeadersToDataStream(false);
+        $easyHandle->setProgressMeterOff(true);
         $easyHandle->setSkipAllSignalHandling(true);
         $easyHandle->setURL($request->url);
+        $easyHandle->setSessionConfig($this->task->session->configuration);
+        $easyHandle->setAllowedProtocolsToFTP();
         $easyHandle->setPreferredReceiveBufferSize(PHP_INT_MAX);
+        $easyHandle->setTimeout((int)$request->timeoutInterval);
         try {
             switch ($body->rawValue) {
                 case TaskBodyRawValue::none:
                     $easyHandle->setRequestBodyLength(0);
                     break;
                 case TaskBodyRawValue::data:
+                    $stream = fopen("php://memory", "r+");
+                    fwrite($stream, $body->data ?? "");
+                    rewind($stream);
+                    $easyHandle->setUpload(true);
+                    $easyHandle->setInputFile($stream);
+                    $easyHandle->setRequestBodyLength($body->getBodyLength() ?? 0);
+                    $this->task->countOfBytesExpectedToSend = $body->getBodyLength() ?? 0;
+                    break;
                 case TaskBodyRawValue::file:
-                case TaskBodyRawValue::stream:
+                    $stream = fopen((string)$body->fileURL?->path, "rb");
+                    $easyHandle->setUpload(true);
+                    $easyHandle->setInputFile($stream);
                     if ($length = $body->getBodyLength()) {
                         $easyHandle->setRequestBodyLength($length);
                         $this->task->countOfBytesExpectedToSend = $length;
                     } else {
                         $easyHandle->setRequestBodyLength(URLResponseUnknownLength);
                     }
+                    break;
+                case TaskBodyRawValue::stream:
+                    $easyHandle->setUpload(true);
+                    $easyHandle->setInputFile($body->stream);
+                    $easyHandle->setRequestBodyLength(URLResponseUnknownLength);
                     break;
             }
         } catch (Exception) {
@@ -72,7 +94,6 @@ final class FTPURLProtocol extends NativeProtocol
             $this->failWithError($error, $request);
             return;
         }
-        $easyHandle->setAutomaticBodyDecompression(true);
     }
 
     public function didReceiveResponse(): void

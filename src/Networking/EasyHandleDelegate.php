@@ -13,7 +13,7 @@ interface EasyHandleDelegate
 
     public function didReceiveHeaderData(string $data, int $contentLength): EasyHandleAction;
 
-    public function fill(mixed $buffer): EasyHandleWriteBufferResult;
+    public function fill(mixed $buffer, int $length): EasyHandleWriteBufferResult;
 
     public function transferCompleted(?Error $error): void;
 

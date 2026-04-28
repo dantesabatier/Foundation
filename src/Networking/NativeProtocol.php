@@ -178,10 +178,10 @@ abstract class NativeProtocol extends URLProtocol implements EasyHandleDelegate
     }
 
     #[Override]
-    public function fill(mixed $buffer): EasyHandleWriteBufferResult
+    public function fill(mixed $buffer, int $length): EasyHandleWriteBufferResult
     {
         $this->internalState->rawValue === InternalStateRawValue::transferInProgress ?: fatal_error("Requested to fill buffer, but transfer isn't in progress.");
-        return EasyHandleWriteBufferResult::bytes(fgets($buffer));
+        return EasyHandleWriteBufferResult::bytes(is_resource($buffer) ? fread($buffer, $length) : "");
     }
 
     #[Override]

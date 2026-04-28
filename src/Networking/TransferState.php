@@ -40,7 +40,7 @@ final class TransferState
         if (str_starts_with($data, (string)FTPHeaderCode::transferCompleted->value)) {
             return $this;
         }
-        if (!($header = $this->parsedResponseHeader->byAppending($data, fn(): bool => str_starts_with($data, (string)FTPHeaderCode::openDataConnection->value)))) {
+        if (!($header = $this->parsedResponseHeader->byAppending($data, fn(): bool => str_starts_with($data, (string)FTPHeaderCode::dataConnectionOpen->value) || str_starts_with($data, (string)FTPHeaderCode::openDataConnection->value)))) {
             fatal_error();
         }
         if ($header->rawVale === ParsedResponseHeaderRawVale::complete) {

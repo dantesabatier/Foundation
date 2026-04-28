@@ -17,7 +17,9 @@ use function Sabatier\Foundation\substring_from_index;
 use const Sabatier\Foundation\URLErrorBadServerResponse;
 use const Sabatier\Foundation\URLErrorBadURL;
 use const Sabatier\Foundation\URLErrorCannotFindHost;
+use const Sabatier\Foundation\URLErrorFileDoesNotExist;
 use const Sabatier\Foundation\URLErrorNetworkConnectionLost;
+use const Sabatier\Foundation\URLErrorNoPermissionsToReadFile;
 use const Sabatier\Foundation\URLErrorTimedOut;
 use const Sabatier\Foundation\URLErrorUnknown;
 use const Sabatier\Foundation\URLErrorUnsupportedURL;
@@ -34,6 +36,8 @@ final class EasyHandle
     /** @var Dictionary<string> */
     private Dictionary $allHeaderFields;
     private bool $isClosing = false;
+    /** @var resource|null */
+    private mixed $inputStream = null;
 
     public function __construct(public readonly EasyHandleDelegate $delegate)
     {
@@ -151,6 +155,18 @@ final class EasyHandle
         $this->set(CURLPROTO_HTTP | CURLPROTO_HTTPS, CURLOPT_REDIR_PROTOCOLS);
     }
 
+    public function setAllowedProtocolsToFTP(): void
+    {
+        $protocols = CURLPROTO_FTP | CURLPROTO_FTPS | CURLPROTO_SFTP;
+        $this->set($protocols, CURLOPT_PROTOCOLS);
+        $this->set(0, CURLOPT_REDIR_PROTOCOLS);
+        if (($caInfo = ProcessInfo::processInfo()->environment["URL_SESSION_CERTIFICATE_AUTHORITY_INFO_FILE"]) && $caInfo !== "INSECURE_SSL_NO_VERIFY") {
+            $this->set($caInfo, CURLOPT_CAINFO);
+        } else {
+            $this->set(false, CURLOPT_SSL_VERIFYPEER);
+        }
+    }
+
     public function setPreferredReceiveBufferSize(int $size): void
     {
         $size = min($size, CURL_MAX_READ_SIZE);
@@ -201,6 +217,12 @@ final class EasyHandle
     public function setRequestBodyLength(int $length): void
     {
         $this->set($length, CURLOPT_INFILESIZE);
+    }
+
+    public function setInputFile(mixed $handle): void
+    {
+        $this->inputStream = $handle;
+        $this->set($handle, CURLOPT_INFILE);
     }
 
     public function setTimeout(int $timeout): void
@@ -261,7 +283,7 @@ final class EasyHandle
     {
         $this->set(true, CURLOPT_RETURNTRANSFER);
         $this->set(fn(CurlHandle $handle, string $data): int => $this->didReceiveData($data), CURLOPT_WRITEFUNCTION);
-        $this->set(fn(CurlHandle $handle, mixed $data, int $size): string => $this->fill($data), CURLOPT_READFUNCTION);
+        $this->set(fn(CurlHandle $handle, mixed $data, int $size): string => $this->fill($data, $size), CURLOPT_READFUNCTION);
         $this->set(function (CurlHandle $handle, float $totalBytesExpectedToReceive, float $totalBytesReceived, float $totalBytesExpectedToSend, float $totalBytesSent): int {
             $this->updateProgressMeter(new EasyHandleProgress($totalBytesSent, $totalBytesExpectedToSend, $totalBytesReceived, $totalBytesExpectedToReceive));
             return CURLE_OK;
@@ -274,11 +296,13 @@ final class EasyHandle
         return match ($easyCode) {
             CURLE_UNSUPPORTED_PROTOCOL => URLErrorUnsupportedURL,
             CURLE_URL_MALFORMAT => URLErrorBadURL,
-            CURLE_RECV_ERROR, CURLE_SEND_ERROR => URLErrorNetworkConnectionLost,
-            CURLE_GOT_NOTHING => URLErrorBadServerResponse,
-            CURLE_ABORTED_BY_CALLBACK => URLErrorUnknown,
-            CURLE_COULDNT_CONNECT, CURLE_OPERATION_TIMEDOUT => URLErrorTimedOut,
-            CURLE_COULDNT_RESOLVE_HOST => URLErrorCannotFindHost,
+            CURLE_RECV_ERROR, CURLE_SEND_ERROR, CURLE_FTP_ACCEPT_FAILED, CURLE_FTP_PORT_FAILED => URLErrorNetworkConnectionLost,
+            CURLE_GOT_NOTHING, CURLE_FTP_WEIRD_SERVER_REPLY, CURLE_FTP_WEIRD_PASS_REPLY, CURLE_FTP_WEIRD_PASV_REPLY, CURLE_FTP_WEIRD_227_FORMAT => URLErrorBadServerResponse,
+            CURLE_ABORTED_BY_CALLBACK, CURLE_FTP_COULDNT_SET_TYPE, CURLE_FTP_COULDNT_USE_REST => URLErrorUnknown,
+            CURLE_COULDNT_CONNECT, CURLE_OPERATION_TIMEDOUT, CURLE_FTP_ACCEPT_TIMEOUT => URLErrorTimedOut,
+            CURLE_COULDNT_RESOLVE_HOST, CURLE_FTP_CANT_GET_HOST => URLErrorCannotFindHost,
+            CURLE_REMOTE_ACCESS_DENIED, CURLE_FTP_COULDNT_RETR_FILE, CURLE_LOGIN_DENIED => URLErrorNoPermissionsToReadFile,
+            CURLE_REMOTE_FILE_NOT_FOUND => URLErrorFileDoesNotExist,
             default => null
         };
     }
@@ -292,9 +316,9 @@ final class EasyHandle
         };
     }
 
-    private function fill(mixed $buffer): string
+    private function fill(mixed $buffer, int $length = CURL_MAX_WRITE_SIZE): string
     {
-        $result = $this->delegate->fill($buffer);
+        $result = $this->delegate->fill($buffer, $length);
         return match ($result->rawValue) {
             EasyHandleWriteBufferResultRawValue::bytes => $result->bytes,
             EasyHandleWriteBufferResultRawValue::pause => (string)CURL_READFUNC_PAUSE,
@@ -367,6 +391,10 @@ final class EasyHandle
             unset($rawHandle);
         } elseif (is_resource($rawHandle)) {
             fclose($rawHandle);
+        }
+        if (is_resource($this->inputStream)) {
+            fclose($this->inputStream);
+            $this->inputStream = null;
         }
     }
 

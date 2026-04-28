@@ -4,6 +4,29 @@ declare(strict_types=1);
 
 namespace Sabatier\Foundation\Networking;
 
+// Conditionally define libcurl FTP error constants absent from some PHP builds.
+if (!defined("CURLE_FTP_ACCEPT_FAILED")) {
+    define("CURLE_FTP_ACCEPT_FAILED", 10);
+}
+if (!defined("CURLE_FTP_ACCEPT_TIMEOUT")) {
+    define("CURLE_FTP_ACCEPT_TIMEOUT", 12);
+}
+if (!defined("CURLE_FTP_COULDNT_SET_TYPE")) {
+    define("CURLE_FTP_COULDNT_SET_TYPE", 17);
+}
+if (!defined("CURLE_REMOTE_ACCESS_DENIED")) {
+    define("CURLE_REMOTE_ACCESS_DENIED", 9);
+}
+if (!defined("CURLE_REMOTE_FILE_NOT_FOUND")) {
+    define("CURLE_REMOTE_FILE_NOT_FOUND", 78);
+}
+if (!defined("CURLE_LOGIN_DENIED")) {
+    define("CURLE_LOGIN_DENIED", 67);
+}
+if (!defined("CURL_MAX_WRITE_SIZE")) {
+    define("CURL_MAX_WRITE_SIZE", 16384);
+}
+
 /** The response length cannot be determined in advance of receiving the data from the server. For example, URLResponseUnknownLength is returned when the server HTTP response does not include a Content-Length header. */
 const URLResponseUnknownLength = -1;
 /** @var int The total size of the transfer cannot be determined. */
