@@ -279,12 +279,12 @@ abstract class NativeProtocol extends URLProtocol implements EasyHandleDelegate
             return;
         }
         $task = $this->task;
-        $task instanceof URLSessionDataTask ?: fatal_error();
+        $task instanceof URLSessionDataTask ?: fatal_error("Asking delegate how to proceed after complete response, but the task is not a data task.");
         /** @var TransferState $ts */
         $ts = $this->internalState->transferState;
         $this->internalState = InternalState::waitingForResponseCompletionHandler($ts);
-        $session = $task->session;
-        $delegate->urlSessionDataTaskDidReceiveResponse($session, $task, $response, function (URLSessionResponseDisposition $disposition): void {
+        /** @psalm-suppress ArgumentTypeCoercion */
+        $delegate->urlSessionDataTaskDidReceiveResponse($task->session, $task, $response, function (URLSessionResponseDisposition $disposition): void {
             $this->didCompleteResponseCallback($disposition);
         });
     }

@@ -392,8 +392,9 @@ final class EasyHandle
         } elseif (is_resource($rawHandle)) {
             fclose($rawHandle);
         }
-        if (is_resource($this->inputStream)) {
-            fclose($this->inputStream);
+        $inputStream = $this->inputStream;
+        if (is_resource($inputStream)) {
+            fclose($inputStream);
             $this->inputStream = null;
         }
     }
