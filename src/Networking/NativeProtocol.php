@@ -8,6 +8,7 @@ use Sabatier\Foundation\Dictionary;
 use Sabatier\Foundation\Error;
 use Sabatier\Foundation\FileHandle;
 use Sabatier\Foundation\FileManager;
+use Sabatier\Foundation\Number;
 use Sabatier\Foundation\ProcessInfo;
 use Sabatier\Foundation\SearchPathDirectory;
 use Sabatier\Foundation\SearchPathDomainMask;
@@ -49,7 +50,7 @@ abstract class NativeProtocol extends URLProtocol implements EasyHandleDelegate
 
     public static function enableLibcurlDebugOutput(): bool
     {
-        return ProcessInfo::processInfo()->environment["URL_SESSION_DEBUG_LIBCURL"] !== null;
+        return new Number(ProcessInfo::processInfo()->environment["URL_SESSION_DEBUG_LIBCURL"] ?? false)->boolValue;
     }
 
     #[Override]
@@ -188,8 +189,13 @@ abstract class NativeProtocol extends URLProtocol implements EasyHandleDelegate
     public function transferCompleted(?Error $error): void
     {
         if ($error instanceof Error) {
-            $this->internalState = InternalState::transferFailed();
-            $this->failWithError($error, $this->request);
+            if ($this->internalState->rawValue !== InternalStateRawValue::transferFailed) {
+                $this->internalState = InternalState::transferFailed();
+                $this->failWithError($error, $this->request);
+            }
+            return;
+        }
+        if ($this->internalState->rawValue === InternalStateRawValue::transferFailed) {
             return;
         }
         $this->internalState->rawValue === InternalStateRawValue::transferInProgress ?: fatal_error("Transfer completed, but it wasn't in progress.");

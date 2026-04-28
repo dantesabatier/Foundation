@@ -10,6 +10,8 @@ use function Sabatier\Foundation\fatal_error;
 use function Sabatier\Foundation\localized_string;
 use const Sabatier\Foundation\LocalizedDescriptionKey;
 use const Sabatier\Foundation\URLErrorDomain;
+use const Sabatier\Foundation\URLErrorNetworkConnectionLost;
+use const Sabatier\Foundation\URLErrorNoPermissionsToReadFile;
 use const Sabatier\Foundation\URLErrorUnknown;
 
 /** @internal */
@@ -27,7 +29,17 @@ final class FTPURLProtocol extends NativeProtocol
     #[Override]
     public function didReceiveHeaderData(string $data, int $contentLength): EasyHandleAction
     {
-        $this->internalState->rawValue === InternalStateRawValue::transferInProgress ?: fatal_error("Received header data, but no transfer in progress.");
+        if ($this->internalState->rawValue !== InternalStateRawValue::transferInProgress) {
+            return EasyHandleAction::proceed;
+        }
+        if (strlen($data) >= 4 && ($data[0] === "4" || $data[0] === "5") && ($data[3] === " " || $data[3] === "-")) {
+            $this->internalState = InternalState::transferFailed();
+            $ftpStatus = (int)substr($data, 0, 3);
+            $errorCode = $ftpStatus >= 500 ? URLErrorNoPermissionsToReadFile : URLErrorNetworkConnectionLost;
+            $error = new Error(URLErrorDomain, $errorCode, new Dictionary([LocalizedDescriptionKey => rtrim(substr($data, 4), "\r\n")]));
+            $this->failWithError($error, $this->request);
+            return EasyHandleAction::proceed;
+        }
         $this->task->countOfBytesReceived = $contentLength ?: URLSessionTransferSizeUnknown;
         try {
             /** @var TransferState $ts */
@@ -94,6 +106,19 @@ final class FTPURLProtocol extends NativeProtocol
             $this->failWithError($error, $request);
             return;
         }
+    }
+
+    #[Override]
+    public function transferCompleted(?Error $error): void
+    {
+        if ($error === null && $this->internalState->rawValue === InternalStateRawValue::transferInProgress) {
+            /** @var TransferState $ts */
+            $ts = $this->internalState->transferState;
+            if ($ts->response === null) {
+                $ts->response = new URLResponse($ts->url, expectedContentLength: URLResponseUnknownLength);
+            }
+        }
+        parent::transferCompleted($error);
     }
 
     public function didReceiveResponse(): void
