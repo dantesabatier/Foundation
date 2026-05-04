@@ -57,3 +57,9 @@ const URLProtectionSpaceFTP = "URLProtectionSpaceFTP";
 const URLCredentialStorageChangedNotification = "URLCredentialStorageChangedNotification";
 /** @var string The corresponding value is a {@see Number} representing a Boolean value that indicates whether credentials which contain the URLCredentialPersistence.synchronizable attribute should be removed. If the key is missing or the value is @NO, then no attempt will be made to remove such a credential. */
 const URLCredentialStorageRemoveSynchronizableCredentials = "URLCredentialStorageRemoveSynchronizableCredentials";
+/** @var string Environment variable to enable libcurl debug output. */
+const URLSessionDebugLibcurl = "URL_SESSION_DEBUG_LIBCURL";
+/** @var string Environment variable specifying the path to the Certificate Authority info file. Use "INSECURE_SSL_NO_VERIFY" to disable SSL verification. */
+const URLSessionCertificateAuthorityInfoFile = "URL_SESSION_CERTIFICATE_AUTHORITY_INFO_FILE";
+/** @var string Special value for URLSessionCertificateAuthorityInfoFile to disable SSL peer verification. */
+const URLSessionInsecureSSLNoVerify = "INSECURE_SSL_NO_VERIFY";

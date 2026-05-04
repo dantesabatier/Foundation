@@ -50,7 +50,7 @@ abstract class NativeProtocol extends URLProtocol implements EasyHandleDelegate
 
     public static function enableLibcurlDebugOutput(): bool
     {
-        return new Number(ProcessInfo::processInfo()->environment["URL_SESSION_DEBUG_LIBCURL"] ?? false)->boolValue;
+        return new Number(ProcessInfo::processInfo()->environment[URLSessionDebugLibcurl] ?? false)->boolValue;
     }
 
     #[Override]

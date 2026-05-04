@@ -142,7 +142,7 @@ final class EasyHandle
         $protocols = CURLPROTO_HTTP | CURLPROTO_HTTPS;
         $this->set($protocols, CURLOPT_PROTOCOLS);
         $this->set($protocols, CURLOPT_REDIR_PROTOCOLS);
-        if (($caInfo = ProcessInfo::processInfo()->environment["URL_SESSION_CERTIFICATE_AUTHORITY_INFO_FILE"]) && $caInfo !== "INSECURE_SSL_NO_VERIFY") {
+        if (($caInfo = ProcessInfo::processInfo()->environment[URLSessionCertificateAuthorityInfoFile]) && $caInfo !== URLSessionInsecureSSLNoVerify) {
             $this->set($caInfo, CURLOPT_CAINFO);
         } else {
             $this->set(false, CURLOPT_SSL_VERIFYPEER);
@@ -160,7 +160,7 @@ final class EasyHandle
         $protocols = CURLPROTO_FTP | CURLPROTO_FTPS | CURLPROTO_SFTP;
         $this->set($protocols, CURLOPT_PROTOCOLS);
         $this->set(0, CURLOPT_REDIR_PROTOCOLS);
-        if (($caInfo = ProcessInfo::processInfo()->environment["URL_SESSION_CERTIFICATE_AUTHORITY_INFO_FILE"]) && $caInfo !== "INSECURE_SSL_NO_VERIFY") {
+        if (($caInfo = ProcessInfo::processInfo()->environment[URLSessionCertificateAuthorityInfoFile]) && $caInfo !== URLSessionInsecureSSLNoVerify) {
             $this->set($caInfo, CURLOPT_CAINFO);
         } else {
             $this->set(false, CURLOPT_SSL_VERIFYPEER);
