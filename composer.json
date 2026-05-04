@@ -1,6 +1,7 @@
 {
   "name": "sabatier/foundation",
-  "description": "The Foundation framework defines a base layer of functionality that is required for almost all applications. ",
+  "description": "The Foundation framework defines a base layer of functionality that is required for almost all applications.",
+  "version": "0.3.0",
   "keywords": [
     "sabatier",
     "foundation",
