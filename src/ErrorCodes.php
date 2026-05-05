@@ -38,3 +38,5 @@ const URLErrorHTTPTooManyRedirects = -1007;
 const URLErrorFileDoesNotExist = -1100;
 /** @var int A resource couldn't be read because of insufficient permissions. */
 const URLErrorNoPermissionsToReadFile = -1102;
+/** @var int An attempt to establish a secure connection failed for reasons that can't be expressed more specifically. */
+const URLErrorSecureConnectionFailed = -1200;

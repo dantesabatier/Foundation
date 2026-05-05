@@ -21,6 +21,7 @@ use const Sabatier\Foundation\URLErrorFileDoesNotExist;
 use const Sabatier\Foundation\URLErrorNetworkConnectionLost;
 use const Sabatier\Foundation\URLErrorNoPermissionsToReadFile;
 use const Sabatier\Foundation\URLErrorTimedOut;
+use const Sabatier\Foundation\URLErrorSecureConnectionFailed;
 use const Sabatier\Foundation\URLErrorUnknown;
 use const Sabatier\Foundation\URLErrorUnsupportedURL;
 
@@ -303,6 +304,7 @@ final class EasyHandle
             CURLE_COULDNT_RESOLVE_HOST, CURLE_FTP_CANT_GET_HOST => URLErrorCannotFindHost,
             CURLE_REMOTE_ACCESS_DENIED, CURLE_FTP_COULDNT_RETR_FILE, CURLE_LOGIN_DENIED => URLErrorNoPermissionsToReadFile,
             CURLE_REMOTE_FILE_NOT_FOUND => URLErrorFileDoesNotExist,
+            CURLE_SSL_CONNECT_ERROR, CURLE_SSL_CERTPROBLEM, CURLE_SSL_CIPHER, CURLE_PEER_FAILED_VERIFICATION, CURLE_SSL_ENGINE_NOTFOUND, CURLE_SSL_ENGINE_SETFAILED, CURLE_SSL_ENGINE_INITFAILED, CURLE_SSL_CACERT_BADFILE, CURLE_SSL_SHUTDOWN_FAILED, CURLE_SSL_CRL_BADFILE, CURLE_SSL_ISSUER_ERROR => URLErrorSecureConnectionFailed,
             default => null
         };
     }
