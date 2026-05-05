@@ -26,6 +26,21 @@ if (!defined("CURLE_LOGIN_DENIED")) {
 if (!defined("CURL_MAX_WRITE_SIZE")) {
     define("CURL_MAX_WRITE_SIZE", 16384);
 }
+if (!defined("CURLE_PEER_FAILED_VERIFICATION")) {
+    define("CURLE_PEER_FAILED_VERIFICATION", 60);
+}
+if (!defined("CURLE_SSL_ENGINE_INITFAILED")) {
+    define("CURLE_SSL_ENGINE_INITFAILED", 66);
+}
+if (!defined("CURLE_SSL_SHUTDOWN_FAILED")) {
+    define("CURLE_SSL_SHUTDOWN_FAILED", 80);
+}
+if (!defined("CURLE_SSL_CRL_BADFILE")) {
+    define("CURLE_SSL_CRL_BADFILE", 82);
+}
+if (!defined("CURLE_SSL_ISSUER_ERROR")) {
+    define("CURLE_SSL_ISSUER_ERROR", 83);
+}
 
 /** The response length cannot be determined in advance of receiving the data from the server. For example, URLResponseUnknownLength is returned when the server HTTP response does not include a Content-Length header. */
 const URLResponseUnknownLength = -1;
