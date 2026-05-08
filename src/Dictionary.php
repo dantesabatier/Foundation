@@ -91,9 +91,34 @@ final class Dictionary extends ObjectClass implements Collection, ArrayAccess, I
         }
     }
 
-    public static function dictionaryWithArray(array $array): Dictionary
+    /**
+     * Creates a Dictionary representation of the given array.
+     *
+     * Sequential nested arrays are recursively converted into ArrayClass instances,
+     * while associative nested arrays are recursively converted into Dictionary instances.
+     *
+     * By default, null values are preserved using the Nil placeholder object. This
+     * allows explicit null values originating from external payloads such as JSON,
+     * HTTP bodies, or serialized data to be represented without being removed from
+     * the resulting Dictionary.
+     *
+     * When $preserveNull is false, null values are treated as absent values and are
+     * therefore not stored in the resulting collection hierarchy.
+     *
+     * @param array<array-key, mixed> $array
+     *     The source array to convert.
+     *
+     * @param bool $preserveNull
+     *     Whether explicit null values should be preserved using the Nil placeholder.
+     *     When false, null values are ignored and therefore removed from the resulting
+     *     collection hierarchy.
+     *
+     * @return Dictionary<mixed>
+     *     A recursively converted Dictionary representation of the given array.
+     */
+    public static function dictionaryWithArray(array $array, bool $preserveNull = true): Dictionary
     {
-        return new ArrayConverter($array)->dictionary;
+        return new ArrayConverter($array, $preserveNull)->dictionary;
     }
 
     /**

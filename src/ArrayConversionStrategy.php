@@ -7,5 +7,9 @@ namespace Sabatier\Foundation;
 /** @internal */
 interface ArrayConversionStrategy
 {
-    public function convert(array $array): mixed;
+    public ArrayConversionStrategy $nestedConversionStrategy {
+        get;
+    }
+
+    public function convert(array $array, bool $preserveNull = true): mixed;
 }

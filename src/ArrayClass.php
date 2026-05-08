@@ -119,9 +119,34 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Arra
         }
     }
 
-    public static function arrayWithArray(array $array): ArrayClass
+    /**
+     * Creates an ArrayClass representation of the given array.
+     *
+     * Sequential nested arrays are recursively converted into ArrayClass instances,
+     * while associative nested arrays are recursively converted into Dictionary instances.
+     *
+     * By default, null values are preserved using the Nil placeholder object. This
+     * allows explicit null values originating from external payloads such as JSON,
+     * HTTP bodies, or serialized data to be represented without being removed from
+     * the resulting collection hierarchy.
+     *
+     * When $preserveNull is false, null values are treated as absent values and are
+     * therefore not stored in the resulting collection hierarchy.
+     *
+     * @param array<array-key, mixed> $array
+     *     The source array to convert.
+     *
+     * @param bool $preserveNull
+     *     Whether explicit null values should be preserved using the Nil placeholder.
+     *     When false, null values are ignored and therefore removed from the resulting
+     *     collection hierarchy.
+     *
+     * @return ArrayClass<mixed>
+     *     A recursively converted ArrayClass representation of the given array.
+     */
+    public static function arrayWithArray(array $array, bool $preserveNull = true): ArrayClass
     {
-        return new ArrayConverter($array)->array;
+        return new ArrayConverter($array, $preserveNull)->array;
     }
 
     /**
