@@ -11,6 +11,7 @@ namespace Sabatier\Foundation;
 
 use ArrayAccess;
 use Closure;
+use Hoa\Visitor\Element;
 use Iterator;
 use Override;
 use Sabatier\Foundation\Predicates\Predicate;
@@ -504,6 +505,32 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Arra
     public function appendContentsOf(iterable $newElements): void
     {
         $this->insertContentsOf($newElements);
+    }
+
+    /**
+     * Creates a new instance of the collection with the specified element appended to it.
+     *
+     * @param Element $element The element to be appended to the collection.
+     * @return ArrayClass<Element> A new collection instance containing all original elements and the appended element.
+     */
+    public function appending(mixed $element): ArrayClass
+    {
+        $copy = clone $this;
+        $copy->append($element);
+        return $copy;
+    }
+
+    /**
+     * Creates a new instance of the collection with the elements of the specified sequence or collection appended to it.
+     *
+     * @param iterable<Element> $newElements The elements to append to the new collection.
+     * @return ArrayClass<Element> A new instance of the collection with the appended elements.
+     */
+    public function appendingContentsOf(iterable $newElements): ArrayClass
+    {
+        $copy = clone $this;
+        $copy->appendContentsOf($newElements);
+        return $copy;
     }
 
     /**
