@@ -262,6 +262,19 @@ class HTTPURLProtocol extends NativeProtocol
     }
 
     #[Override]
+    public function transferCompleted(?Error $error): void
+    {
+        if ($error === null && $this->internalState->rawValue === InternalStateRawValue::transferInProgress) {
+            /** @var TransferState $ts */
+            $ts = $this->internalState->transferState;
+            if ($ts->response === null) {
+                $ts->response = new HTTPURLResponse($ts->url, HTTPStatusCode::ok, "HTTP/0.9");
+            }
+        }
+        parent::transferCompleted($error);
+    }
+
+    #[Override]
     public function validateHeaderComplete(TransferState $transferState): ?URLResponse
     {
         if (!$transferState->isHeaderComplete()) {
