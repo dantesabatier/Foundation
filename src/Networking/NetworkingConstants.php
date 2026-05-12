@@ -62,6 +62,8 @@ const URLAuthenticationMethodHTMLForm = "URLAuthenticationMethodHTMLForm";
 const URLAuthenticationMethodHTTPBasic = "URLAuthenticationMethodHTTPBasic";
 /** @var string Use HTTP digest authentication for this protection space. */
 const URLAuthenticationMethodHTTPDigest = "URLAuthenticationMethodHTTPDigest";
+/** @var string Use HTTP Bearer token authentication for this protection space. */
+const URLAuthenticationMethodHTTPBearer = "URLAuthenticationMethodHTTPBearer";
 /** @var string The protocol type for HTTP. */
 const URLProtectionSpaceHTTP = "URLProtectionSpaceHTTP";
 /** @var string The protocol type for HTTPS. */

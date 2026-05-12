@@ -9,7 +9,6 @@ use Sabatier\Foundation\Error;
 use Sabatier\Foundation\ObjectClass;
 use Sabatier\Foundation\ProcessInfo;
 use Sabatier\Foundation\Progress;
-use function Sabatier\Foundation\fatal_error;
 use function Sabatier\Foundation\localized_string;
 use const Sabatier\Foundation\CocoaErrorDomain;
 use const Sabatier\Foundation\LocalizedDescriptionKey;
@@ -296,6 +295,7 @@ abstract class URLSessionTask extends ObjectClass
             $password = $credential?->password ?? "";
             if (!($authorization = match ($method) {
                 URLAuthenticationMethodHTTPBasic => base64_encode("$username:$password"),
+                URLAuthenticationMethodHTTPBearer => $password ?: null,
                 URLAuthenticationMethodHTTPDigest => (function () use ($password, $username, $request, $challenge): ?string {
                     $parameters = $challenge->authParameters;
                     if (!($realm = $parameters["realm"]) || !($uri = $parameters["uri"]) || !($algorithm = $parameters["algorithm"]) || !($nonce = $parameters["nonce"]) || !($qop = $parameters["qop"]) || !($opaque = $parameters["opaque"])) {
@@ -315,7 +315,8 @@ abstract class URLSessionTask extends ObjectClass
                 })(),
                 default => null
             })) {
-                fatal_error("This URLSession implementation doesn't currently handle $method authentication.");
+                $task->cancel();
+                return;
             }
             $task->authRequest = $request;
             $task->authRequest->setValueForHttpHeaderField("$challenge->authScheme $authorization", "Authorization");

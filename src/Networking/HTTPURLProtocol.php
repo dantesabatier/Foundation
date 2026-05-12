@@ -265,10 +265,12 @@ class HTTPURLProtocol extends NativeProtocol
     public function transferCompleted(?Error $error): void
     {
         if ($error === null && $this->internalState->rawValue === InternalStateRawValue::transferInProgress) {
-            /** @var TransferState $ts */
+            /** @var TransferState $ts transferState is non-null when state is transferInProgress */
             $ts = $this->internalState->transferState;
-            if ($ts->response === null) {
-                $ts->response = new HTTPURLResponse($ts->url, HTTPStatusCode::ok, "HTTP/0.9");
+            if ($ts->response === null && $this->task->response === null) {
+                $syntheticResponse = new HTTPURLResponse($ts->url, HTTPStatusCode::ok, "HTTP/0.9");
+                $ts->response = $syntheticResponse;
+                $this->task->response = $syntheticResponse;
             }
         }
         parent::transferCompleted($error);

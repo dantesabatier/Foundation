@@ -15,6 +15,7 @@ final class URLProtectionSpace extends ObjectClass
         URLAuthenticationMethodDefault,
         URLAuthenticationMethodHTTPBasic,
         URLAuthenticationMethodHTTPDigest,
+        URLAuthenticationMethodHTTPBearer,
         URLAuthenticationMethodHTMLForm,
         URLAuthenticationMethodNTLM,
         URLAuthenticationMethodNegotiate,

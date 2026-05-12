@@ -35,7 +35,11 @@ final class FTPURLProtocol extends NativeProtocol
         if (strlen($data) >= 4 && ($data[0] === "4" || $data[0] === "5") && ($data[3] === " " || $data[3] === "-")) {
             $this->internalState = InternalState::transferFailed();
             $ftpStatus = (int)substr($data, 0, 3);
-            $errorCode = $ftpStatus >= 500 ? URLErrorNoPermissionsToReadFile : URLErrorNetworkConnectionLost;
+            $errorCode = match (true) {
+                $ftpStatus === 421, $ftpStatus === 425, $ftpStatus === 426 => URLErrorNetworkConnectionLost,
+                $ftpStatus === 530, $ftpStatus === 550, $ftpStatus === 551 => URLErrorNoPermissionsToReadFile,
+                default => URLErrorUnknown,
+            };
             $error = new Error(URLErrorDomain, $errorCode, new Dictionary([LocalizedDescriptionKey => rtrim(substr($data, 4), "\r\n")]));
             $this->failWithError($error, $this->request);
             return EasyHandleAction::proceed;
@@ -76,7 +80,12 @@ final class FTPURLProtocol extends NativeProtocol
                     break;
                 case TaskBodyRawValue::data:
                     $stream = fopen("php://memory", "r+");
-                    fwrite($stream, $body->data ?? "");
+                    if ($stream === false) {
+                        throw new Exception("Failed to open php://memory stream");
+                    }
+                    if (fwrite($stream, $body->data ?? "") === false) {
+                        throw new Exception("Failed to write body data to php://memory stream");
+                    }
                     rewind($stream);
                     $easyHandle->setUpload(true);
                     $easyHandle->setInputFile($stream);
@@ -84,7 +93,11 @@ final class FTPURLProtocol extends NativeProtocol
                     $this->task->countOfBytesExpectedToSend = $body->getBodyLength() ?? 0;
                     break;
                 case TaskBodyRawValue::file:
-                    $stream = fopen((string)$body->fileURL?->path, "rb");
+                    $filePath = $body->fileURL?->path ?? throw new Exception("TaskBody::file has a null fileURL");
+                    $stream = fopen($filePath, "rb");
+                    if ($stream === false) {
+                        throw new Exception("Cannot open file for FTP upload: $filePath");
+                    }
                     $easyHandle->setUpload(true);
                     $easyHandle->setInputFile($stream);
                     if ($length = $body->getBodyLength()) {
@@ -95,6 +108,9 @@ final class FTPURLProtocol extends NativeProtocol
                     }
                     break;
                 case TaskBodyRawValue::stream:
+                    if (!is_resource($body->stream)) {
+                        throw new Exception("TaskBody::stream does not contain a valid resource");
+                    }
                     $easyHandle->setUpload(true);
                     $easyHandle->setInputFile($body->stream);
                     $easyHandle->setRequestBodyLength(URLResponseUnknownLength);
@@ -112,10 +128,12 @@ final class FTPURLProtocol extends NativeProtocol
     public function transferCompleted(?Error $error): void
     {
         if ($error === null && $this->internalState->rawValue === InternalStateRawValue::transferInProgress) {
-            /** @var TransferState $ts */
+            /** @var TransferState $ts transferState is non-null when state is transferInProgress */
             $ts = $this->internalState->transferState;
-            if ($ts->response === null) {
-                $ts->response = new URLResponse($ts->url, expectedContentLength: URLResponseUnknownLength);
+            if ($ts->response === null && $this->task->response === null) {
+                $syntheticResponse = new URLResponse($ts->url, expectedContentLength: URLResponseUnknownLength);
+                $ts->response = $syntheticResponse;
+                $this->task->response = $syntheticResponse;
             }
         }
         parent::transferCompleted($error);
