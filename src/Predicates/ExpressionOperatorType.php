@@ -57,6 +57,7 @@ enum ExpressionOperatorType: int
     case currentDate = 45;
     case dateFormat = 46;
     case dateDiff = 47;
+    case dateAdd = 48;
     case uuid = 111;
     case concat = 112;
     case substring = 113;
@@ -100,6 +101,7 @@ enum ExpressionOperatorType: int
             "curdate:" => self::currentDate,
             "date:format:" => self::dateFormat,
             "datediff:" => self::dateDiff,
+            "dateadd:" => self::dateAdd,
             "floor:" => self::floor,
             "uppercase:" => self::uppercase,
             "lowercase:" => self::lowercase,

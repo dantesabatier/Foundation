@@ -10,8 +10,10 @@
 namespace Sabatier\Foundation\Predicates;
 
 use Countable;
+use DateInterval;
 use DateTime;
 use Exception;
+use InvalidArgumentException;
 use JetBrains\PhpStorm\Language;
 use JetBrains\PhpStorm\Pure;
 use Sabatier\Foundation\ArrayClass;
@@ -293,6 +295,23 @@ final class PredicateUtilities
             default => $unit
         };
         return new Number(new DateTime((string)$d1)->diff(new DateTime((string)$d2))->$unit ?? 0);
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function dateAdd(Date|string|null $date, int $interval, string $unit): Date
+    {
+        $format = match (strtoupper($unit)) {
+            "YEAR" => "P{$interval}Y",
+            "MONTH" => "P{$interval}M",
+            "DAY" => "P{$interval}D",
+            "HOUR" => "PT{$interval}H",
+            "MINUTE" => "PT{$interval}M",
+            "SECOND" => "PT{$interval}S",
+            default => throw new InvalidArgumentException("Unidad no válida: $unit")
+        };
+        return new Date(new DateTime((string)$date)->add(new DateInterval($format))->getTimestamp());
     }
 
     public static function floor(Number|float $value): Number
