@@ -297,6 +297,60 @@ final class PredicateUtilities
         return new Number(new DateTime((string)$d1)->diff(new DateTime((string)$d2))->$unit ?? 0);
     }
 
+    public static function quarter(?Date $date): ?Number
+    {
+        return $date ? new Number((int)ceil((int)$date->format("n") / 3)) : null;
+    }
+
+    /**
+     * @throws Exception
+     */
+    public static function lastDay(?Date $date): ?Date
+    {
+        return $date ? new Date(new DateTime((string)$date)->modify("last day of this month")->getTimestamp()) : null;
+    }
+
+    public static function dayOfWeek(?Date $date): ?Number
+    {
+        return $date ? new Number((int)$date->format("w") + 1) : null;
+    }
+
+    public static function dayOfYear(?Date $date): ?Number
+    {
+        return $date ? new Number((int)$date->format("z") + 1) : null;
+    }
+
+    public static function fromUnixTime(int|float $timestamp): Date
+    {
+        return new Date((int)$timestamp);
+    }
+
+    /**
+     * @throws Exception
+     */
+    public static function unixTimestamp(Date|string|null $date = null): Number
+    {
+        return $date ? new Number(new DateTime((string)$date)->getTimestamp()) : new Number(time());
+    }
+
+    /**
+     * @throws Exception
+     */
+    public static function addTime(Date|string|null $datetime, string $time): Date
+    {
+        [$h, $m, $s] = array_map("intval", explode(":", $time));
+        return new Date(new DateTime((string)$datetime)->add(new DateInterval("PT{$h}H{$m}M{$s}S"))->getTimestamp());
+    }
+
+    /**
+     * @throws Exception
+     */
+    public static function subTime(Date|string|null $datetime, string $time): Date
+    {
+        [$h, $m, $s] = array_map("intval", explode(":", $time));
+        return new Date(new DateTime((string)$datetime)->sub(new DateInterval("PT{$h}H{$m}M{$s}S"))->getTimestamp());
+    }
+
     /**
      * @throws Exception
      */
@@ -312,6 +366,43 @@ final class PredicateUtilities
             default => throw new InvalidArgumentException("Unidad no válida: $unit")
         };
         return new Date(new DateTime((string)$date)->add(new DateInterval($format))->getTimestamp());
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function dateSub(Date|string|null $date, int $interval, string $unit): Date
+    {
+        $format = match (strtoupper($unit)) {
+            "YEAR" => "P{$interval}Y",
+            "MONTH" => "P{$interval}M",
+            "DAY" => "P{$interval}D",
+            "HOUR" => "PT{$interval}H",
+            "MINUTE" => "PT{$interval}M",
+            "SECOND" => "PT{$interval}S",
+            default => throw new InvalidArgumentException("Unidad no válida: $unit")
+        };
+        return new Date(new DateTime((string)$date)->sub(new DateInterval($format))->getTimestamp());
+    }
+
+    public static function round(Number|float $value, int $precision = 0): Number
+    {
+        return new Number(round(pn($value), $precision));
+    }
+
+    public static function coalesce(mixed ...$values): mixed
+    {
+        return array_find($values, fn($value) => $value !== null);
+    }
+
+    public static function greatest(mixed ...$values): mixed
+    {
+        return empty($values) ? null : max(...array_map(fn(mixed $v): mixed => $v instanceof Number ? pn($v) : $v, $values));
+    }
+
+    public static function least(mixed ...$values): mixed
+    {
+        return empty($values) ? null : min(...array_map(fn(mixed $v): mixed => $v instanceof Number ? pn($v) : $v, $values));
     }
 
     public static function floor(Number|float $value): Number
@@ -370,6 +461,49 @@ final class PredicateUtilities
     public static function regexpReplace(string $subject, #[Language("RegExp")] string $pattern, string $replace): string
     {
         return (string)preg_replace($pattern, $replace, $subject);
+    }
+
+    #[Pure]
+    public static function lpad(string $string, int $length, string $pad): string
+    {
+        return str_pad($string, $length, $pad, STR_PAD_LEFT);
+    }
+
+    #[Pure]
+    public static function rpad(string $string, int $length, string $pad): string
+    {
+        return str_pad($string, $length, $pad);
+    }
+
+    #[Pure]
+    public static function left(string $string, int $length): string
+    {
+        return substr($string, 0, $length);
+    }
+
+    #[Pure]
+    public static function right(string $string, int $length): string
+    {
+        return substr($string, -$length);
+    }
+
+    #[Pure]
+    public static function instr(string $string, string $substring): int
+    {
+        $pos = strpos($string, $substring);
+        return $pos === false ? 0 : $pos + 1;
+    }
+
+    #[Pure]
+    public static function reverse(string $string): string
+    {
+        return strrev($string);
+    }
+
+    #[Pure]
+    public static function repeat(string $string, int $count): string
+    {
+        return str_repeat($string, $count);
     }
 
     public static function uuid(): UUID
