@@ -82,7 +82,7 @@ final class NotificationCenter
      */
     public function postNotification(Notification $notification): void
     {
-        foreach ($this->observers as $observer) {
+        foreach (clone $this->observers as $observer) {
             if (($observer->name === $notification->name) && (($observer->observed && ($observer->observed === $notification->object)) || !$observer->observed)) {
                 $observer->postNotification($notification);
             }
