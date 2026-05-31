@@ -104,7 +104,7 @@ final class PredicateUtilities
         $values = $values->sort(fn(Number|int|float $e1, Number|int|float $e2): int => pn($e1) <=> pn($e2));
         $count = $values->count;
         if ($count % 2 === 0) {
-            return new Number((pn($values[(int)($count / 2)]) + pn($values[(int)($count / 2) - 1])) / 2);
+            return new Number((pn($values[$count / 2]) + pn($values[$count / 2 - 1])) / 2);
         }
         return new Number($values[(int)(($count - 1) / 2)]);
     }
@@ -338,7 +338,7 @@ final class PredicateUtilities
      */
     public static function addTime(Date|string|null $datetime, string $time): Date
     {
-        [$h, $m, $s] = array_map("intval", explode(":", $time));
+        [$h, $m, $s] = array_map(intval(...), explode(":", $time));
         return new Date(new DateTime((string)$datetime)->add(new DateInterval("PT{$h}H{$m}M{$s}S"))->getTimestamp());
     }
 
@@ -347,7 +347,7 @@ final class PredicateUtilities
      */
     public static function subTime(Date|string|null $datetime, string $time): Date
     {
-        [$h, $m, $s] = array_map("intval", explode(":", $time));
+        [$h, $m, $s] = array_map(intval(...), explode(":", $time));
         return new Date(new DateTime((string)$datetime)->sub(new DateInterval("PT{$h}H{$m}M{$s}S"))->getTimestamp());
     }
 
@@ -397,12 +397,12 @@ final class PredicateUtilities
 
     public static function greatest(mixed ...$values): mixed
     {
-        return empty($values) ? null : max(...array_map(fn(mixed $v): mixed => $v instanceof Number ? pn($v) : $v, $values));
+        return $values === [] ? null : max(...array_map(fn(mixed $v): mixed => $v instanceof Number ? pn($v) : $v, $values));
     }
 
     public static function least(mixed ...$values): mixed
     {
-        return empty($values) ? null : min(...array_map(fn(mixed $v): mixed => $v instanceof Number ? pn($v) : $v, $values));
+        return $values === [] ? null : min(...array_map(fn(mixed $v): mixed => $v instanceof Number ? pn($v) : $v, $values));
     }
 
     public static function floor(Number|float $value): Number
