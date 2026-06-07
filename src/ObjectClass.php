@@ -378,7 +378,7 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
              * @return Dictionary<mixed>
              */
             function (Dictionary $values, string $key) use ($properties): Dictionary {
-                $value = $this->valueForKey($key);
+                $value = $this->valueForKeyPath($key);
                 if ($properties->offsetExists($key)) {
                     $value = new SensitiveValue($value);
                 }
