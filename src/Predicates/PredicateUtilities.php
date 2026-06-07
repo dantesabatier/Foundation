@@ -104,7 +104,7 @@ final class PredicateUtilities
         $values = $values->sort(fn(Number|int|float $e1, Number|int|float $e2): int => pn($e1) <=> pn($e2));
         $count = $values->count;
         if ($count % 2 === 0) {
-            return new Number((pn($values[$count / 2]) + pn($values[$count / 2 - 1])) / 2);
+            return new Number((pn($values[(int)($count / 2)]) + pn($values[((int)($count / 2)) - 1])) / 2);
         }
         return new Number($values[(int)(($count - 1) / 2)]);
     }
