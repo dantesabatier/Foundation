@@ -5,13 +5,13 @@
 Tools are installed globally and available in PATH.
 
 ```bash
-composer psalm                    # Psalm level 4 (config: psalm.xml)
-phpstan analyse                   # PHPStan level 3 (config: phpstan.neon)
-php-cs-fixer fix                  # Code style (PSR12, config: .php-cs-fixer.dist.php)
-rector process --dry-run          # Code quality check (config: rector.php)
+psalm --show-info=true --force-jit  # Psalm level 4 (config: psalm.xml)
+phpstan analyse                     # PHPStan level 3 (config: phpstan.neon)
+php-cs-fixer fix                    # Code style (PSR12, config: .php-cs-fixer.dist.php)
+rector process --dry-run            # Code quality check (config: rector.php)
 ```
 
-No test suite exists — correctness is enforced entirely through static analysis.
+All tools installed globally and available in PATH. No test suite exists — correctness is enforced entirely through static analysis.
 
 ## PHP Requirements
 
@@ -40,6 +40,7 @@ Single-package repo, all code under `src/`:
 - PHPStan suppressions in `phpstan.neon`
 - Before adding new suppressions, try making code type-safe first
 - Custom Psalm plugin registered via `composer.json` extra: `Sabatier\Foundation\Plugins\Psalm\Plugin`
+- Stubs for platform-specific built-in classes (e.g. `COM`) in `stubs/`, registered in both Psalm and PHPStan config
 
 ## Autoloading
 

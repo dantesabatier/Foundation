@@ -3,6 +3,7 @@
 namespace Sabatier\Foundation;
 
 use Collator;
+use COM;
 use JetBrains\PhpStorm\Deprecated;
 use JetBrains\PhpStorm\ExpectedValues;
 use JetBrains\PhpStorm\Pure;
@@ -505,12 +506,27 @@ function home_directory(): string
  */
 function full_user_name(): string
 {
-    /** @noinspection SpellCheckingInspection */
     if (function_exists("posix_getpwuid")) {
         /** @noinspection PhpComposerExtensionStubsInspection */
-        return posix_getpwuid(posix_geteuid())["name"] ?? get_current_user();
+        $gecos = posix_getpwuid(posix_geteuid())["gecos"] ?? "";
+        return explode(",", $gecos)[0] ?: get_current_user();
+    }
+    if (TARGET_OS_WINDOWS && class_exists("COM")) {
+        $wmi = new COM(sprintf("WinNT://%s/%s,user", getenv("COMPUTERNAME"), getenv("USERNAME")));
+        return $wmi->FullName ?: get_current_user();
     }
     return get_current_user();
+}
+
+/**
+ * Returns the name of the current process.
+ */
+function process_name(): string
+{
+    if (RUNNING_FROM_CLI) {
+        return cli_get_process_title() ?? "Unknown";
+    }
+    return "Unknown";
 }
 
 /**

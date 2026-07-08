@@ -26,20 +26,7 @@ final class ProcessInfo extends ObjectClass
     }
     /** @var string The process name is used to register application defaults and is used in error messages. It does not uniquely identify the process. */
     public string $processName {
-        get {
-            if (isset($this->processName)) {
-                return $this->processName;
-            }
-            $processName = "Unknown";
-            /** @psalm-suppress RedundantCondition */
-            if (RUNNING_FROM_CLI) {
-                $processTitle = cli_get_process_title();
-                if ($processTitle !== null) {
-                    $processName = $processTitle;
-                }
-            }
-            return $this->processName = $processName;
-        }
+        get => $this->processName ??= process_name();
     }
     /** @var string Returns the account name of the current user. */
     private(set) string $userName {
@@ -47,7 +34,7 @@ final class ProcessInfo extends ObjectClass
     }
     /** @var string Returns the full name of the current user. */
     private(set) string $fullUserName {
-        get => $this->fullUserName ??= get_current_user();
+        get => $this->fullUserName ??= full_user_name();
     }
     /** @var string The name of the host computer on which the process is executing. */
     private(set) string $hostName {

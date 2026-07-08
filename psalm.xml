@@ -7,6 +7,9 @@
             <directory name="vendor"/>
         </ignoreFiles>
     </projectFiles>
+    <stubs>
+        <file name="stubs/COM.php"/>
+    </stubs>
     <issueHandlers>
         <PropertyNotSetInConstructor errorLevel="suppress"/>
         <MissingConstructor errorLevel="suppress"/>
