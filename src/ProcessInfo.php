@@ -2,6 +2,8 @@
 
 namespace Sabatier\Foundation;
 
+use Random\RandomException;
+
 /**
  * A collection of information about the current process.
  */
@@ -18,11 +20,14 @@ final class ProcessInfo extends ObjectClass
     }
     /** @var string Global unique identifier for the process. */
     private(set) string $globallyUniqueString {
-        get => $this->globallyUniqueString ??= md5((string)$this->processIdentifier);
+        /**
+         * @throws RandomException
+         */
+        get => $this->globallyUniqueString ??= bin2hex(random_bytes(16));
     }
     /** @var int The identifier of the process (often called process ID). */
     private(set) int $processIdentifier {
-        get => $this->processIdentifier ??= getmypid();
+        get => $this->processIdentifier ??= getmypid() ?: 0;
     }
     /** @var string The process name is used to register application defaults and is used in error messages. It does not uniquely identify the process. */
     public string $processName {
@@ -30,7 +35,7 @@ final class ProcessInfo extends ObjectClass
     }
     /** @var string Returns the account name of the current user. */
     private(set) string $userName {
-        get => $this->userName ??= get_current_user();
+        get => $this->userName ??= user_name();
     }
     /** @var string Returns the full name of the current user. */
     private(set) string $fullUserName {
@@ -38,7 +43,7 @@ final class ProcessInfo extends ObjectClass
     }
     /** @var string The name of the host computer on which the process is executing. */
     private(set) string $hostName {
-        get => $this->hostName ??= gethostname();
+        get => $this->hostName ??= gethostname() ?: "localhost";
     }
 
     /**

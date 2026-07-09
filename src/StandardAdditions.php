@@ -501,6 +501,21 @@ function home_directory(): string
 }
 
 /**
+ * A string containing the account name of the current user.
+ */
+function user_name(): string
+{
+    if (function_exists("posix_getpwuid")) {
+        /** @noinspection PhpComposerExtensionStubsInspection */
+        $name = posix_getpwuid(posix_geteuid())["name"] ?? "";
+        if ($name !== "") {
+            return $name;
+        }
+    }
+    return getenv("USERNAME") ?: getenv("USER") ?: get_current_user();
+}
+
+/**
  * A string containing the full name of the current user.
  */
 function full_user_name(): string
@@ -508,10 +523,10 @@ function full_user_name(): string
     if (function_exists("posix_getpwuid")) {
         /** @noinspection PhpComposerExtensionStubsInspection */
         $gecos = posix_getpwuid(posix_geteuid())["gecos"] ?? "";
-        return explode(",", $gecos)[0] ?: get_current_user();
+        return explode(",", $gecos)[0] ?: user_name();
     }
-    if (TARGET_OS_WINDOWS) {
-        $output = get_current_user()
+    if (TARGET_OS_WINDOWS && function_exists("shell_exec")) {
+        $output = user_name()
                 |> escapeshellarg(...)
                 |> (fn($x) => sprintf("net user %s 2>nul", $x))
                 |> shell_exec(...);
@@ -519,7 +534,7 @@ function full_user_name(): string
             return trim($matches[1]);
         }
     }
-    return get_current_user();
+    return user_name();
 }
 
 /**
