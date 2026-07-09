@@ -511,7 +511,7 @@ function full_user_name(): string
         return explode(",", $gecos)[0] ?: get_current_user();
     }
     if (function_exists("shell_exec")) {
-        $output = shell_exec("net user \"" . get_current_user() . '" 2>nul');
+        $output = shell_exec(sprintf("net user \"%s\" 2>nul", get_current_user()));
         if ($output && preg_match("/(?:Full Name|Nombre completo)\\s+(.+)/i", $output, $matches)) {
             return trim($matches[1]);
         }
