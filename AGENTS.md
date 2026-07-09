@@ -40,7 +40,7 @@ Single-package repo, all code under `src/`:
 - PHPStan suppressions in `phpstan.neon`
 - Before adding new suppressions, try making code type-safe first
 - Custom Psalm plugin registered via `composer.json` extra: `Sabatier\Foundation\Plugins\Psalm\Plugin`
-- Stubs for platform-specific built-in classes (e.g. `COM`) in `stubs/`, registered in both Psalm and PHPStan config
+
 
 ## Autoloading
 

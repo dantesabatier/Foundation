@@ -3,7 +3,6 @@
 namespace Sabatier\Foundation;
 
 use Collator;
-use COM;
 use JetBrains\PhpStorm\Deprecated;
 use JetBrains\PhpStorm\ExpectedValues;
 use JetBrains\PhpStorm\Pure;
@@ -511,9 +510,11 @@ function full_user_name(): string
         $gecos = posix_getpwuid(posix_geteuid())["gecos"] ?? "";
         return explode(",", $gecos)[0] ?: get_current_user();
     }
-    if (TARGET_OS_WINDOWS && class_exists("COM")) {
-        $wmi = new COM(sprintf("WinNT://%s/%s,user", getenv("COMPUTERNAME"), getenv("USERNAME")));
-        return $wmi->FullName ?: get_current_user();
+    if (function_exists("shell_exec")) {
+        $output = shell_exec("net user \"" . get_current_user() . '" 2>nul');
+        if ($output && preg_match("/(?:Full Name|Nombre completo)\\s+(.+)/i", $output, $matches)) {
+            return trim($matches[1]);
+        }
     }
     return get_current_user();
 }

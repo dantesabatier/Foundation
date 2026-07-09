@@ -2,8 +2,6 @@ parameters:
 	level: 3
 	paths:
 		- src
-	scanFiles:
-		- stubs/COM.php
 	ignoreErrors:
 		- identifier: staticClassAccess.privateProperty
 		- identifier: property.staticAccess
