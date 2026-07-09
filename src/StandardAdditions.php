@@ -510,8 +510,11 @@ function full_user_name(): string
         $gecos = posix_getpwuid(posix_geteuid())["gecos"] ?? "";
         return explode(",", $gecos)[0] ?: get_current_user();
     }
-    if (function_exists("shell_exec")) {
-        $output = shell_exec(sprintf("net user \"%s\" 2>nul", get_current_user()));
+    if (TARGET_OS_WINDOWS) {
+        $output = get_current_user()
+                |> escapeshellarg(...)
+                |> (fn($x) => sprintf("net user %s 2>nul", $x))
+                |> shell_exec(...);
         if ($output && preg_match("/(?:Full Name|Nombre completo)\\s+(.+)/i", $output, $matches)) {
             return trim($matches[1]);
         }
@@ -547,7 +550,7 @@ function temporary_directory(): string
  */
 function is_hidden(string $filename): bool
 {
-    if (USE_UNSAFE_FUNCTIONS && TARGET_OS_WINDOWS) {
+    if (USE_UNSAFE_FUNCTIONS && TARGET_OS_WINDOWS && function_exists("shell_exec")) {
         $attributes = trim(unsafe_value(fn(): string => (string)shell_exec("FOR %A IN (\"$filename\") DO @ECHO %~aA")));
         return $attributes[3] === "h" || $attributes[4] === "s";
     }
