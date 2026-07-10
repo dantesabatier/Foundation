@@ -18,33 +18,31 @@ function absolute_time_get_current(): float
 }
 
 /**
- * Generates a bright and visually distinct color suitable for use in UI elements depending on the theme (dark or light).
+ * Generates a deterministic color from a string, suitable for use in UI elements depending on the theme (dark or light).
  *
- * The function ensures that the resulting color has enough contrast to be legible on the specified background theme.
+ * The same input string always produces the same color. The function ensures that the resulting
+ * color has enough contrast to be legible on the specified background theme.
  *
- * @param string $string The input string for which to generate a color.
+ * @param string $string The input string used to derive the color.
  * @param string $theme The target UI theme. Acceptable values are:
- *                      - "dark": generates colors suitable for dark backgrounds.
- *                      - "light": generates colors suitable for light backgrounds.
- * @return string A CSS-compatible hexadecimal color string, e.g., "#4CAF50".
+ *                      - "dark": generates lighter colors suitable for dark backgrounds.
+ *                      - "light": generates darker colors suitable for light backgrounds.
+ * @return string A CSS-compatible hexadecimal color string, e.g., "#F57C00".
  *
  * <code>
  * // Generate a color for dark theme
- * $color = bright_color_for_theme("dark"); // e.g., "#F57C00"
+ * $color = random_color("hello", "dark"); // e.g., "#F57C00"
  * </code>
  *
  * <code>
  * // Generate a color for light theme
- * $color = bright_color_for_theme("light"); // e.g., "#1976D2"
+ * $color = random_color("hello", "light"); // e.g., "#1976D2"
  * </code>
- * Notes:
- * - The function internally adjusts the lightness and saturation of the color to maximize contrast while keeping the color visually appealing.
- * - Colors are randomized per call but constrained to a safe range for the theme.
  */
 function random_color(string $string, string $theme = "dark"): string
 {
     $hash = crc32(strtolower($string));
-    $h = $hash % 360;
+    $h = abs($hash) % 360;
     $s = 80;
     $l = $theme === "dark" ? 50 : 30;
     return hsl_to_hex($h, $s, $l);
@@ -77,12 +75,13 @@ function hsl_to_hex(int $h, int $s, int $l): string
 }
 
 /**
- * Determines whether a value falls within the specified range.
+ * Determines whether a value falls within the specified half-open range [min, max).
+ * The minimum is inclusive and the maximum is exclusive.
  *
  * @param float|int|string $value The value to check.
- * @param float|int|string $min The lower bound of the range.
- * @param float|int|string $max The upper bound of the range.
- * @return bool Returns true if the value is within the range, otherwise false.
+ * @param float|int|string $min The inclusive lower bound of the range.
+ * @param float|int|string $max The exclusive upper bound of the range.
+ * @return bool Returns true if min <= value < max, otherwise false.
  */
 #[Pure]
 function in_range(float|int|string $value, float|int|string $min, float|int|string $max): bool
@@ -91,11 +90,12 @@ function in_range(float|int|string $value, float|int|string $min, float|int|stri
 }
 
 /**
- * Determines whether the given array is sequential.
- * An array is considered sequential if it is empty or if its keys are consecutive integers starting from 0.
+ * Determines whether the given array has an integer or null first key.
+ * An array is considered sequential if it is empty or if its first key is an integer.
+ * Note: this does not verify that keys are consecutive starting from 0; use array_is_list() for that.
  *
  * @param array $array The array to check.
- * @return bool Returns true if the array is sequential, otherwise false.
+ * @return bool Returns true if the array is empty or its first key is an integer, otherwise false.
  */
 #[Pure]
 function is_sequential(array $array): bool
@@ -182,13 +182,14 @@ function canonical(string $string): string
 }
 
 /**
- * Converts a string to camel case by capitalizing the first letter of each word after a space and removing the spaces.
+ * Converts a string to camel case by capitalizing the first letter of each word after a separator
+ * (space, underscore, or hyphen) and removing the separators.
  * @param string $string The input string to be converted to camel case.
  * @return string Returns the camel case representation of the input string.
  */
 function camelcase(string $string): string
 {
-    return (string)preg_replace_callback("/\s(.)/", fn(array $matches) => strtoupper($matches[1]), $string);
+    return (string)preg_replace_callback("/[_\-\s](.)/", fn(array $matches) => strtoupper($matches[1]), $string);
 }
 
 /**
@@ -245,7 +246,9 @@ function string_compare(string $string, string $other, #[ExpectedValues(flagsFro
                 if (($options & CompareOptions::caseInsensitive) && ($options & CompareOptions::diacriticInsensitive) && !($options & CompareOptions::normalized)) {
                     $collator->setAttribute(Collator::NORMALIZATION_MODE, Collator::ON);
                 }
-                return $collator->compare($string, $other);
+                return $collator->compare($string, $other)
+                        |> (fn(int $x): int => min($x, ComparisonResult::orderedDescending->value))
+                        |> (fn(int $x): int => max($x, ComparisonResult::orderedAscending->value));
             }
         }
         $string = string_with_options($string, $options);
@@ -528,7 +531,7 @@ function full_user_name(): string
     if (TARGET_OS_WINDOWS && function_exists("shell_exec")) {
         $output = user_name()
                 |> escapeshellarg(...)
-                |> (fn($x) => sprintf("net user %s 2>nul", $x))
+                |> (fn(string $x): string => sprintf("net user %s 2>nul", $x))
                 |> shell_exec(...);
         if ($output && preg_match("/(?:Full Name|Nombre completo)\\s+(.+)/i", $output, $matches)) {
             return trim($matches[1]);
@@ -566,7 +569,10 @@ function temporary_directory(): string
 function is_hidden(string $filename): bool
 {
     if (USE_UNSAFE_FUNCTIONS && TARGET_OS_WINDOWS && function_exists("shell_exec")) {
-        $attributes = trim(unsafe_value(fn(): string => (string)shell_exec("FOR %A IN (\"$filename\") DO @ECHO %~aA")));
+        $attributes = trim(unsafe_value(fn(): string => $filename
+                |> escapeshellarg(...)
+                |> (fn(string $x): string => sprintf("FOR %%A IN (%s) DO @ECHO %%~aA", $x))
+                |> shell_exec(...)));
         return $attributes[3] === "h" || $attributes[4] === "s";
     }
     return str_starts_with($filename, ".");
@@ -618,7 +624,14 @@ function is_serialized(mixed $value, bool $strict = true): bool
                 if (substr($value, -2, 1) !== "\"") {
                     return false;
                 }
-            } elseif (!str_contains($value, "\"")) {
+                if (preg_match("/^s:(\d+):\"/", $value, $m)) {
+                    $contentStart = strlen($m[0]);
+                    $contentEnd = strrpos($value, "\";");
+                    return $contentEnd !== false && (int)$m[1] === $contentEnd - $contentStart;
+                }
+                return false;
+            }
+            if (!str_contains($value, "\"")) {
                 return false;
             }
         // no break
@@ -680,12 +693,21 @@ function is_equal(mixed $a, mixed $b): bool
 
 /**
  * Compares two values to determine their ordering.
+ * If the receiver implements {@see Comparable}, it decides what it can be compared with.
+ * If only the other value implements it, the result is negated.
+ * If neither implements it, the spaceship operator is used.
  *
- * @param mixed $a The first value to compare. Can be any type, but ideally implements Comparable.
- * @param mixed $b The second value to compare. Can be any type, but ideally implements Comparable.
+ * @param mixed $a The first value to compare.
+ * @param mixed $b The second value to compare.
  * @return int Returns a negative integer, zero, or a positive integer as $a is less than, equal to, or greater than $b.
  */
 function compare(mixed $a, mixed $b): int
 {
-    return $a instanceof Comparable && $b instanceof Comparable ? $a->compare($b)->value : $a <=> $b;
+    if ($a instanceof Comparable) {
+        return $a->compare($b)->value;
+    }
+    if ($b instanceof Comparable) {
+        return -$b->compare($a)->value;
+    }
+    return $a <=> $b;
 }

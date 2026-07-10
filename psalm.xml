@@ -67,11 +67,6 @@
         <InvalidOperand errorLevel="suppress"/>
         <NoInterfaceProperties errorLevel="suppress"/>
         <TypeDoesNotContainType errorLevel="suppress"/>
-        <ForbiddenCode>
-            <errorLevel type="suppress">
-                <file name="src/StandardAdditions.php"/>
-            </errorLevel>
-        </ForbiddenCode>
         <ClassMustBeFinal>
             <errorLevel type="suppress">
                 <file name="src/ArrayClass.php"/>
