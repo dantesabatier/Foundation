@@ -155,7 +155,7 @@ function string_split_trimmed(string $string, string $separator = ","): array
 #[Pure]
 function substring_from_index(string $string, int $index): string
 {
-    return substr($string, $index, strlen($string));
+    return substr($string, $index);
 }
 
 /**
@@ -245,6 +245,8 @@ function string_compare(string $string, string $other, #[ExpectedValues(flagsFro
                 }
                 if (($options & CompareOptions::caseInsensitive) && ($options & CompareOptions::diacriticInsensitive) && !($options & CompareOptions::normalized)) {
                     $collator->setAttribute(Collator::NORMALIZATION_MODE, Collator::ON);
+                } else {
+                    $collator->setAttribute(Collator::NORMALIZATION_MODE, Collator::OFF);
                 }
                 return $collator->compare($string, $other)
                         |> (fn(int $x): int => min($x, ComparisonResult::orderedDescending->value))
@@ -317,7 +319,7 @@ function string_search(string $string, string $needle, SearchMethod $method = Se
     $string = string_with_options($string, $options);
     $needle = string_with_options($needle, $options);
     if (!($options & CompareOptions::quoted)) {
-        $needle = preg_quote($needle);
+        $needle = preg_quote($needle, "/");
     }
     /** @var non-empty-string $pattern */
     $pattern = $needle;
@@ -336,6 +338,10 @@ function string_search(string $string, string $needle, SearchMethod $method = Se
         }
     }
     $value = preg_match_all($pattern, $string, $matches);
+    if ($value === false) {
+        $matches = [];
+        return 0;
+    }
     $matches = array_map(trim(...), $matches[0]);
     return $value;
 }
@@ -479,7 +485,7 @@ function document_root_directory(): string
             $path = $_SERVER["PWD"];
         }
         if (empty($path)) {
-            $path = getcwd();
+            $path = getcwd() ?: "";
         }
     }
     return $path;
@@ -546,7 +552,7 @@ function full_user_name(): string
 function process_name(): string
 {
     if (RUNNING_FROM_CLI) {
-        return cli_get_process_title() ?? "Unknown";
+        return cli_get_process_title() ?: "Unknown";
     }
     return "Unknown";
 }
@@ -573,7 +579,9 @@ function is_hidden(string $filename): bool
                 |> escapeshellarg(...)
                 |> (fn(string $x): string => sprintf("FOR %%A IN (%s) DO @ECHO %%~aA", $x))
                 |> shell_exec(...)));
-        return $attributes[3] === "h" || $attributes[4] === "s";
+        if (strlen($attributes) >= 5) {
+            return $attributes[3] === "h" || $attributes[4] === "s";
+        }
     }
     return str_starts_with($filename, ".");
 }
@@ -639,10 +647,14 @@ function is_serialized(mixed $value, bool $strict = true): bool
         case "O":
             return (bool)preg_match("/^$token:\d+:/s", $value);
         case "b":
+            $end = $strict ? "$" : "";
+            return (bool)preg_match("/^b:[01];$end/", $value);
         case "i":
+            $end = $strict ? "$" : "";
+            return (bool)preg_match("/^i:-?\d+;$end/", $value);
         case "d":
             $end = $strict ? "$" : "";
-            return (bool)preg_match("/^$token:[\d.E+-]+;$end/", $value);
+            return (bool)preg_match("/^d:(?:[\d.E+-]+|-?INF|NAN);$end/", $value);
     }
     return false;
 }
