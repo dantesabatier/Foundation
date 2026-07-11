@@ -90,10 +90,7 @@ final class URLComponents extends ObjectClass
                 return null;
             }
             return new ArrayClass($components)->map(function (string $pair): URLQueryItem {
-                $components = preg_quote("=", "/")
-                        |> (fn($x) => sprintf("/%s/", $x))
-                        |> (fn($x) => preg_split($x, $pair, -1, PREG_SPLIT_NO_EMPTY));
-                [$name, $value] = $components;
+                [$name, $value] = explode("=", $pair, 2) + [1 => null];
                 if ($value) {
                     $value = htmlspecialchars(urldecode($value), ENT_QUOTES);
                 }
@@ -103,7 +100,12 @@ final class URLComponents extends ObjectClass
         set {
             $this->query = null;
             if ($value instanceof ArrayClass) {
-                $this->query = http_build_query($value->flatMap(fn(URLQueryItem $queryItem): array => [$queryItem->name => $queryItem->value])->array);
+                /** @var Dictionary<string|null> $items */
+                $items = $value->reduce(new Dictionary(), function (Dictionary $result, URLQueryItem $queryItem): Dictionary {
+                    $result[$queryItem->name] = $queryItem->value;
+                    return $result;
+                });
+                $this->query = http_build_query($items->array);
             }
         }
     }
