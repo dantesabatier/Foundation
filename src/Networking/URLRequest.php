@@ -60,7 +60,7 @@ class URLRequest extends ObjectClass
         }
         return match ($mediaType) {
             "application/x-www-form-urlencoded" => (function (): array {
-                parse_str(urldecode((string)$this->httpBody), $result);
+                parse_str((string)$this->httpBody, $result);
                 return $result;
             })(),
             "multipart/form-data" => $_POST,
