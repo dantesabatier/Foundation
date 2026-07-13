@@ -36,7 +36,7 @@ final class DiskEntry
         }
         [$t1, $t2, $identifier] = $parts;
         $entry = new DiskEntry($url);
-        $entry->date = new Date((float)"$t1.$t2");
+        $entry->date = Date::dateWithTimeIntervalSinceReferenceDate((float)"$t1.$t2");
         $entry->identifier = $identifier;
         return $entry;
     }

@@ -79,8 +79,14 @@ $unixEpoch = Date::dateWithTimeIntervalSince1970(0.0);
 $check($unixEpoch->timeIntervalSinceReferenceDate === -978_307_200.0, "the Unix epoch is 978307200 seconds before the reference date");
 $check($unixEpoch->timeIntervalSince1970 === 0.0, "timeIntervalSince1970 round-trips through the factory");
 $check(Date::dateWithTimeIntervalSince1970(1_234_567_890.5)->timeIntervalSince1970 === 1_234_567_890.5, "fractional Unix timestamps survive the round-trip");
-$check(new Date(0.0)->timeIntervalSince1970 === 978_307_200.0, "the reference date itself is 978307200 in Unix time");
+$check(Date::dateWithTimeIntervalSinceReferenceDate(0.0)->timeIntervalSince1970 === 978_307_200.0, "the reference date itself is 978307200 in Unix time");
 $check(Date::timeIntervalBetween1970AndReferenceDate === 978_307_200.0, "the 1970-to-reference constant");
+
+// The plain constructor takes Unix seconds — the ecosystem-wide `new Date(strtotime(...))`
+// idiom must be correct by construction (Apple has no unlabeled float initializer).
+$check(new Date(0.0)->isEqual($unixEpoch), "the constructor takes Unix seconds");
+$check(new Date((float)strtotime("2024-02-10 15:30:00"))->format("Y-m-d H:i:s") === "2024-02-10 15:30:00", "new Date(strtotime(...)) round-trips through format");
+$check(new Date(529_887_685.0)->format("Y-m-d") === "1986-10-16", "a literal Unix timestamp lands on its calendar date");
 
 // A cookie-style numeric expiration built from Unix time must sit in the near future,
 // not 31 years away.
@@ -128,10 +134,10 @@ $section("formatting");
 // ---------------------------------------------------------------------------
 
 $check($unixEpoch->format("Y-m-d H:i:s") === "1970-01-01 00:00:00", "format renders the Unix epoch correctly");
-$check(new Date(0.0)->format("Y-m-d H:i:s") === "2001-01-01 00:00:00", "format renders the reference date correctly");
+$check(Date::dateWithTimeIntervalSinceReferenceDate(0.0)->format("Y-m-d H:i:s") === "2001-01-01 00:00:00", "format renders the reference date correctly");
 $check($unixEpoch->ISO8601Format() === "1970-01-01T00:00:00+00:00", "ISO8601Format renders DATE_ATOM");
-$check(new Date(0.0)->description === "2001-01-01 00:00:00", "description is the default format");
-$check(new Date(0.0)->jsonSerialize() === "2001-01-01 00:00:00", "jsonSerialize is the description");
+$check(Date::dateWithTimeIntervalSinceReferenceDate(0.0)->description === "2001-01-01 00:00:00", "description is the default format");
+$check(Date::dateWithTimeIntervalSinceReferenceDate(0.0)->jsonSerialize() === "2001-01-01 00:00:00", "jsonSerialize is the description");
 $formatted = Date::dateWithTimeIntervalSince1970(0.0)->formatted();
 $check(is_string($formatted) && str_contains($formatted, "1970"), "formatted renders the correct year");
 

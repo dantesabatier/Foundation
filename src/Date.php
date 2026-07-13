@@ -35,9 +35,20 @@ final class Date extends ObjectClass
         get => sprintf("<%s %s>", $this->class, $this->description);
     }
 
-    public function __construct(?float $time = null)
+    /**
+     * Creates a date value from the given number of seconds since 00:00:00 UTC on 1 January 1970,
+     * or representing the current instant when $timeIntervalSince1970 is null.
+     *
+     * The parameter is deliberately Unix time — the value produced by time(), strtotime(),
+     * filemtime(), or DateTime::getTimestamp() — so the natural PHP idiom
+     * `new Date(strtotime(...))` is correct by construction. Apple's Foundation has no unlabeled
+     * float initializer; to create a date from a reference-date interval use
+     * {@see dateWithTimeIntervalSinceReferenceDate()}.
+     * @param float|null $timeIntervalSince1970 The number of seconds since 00:00:00 UTC on 1 January 1970, or null for the current date and time.
+     */
+    public function __construct(?float $timeIntervalSince1970 = null)
     {
-        $this->timeIntervalSinceReferenceDate = $time ?? absolute_time_get_current();
+        $this->timeIntervalSinceReferenceDate = $timeIntervalSince1970 === null ? absolute_time_get_current() : $timeIntervalSince1970 - self::timeIntervalBetween1970AndReferenceDate;
     }
 
     public function __serialize(): array
@@ -91,7 +102,7 @@ final class Date extends ObjectClass
      */
     public static function dateWithTimeIntervalSince1970(float $timeInterval): Date
     {
-        return Date::dateWithTimeIntervalSinceReferenceDate($timeInterval - Date::timeIntervalBetween1970AndReferenceDate);
+        return new Date($timeInterval);
     }
 
     /**
@@ -102,7 +113,9 @@ final class Date extends ObjectClass
      */
     public static function dateWithTimeIntervalSinceReferenceDate(float $timeInterval): Date
     {
-        return new Date($timeInterval);
+        $date = new Date();
+        $date->timeIntervalSinceReferenceDate = $timeInterval;
+        return $date;
     }
 
     /**
