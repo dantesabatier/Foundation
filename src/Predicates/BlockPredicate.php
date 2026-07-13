@@ -7,6 +7,8 @@
  * Time: 00:48
  */
 
+declare(strict_types=1);
+
 namespace Sabatier\Foundation\Predicates;
 
 use Closure;

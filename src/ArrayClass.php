@@ -7,6 +7,8 @@
  * Time: 05:32
  */
 
+declare(strict_types=1);
+
 namespace Sabatier\Foundation;
 
 use ArrayAccess;
@@ -680,7 +682,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Arra
                 return false;
             }
             /** @psalm-suppress InvalidArgument */
-            $result[] = new Slice($this, new Range($subSequenceStart, $end));
+            $result->append(new Slice($this, new Range($subSequenceStart, $end)));
             return true;
         });
         if ($maxSplits === 0 || $this->isEmpty) {
@@ -703,7 +705,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Arra
         }
         if ($subSequenceStart !== $cachedEndIndex || !$omittingEmptySubsequences) {
             /** @psalm-suppress InvalidArgument */
-            $result[] = new Slice($this, new Range($subSequenceStart, $cachedEndIndex));
+            $result->append(new Slice($this, new Range($subSequenceStart, $cachedEndIndex)));
         }
         return $result;
     }

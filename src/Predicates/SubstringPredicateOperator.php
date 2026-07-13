@@ -7,6 +7,8 @@
  * Time: 11:52
  */
 
+declare(strict_types=1);
+
 namespace Sabatier\Foundation\Predicates;
 
 use JetBrains\PhpStorm\ExpectedValues;

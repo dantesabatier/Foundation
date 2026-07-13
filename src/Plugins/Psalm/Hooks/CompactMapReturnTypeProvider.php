@@ -2,6 +2,8 @@
 
 /** @noinspection PhpInternalEntityUsedInspection */
 
+declare(strict_types=1);
+
 namespace Sabatier\Foundation\Plugins\Psalm\Hooks;
 
 use Override;

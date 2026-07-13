@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Sabatier\Foundation;
 
 use SplFileObject;
@@ -27,6 +29,9 @@ function parse_env_file(string $path): array
     $file->setFlags(SplFileObject::DROP_NEW_LINE | SplFileObject::SKIP_EMPTY);
     /** @var string $line */
     foreach ($file as $line) {
+        if (!is_string($line)) {
+            continue;
+        }
         $line = trim($line);
         if ($line === "") {
             continue;

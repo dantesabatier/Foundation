@@ -7,6 +7,8 @@
  * Time: 22:40
  */
 
+declare(strict_types=1);
+
 namespace Sabatier\Foundation\Predicates;
 
 use Countable;

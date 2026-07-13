@@ -7,6 +7,8 @@
  * Time: 07:11
  */
 
+declare(strict_types=1);
+
 namespace Sabatier\Foundation;
 
 use ArrayAccess;

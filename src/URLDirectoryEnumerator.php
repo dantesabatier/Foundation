@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Sabatier\Foundation;
 
 use Closure;
@@ -69,6 +71,7 @@ final class URLDirectoryEnumerator extends DirectoryEnumerator
             /** @var Set<string>|null $keys */
             $keys = $this->keys ? new Set($this->keys) : null;
             foreach ($this->iterator as $path) {
+                $path = (string)$path;
                 $url = URL::fileURL($path);
                 if (($this->options & DirectoryEnumerationOptions::skipsSubdirectoryDescendants || $this->options & DirectoryEnumerationOptions::skipsPackageDescendants) && !$this->url->isEqual($url->deletingLastPathComponent())) {
                     continue;

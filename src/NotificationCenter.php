@@ -7,6 +7,8 @@
  * Time: 10:22
  */
 
+declare(strict_types=1);
+
 namespace Sabatier\Foundation;
 
 use Closure;

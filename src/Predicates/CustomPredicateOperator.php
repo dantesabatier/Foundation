@@ -7,6 +7,8 @@
  * Time: 11:44
  */
 
+declare(strict_types=1);
+
 namespace Sabatier\Foundation\Predicates;
 
 use Override;

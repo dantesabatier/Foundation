@@ -2,6 +2,8 @@
 
 /** @noinspection PhpMixedReturnTypeCanBeReducedInspection */
 
+declare(strict_types=1);
+
 namespace Sabatier\Foundation;
 
 use Exception;
@@ -20,6 +22,11 @@ final class FileHandle extends ObjectClass
     public string $availableData {
         /** @noinspection PhpUnhandledExceptionInspection */
         get => $this->read(PHP_INT_MAX) ?? "";
+    }
+    /** @var int The position of the file pointer within the file. */
+    public int $offsetInFile {
+        /** @throws Exception Throws an error if accessed on a file handle representing a pipe or socket, or if the file descriptor is closed. */
+        get => unsafe_value(fn(): int => ftell($this->rawHandle));
     }
 
     /**
@@ -169,16 +176,6 @@ final class FileHandle extends ObjectClass
     }
 
     /**
-     * Gets the position of the file pointer within the file.
-     * @return int The position of the file pointer within the file.
-     * @throws Exception Throws an error if called on a file handle representing a pipe or socket, or if the file descriptor is closed.
-     */
-    public function offset(): int
-    {
-        return unsafe_value(fn(): int => ftell($this->rawHandle));
-    }
-
-    /**
      * Places the file pointer at the end of the file referenced by the file handle and returns the new file offset.
      * @return int The file offset with the file pointer at the end of the file. This is therefore equal to the size of the file.
      * @throws Exception Throws an error if called on a file handle representing a pipe or socket, or if the file descriptor is closed.
@@ -186,7 +183,7 @@ final class FileHandle extends ObjectClass
     public function seekToEnd(): int
     {
         unsafe_value(fn(): int => fseek($this->rawHandle, -1, SEEK_END));
-        return $this->offset();
+        return $this->offsetInFile;
     }
 
     /**
@@ -205,6 +202,9 @@ final class FileHandle extends ObjectClass
      */
     public function close(): void
     {
+        if (!is_resource($this->rawHandle)) {
+            return;
+        }
         /** @psalm-suppress InvalidPropertyAssignmentValue */
         unsafe_value(fn(): bool => fclose($this->rawHandle));
     }

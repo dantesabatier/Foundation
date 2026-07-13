@@ -7,6 +7,8 @@
  * Time: 07:38
  */
 
+declare(strict_types=1);
+
 namespace Sabatier\Foundation;
 
 use ArrayAccess;
@@ -275,7 +277,7 @@ final class Dictionary extends ObjectClass implements Collection, ArrayAccess, I
         foreach ($this as $key => $value) {
             $result = $transform($value, $key);
             if ($result !== null) {
-                $array[] = $result;
+                $array->append($result);
             }
         }
         return $array;

@@ -7,6 +7,8 @@
  * Time: 09:40
  */
 
+declare(strict_types=1);
+
 namespace Sabatier\Foundation\Predicates;
 
 use BackedEnum;

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Sabatier\Foundation\Networking;
 
 use Closure;
@@ -355,13 +357,7 @@ final class URLCache extends ObjectClass
     public function removeCachedResponses(Date $date): void
     {
         /** @var Set<string> $identifiersToRemove */
-        $identifiersToRemove = new Set();
-        /** @var CacheEntry $entry */
-        foreach ($this->inMemoryCacheContents as $identifier => $entry) {
-            if ($entry->date->timeIntervalSinceReferenceDate > $date->timeIntervalSinceReferenceDate) {
-                $identifiersToRemove->insert($identifier);
-            }
-        }
+        $identifiersToRemove = new Set($this->inMemoryCacheContents->filter(fn(CacheEntry $entry): bool => $entry->date->timeIntervalSinceReferenceDate > $date->timeIntervalSinceReferenceDate)->keys);
         $identifiersToRemove->forEach(fn(string $identifier) => $this->inMemoryCacheContents->removeValueForKey($identifier));
         $this->inMemoryCacheOrder->removeAll($identifiersToRemove->containsElement(...));
         try {

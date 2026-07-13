@@ -9,6 +9,8 @@
  * Time: 01:18
  */
 
+declare(strict_types=1);
+
 namespace Sabatier\Foundation\Predicates;
 
 use Exception;

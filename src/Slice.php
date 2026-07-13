@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Sabatier\Foundation;
 
 use ArrayAccess;
@@ -163,7 +165,7 @@ final class Slice extends ObjectClass implements Collection, IteratorAggregate
         foreach ($this as $i => $e) {
             $stop = false;
             if ($isIncluded($e, $i, $stop)) {
-                $instance[] = $e;
+                $instance->append($e);
             }
             /** @noinspection PhpConditionAlreadyCheckedInspection */
             if ($stop) {
