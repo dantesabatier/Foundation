@@ -100,12 +100,16 @@ final class URLComponents extends ObjectClass
         set {
             $this->query = null;
             if ($value instanceof ArrayClass) {
-                /** @var Dictionary<string|null> $items */
-                $items = $value->reduce(new Dictionary(), function (Dictionary $result, URLQueryItem $queryItem): Dictionary {
-                    $result[$queryItem->name] = $queryItem->value;
-                    return $result;
-                });
-                $this->query = http_build_query($items->array);
+                $this->query = http_build_query($value->reduce(new Dictionary(),
+                    /**
+                     * @param Dictionary<string> $result
+                     * @param URLQueryItem $queryItem
+                     * @return Dictionary<string>
+                     */
+                    function (Dictionary $result, URLQueryItem $queryItem): Dictionary {
+                        $result[$queryItem->name] = $queryItem->value;
+                        return $result;
+                    })->array);
             }
         }
     }
