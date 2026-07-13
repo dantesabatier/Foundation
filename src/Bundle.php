@@ -28,6 +28,9 @@ final class Bundle extends ObjectClass
     private ArrayClass $loadedClasses {
         get => $this->loadedClasses ??= new ArrayClass();
     }
+    private ClassLoader $classLoader {
+        get => $this->classLoader ??= new ClassLoader($this->bundleURL);
+    }
     /** @var URL|null The file URL of the bundle's subdirectory containing resource files. */
     private(set) ?URL $resourceURL {
         get => $this->resourceURL ??= $this->directoryURL($this->bundleURL, "Resources");
@@ -116,11 +119,6 @@ final class Bundle extends ObjectClass
     private function __construct(public readonly URL $bundleURL)
     {
         FileManager::default()->fileExists($this->bundleURL->path, $isDirectory) && $isDirectory ?: fatal_error("Invalid bundle url \"$this->bundleURL\"");
-    }
-
-    public function __destruct()
-    {
-        self::loadedBundles()->removeValueForKey($this->bundleURL->absoluteString);
     }
 
     private function directoryURL(URL $baseURL, string $name): ?URL
@@ -431,8 +429,7 @@ final class Bundle extends ObjectClass
      */
     public function classNamed(string $className): ?string
     {
-        $loader = new ClassLoader($this->bundleURL);
-        $class = $loader->load($className);
+        $class = $this->classLoader->load($className);
         if ($class) {
             $this->append($class);
         }
