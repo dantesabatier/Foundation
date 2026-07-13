@@ -47,6 +47,10 @@ final class ProcessInfo extends ObjectClass
     private(set) string $hostName {
         get => $this->hostName ??= gethostname() ?: "localhost";
     }
+    /** @var float The current monotonic time, in seconds. Backed by hrtime(), it never jumps with wall-clock adjustments (NTP), so differences between two readings are reliable elapsed-time measurements. Use this for benchmarks and timeouts; use absolute_time_get_current() only for calendar dates. */
+    public float $systemUptime {
+        get => hrtime(true) / 1e9;
+    }
 
     /**
      * Returns the process information agent for the process.
