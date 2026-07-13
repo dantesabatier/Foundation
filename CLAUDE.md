@@ -27,7 +27,7 @@ phpstan analyse
 rector process --dry-run
 ```
 
-There is no test suite — correctness is enforced entirely through static analysis (Psalm level 4, PHPStan level 3).
+Correctness is enforced primarily through static analysis (Psalm level 4, PHPStan level 3), complemented by standalone test scripts in `tests/`. There is no PHPUnit: each suite is a self-contained script with its own runner class that exits non-zero on failure. Run one with `php tests/<Name>Test.php`; there is no single command to run them all, so loop over the directory if you need the full set. When fixing a bug, add a regression check to the matching suite (or create one following the existing pattern).
 
 ## Architecture
 

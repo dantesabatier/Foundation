@@ -37,7 +37,16 @@ final class Bundle extends ObjectClass
     }
     /** @var URL|null The file URL of the receiver's executable file. */
     private(set) ?URL $executableURL {
-        get => $this->executableURL ??= $this->directoryURL($this->bundleURL->appendingPathComponent("OS"), $this->object(kCFBundleExecutableKey) ?? $this->object(kCFBundleNameKey));
+        get {
+            if (isset($this->executableURL)) {
+                return $this->executableURL;
+            }
+            $name = $this->object(kCFBundleExecutableKey) ?? $this->object(kCFBundleNameKey);
+            if (!is_string($name)) {
+                return null;
+            }
+            return $this->executableURL = $this->directoryURL($this->bundleURL->appendingPathComponent("OS"), $name);
+        }
     }
     /** @var URL|null The file URL of the bundle's subdirectory containing private frameworks. */
     private(set) ?URL $privateFrameworksURL {
@@ -198,7 +207,12 @@ final class Bundle extends ObjectClass
             }
             $url = URL::fileURL($path);
             while ($url->path !== "/") {
+                // On Windows the path bottoms out at a drive root ("C:/"), never "/"; stop when it no longer shrinks.
+                $parent = $url->path;
                 $url->deleteLastPathComponent();
+                if ($url->path === $parent) {
+                    break;
+                }
                 if (string_is_equal($url->lastPathComponent, "src", CompareOptions::caseInsensitive)) {
                     $url->deleteLastPathComponent();
                     break;
@@ -261,9 +275,13 @@ final class Bundle extends ObjectClass
             }
         }
         $languages ??= new ArrayClass([""]);
-        $resources = $languages->flatMap(fn(string $language): ArrayClass => FileManager::default()->contentsOfDirectory($language ? $baseURL->appendingPathComponent($language) : $baseURL, null, DirectoryEnumerationOptions::skipsHiddenFiles))->filter(function (URL $url, int $idx, bool &$stop) use ($name, $extensions, $limit): bool {
-            $ok = $url->deletingPathExtension()->lastPathComponent === pathinfo((string)$name, PATHINFO_FILENAME) && (!$extensions instanceof ArrayClass || $extensions->isEmpty || $extensions->contains(fn(string $extension): bool => string_is_equal($url->pathExtension, $extension, CompareOptions::caseInsensitive)));
-            $stop = $ok && $limit > 0 && $limit >= $idx;
+        $matches = 0;
+        $resources = $languages->flatMap(fn(string $language): ArrayClass => FileManager::default()->contentsOfDirectory($language ? $baseURL->appendingPathComponent($language) : $baseURL, null, DirectoryEnumerationOptions::skipsHiddenFiles))->filter(function (URL $url, int $idx, bool &$stop) use ($name, $extensions, $limit, &$matches): bool {
+            $ok = ($name === null || $url->deletingPathExtension()->lastPathComponent === pathinfo($name, PATHINFO_FILENAME)) && (!$extensions instanceof ArrayClass || $extensions->isEmpty || $extensions->contains(fn(string $extension): bool => string_is_equal($url->pathExtension, $extension, CompareOptions::caseInsensitive)));
+            if ($ok) {
+                $matches++;
+            }
+            $stop = $ok && $limit > 0 && $matches >= $limit;
             return $ok;
         });
         if ($resources->isEmpty) {
@@ -363,8 +381,8 @@ final class Bundle extends ObjectClass
     {
         if (($url = $this->urlForImageResource($name)) && ($mimeType = URLFileTypeMappings::shared()->mimeType($url->pathExtension))) {
             return match ($mimeType) {
-                MimeTypeJPEG => imagecreatefromjpeg($url->path),
-                MimeTypePNG => imagecreatefrompng($url->path),
+                MimeTypeJPEG => imagecreatefromjpeg($url->path) ?: null,
+                MimeTypePNG => imagecreatefrompng($url->path) ?: null,
                 default => null,
             };
         }
