@@ -19,7 +19,11 @@ use SplFileInfo;
  */
 final class URL extends ObjectClass
 {
+    private const array ENCODED_PATH_SCHEMES = ["http", "https", "ftp", "ftps", "ws", "wss", "file"];
+
     private string $string;
+    /** @var array{scheme?: string, host?: string, port?: int, user?: string, pass?: string, path?: string, query?: string, fragment?: string}|null The cached raw components of the absolute string, as returned by parse_url(). */
+    private ?array $components = null;
     /** @var string The absolute string for the URL. */
     public string $absoluteString {
         get {
@@ -29,67 +33,68 @@ final class URL extends ObjectClass
             return $this->absoluteURL->absoluteString;
         }
     }
-    /** @var URL The absolute URL. */
+    /** @var URL The absolute URL. Relative references are resolved against baseURL following RFC 3986 section 5. */
     public URL $absoluteURL {
         get {
-            $baseURL = $this->baseURL;
-            if (!$baseURL instanceof URL) {
+            if ($this->baseURL === null) {
                 return $this;
             }
-            while (!$baseURL->hasDirectoryPath) {
-                $baseURL = $baseURL->deletingLastPathComponent();
-                if ($baseURL->path === "/") {
-                    break;
-                }
+            $reference = parse_url($this->string) ?: [];
+            if (isset($reference["scheme"])) {
+                return new URL($this->string);
             }
-            $relative = $this->string;
-            if (str_starts_with($relative, "/")) {
-                $relative = substring_from_index($relative, 1);
-            } elseif (str_starts_with($relative, "./")) {
-                $relative = substring_from_index($relative, 2);
-            } elseif (str_starts_with($relative, "../")) {
-                $steps = substr_count($relative, "../");
-                $numberOfComponents = $baseURL->pathComponents->count;
-                if ($steps >= $numberOfComponents) {
-                    $steps = ($numberOfComponents - 1);
-                }
-                while ($steps > 0) {
-                    $baseURL = $baseURL->deletingLastPathComponent();
-                    $relative = substring_from_index($relative, 3);
-                    $steps--;
-                }
+            $base = $this->baseURL->absoluteURL;
+            if (isset($reference["host"])) {
+                return new URL($base->scheme . ":" . $this->string);
             }
-            if (empty($relative)) {
-                return $baseURL;
+            $components = $base->parsed();
+            $referencePath = isset($reference["path"]) ? (string)$reference["path"] : "";
+            if ($referencePath !== "") {
+                if (str_starts_with($referencePath, "/")) {
+                    $path = self::removeDotSegments($referencePath);
+                } else {
+                    $basePath = isset($components["path"]) ? (string)$components["path"] : "";
+                    $slash = strrpos($basePath, "/");
+                    $path = self::removeDotSegments(($slash === false ? "/" : substr($basePath, 0, $slash + 1)) . $referencePath);
+                }
+                $components["path"] = $path;
+                unset($components["query"]);
             }
-            return $baseURL->appendingPathComponent($relative);
+            if (isset($reference["query"])) {
+                $components["query"] = (string)$reference["query"];
+            }
+            unset($components["fragment"]);
+            if (isset($reference["fragment"])) {
+                $components["fragment"] = (string)$reference["fragment"];
+            }
+            return new URL(self::stringFromComponents($components));
         }
     }
-    /** @var string The relative path of the URL if the URL conforms to RFC 1808 (the most common form of URL), otherwise null. */
+    /** @var string The path of the relative portion of the URL, or the full path if the URL is not relative to a base URL. */
     public string $relativePath {
         get {
-            if ($this->baseURL === null) {
-                return $this->path;
-            }
-            return $this->absoluteURL->path;
+            $path = parse_url($this->string, PHP_URL_PATH);
+            return is_string($path) ? rawurldecode($path) : "";
         }
     }
-    /** @var string The relative portion of a URL. */
+    /** @var string The relative portion of a URL. If the URL was created without a base URL, this is the same as absoluteString. */
     public string $relativeString {
-        get {
-            if ($this->baseURL === null) {
-                return $this->absoluteString;
-            }
-            return $this->absoluteURL->absoluteString;
-        }
+        get => $this->string;
     }
-    /** @var string A string containing the URL's file system path. */
+    /** @var string A string containing the URL's file system path, in the platform's native form. */
     public string $fileSystemRepresentation {
-        get => new SplFileInfo($this->path)->getRealPath();
+        get {
+            $path = self::nativePath($this->path);
+            $resolved = new SplFileInfo($path)->getRealPath();
+            return $resolved === false ? $path : $resolved;
+        }
     }
     /** @var string|null The fragment component of the URL if the URL conforms to RFC 1808 (the most common form of URL), otherwise null. */
     public ?string $fragment {
-        get => $this->parse(PHP_URL_FRAGMENT);
+        get {
+            $fragment = $this->component("fragment");
+            return $fragment === null ? null : rawurldecode($fragment);
+        }
     }
     /** @var URL A version of the URL with any instances of ".." or "." removed from its path. */
     public URL $standardized {
@@ -105,19 +110,25 @@ final class URL extends ObjectClass
     }
     /** @var string The scheme of the URL. */
     public string $scheme {
-        get => $this->parse(PHP_URL_SCHEME) ?? "";
+        get => $this->component("scheme") ?? "";
     }
     /** @var string|null The host component of a URL if the URL conforms to RFC 1808 (the most common form of URL), otherwise null. */
     public ?string $host {
-        get => $this->parse(PHP_URL_HOST);
+        get {
+            $host = $this->component("host");
+            return $host === null ? null : rawurldecode($host);
+        }
     }
     /** @var string The last path component of the URL, or an empty string if the path is an empty string. */
     public string $lastPathComponent {
-        get => basename($this->path);
+        get {
+            $path = $this->path;
+            return $path === "/" ? "/" : basename($path);
+        }
     }
-    /** @var string The path component of the URL if the URL conforms to RFC 1808 (the most common form of URL), otherwise an empty string. */
+    /** @var string The path component of the URL if the URL conforms to RFC 1808 (the most common form of URL), otherwise an empty string. The path is percent-decoded. */
     public string $path {
-        get => $this->parse(PHP_URL_PATH) ?? "";
+        get => rawurldecode($this->rawPath());
     }
     /** @var ArrayClass<string> $pathComponents The path components of the URL, or an empty array if the path is an empty string. */
     public ArrayClass $pathComponents {
@@ -141,19 +152,28 @@ final class URL extends ObjectClass
     }
     /** @var int|null The port component of the URL if the URL conforms to RFC 1808 (the most common form of URL), otherwise null. */
     public ?int $port {
-        get => $this->parse(PHP_URL_PORT);
+        get {
+            $port = $this->parsed()["port"] ?? null;
+            return $port === null ? null : (int)$port;
+        }
     }
-    /** @var string|null The query of the URL if the URL conforms to RFC 1808 (the most common form of URL), otherwise null. */
+    /** @var string|null The query of the URL if the URL conforms to RFC 1808 (the most common form of URL), otherwise null. The query keeps its percent-encoding, since decoding it can change its structure (an encoded "&" or "=" would become a separator). */
     public ?string $query {
-        get => $this->parse(PHP_URL_QUERY);
+        get => $this->component("query");
     }
     /** @var string|null The user component of the URL if the URL conforms to RFC 1808 (the most common form of URL), otherwise null. */
     public ?string $user {
-        get => $this->parse(PHP_URL_USER);
+        get {
+            $user = $this->component("user");
+            return $user === null ? null : rawurldecode($user);
+        }
     }
     /** @var string|null The password component of the URL if the URL conforms to RFC 1808 (the most common form of URL), otherwise null. */
     public ?string $password {
-        get => $this->parse(PHP_URL_PASS);
+        get {
+            $password = $this->component("pass");
+            return $password === null ? null : rawurldecode($password);
+        }
     }
     /** @var bool A Boolean that is true if the scheme is "file". */
     public bool $isFileURL {
@@ -162,8 +182,13 @@ final class URL extends ObjectClass
     /** @var bool A Boolean that is true if the URL path represents a directory. */
     public bool $hasDirectoryPath {
         get {
-            $path = $this->path;
-            return $this->isFileURL && file_exists($path) ? is_dir($path) : $this->pathExtension === "";
+            if ($this->isFileURL) {
+                $path = self::nativePath($this->path);
+                if (file_exists($path)) {
+                    return is_dir($path);
+                }
+            }
+            return str_ends_with($this->rawPath(), "/") || $this->pathExtension === "";
         }
     }
     private URLResourceValuesStorage $storage {
@@ -205,30 +230,139 @@ final class URL extends ObjectClass
     {
         $this->string = $data["string"];
         $this->baseURL = $data["baseURL"];
+        $this->components = null;
     }
 
-    /** @noinspection PhpMixedReturnTypeCanBeReducedInspection */
-    private function parse(int $component): mixed
+    /**
+     * Returns the raw (still percent-encoded) components of the absolute string, caching the parse.
+     * @return array{scheme?: string, host?: string, port?: int, user?: string, pass?: string, path?: string, query?: string, fragment?: string}
+     */
+    private function parsed(): array
     {
-        $v = parse_url(rawurldecode($this->absoluteString), $component);
-        if (empty($v)) {
-            return null;
-        }
-        return $v;
+        return $this->components ??= (parse_url($this->absoluteString) ?: []);
     }
 
+    /** Returns the named raw component of the absolute string, or null if it is absent. */
+    private function component(/** @noinspection PhpSameParameterValueInspection */ string $name): ?string
+    {
+        $value = $this->parsed()[$name] ?? null;
+        return $value === null ? null : (string)$value;
+    }
+
+    /** Returns the raw (still percent-encoded) path of the absolute string. */
+    private function rawPath(): string
+    {
+        return $this->component("path") ?? "";
+    }
+
+    /**
+     * Reassembles a URL string from raw parse_url()-style components. No encoding or decoding is
+     * performed, so components round-trip byte for byte.
+     * @param array{scheme?: string, host?: string, port?: int, user?: string, pass?: string, path?: string, query?: string, fragment?: string} $components
+     */
+    private static function stringFromComponents(array $components): string
+    {
+        $string = "";
+        if (isset($components["scheme"])) {
+            $string .= $components["scheme"] . "://";
+        }
+        if (isset($components["user"])) {
+            $string .= $components["user"];
+            if (isset($components["pass"])) {
+                $string .= ":" . $components["pass"];
+            }
+            $string .= "@";
+        }
+        $string .= $components["host"] ?? "";
+        if (isset($components["port"])) {
+            $string .= ":" . $components["port"];
+        }
+        $path = $components["path"] ?? "";
+        // On Windows, parse_url() strips the slash before a drive letter ("file:///C:/x" parses
+        // to path "C:/x"); reinsert it so the authority and path stay separated.
+        if ($path !== "" && !str_starts_with($path, "/")) {
+            $path = "/" . $path;
+        }
+        $string .= $path;
+        if (isset($components["query"])) {
+            $string .= "?" . $components["query"];
+        }
+        if (isset($components["fragment"])) {
+            $string .= "#" . $components["fragment"];
+        }
+        return $string;
+    }
+
+    /** Replaces the path of the URL, keeping every other component intact. The URL becomes absolute. */
     private function rebuild(string $path): void
     {
-        $components = new URLComponents();
-        $components->scheme = $this->scheme;
-        $components->user = $this->user;
-        $components->password = $this->password;
-        $components->host = $this->host;
-        $components->port = $this->port;
-        $components->path = $path;
-        $components->query = $this->query;
-        $components->fragment = $this->fragment;
-        $this->string = $components->string ?? fatal_error();
+        $components = $this->parsed();
+        $components["path"] = $path;
+        $this->string = self::stringFromComponents($components);
+        $this->baseURL = null;
+        $this->components = null;
+    }
+
+    /** Removes "." and ".." segments from a path, per RFC 3986 section 5.2.4. */
+    private static function removeDotSegments(string $path): string
+    {
+        $input = $path;
+        $output = "";
+        while ($input !== "") {
+            if (str_starts_with($input, "../")) {
+                $input = substr($input, 3);
+            } elseif (str_starts_with($input, "./")) {
+                $input = substr($input, 2);
+            } elseif (str_starts_with($input, "/./")) {
+                $input = substr($input, 2);
+            } elseif ($input === "/.") {
+                $input = "/";
+            } elseif (str_starts_with($input, "/../")) {
+                $input = substr($input, 3);
+                $output = substr($output, 0, (int)strrpos($output, "/"));
+            } elseif ($input === "/..") {
+                $input = "/";
+                $output = substr($output, 0, (int)strrpos($output, "/"));
+            } elseif ($input === "." || $input === "..") {
+                $input = "";
+            } else {
+                preg_match("#^/?[^/]*#", $input, $matches);
+                $output .= $matches[0];
+                $input = substr($input, strlen($matches[0]));
+            }
+        }
+        return $output;
+    }
+
+    /**
+     * Converts a URL path such as "/C:/Users/dante" into the platform-native form "C:/Users/dante".
+     * Paths that do not carry a Windows drive prefix are returned unchanged.
+     */
+    private static function nativePath(string $path): string
+    {
+        if (preg_match("#^/[A-Za-z]:#", $path) === 1) {
+            return substr($path, 1);
+        }
+        return $path;
+    }
+
+    /**
+     * Percent-encodes each segment of a path component for schemes whose paths are expected to be
+     * encoded, leaving Windows drive segments and already-encoded input intact.
+     */
+    private function encodedPathComponent(string $component): string
+    {
+        if (!in_array($this->scheme, self::ENCODED_PATH_SCHEMES, true)) {
+            return $component;
+        }
+        return explode("/", $component)
+                |> (fn(array $x): array => array_map(static function (string $segment): string {
+                    if ($segment === "" || preg_match("#^[A-Za-z]:$#", $segment) === 1) {
+                        return $segment;
+                    }
+                    return rawurlencode(rawurldecode($segment));
+                }, $x))
+                |> (fn(array $x): string => implode("/", $x));
     }
 
     /**
@@ -239,10 +373,10 @@ final class URL extends ObjectClass
      */
     public static function fileURL(string $path, ?URL $base = null): URL
     {
+        $path = str_replace("\\", "/", $path);
         if (!str_starts_with($path, "/")) {
             $path = "/$path";
         }
-        $path = str_replace("\\", "/", $path);
         return new URL("file://$path", $base);
     }
 
@@ -252,14 +386,14 @@ final class URL extends ObjectClass
      */
     public function appendPathComponent(string $component): URL
     {
-        $path = $this->path;
+        $path = $this->rawPath();
         if (!str_ends_with($path, "/")) {
-            if ($this->isFileURL && FileManager::default()->fileExists($path, $isDirectory) && !$isDirectory) {
+            if ($this->isFileURL && FileManager::default()->fileExists(self::nativePath($this->path), $isDirectory) && !$isDirectory) {
                 fatal_error("Cannot append components to a file");
             }
             $path .= "/";
         }
-        $path .= $component;
+        $path .= $this->encodedPathComponent(ltrim($component, "/"));
         $this->rebuild($path);
         return $this;
     }
@@ -282,11 +416,18 @@ final class URL extends ObjectClass
     public function appendPathExtension(string $extension): URL
     {
         if (strlen($extension)) {
-            $path = $this->path;
+            $rawPath = $this->rawPath();
+            $path = rtrim($rawPath, "/");
+            if ($path === "") {
+                return $this;
+            }
             if (!str_ends_with($path, ".") && !str_starts_with($extension, ".")) {
                 $path .= ".";
             }
             $path .= $extension;
+            if (str_ends_with($rawPath, "/")) {
+                $path .= "/";
+            }
             $this->rebuild($path);
         }
         return $this;
@@ -304,11 +445,18 @@ final class URL extends ObjectClass
     }
 
     /**
-     * Returns a URL constructed by removing the last path component of self.
+     * Removes the last path component of self. The other components of the URL (host, query,
+     * fragment, ...) are left intact. A URL whose path is empty or "/" is returned unchanged.
      */
     public function deleteLastPathComponent(): URL
     {
-        $this->string = (string)preg_replace("#/[^/]+/?\$#", "", rtrim($this->string, "/."));
+        $trimmed = rtrim($this->rawPath(), "/");
+        if ($trimmed === "") {
+            return $this;
+        }
+        $slash = strrpos($trimmed, "/");
+        $path = $slash === false ? "" : substr($trimmed, 0, $slash);
+        $this->rebuild($path === "" ? "/" : $path);
         return $this;
     }
 
@@ -323,11 +471,16 @@ final class URL extends ObjectClass
     }
 
     /**
-     * Returns a URL constructed by removing any path extension.
+     * Removes any path extension of the last path component of self. The other components of the
+     * URL are left intact.
      */
     public function deletePathExtension(): URL
     {
-        $this->string = rtrim(str_replace($this->pathExtension, "", $this->string), "/.");
+        $path = $this->rawPath();
+        $extension = pathinfo(rtrim($path, "/"), PATHINFO_EXTENSION);
+        if ($extension !== "") {
+            $this->rebuild((string)preg_replace("#\\." . preg_quote($extension, "#") . "(/*)\$#", "\$1", $path));
+        }
         return $this;
     }
 
@@ -343,7 +496,7 @@ final class URL extends ObjectClass
 
     public function removingPercentEncoding(): string
     {
-        return urldecode($this->absoluteString);
+        return rawurldecode($this->absoluteString);
     }
 
     /**
@@ -417,8 +570,7 @@ final class URL extends ObjectClass
     /**
      * @template ResultType
      * Passes the URL's path in the file system representation to a closure.
-     * @param Closure(string): ResultType $block A closure to execute, which receives a string as its parameter and returns a value of a type you choose.
-     * The parameter passed to the closure is null if the URL cannot be represented by the file system. For example, if the URL contains an accented character and the file system only supports ASCII, no file system representation is possible.
+     * @param Closure(string): ResultType $block A closure to execute, which receives the file system representation of the URL as its parameter and returns a value of a type you choose.
      * @return ResultType
      */
     public function withUnsafeFileSystemRepresentation(Closure $block)
@@ -429,13 +581,14 @@ final class URL extends ObjectClass
     /**
      * Resolves any symlinks in the path of a file URL.
      *
-     * If the isFileURL is false, this method does nothing.
+     * If isFileURL is false, or the path does not exist on disk, this method does nothing.
      */
     public function resolveSymlinksInPath(): URL
     {
-        if ($this->isFileURL) {
-            $this->string = (URL::fileURL(readlink($this->path)))->string;
+        if ($this->isFileURL && ($resolved = realpath(self::nativePath($this->path))) !== false) {
+            $this->string = URL::fileURL($resolved)->string;
             $this->baseURL = null;
+            $this->components = null;
         }
         return $this;
     }
@@ -454,13 +607,15 @@ final class URL extends ObjectClass
     }
 
     /**
-     * Standardizes the path of a file URL.
+     * Standardizes the path of the URL by lexically removing any "." and ".." segments,
+     * per RFC 3986 section 5.2.4. The path does not need to exist on disk.
      */
     public function standardize(): URL
     {
-        if ($this->isFileURL) {
-            $this->string = (URL::fileURL(realpath($this->path)))->string;
-            $this->baseURL = null;
+        $path = $this->rawPath();
+        $standardized = self::removeDotSegments($path);
+        if ($standardized !== $path) {
+            $this->rebuild($standardized);
         }
         return $this;
     }
@@ -475,9 +630,26 @@ final class URL extends ObjectClass
     public function compare(mixed $other): ComparisonResult
     {
         if ($other instanceof URL) {
-            return ComparisonResult::from(string_compare($this->absoluteString, $other->absoluteString, CompareOptions::caseInsensitive));
+            $options = $this->isFileURL && $other->isFileURL ? CompareOptions::caseInsensitive : CompareOptions::none;
+            return ComparisonResult::from(string_compare($this->canonicalString(), $other->canonicalString(), $options));
         }
         return ComparisonResult::orderedDescending;
+    }
+
+    /**
+     * Returns the absolute string with the scheme and host lowercased, so that comparisons treat
+     * only those components as case-insensitive, per RFC 3986 section 6.2.2.1.
+     */
+    private function canonicalString(): string
+    {
+        $components = $this->absoluteURL->parsed();
+        if (isset($components["scheme"])) {
+            $components["scheme"] = strtolower($components["scheme"]);
+        }
+        if (isset($components["host"])) {
+            $components["host"] = strtolower($components["host"]);
+        }
+        return self::stringFromComponents($components);
     }
 
     #[Override]

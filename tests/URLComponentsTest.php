@@ -137,4 +137,20 @@ $check($reassembled->string !== null && str_starts_with($reassembled->string, "h
 $check($reassembled->string !== null && str_contains($reassembled->string, "?x=1"), "string keeps query");
 $check($reassembled->string !== null && str_contains($reassembled->string, "#frag"), "string keeps fragment");
 
+// ---------------------------------------------------------------------------
+$section("string (regressions)");
+// ---------------------------------------------------------------------------
+
+// A trailing path slash used to be lost in reassembly, which broke directory URLs.
+$check(new URLComponents("https://example.com/a/b/")->string === "https://example.com/a/b/", "trailing path slash is preserved");
+$check(new URLComponents("https://example.com/")->string === "https://example.com/", "root path does not become a double slash");
+
+// An already percent-encoded password used to be encoded a second time.
+$check(new URLComponents("https://u:p%40ss@example.com/x")->string === "https://u:p%40ss@example.com/x", "password keeps single encoding through reassembly");
+
+// "0" is a valid value for a component; empty() used to swallow it.
+$zero = new URLComponents("https://example.com/p?0");
+$check($zero->query === "0", "a query of \"0\" survives parsing");
+$check($zero->string === "https://example.com/p?0", "a query of \"0\" survives reassembly");
+
 URLComponentsTestRunner::finish();

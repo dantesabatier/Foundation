@@ -36,10 +36,10 @@ final class URLComponents extends ObjectClass
             }
             $user = $this->user;
             $password = $this->password;
-            if ($password && $user) {
+            if ($password !== null && $password !== "" && $user !== null && $user !== "") {
                 $user .= ":";
-                $password = rawurlencode($password) . "@";
-            } elseif ($user) {
+                $password = rawurlencode(rawurldecode($password)) . "@";
+            } elseif ($user !== null && $user !== "") {
                 $user .= "@";
             }
             $host = $this->host;
@@ -51,7 +51,7 @@ final class URLComponents extends ObjectClass
             if ($path) {
                 $tu = "";
                 $tok = strtok($path, "\\/");
-                while (strlen($tok)) {
+                while ($tok !== false) {
                     $tu .= match ($this->scheme) {
                         "http", "https", "ftp", "ftps", "ws", "wss", "file" => (function () use ($tok): string {
                             $tok = rawurldecode($tok);
@@ -64,14 +64,15 @@ final class URLComponents extends ObjectClass
                     };
                     $tok = strtok("\\/");
                 }
-                $path = "/" . trim($tu, "/");
+                $trailingSlash = $tu !== "" && (str_ends_with($path, "/") || str_ends_with($path, "\\"));
+                $path = "/" . trim($tu, "/") . ($trailingSlash ? "/" : "");
             }
             $query = $this->query;
-            if ($query) {
+            if ($query !== null && $query !== "") {
                 $query = "?" . $query;
             }
             $fragment = $this->fragment;
-            if ($fragment) {
+            if ($fragment !== null && $fragment !== "") {
                 $fragment = "#" . $fragment;
             }
             $string = new ArrayClass([$scheme, $user, $password, $host, $port, $path, $query, $fragment])->compactMap(fn(string|int|null $element): string|int|null => $element)->join("");
@@ -82,7 +83,7 @@ final class URLComponents extends ObjectClass
     public ?ArrayClass $queryItems {
         get {
             $query = $this->query;
-            if (!$query) {
+            if ($query === null || $query === "") {
                 return null;
             }
             $components = explode("&", $query);
@@ -121,7 +122,7 @@ final class URLComponents extends ObjectClass
                 if ($key === "pass") {
                     $key = "password";
                 }
-                if (!empty($value)) {
+                if ($value !== "") {
                     $this->$key = $value;
                 }
             }
