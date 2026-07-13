@@ -328,9 +328,11 @@ function invalid_mutation(): never
 function unsafe_value(Closure $block)
 {
     set_error_handler(fn(int $severity, string $message, string $file, int $line): never => fatal_error($message, $file, $line));
-    $value = $block();
-    restore_error_handler();
-    return $value;
+    try {
+        return $block();
+    } finally {
+        restore_error_handler();
+    }
 }
 
 /**

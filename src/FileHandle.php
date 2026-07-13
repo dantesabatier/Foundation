@@ -51,11 +51,14 @@ final class FileHandle extends ObjectClass
      * When using this method to create a file handle object, the file handle owns its associated file descriptor and is responsible for closing it.
      * @param URL $url The URL of the file, device, or named socket to access.
      * @return FileHandle|null The initialized file handle object or null if no file exists at url.
-     * @throws Exception
      */
     public static function fileHandleForReadingFromURL(URL $url): ?FileHandle
     {
-        if (!($handle = unsafe_value(fn(): mixed => fopen($url->path, "r")))) {
+        try {
+            if (!($handle = unsafe_value(fn(): mixed => fopen($url->path, "r")))) {
+                return null;
+            }
+        } catch (Exception) {
             return null;
         }
         return new FileHandle($handle);
@@ -67,12 +70,15 @@ final class FileHandle extends ObjectClass
      * The file pointer is set to the beginning of the file. The returned object responds only to {@see write()}.
      * When using this method to create a file handle object, the file handle owns its associated file descriptor and is responsible for closing it.
      * @param URL $url The URL of the file, device, or named socket to access.
-     * @return FileHandle|null The initialized file handle object or null if no file exists at url.
-     * @throws Exception
+     * @return FileHandle|null The initialized file handle object or null if the file cannot be opened for writing.
      */
     public static function fileHandleForWritingToURL(URL $url): ?FileHandle
     {
-        if (!($handle = unsafe_value(fn(): mixed => fopen($url->path, "w")))) {
+        try {
+            if (!($handle = unsafe_value(fn(): mixed => fopen($url->path, "w")))) {
+                return null;
+            }
+        } catch (Exception) {
             return null;
         }
         return new FileHandle($handle);
@@ -84,12 +90,15 @@ final class FileHandle extends ObjectClass
      * The file pointer is set to the beginning of the file. The returned object responds to both {@see read()}... messages and {@see write()}.
      * When using this method to create a file handle object, the file handle owns its associated file descriptor and is responsible for closing it.
      * @param URL $url The URL of the file, device, or named socket to access.
-     * @return FileHandle|null The initialized file handle object or null if no file exists at url.
-     * @throws Exception
+     * @return FileHandle|null The initialized file handle object or null if the file cannot be opened for updating.
      */
     public static function fileHandleForUpdatingURL(URL $url): ?FileHandle
     {
-        if (!($handle = unsafe_value(fn(): mixed => fopen($url->path, "w+")))) {
+        try {
+            if (!($handle = unsafe_value(fn(): mixed => fopen($url->path, "w+")))) {
+                return null;
+            }
+        } catch (Exception) {
             return null;
         }
         return new FileHandle($handle);
@@ -182,7 +191,7 @@ final class FileHandle extends ObjectClass
      */
     public function seekToEnd(): int
     {
-        unsafe_value(fn(): int => fseek($this->rawHandle, -1, SEEK_END));
+        unsafe_value(fn(): int => fseek($this->rawHandle, 0, SEEK_END));
         return $this->offsetInFile;
     }
 
