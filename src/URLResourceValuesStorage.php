@@ -108,9 +108,9 @@ final class URLResourceValuesStorage
             } elseif ($key === URLResourceKey::isRegularFileKey) {
                 $result[$key] = $info->isFile();
             } elseif ($key === URLResourceKey::attributeModificationDateKey) {
-                $result[$key] = new Date((float)$info->getMTime());
+                $result[$key] = Date::dateWithTimeIntervalSince1970((float)$info->getMTime());
             } elseif ($key === URLResourceKey::creationDateKey) {
-                $result[$key] = new Date((float)$info->getCTime());
+                $result[$key] = Date::dateWithTimeIntervalSince1970((float)$info->getCTime());
             } elseif ($key === URLResourceKey::isExecutableKey) {
                 $result[$key] = $info->isExecutable();
             } elseif ($key === URLResourceKey::isHiddenKey) {

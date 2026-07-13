@@ -24,7 +24,7 @@ final class Date extends ObjectClass
     }
     /** @var float The interval between the date value and 00:00:00 UTC on 1 January 1970. This property's value is negative if the date object is earlier than 00:00:00 UTC on 1 January 1970. */
     public float $timeIntervalSince1970 {
-        get => $this->timeIntervalSinceReferenceDate - self::timeIntervalBetween1970AndReferenceDate;
+        get => $this->timeIntervalSinceReferenceDate + self::timeIntervalBetween1970AndReferenceDate;
     }
     #[Override]
     public string $description {
@@ -91,7 +91,7 @@ final class Date extends ObjectClass
      */
     public static function dateWithTimeIntervalSince1970(float $timeInterval): Date
     {
-        return Date::dateWithTimeIntervalSinceReferenceDate($timeInterval + Date::timeIntervalBetween1970AndReferenceDate);
+        return Date::dateWithTimeIntervalSinceReferenceDate($timeInterval - Date::timeIntervalBetween1970AndReferenceDate);
     }
 
     /**
@@ -200,12 +200,13 @@ final class Date extends ObjectClass
      */
     public function formatted(DateFormatStyleDateStyle $date = DateFormatStyleDateStyle::abbreviated, DateFormatStyleTimeStyle $time = DateFormatStyleTimeStyle::shortened): string
     {
-        return new IntlDateFormatter(Locale::getDefault(), $date->value, $time->value)->format((int)$this->timeIntervalSinceReferenceDate);
+        $formatted = new IntlDateFormatter(Locale::getDefault(), $date->value, $time->value)->format($this->timeIntervalSince1970);
+        return $formatted === false ? $this->format() : $formatted;
     }
 
     public function format(string $format = "Y-m-d H:i:s"): string
     {
-        return date($format, (int)$this->timeIntervalSinceReferenceDate);
+        return date($format, (int)$this->timeIntervalSince1970);
     }
 
     /**

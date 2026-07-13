@@ -11,12 +11,13 @@ use JetBrains\PhpStorm\Pure;
 use SensitiveParameter;
 
 /**
- * Returns the current system absolute time.
+ * Returns the current system absolute time, measured in seconds since 00:00:00 UTC on 1 January 2001.
+ * This is the PHP counterpart of CFAbsoluteTimeGetCurrent().
  * @return float The current absolute time.
  */
 function absolute_time_get_current(): float
 {
-    return microtime(true);
+    return microtime(true) - kCFAbsoluteTimeIntervalSince1970;
 }
 
 /**

@@ -157,7 +157,7 @@ final class HTTPCookieStorage extends ObjectClass
      */
     public function removeCookies(Date $date): void
     {
-        $this->allCookies->removeAll(fn(HTTPCookie $cookie): bool => ($expiresDate = $cookie->expiresDate) && $expiresDate->timeIntervalSinceNow > $date->timeIntervalSinceReferenceDate);
+        $this->allCookies->removeAll(fn(HTTPCookie $cookie): bool => (float)$cookie->properties[HTTPCookiePropertyKey::created] >= $date->timeIntervalSinceReferenceDate);
         $this->updatePersistentStore();
     }
 

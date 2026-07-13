@@ -493,8 +493,8 @@ final class FileManager extends ObjectClass
     {
         return unsafe_value(fn(): Dictionary => new Dictionary([
             FileAttributeKey::appendOnly => is_readable($path) && !is_writable($path),
-            FileAttributeKey::creationDate => new Date((float)filectime($path)),
-            FileAttributeKey::modificationDate => new Date((float)filemtime($path)),
+            FileAttributeKey::creationDate => Date::dateWithTimeIntervalSince1970((float)filectime($path)),
+            FileAttributeKey::modificationDate => Date::dateWithTimeIntervalSince1970((float)filemtime($path)),
             FileAttributeKey::immutable => !is_writable($path),
             FileAttributeKey::size => filesize($path),
             FileAttributeKey::type => filetype($path),

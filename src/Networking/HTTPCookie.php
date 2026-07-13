@@ -105,7 +105,7 @@ final class HTTPCookie extends ObjectClass
             if ($expires instanceof Date) {
                 $expiresDate = $expires;
             } elseif ($expires) {
-                $expiresDate = new Date((float)strtotime($expires));
+                $expiresDate = Date::dateWithTimeIntervalSince1970((float)strtotime($expires));
             }
         }
         $this->expiresDate = $expiresDate;

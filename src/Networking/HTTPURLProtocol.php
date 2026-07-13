@@ -63,7 +63,7 @@ class HTTPURLProtocol extends NativeProtocol
         }
         $now = new Date();
         if ($dateString = $response->allHeaderFields["Date"]) {
-            $date = new Date((float)strtotime((string)$dateString));
+            $date = Date::dateWithTimeIntervalSince1970((float)strtotime((string)$dateString));
             $expirationStart = $date->compare($cacheable->date) === ComparisonResult::orderedDescending ? $date : $cacheable->date;
         } else {
             $expirationStart = $cacheable->date;
@@ -114,7 +114,7 @@ class HTTPURLProtocol extends NativeProtocol
             return false;
         }
         if (!$hasMaxAge && ($expires = $response->allHeaderFields["Expires"])) {
-            $expiration = new Date((float)strtotime((string)$expires));
+            $expiration = Date::dateWithTimeIntervalSince1970((float)strtotime((string)$expires));
             if ($now->timeIntervalSinceReferenceDate >= $expiration->timeIntervalSinceReferenceDate) {
                 return false;
             }

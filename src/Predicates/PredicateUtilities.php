@@ -217,7 +217,7 @@ final class PredicateUtilities
             "int", "integer" => new Number($value)->intValue,
             "float", "double" => new Number($value)->floatValue,
             "bool", "boolean" => new Number($value)->boolValue,
-            Date::class => new Date(new Number($value)->floatValue),
+            Date::class => Date::dateWithTimeIntervalSince1970(new Number($value)->floatValue),
             Number::class => new Number($value),
             default => $value
                     |> human_readable_value(...)
@@ -309,7 +309,7 @@ final class PredicateUtilities
      */
     public static function lastDay(?Date $date): ?Date
     {
-        return $date ? new Date(new DateTime((string)$date)->modify("last day of this month")->getTimestamp()) : null;
+        return $date ? Date::dateWithTimeIntervalSince1970((float)new DateTime((string)$date)->modify("last day of this month")->getTimestamp()) : null;
     }
 
     public static function dayOfWeek(?Date $date): ?Number
@@ -324,7 +324,7 @@ final class PredicateUtilities
 
     public static function fromUnixTime(int|float $timestamp): Date
     {
-        return new Date((int)$timestamp);
+        return Date::dateWithTimeIntervalSince1970((float)$timestamp);
     }
 
     /**
@@ -341,7 +341,7 @@ final class PredicateUtilities
     public static function addTime(Date|string|null $datetime, string $time): Date
     {
         [$h, $m, $s] = array_map(intval(...), explode(":", $time));
-        return new Date(new DateTime((string)$datetime)->add(new DateInterval("PT{$h}H{$m}M{$s}S"))->getTimestamp());
+        return Date::dateWithTimeIntervalSince1970((float)new DateTime((string)$datetime)->add(new DateInterval("PT{$h}H{$m}M{$s}S"))->getTimestamp());
     }
 
     /**
@@ -350,7 +350,7 @@ final class PredicateUtilities
     public static function subTime(Date|string|null $datetime, string $time): Date
     {
         [$h, $m, $s] = array_map(intval(...), explode(":", $time));
-        return new Date(new DateTime((string)$datetime)->sub(new DateInterval("PT{$h}H{$m}M{$s}S"))->getTimestamp());
+        return Date::dateWithTimeIntervalSince1970((float)new DateTime((string)$datetime)->sub(new DateInterval("PT{$h}H{$m}M{$s}S"))->getTimestamp());
     }
 
     /**
@@ -367,7 +367,7 @@ final class PredicateUtilities
             "SECOND" => "PT{$interval}S",
             default => throw new InvalidArgumentException("Unidad no válida: $unit")
         };
-        return new Date(new DateTime((string)$date)->add(new DateInterval($format))->getTimestamp());
+        return Date::dateWithTimeIntervalSince1970((float)new DateTime((string)$date)->add(new DateInterval($format))->getTimestamp());
     }
 
     /**
@@ -384,7 +384,7 @@ final class PredicateUtilities
             "SECOND" => "PT{$interval}S",
             default => throw new InvalidArgumentException("Unidad no válida: $unit")
         };
-        return new Date(new DateTime((string)$date)->sub(new DateInterval($format))->getTimestamp());
+        return Date::dateWithTimeIntervalSince1970((float)new DateTime((string)$date)->sub(new DateInterval($format))->getTimestamp());
     }
 
     public static function round(Number|float $value, int $precision = 0): Number

@@ -80,7 +80,7 @@ final readonly class PropertyListSerializer
             "integer" => (int)$element->nodeValue,
             "real" => (float)$element->nodeValue,
             "true", "false" => filter_var($element->nodeName, FILTER_VALIDATE_BOOLEAN),
-            "date" => new Date(strtotime((string)$element->nodeValue)),
+            "date" => Date::dateWithTimeIntervalSince1970((float)strtotime((string)$element->nodeValue)),
             default => $element->nodeValue,
         };
     }
