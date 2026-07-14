@@ -112,6 +112,9 @@ switch ($path) {
         header("Set-Cookie: session=abc123; Path=/");
         echo "cookie set";
         break;
+    case "/show-cookies":
+        echo $_COOKIE["session"] ?? "none";
+        break;
     default:
         http_response_code(500);
         echo "unexpected path $path";
@@ -204,6 +207,11 @@ try {
     $stored = $storage->cookies->first(fn(HTTPCookie $cookie): bool => $cookie->name === "session");
     $check($stored instanceof HTTPCookie, "the Set-Cookie header lands in the shared cookie storage");
     $check($stored instanceof HTTPCookie && $stored->value === "abc123", "the stored cookie keeps its value");
+
+    // Round-trip: the configuration attaches stored cookies to subsequent requests
+    // (httpShouldSetCookies), so the server must see the cookie back.
+    [$data, , $error] = await_data_task($session, new URLRequest(new URL("http://$host/show-cookies?r=$unique")));
+    $check($error === null && $data === "abc123", "stored cookies are sent back on subsequent requests");
 
     // -----------------------------------------------------------------------
     $section("download task");
