@@ -211,13 +211,18 @@ final class FileManager extends ObjectClass
      * If false, this method fails if any of the intermediate parent directories do not exist.
      * @param Dictionary|null $attributes The file attributes for the new directory.
      * You can set the owner and group numbers, file permissions, and modification date.
-     * @return bool true if the directory was created, true if createIntermediates is set and the directory already exists, or false if an error occurred.
-     * @throws Exception This method fails if any of the intermediate parent directories does not exist.
+     * @return bool true if the directory was created, or true if createIntermediates is set and the directory already exists.
+     * @throws Exception Like the Swift API, failures are reported by throwing rather than by returning false:
+     * an intermediate parent directory that does not exist while $createIntermediates is false,
+     * an existing item at $url while $createIntermediates is false, insufficient permissions, and so on.
      */
     public function createDirectory(URL $url, bool $createIntermediates = false, ?Dictionary $attributes = null): bool
     {
         return unsafe_value(function () use ($url, $createIntermediates, $attributes): bool {
             $path = $url->path;
+            if ($createIntermediates && is_dir($path)) {
+                return true;
+            }
             /** @var int $posixPermissions */
             $posixPermissions = $attributes?->valueForKey(FileAttributeKey::posixPermissions) ?? 0755;
             if (mkdir($path, $posixPermissions, $createIntermediates)) {
@@ -239,8 +244,8 @@ final class FileManager extends ObjectClass
      * @param string $path The path for the new file.
      * @param string|null $data A data object containing the contents of the new file.
      * @param Dictionary|null $attributes A dictionary containing the attributes to associate with the new file. You can use these attributes to set the owner and group numbers, file permissions, and modification date. For a list of keys, see {@see FileAttributeKey}. If you specify null for attributes, the file is created with a set of default attributes.
-     * @return bool true if the operation was successful or if the item already exists, otherwise false.
-     * @throws Exception
+     * @return bool true if the operation was successful or if the item already exists.
+     * @throws Exception Like the Swift API, failures (a missing parent directory, insufficient permissions, and so on) are reported by throwing rather than by returning false.
      */
     public function createFile(string $path, ?string $data, ?Dictionary $attributes = null): bool
     {
@@ -263,18 +268,18 @@ final class FileManager extends ObjectClass
      * Removes the file or directory at the specified URL.
      * @param URL $fileURL A file URL specifying the file or directory to remove.
      * If the URL specifies a directory, the contents of that directory are recursively removed.
-     * @return bool true if the item was removed successfully. Returns false if an error occurred.
-     * If the delegate stops the operation for a file, this method returns true.
-     * However, if the delegate stops the operation for a directory, this method returns false.
-     * @throws Exception
+     * If the URL specifies a symbolic link, the link itself is removed, not its target.
+     * @return bool true if the item was removed successfully.
+     * Returns false if no item exists at $fileURL or if the delegate stopped the operation.
+     * @throws Exception Like the Swift API, failures (insufficient permissions and so on) are reported by throwing rather than by returning false.
      */
     public function removeItem(URL $fileURL): bool
     {
-        return $this->fileExists($fileURL->path) && unsafe_value(function () use ($fileURL): bool {
+        return ($this->fileExists($fileURL->path) || is_link($fileURL->path)) && unsafe_value(function () use ($fileURL): bool {
                 $process = function () use ($fileURL): bool {
                     $path = $fileURL->path;
                     if (is_link($path)) {
-                        return true;
+                        return PHP_OS_FAMILY === "Windows" && is_dir($path) ? rmdir($path) : unlink($path);
                     }
                     if (!$fileURL->hasDirectoryPath) {
                         return unlink($path);
@@ -305,14 +310,13 @@ final class FileManager extends ObjectClass
     {
         $directory = $this->url(SearchPathDirectory::trashDirectory, SearchPathDomainMask::local, null, true);
         $filename = (function (string $name, string $extension, URL $directoryURL): string {
+            $filename = $extension === "" ? $name : "$name.$extension";
             $index = 1;
-            while ($this->fileExists($directoryURL->appendingPathComponent($name)->appendingPathExtension($extension)->path)) {
-                $name = preg_replace("/\d+/u", "", $name)
-                        |> human_readable_value(...)
-                        |> (fn(string $x): string => sprintf("%s%d", $x, $index));
+            while ($this->fileExists($directoryURL->appendingPathComponent($filename)->path)) {
+                $filename = $extension === "" ? sprintf("%s %d", $name, $index) : sprintf("%s %d.%s", $name, $index, $extension);
                 $index++;
             }
-            return "$name.$extension";
+            return $filename;
         })($url->deletingPathExtension()->lastPathComponent, $url->pathExtension, $directory);
         $resultingItemURL = $directory->appendingPathComponent($filename);
         return $this->moveItem($url, $resultingItemURL);
@@ -324,27 +328,51 @@ final class FileManager extends ObjectClass
      * The URL in this parameter must not be a file reference URL.
      * @param URL $destinationURL The URL at which to place the copy of srcURL.
      * The URL in this parameter must not be a file reference URL and must include the name of the file in its new location.
-     * @return bool true if the item was copied successfully or the file manager's delegate stopped the operation deliberately.
-     * Returns false if an error occurred.
+     * @return bool true if the item was copied successfully, or false if the file manager's delegate stopped the operation.
      * When copying items, the current process must have permission to read the file or directory at sourceURL and write the parent directory of destinationURL.
      * If the item at srcURL is a directory, this method copies the directory and all of its contents, including any hidden files.
-     * If a file with the same name already exists at dstURL, this method stops the copy attempt and returns an appropriate error.
      * If the last component of srcURL is a symbolic link, only the link is copied to the new path.
      * Before copying each item, the file manager asks its delegate if it should actually do so.
      * It does this by calling the {@see FileManagerDelegate::fileManagerShouldCopyItemAtURL()} method;
+     * for a directory, the delegate is asked once for the directory and once for each item inside it.
      * If the delegate method returns true, or if the delegate does not implement the appropriate methods,
-     * the file manager proceeds to copy the file or directory
-     * @throws Exception
+     * the file manager proceeds to copy the file or directory.
+     * @throws Exception Like the Swift API, failures are reported by throwing rather than by returning false:
+     * an item already existing at destinationURL, insufficient permissions, and so on.
      */
     public function copyItem(URL $sourceURL, URL $destinationURL): bool
     {
         return unsafe_value(function () use ($sourceURL, $destinationURL): bool {
-            $process = fn(): bool => copy($sourceURL->path, $destinationURL->path);
-            if ($delegate = $this->delegate) {
-                return $delegate->fileManagerShouldCopyItemAtURL($this, $sourceURL, $destinationURL) && $process();
+            if ($this->fileExists($destinationURL->path) || is_link($destinationURL->path)) {
+                fatal_error("an item already exists at \"$destinationURL->path\"");
             }
-            return $process();
+            return $this->copyItemProcess($sourceURL, $destinationURL);
         });
+    }
+
+    private function copyItemProcess(URL $sourceURL, URL $destinationURL): bool
+    {
+        if ($delegate = $this->delegate) {
+            if (!$delegate->fileManagerShouldCopyItemAtURL($this, $sourceURL, $destinationURL)) {
+                return false;
+            }
+        }
+        $path = $sourceURL->path;
+        if (is_link($path)) {
+            return symlink(readlink($path), $destinationURL->path);
+        }
+        if (!is_dir($path)) {
+            return copy($path, $destinationURL->path);
+        }
+        if (!mkdir($destinationURL->path)) {
+            return false;
+        }
+        foreach ($this->contentsOfDirectory($sourceURL) as $childURL) {
+            if (!$this->copyItemProcess($childURL, $destinationURL->appendingPathComponent($childURL->lastPathComponent))) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -353,15 +381,14 @@ final class FileManager extends ObjectClass
      * The URL in this parameter must not be a file reference URL.
      * @param URL $destinationURL The new location for the item in sourceURL.
      * The URL in this parameter must not be a file reference URL and must include the name of the file or directory in its new location.
-     * @return bool true if the item was moved successfully or the file manager's delegate stopped the operation deliberately. Returns false if an error occurred.
+     * @return bool true if the item was moved successfully, or false if the file manager's delegate stopped the operation.
      * When moving items, the current process must have permission to read the item at sourceURL and write the parent directory of destinationURL.
      * If the item at srcURL is a directory, this method moves the directory and all of its contents, including any hidden files.
-     * If an item with the same name already exists at dstURL, this method stops the move attempt and returns an appropriate error.
      * Before moving the item, the file manager asks its delegate if it should actually move it.
      * It does this by calling the {@see FileManagerDelegate::fileManagerShouldMoveItemAtURL()} method.
      * If the item being moved is a directory, the file manager notifies the delegate only for the directory itself and not for any of its contents.
      * If the delegate method returns true, or if the delegate does not implement the appropriate methods, the file manager moves the file.
-     * @throws Exception
+     * @throws Exception Like the Swift API, failures (insufficient permissions and so on) are reported by throwing rather than by returning false.
      */
     public function moveItem(URL $sourceURL, URL $destinationURL): bool
     {
@@ -379,13 +406,13 @@ final class FileManager extends ObjectClass
      * @param URL $sourceURL The file URL at which to create the new symbolic link. The last path component of the URL is issued as the name of the link.
      * @param URL $destinationURL The file URL that contains the item to be pointed to by the link.
      * In other words, this is the destination of the link.
-     * @return bool true if the symbolic link was created or false if an error occurred.
-     * This method also returns false if a file, directory, or link already exists at url.
-     * @throws Exception
+     * @return bool true if the symbolic link was created.
+     * @throws Exception Like the Swift API, failures are reported by throwing rather than by returning false:
+     * a file, directory, or link already existing at $sourceURL, insufficient permissions, and so on.
      */
     public function createSymbolicLink(URL $sourceURL, URL $destinationURL): bool
     {
-        return unsafe_value(fn(): bool => symlink($sourceURL->fileSystemRepresentation, $destinationURL->path));
+        return unsafe_value(fn(): bool => symlink($destinationURL->fileSystemRepresentation, $sourceURL->path));
     }
 
     /**
@@ -394,9 +421,9 @@ final class FileManager extends ObjectClass
      * The URL in this parameter must not be a file reference URL; it must specify the actual path to the item.
      * @param URL $destinationURL The file URL that specifies where you want to create the hard link.
      * The URL in this parameter must not be a file reference URL; it must specify the actual path to the item.
-     * @return bool true if the hard link was created or false if an error occurred.
-     * This method also returns false if a file, directory, or link already exists at destinationURL.
-     * @throws Exception
+     * @return bool true if the hard link was created, or false if the file manager's delegate stopped the operation.
+     * @throws Exception Like the Swift API, failures are reported by throwing rather than by returning false:
+     * a file, directory, or link already existing at destinationURL, insufficient permissions, and so on.
      */
     public function linkItem(URL $sourceURL, URL $destinationURL): bool
     {
@@ -465,12 +492,14 @@ final class FileManager extends ObjectClass
 
     /**
      * Returns a Boolean value that indicates whether the invoking object appears able to delete a specified file.
+     *
+     * Deleting an item requires write permission on its parent directory, not on the item itself.
      * @param string $path A file path.
      * @return bool true if the current process has delete privileges for the file at $path; otherwise false if the process does not have delete privileges or the existence of the file could not be determined.
      */
     public function isDeletableFile(string $path): bool
     {
-        return is_writable($path);
+        return ($this->fileExists($path) || is_link($path)) && is_writable(dirname($path));
     }
 
     /**
@@ -498,7 +527,7 @@ final class FileManager extends ObjectClass
             FileAttributeKey::immutable => !is_writable($path),
             FileAttributeKey::size => filesize($path),
             FileAttributeKey::type => filetype($path),
-            FileAttributeKey::posixPermissions => fileperms($path),
+            FileAttributeKey::posixPermissions => fileperms($path) & 0o7777,
             FileAttributeKey::groupOwnerAccountID => filegroup($path),
             FileAttributeKey::ownerAccountID => fileowner($path)
         ]));

@@ -12,11 +12,20 @@ declare(strict_types=1);
  *  - URLDirectoryEnumerator receives SplFileInfo objects from its iterator and must cast
  *    them before handing them to URL::fileURL() (a TypeError under strict_types);
  *  - hasDirectoryPath / fileSystemRepresentation must work with Windows drive paths
- *    ("/C:/..." vs "C:/...").
+ *    ("/C:/..." vs "C:/...");
+ *  - removeItem must delete symbolic links instead of silently reporting success;
+ *  - createSymbolicLink must create the link at $sourceURL pointing to $destinationURL
+ *    (the arguments used to be fed to symlink() in the wrong order);
+ *  - copyItem must copy directories recursively and refuse an existing destination;
+ *  - isDeletableFile must check the parent directory's writability, not the file's;
+ *  - trashItem must keep digits in colliding names and not add a trailing dot to
+ *    extensionless files;
+ *  - attributesOfItem must expose posixPermissions without filetype bits.
  */
 
 namespace Sabatier\Foundation\Tests;
 
+use Sabatier\Foundation\FileAttributeKey;
 use Sabatier\Foundation\FileManager;
 use Sabatier\Foundation\URL;
 
@@ -70,6 +79,7 @@ mkdir($root . DIRECTORY_SEPARATOR . "sub", 0777, true);
 file_put_contents($root . DIRECTORY_SEPARATOR . "a.txt", "alpha");
 file_put_contents($root . DIRECTORY_SEPARATOR . "sub" . DIRECTORY_SEPARATOR . "b.txt", "beta");
 $rootURL = URL::fileURL($root);
+$originalPWD = $_SERVER["PWD"] ?? null;
 
 try {
     // -----------------------------------------------------------------------
@@ -111,6 +121,7 @@ try {
     $created = $rootURL->appendingPathComponent("nested")->appendingPathComponent("deep");
     $check($manager->createDirectory($created, true) === true, "createDirectory with intermediates");
     $check($manager->fileExists($created->fileSystemRepresentation, $isDirectory) && $isDirectory, "created directory exists");
+    $check($manager->createDirectory($created, true) === true, "createDirectory with intermediates succeeds when the directory already exists");
 
     $check($manager->createFile($root . DIRECTORY_SEPARATOR . "c.txt", "gamma") === true, "createFile");
     $check($manager->contents($root . DIRECTORY_SEPARATOR . "c.txt") === "gamma", "createFile writes the data");
@@ -131,6 +142,117 @@ try {
     $check($manager->removeItem($sourceURL) === true, "removeItem cleans up");
 
     // -----------------------------------------------------------------------
+    $section("directory copy");
+    // -----------------------------------------------------------------------
+
+    $treeURL = $rootURL->appendingPathComponent("tree");
+    $manager->createDirectory($treeURL->appendingPathComponent("inner"), true);
+    $manager->createFile($root . DIRECTORY_SEPARATOR . "tree" . DIRECTORY_SEPARATOR . "one.txt", "uno");
+    $manager->createFile($root . DIRECTORY_SEPARATOR . "tree" . DIRECTORY_SEPARATOR . ".hidden", "oculto");
+    $manager->createFile($root . DIRECTORY_SEPARATOR . "tree" . DIRECTORY_SEPARATOR . "inner" . DIRECTORY_SEPARATOR . "two.txt", "dos");
+
+    $treeCopyURL = $rootURL->appendingPathComponent("tree-copy");
+    $check($manager->copyItem($treeURL, $treeCopyURL) === true, "copyItem copies a directory");
+    $treeCopyPath = $root . DIRECTORY_SEPARATOR . "tree-copy";
+    $check($manager->contents($treeCopyPath . DIRECTORY_SEPARATOR . "one.txt") === "uno", "the copy contains the direct children");
+    $check($manager->contents($treeCopyPath . DIRECTORY_SEPARATOR . "inner" . DIRECTORY_SEPARATOR . "two.txt") === "dos", "copyItem descends into subdirectories");
+    $check($manager->fileExists($treeCopyPath . DIRECTORY_SEPARATOR . ".hidden") === true, "copyItem includes hidden files");
+    $check($manager->contents($root . DIRECTORY_SEPARATOR . "tree" . DIRECTORY_SEPARATOR . "one.txt") === "uno", "copyItem keeps the source tree");
+
+    $threw = false;
+    try {
+        $manager->copyItem($treeURL, $treeCopyURL);
+    } catch (\Throwable) {
+        $threw = true;
+    }
+    $check($threw, "copyItem throws when the destination already exists");
+
+    $check($manager->removeItem($treeCopyURL) === true, "removeItem on a directory tree");
+    $check($manager->fileExists($treeCopyPath) === false, "the removed tree no longer exists");
+
+    // -----------------------------------------------------------------------
+    $section("symbolic links");
+    // -----------------------------------------------------------------------
+
+    $linkPath = $root . DIRECTORY_SEPARATOR . "a-link.txt";
+    $linkURL = $rootURL->appendingPathComponent("a-link.txt");
+    $linkTargetURL = $rootURL->appendingPathComponent("a.txt");
+    $linkSupported = true;
+    try {
+        $manager->createSymbolicLink($linkURL, $linkTargetURL);
+    } catch (\Throwable) {
+        // Creating symlinks on Windows requires Developer Mode or elevation.
+        $linkSupported = false;
+        print "NOTE symbolic links are not supported in this environment; skipping the section" . PHP_EOL;
+    }
+    if ($linkSupported) {
+        $check(is_link($linkPath), "createSymbolicLink creates the link at the source URL");
+        $check($manager->contents($linkPath) === "alpha", "the link points at the destination URL");
+        $check($manager->destinationOfSymbolicLink($linkPath) === realpath($root . DIRECTORY_SEPARATOR . "a.txt"), "destinationOfSymbolicLink reads the link back");
+        $check($manager->removeItem($linkURL) === true, "removeItem on a symlink");
+        $check(is_link($linkPath) === false, "removeItem deletes the link itself");
+        $check($manager->fileExists($root . DIRECTORY_SEPARATOR . "a.txt") === true, "removeItem keeps the link target");
+    }
+
+    // -----------------------------------------------------------------------
+    $section("deletability");
+    // -----------------------------------------------------------------------
+
+    $check($manager->isDeletableFile($root . DIRECTORY_SEPARATOR . "a.txt") === true, "isDeletableFile is true for a file in a writable directory");
+    $check($manager->isDeletableFile($root . DIRECTORY_SEPARATOR . "missing.bin") === false, "isDeletableFile is false for a missing file");
+    if (PHP_OS_FAMILY !== "Windows") {
+        // POSIX only: Windows ignores the write bit on directories.
+        $lockedPath = $root . DIRECTORY_SEPARATOR . "locked";
+        mkdir($lockedPath);
+        file_put_contents($lockedPath . DIRECTORY_SEPARATOR . "captive.txt", "x");
+        chmod($lockedPath . DIRECTORY_SEPARATOR . "captive.txt", 0666);
+        chmod($lockedPath, 0555);
+        $check($manager->isDeletableFile($lockedPath . DIRECTORY_SEPARATOR . "captive.txt") === false, "isDeletableFile is false for a writable file in a read-only directory");
+        chmod($lockedPath, 0755);
+    }
+
+    // -----------------------------------------------------------------------
+    $section("attributes");
+    // -----------------------------------------------------------------------
+
+    $attributes = $manager->attributesOfItem($root . DIRECTORY_SEPARATOR . "a.txt");
+    $permissions = $attributes[FileAttributeKey::posixPermissions];
+    $check(is_int($permissions) && ($permissions & ~0o7777) === 0, "posixPermissions carries permission bits only, no filetype bits");
+    $check($attributes[FileAttributeKey::size] === 5, "the size attribute matches the contents");
+
+    // -----------------------------------------------------------------------
+    $section("trash");
+    // -----------------------------------------------------------------------
+
+    // documentRootDirectory honors $_SERVER["PWD"] on the CLI and is lazy per instance,
+    // so a fresh manager confines the Trash directory to the sandbox.
+    $_SERVER["PWD"] = $root;
+    $trashManager = new FileManager();
+    $trashPath = $root . DIRECTORY_SEPARATOR . "Trash";
+
+    $victimPath = $root . DIRECTORY_SEPARATOR . "photo2024.txt";
+    $victimURL = $rootURL->appendingPathComponent("photo2024.txt");
+    $trashManager->createFile($victimPath, "first");
+    $check($trashManager->trashItem($victimURL, $trashedURL) === true, "trashItem moves the item to the trash");
+    $check($trashedURL->lastPathComponent === "photo2024.txt", "trashItem keeps the original name when it is free");
+    $check($trashManager->contents($trashPath . DIRECTORY_SEPARATOR . "photo2024.txt") === "first", "the trashed item lives in the Trash directory");
+    $check($trashManager->fileExists($victimPath) === false, "trashItem removes the original");
+
+    $trashManager->createFile($victimPath, "second");
+    $check($trashManager->trashItem($victimURL, $renamedURL) === true, "trashItem resolves a name collision");
+    $check($renamedURL->lastPathComponent === "photo2024 1.txt", "the collision name keeps the digits of the original");
+    $check($trashManager->contents($renamedURL->path) === "second", "the renamed trashed item keeps its contents");
+
+    $plainPath = $root . DIRECTORY_SEPARATOR . "README";
+    $plainURL = $rootURL->appendingPathComponent("README");
+    $trashManager->createFile($plainPath, "read me");
+    $check($trashManager->trashItem($plainURL, $plainTrashedURL) === true, "trashItem accepts an extensionless item");
+    $check($plainTrashedURL->lastPathComponent === "README", "no trailing dot is added to an extensionless name");
+    $trashManager->createFile($plainPath, "read me again");
+    $check($trashManager->trashItem($plainURL, $plainRenamedURL) === true, "trashItem resolves an extensionless collision");
+    $check($plainRenamedURL->lastPathComponent === "README 1", "the extensionless collision name has no dot either");
+
+    // -----------------------------------------------------------------------
     $section("URL filesystem semantics");
     // -----------------------------------------------------------------------
 
@@ -139,15 +261,29 @@ try {
     $expected = realpath($root . DIRECTORY_SEPARATOR . "a.txt");
     $check($expected !== false && $rootURL->appendingPathComponent("a.txt")->fileSystemRepresentation === $expected, "fileSystemRepresentation matches realpath");
 } finally {
-    @unlink($root . DIRECTORY_SEPARATOR . "a.txt");
-    @unlink($root . DIRECTORY_SEPARATOR . "c.txt");
-    @unlink($root . DIRECTORY_SEPARATOR . "c-copy.txt");
-    @unlink($root . DIRECTORY_SEPARATOR . "c-moved.txt");
-    @unlink($root . DIRECTORY_SEPARATOR . "sub" . DIRECTORY_SEPARATOR . "b.txt");
-    @rmdir($root . DIRECTORY_SEPARATOR . "sub");
-    @rmdir($root . DIRECTORY_SEPARATOR . "nested" . DIRECTORY_SEPARATOR . "deep");
-    @rmdir($root . DIRECTORY_SEPARATOR . "nested");
-    @rmdir($root);
+    if ($originalPWD === null) {
+        unset($_SERVER["PWD"]);
+    } else {
+        $_SERVER["PWD"] = $originalPWD;
+    }
+    $wipe = function (string $path) use (&$wipe): void {
+        if (is_link($path)) {
+            @unlink($path) || @rmdir($path);
+            return;
+        }
+        if (is_dir($path)) {
+            @chmod($path, 0755);
+            foreach (scandir($path) ?: [] as $entry) {
+                if ($entry !== "." && $entry !== "..") {
+                    $wipe($path . DIRECTORY_SEPARATOR . $entry);
+                }
+            }
+            @rmdir($path);
+            return;
+        }
+        @unlink($path);
+    };
+    $wipe($root);
 }
 
 FileManagerTestRunner::finish();
