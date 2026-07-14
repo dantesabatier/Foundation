@@ -219,17 +219,18 @@ try {
 
     $downloadResult = null;
     $task = $session->downloadTaskWithURL(new URL("http://$host/hello?download=$unique"), function (?URL $location, $response, $error) use (&$downloadResult): void {
-        // Read inside the handler: the file may be temporary and cleaned up afterwards.
-        $downloadResult = [$location !== null ? file_get_contents($location->fileSystemRepresentation) : null, $response, $error];
+        // Read inside the handler: the file is only valid for its duration, as in Foundation.
+        $downloadResult = [$location !== null ? file_get_contents($location->fileSystemRepresentation) : null, $response, $error, $location?->fileSystemRepresentation];
     });
     $task->resume();
     if ($downloadResult === null) {
         $session->delegateQueue->waitUntilAllOperationsAreFinished();
     }
-    [$contents, $response, $error] = $downloadResult ?? [null, null, null];
+    [$contents, $response, $error, $temporaryPath] = $downloadResult ?? [null, null, null, null];
     $check($error === null, "download task completes without error");
     $check($contents === "hello world", "the downloaded file holds the body");
     $check($response instanceof HTTPURLResponse && $response->statusCode === 200, "download task reports the response");
+    $check($temporaryPath !== null && !file_exists($temporaryPath), "the temporary file is removed after the completion handler returns");
 
     // -----------------------------------------------------------------------
     $section("upload task");

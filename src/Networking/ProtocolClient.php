@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace Sabatier\Foundation\Networking;
 
+use Exception;
 use Override;
 use Sabatier\Foundation\Dictionary;
 use Sabatier\Foundation\Error;
+use Sabatier\Foundation\FileManager;
+use Sabatier\Foundation\URL;
 use function Sabatier\Foundation\fatal_error;
 use const Sabatier\Foundation\CocoaErrorDomain;
 use const Sabatier\Foundation\UserCancelledError;
@@ -286,7 +289,10 @@ final class ProtocolClient implements URLProtocolClient
                 $delegate = $behaviour->taskDelegate;
                 if ($delegate instanceof URLSessionTaskDelegate) {
                     if ($delegate instanceof URLSessionDownloadDelegate && $task instanceof URLSessionDownloadTask) {
-                        $delegate->urlSessionDownloadTaskDidFinishDownloadingToURL($session, $task, $protocol::property("temporaryFileURL", $request));
+                        /** @var URL|null $location */
+                        $location = $protocol::property("temporaryFileURL", $request);
+                        $delegate->urlSessionDownloadTaskDidFinishDownloadingToURL($session, $task, $location);
+                        self::removeTemporaryFile($location);
                     } elseif ($delegate instanceof URLSessionWebSocketDelegate && $task instanceof URLSessionWebSocketTask) {
                         $delegate->urlSessionWebSocketTaskDidCloseWithReason($session, $task, $task->closeCode, $task->closeReason);
                     }
@@ -311,10 +317,29 @@ final class ProtocolClient implements URLProtocolClient
                 }
                 /** @var DownloadCompletionHandler $downloadCompletionHandler */
                 $downloadCompletionHandler = $behaviour->downloadCompletionHandler;
-                $downloadCompletionHandler($protocol::property("temporaryFileURL", $request), $response, null);
+                /** @var URL|null $location */
+                $location = $protocol::property("temporaryFileURL", $request);
+                $downloadCompletionHandler($location, $response, null);
+                self::removeTemporaryFile($location);
                 $session->taskRegistry->remove($task);
                 break;
         }
         $task->invalidateProtocol();
+    }
+
+    /**
+     * Removes a delivered download's temporary file. As in Foundation, the file is only valid
+     * for the duration of the delegate call or completion handler; failures are ignored because
+     * the consumer may have already moved the file into place.
+     */
+    private static function removeTemporaryFile(?URL $location): void
+    {
+        if (!$location instanceof URL) {
+            return;
+        }
+        try {
+            FileManager::default()->removeItem($location);
+        } catch (Exception) {
+        }
     }
 }
