@@ -36,19 +36,18 @@ final class Date extends ObjectClass
     }
 
     /**
-     * Creates a date value from the given number of seconds since 00:00:00 UTC on 1 January 1970,
-     * or representing the current instant when $timeIntervalSince1970 is null.
+     * Creates a date value initialized to the current date and time.
      *
-     * The parameter is deliberately Unix time — the value produced by time(), strtotime(),
-     * filemtime(), or DateTime::getTimestamp() — so the natural PHP idiom
-     * `new Date(strtotime(...))` is correct by construction. Apple's Foundation has no unlabeled
-     * float initializer; to create a date from a reference-date interval use
-     * {@see dateWithTimeIntervalSinceReferenceDate()}.
-     * @param float|null $timeIntervalSince1970 The number of seconds since 00:00:00 UTC on 1 January 1970, or null for the current date and time.
+     * The constructor takes no arguments; PHP silently ignores extra arguments to non-variadic
+     * functions, so an accidental `new Date($timestamp)` is promoted to a hard error instead of
+     * silently meaning "now". To create a date from a value, use the factory that names its
+     * epoch: {@see dateWithTimeIntervalSince1970()}, {@see dateWithTimeIntervalSinceReferenceDate()},
+     * {@see dateWithTimeIntervalSinceNow()}, or {@see dateWithTimeIntervalSinceDate()}.
      */
-    public function __construct(?float $timeIntervalSince1970 = null)
+    public function __construct()
     {
-        $this->timeIntervalSinceReferenceDate = $timeIntervalSince1970 === null ? absolute_time_get_current() : $timeIntervalSince1970 - self::timeIntervalBetween1970AndReferenceDate;
+        func_num_args() === 0 ?: fatal_error("Date() takes no arguments; use Date::dateWithTimeIntervalSince1970() or one of the other factories");
+        $this->timeIntervalSinceReferenceDate = absolute_time_get_current();
     }
 
     public function __serialize(): array
@@ -102,7 +101,7 @@ final class Date extends ObjectClass
      */
     public static function dateWithTimeIntervalSince1970(float $timeInterval): Date
     {
-        return new Date($timeInterval);
+        return Date::dateWithTimeIntervalSinceReferenceDate($timeInterval - Date::timeIntervalBetween1970AndReferenceDate);
     }
 
     /**

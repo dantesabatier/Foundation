@@ -82,11 +82,21 @@ $check(Date::dateWithTimeIntervalSince1970(1_234_567_890.5)->timeIntervalSince19
 $check(Date::dateWithTimeIntervalSinceReferenceDate(0.0)->timeIntervalSince1970 === 978_307_200.0, "the reference date itself is 978307200 in Unix time");
 $check(Date::timeIntervalBetween1970AndReferenceDate === 978_307_200.0, "the 1970-to-reference constant");
 
-// The plain constructor takes Unix seconds — the ecosystem-wide `new Date(strtotime(...))`
-// idiom must be correct by construction (Apple has no unlabeled float initializer).
-$check(new Date(0.0)->isEqual($unixEpoch), "the constructor takes Unix seconds");
-$check(new Date((float)strtotime("2024-02-10 15:30:00"))->format("Y-m-d H:i:s") === "2024-02-10 15:30:00", "new Date(strtotime(...)) round-trips through format");
-$check(new Date(529_887_685.0)->format("Y-m-d") === "1986-10-16", "a literal Unix timestamp lands on its calendar date");
+// The constructor only produces "now"; every value-based construction goes through the
+// factory that names its epoch. PHP silently ignores extra arguments to non-variadic
+// functions, so the constructor promotes them to a hard error instead of silently meaning
+// "now" — the old `new Date($timestamp)` habit fails loudly.
+$check(abs(new Date()->timeIntervalSinceNow) < 2.0, "the bare constructor is the current instant");
+try {
+    new Date(529_887_685.0);
+    $check(false, "a constructor argument must fail");
+} catch (\Sabatier\Foundation\InternalInconsistencyException) {
+    $check(true, "a constructor argument fails loudly instead of being ignored");
+}
+$check(Date::dateWithTimeIntervalSince1970((float)strtotime("2024-02-10 15:30:00"))->format("Y-m-d H:i:s") === "2024-02-10 15:30:00", "the 1970 factory round-trips through format");
+$check(Date::dateWithTimeIntervalSince1970(529_887_685.0)->format("Y-m-d") === "1986-10-16", "a literal Unix timestamp lands on its calendar date");
+$anchor = Date::dateWithTimeIntervalSinceReferenceDate(1000.0);
+$check(Date::dateWithTimeIntervalSinceDate(500.0, $anchor)->timeIntervalSinceReferenceDate === 1500.0, "dateWithTimeIntervalSinceDate offsets from the anchor");
 
 // A cookie-style numeric expiration built from Unix time must sit in the near future,
 // not 31 years away.
