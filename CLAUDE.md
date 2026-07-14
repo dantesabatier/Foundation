@@ -63,6 +63,18 @@ use RangeReplaceableCollectionAlgorithms {
 
 ~47 classes modeling NSPredicate. `Predicate` is the abstract base with factory methods (`Predicate::format()`). `PredicateScanner` parses predicate format strings; `PredicateVisitor` evaluates them against objects. Key subtypes: `ComparisonPredicate`, `CompoundPredicate` (AND/OR/NOT), and expression types (`KeyPathExpression`, `FunctionExpression`, `VariableExpression`).
 
+### Date & Time
+
+`Date` stores a true CFAbsoluteTime: seconds since 00:00:00 UTC on 1 January **2001** (`absolute_time_get_current()` is the counterpart of `CFAbsoluteTimeGetCurrent()`). The conventions are settled — do not revisit them:
+
+- **The constructor takes no arguments.** `new Date()` is the current instant; passing anything is a fatal error (guarded, because PHP would otherwise silently ignore extra arguments). Construct from a value with the factory that names its epoch, mirroring NSDate's factory surface:
+  - `Date::dateWithTimeIntervalSince1970($unix)` — for anything Unix-based: `time()`, `strtotime()`, `filemtime()`, `DateTime::getTimestamp()`, database numeric timestamps
+  - `Date::dateWithTimeIntervalSinceReferenceDate($interval)` — the primitive the others delegate to
+  - `Date::dateWithTimeIntervalSinceNow($seconds)` / `Date::dateWithTimeIntervalSinceDate($seconds, $date)`
+- **Never feed a Unix timestamp anywhere but the 1970 factory** — a raw interval lands 31 years off. CoreData persists dates as `"Y-m-d H:i:s"` strings and rebuilds them through the 1970 factory.
+- **Elapsed time is not measured with dates.** Benchmarks, timeouts, and heartbeats use `ProcessInfo::processInfo()->systemUptime` (hrtime-backed, monotonic); `absolute_time_get_current()` exists only for `Date`.
+- `format()`/`description` render through Unix time in the process time zone; pin the TZ in tests that assert formatted output.
+
 ### Networking (`src/Networking/`)
 
 ~79 files providing a URLSession-style HTTP/FTP/WebSocket client. `EasyHandle` wraps CURL. `URLSession` is the top-level API with data, download, upload, and WebSocket tasks. Authentication is handled via `URLCredential` / `URLAuthenticationChallenge`. Responses are cacheable via `URLCache`.
