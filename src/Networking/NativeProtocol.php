@@ -337,6 +337,10 @@ abstract class NativeProtocol extends URLProtocol implements EasyHandleDelegate
                 $this->client?->urlProtocolDidLoad($this, $data);
                 break;
             case DataDrainRawValue::toFile:
+                // Flush and release the drain before anyone reads the delivered file.
+                /** @noinspection PhpUnhandledExceptionInspection */
+                $bodyDataDrain->fileHandle?->close();
+                break;
             case DataDrainRawValue::ignore:
                 break;
         }

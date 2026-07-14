@@ -148,6 +148,9 @@ $check(new URLComponents("https://example.com/")->string === "https://example.co
 // An already percent-encoded password used to be encoded a second time.
 $check(new URLComponents("https://u:p%40ss@example.com/x")->string === "https://u:p%40ss@example.com/x", "password keeps single encoding through reassembly");
 
+// The scheme is case-insensitive per RFC 3986 and is canonicalized to lowercase on parse.
+$check(new URLComponents("HTTPS://example.com/a")->scheme === "https", "the scheme is canonicalized to lowercase");
+
 // "0" is a valid value for a component; empty() used to swallow it.
 $zero = new URLComponents("https://example.com/p?0");
 $check($zero->query === "0", "a query of \"0\" survives parsing");

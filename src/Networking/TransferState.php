@@ -59,7 +59,11 @@ final class TransferState
                 $bodyData .= $data;
                 return new TransferState($this->url, $this->parsedResponseHeader, $this->response, DataDrain::inMemory($bodyData));
             })(),
-            DataDrainRawValue::toFile => new TransferState($this->url, $this->parsedResponseHeader, $this->response, $this->bodyDataDrain),
+            DataDrainRawValue::toFile => (function () use ($data): TransferState {
+                /** @noinspection PhpUnhandledExceptionInspection */
+                $this->bodyDataDrain->fileHandle?->write($data);
+                return $this;
+            })(),
             DataDrainRawValue::ignore => $this
         };
     }

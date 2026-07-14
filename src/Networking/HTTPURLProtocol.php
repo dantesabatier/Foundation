@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Sabatier\Foundation\Networking;
 
-use CURLFile;
 use Exception;
 use Locale;
 use Override;
@@ -15,10 +14,10 @@ use Sabatier\Foundation\Dictionary;
 use Sabatier\Foundation\Error;
 use Sabatier\Foundation\ProcessInfo;
 use Sabatier\Foundation\URL;
-use Sabatier\Foundation\URLFileTypeMappings;
 use function Sabatier\Foundation\fatal_error;
 use function Sabatier\Foundation\localized_string;
 use function Sabatier\Foundation\string_is_equal;
+use function Sabatier\Foundation\unsafe_value;
 use const Sabatier\Foundation\CocoaErrorDomain;
 use const Sabatier\Foundation\LocalizedDescriptionKey;
 use const Sabatier\Foundation\URLErrorDomain;
@@ -167,7 +166,13 @@ class HTTPURLProtocol extends NativeProtocol
                     if ($data = $body->data) {
                         $easyHandle->set($data, CURLOPT_POSTFIELDS);
                     } elseif ($fileURL = $body->fileURL) {
-                        $easyHandle->set(["file" => new CURLFile($fileURL->path, URLFileTypeMappings::shared()->mimeType($fileURL->pathExtension) ?? "application/octet-stream", $fileURL->lastPathComponent)], CURLOPT_POSTFIELDS);
+                        // Upload the raw file contents as the request body (Foundation semantics),
+                        // not a multipart form field. The read callback streams from CURLOPT_INFILE.
+                        $easyHandle->setInputFile(unsafe_value(fn(): mixed => fopen($fileURL->fileSystemRepresentation, "r")));
+                        $easyHandle->setUpload(true);
+                    } elseif (($stream = $body->stream) !== null) {
+                        $easyHandle->setInputFile($stream);
+                        $easyHandle->setUpload(true);
                     }
                     if ($length = $body->getBodyLength()) {
                         $easyHandle->setRequestBodyLength($length);

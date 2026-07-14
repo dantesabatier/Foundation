@@ -123,6 +123,10 @@ final class URLComponents extends ObjectClass
             foreach ($components as $key => $value) {
                 if ($key === "pass") {
                     $key = "password";
+                } elseif ($key === "scheme") {
+                    // The scheme is case-insensitive per RFC 3986 section 6.2.2.1; canonicalize it
+                    // so downstream comparisons ("file", "https", ...) hold.
+                    $value = strtolower((string)$value);
                 }
                 if ($value !== "") {
                     $this->$key = $value;

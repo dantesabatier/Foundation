@@ -18,6 +18,8 @@ declare(strict_types=1);
 
 namespace Sabatier\Foundation\Tests;
 
+use Sabatier\Foundation\Networking\HTTPCookie;
+use Sabatier\Foundation\Networking\HTTPCookieStorage;
 use Sabatier\Foundation\Networking\HTTPRequestMethod;
 use Sabatier\Foundation\Networking\HTTPURLResponse;
 use Sabatier\Foundation\Networking\URLRequest;
@@ -106,6 +108,10 @@ switch ($path) {
         http_response_code(404);
         echo "not found";
         break;
+    case "/set-cookie":
+        header("Set-Cookie: session=abc123; Path=/");
+        echo "cookie set";
+        break;
     default:
         http_response_code(500);
         echo "unexpected path $path";
@@ -187,6 +193,59 @@ try {
     [$data, , $error] = await_data_task($session, $request);
     $check($error === null, "POST request completes");
     $check($data === "SABATIER FOUNDATION", "the request body reaches the server and the echo comes back");
+
+    // -----------------------------------------------------------------------
+    $section("cookies");
+    // -----------------------------------------------------------------------
+
+    [$data, , $error] = await_data_task($session, new URLRequest(new URL("http://$host/set-cookie?r=$unique")));
+    $check($error === null && $data === "cookie set", "set-cookie endpoint responds");
+    $storage = HTTPCookieStorage::shared();
+    $stored = $storage->cookies->first(fn(HTTPCookie $cookie): bool => $cookie->name === "session");
+    $check($stored instanceof HTTPCookie, "the Set-Cookie header lands in the shared cookie storage");
+    $check($stored instanceof HTTPCookie && $stored->value === "abc123", "the stored cookie keeps its value");
+
+    // -----------------------------------------------------------------------
+    $section("download task");
+    // -----------------------------------------------------------------------
+
+    $downloadResult = null;
+    $task = $session->downloadTaskWithURL(new URL("http://$host/hello?download=$unique"), function (?URL $location, $response, $error) use (&$downloadResult): void {
+        // Read inside the handler: the file may be temporary and cleaned up afterwards.
+        $downloadResult = [$location !== null ? file_get_contents($location->fileSystemRepresentation) : null, $response, $error];
+    });
+    $task->resume();
+    if ($downloadResult === null) {
+        $session->delegateQueue->waitUntilAllOperationsAreFinished();
+    }
+    [$contents, $response, $error] = $downloadResult ?? [null, null, null];
+    $check($error === null, "download task completes without error");
+    $check($contents === "hello world", "the downloaded file holds the body");
+    $check($response instanceof HTTPURLResponse && $response->statusCode === 200, "download task reports the response");
+
+    // -----------------------------------------------------------------------
+    $section("upload task");
+    // -----------------------------------------------------------------------
+
+    $uploadSource = sys_get_temp_dir() . DIRECTORY_SEPARATOR . "sabatier-upload-" . getmypid() . ".txt";
+    file_put_contents($uploadSource, "upload payload");
+    try {
+        $uploadResult = null;
+        $request = new URLRequest(new URL("http://$host/echo?upload=$unique"));
+        $request->httpMethod = HTTPRequestMethod::post;
+        $task = $session->uploadTaskWithRequest($request, URL::fileURL($uploadSource), function (?string $data, $response, $error) use (&$uploadResult): void {
+            $uploadResult = [$data, $response, $error];
+        });
+        $task->resume();
+        if ($uploadResult === null) {
+            $session->delegateQueue->waitUntilAllOperationsAreFinished();
+        }
+        [$data, , $error] = $uploadResult ?? [null, null, null];
+        $check($error === null, "upload task completes without error");
+        $check($data === "UPLOAD PAYLOAD", "the uploaded file body reaches the server");
+    } finally {
+        @unlink($uploadSource);
+    }
 
     // -----------------------------------------------------------------------
     $section("transport errors");

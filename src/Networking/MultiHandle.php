@@ -85,9 +85,9 @@ final class MultiHandle
         do {
             curl_multi_exec($this->rawHandle, $running);
             curl_multi_select($this->rawHandle);
-            /** @var array{msg: int, result: int, handle: ?CurlHandle} $info */
+            /** @var array{msg: int, result: int, handle: ?CurlHandle}|false $info */
             $info = curl_multi_info_read($this->rawHandle);
-            if (!($handle = $info["handle"])) {
+            if (!$info || !($handle = $info["handle"])) {
                 break;
             }
             $code = $info["result"];

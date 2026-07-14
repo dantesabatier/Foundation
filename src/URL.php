@@ -86,7 +86,7 @@ final class URL extends ObjectClass
     /** @var string A string containing the URL's file system path, in the platform's native form. */
     public string $fileSystemRepresentation {
         get {
-            $path = self::nativePath($this->path);
+            $path = $this->nativeFileSystemPath();
             $resolved = new SplFileInfo($path)->getRealPath();
             return $resolved === false ? $path : $resolved;
         }
@@ -185,7 +185,7 @@ final class URL extends ObjectClass
     public bool $hasDirectoryPath {
         get {
             if ($this->isFileURL) {
-                $path = self::nativePath($this->path);
+                $path = $this->nativeFileSystemPath();
                 if (file_exists($path)) {
                     return is_dir($path);
                 }
@@ -349,6 +349,17 @@ final class URL extends ObjectClass
     }
 
     /**
+     * Returns the platform-native filesystem path of a file URL, restoring the UNC authority
+     * ("file://server/share" becomes "//server/share") when the URL carries a host.
+     */
+    private function nativeFileSystemPath(): string
+    {
+        $path = self::nativePath($this->path);
+        $host = $this->host;
+        return $host !== null && $host !== "" ? "//$host$path" : $path;
+    }
+
+    /**
      * Percent-encodes each segment of a path component for schemes whose paths are expected to be
      * encoded, leaving Windows drive segments and already-encoded input intact.
      */
@@ -376,6 +387,10 @@ final class URL extends ObjectClass
     public static function fileURL(string $path, ?URL $base = null): URL
     {
         $path = str_replace("\\", "/", $path);
+        if (str_starts_with($path, "//")) {
+            // A UNC path (\\server\share) becomes an authority-form file URL: file://server/share.
+            return new URL("file:$path", $base);
+        }
         if (!str_starts_with($path, "/")) {
             $path = "/$path";
         }
@@ -390,7 +405,7 @@ final class URL extends ObjectClass
     {
         $path = $this->rawPath();
         if (!str_ends_with($path, "/")) {
-            if ($this->isFileURL && FileManager::default()->fileExists(self::nativePath($this->path), $isDirectory) && !$isDirectory) {
+            if ($this->isFileURL && FileManager::default()->fileExists($this->nativeFileSystemPath(), $isDirectory) && !$isDirectory) {
                 fatal_error("Cannot append components to a file");
             }
             $path .= "/";
@@ -587,7 +602,7 @@ final class URL extends ObjectClass
      */
     public function resolveSymlinksInPath(): URL
     {
-        if ($this->isFileURL && ($resolved = realpath(self::nativePath($this->path))) !== false) {
+        if ($this->isFileURL && ($resolved = realpath($this->nativeFileSystemPath())) !== false) {
             $this->string = URL::fileURL($resolved)->string;
             $this->baseURL = null;
             $this->components = null;

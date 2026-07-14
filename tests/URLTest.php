@@ -243,6 +243,18 @@ $check(URL::fileURL("C:/Temp/My Files")->absoluteString === "file:///C:/Temp/My%
 $check(in_array(URL::fileURL("C:/Temp/My Files")->path, ["C:/Temp/My Files", "/C:/Temp/My Files"], true), "file URL path decodes back");
 $check(URL::fileURL("C:/Temp")->isFileURL === true, "fileURL creates a file URL");
 
+// A UNC path becomes an authority-form file URL and its native path restores the authority.
+$unc = URL::fileURL("\\\\server\\share\\file.txt");
+$check($unc->absoluteString === "file://server/share/file.txt", "UNC path becomes an authority-form file URL");
+$check($unc->host === "server", "the UNC server is the URL host");
+$check($unc->path === "/share/file.txt", "the UNC share is the URL path");
+$check($unc->fileSystemRepresentation === "//server/share/file.txt", "fileSystemRepresentation restores the UNC authority");
+
+// The scheme is case-insensitive per RFC 3986; it is canonicalized to lowercase.
+$check(new URL("HTTPS://EXAMPLE.com/Path")->scheme === "https", "an uppercase scheme parses and canonicalizes");
+$check(new URL("HTTPS://EXAMPLE.com/Path")->host === "EXAMPLE.com", "only the scheme is canonicalized, not the host string");
+$check(new URL("FILE:///C:/Temp/x.txt")->isFileURL === true, "isFileURL holds for an uppercase scheme");
+
 $temporaryDirectory = sys_get_temp_dir() . DIRECTORY_SEPARATOR . "sabatier-url-test-" . getmypid();
 mkdir($temporaryDirectory);
 file_put_contents($temporaryDirectory . DIRECTORY_SEPARATOR . "file.txt", "x");

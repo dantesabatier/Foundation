@@ -42,7 +42,7 @@ namespace Sabatier\Foundation;
  */
 function is_parseable_url(string $url): bool
 {
-    return preg_match("/^(https?|ftps?|wss?|sftp|ssh|file|data|sql|redis|mongodb|postgresql|mysql|ssl|tcp|amqps?|ldaps?|php|git|x-coredata):\\/\\//", $url) === 1;
+    return preg_match("/^(https?|ftps?|wss?|sftp|ssh|file|data|sql|redis|mongodb|postgresql|mysql|ssl|tcp|amqps?|ldaps?|php|git|x-coredata):\\/\\//i", $url) === 1;
 }
 
 /**

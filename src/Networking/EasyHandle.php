@@ -109,7 +109,7 @@ final class EasyHandle
             $absoluteURL = $url->absoluteURL;
             $components = new URLComponents($absoluteURL->absoluteString);
             $components->scheme = $absoluteURL->scheme === "wss" ? "ssl" : "tcp";
-            $components->port = $absoluteURL->port ?? $absoluteURL->scheme === "wss" ? 443 : 80;
+            $components->port = $absoluteURL->port ?? ($absoluteURL->scheme === "wss" ? 443 : 80);
             /** @var URL $url */
             $url = $components->url;
             $authority = (string)$url->host;
