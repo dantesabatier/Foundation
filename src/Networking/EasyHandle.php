@@ -291,7 +291,7 @@ final class EasyHandle
             $this->updateProgressMeter(new EasyHandleProgress($totalBytesSent, $totalBytesExpectedToSend, $totalBytesReceived, $totalBytesExpectedToReceive));
             return CURLE_OK;
         }, CURLOPT_PROGRESSFUNCTION);
-        $this->set(fn(CurlHandle $handle, string $data): int => $this->didReceiveHeaderData($data, curl_getinfo($handle, CURLINFO_CONTENT_LENGTH_DOWNLOAD)), CURLOPT_HEADERFUNCTION);
+        $this->set(fn(CurlHandle $handle, string $data): int => $this->didReceiveHeaderData($data, (int)curl_getinfo($handle, CURLINFO_CONTENT_LENGTH_DOWNLOAD)), CURLOPT_HEADERFUNCTION);
     }
 
     public function urlErrorCode(int $easyCode): ?int

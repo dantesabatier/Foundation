@@ -190,6 +190,12 @@ $check($dictionary->mapValues(fn(int $value): int => $value * 2)->array === ["a"
 $check($dictionary->compactMapValues(fn(int $value): ?int => $value > 1 ? $value : null)->array === ["b" => 2, "c" => 3], "compactMapValues keeps keys and drops nulls");
 $check($dictionary->reduce(0, fn(int &$acc, int $value): int => $acc += $value) === 6, "reduce over values");
 
+// PHP converts numeric-string array keys to int internally; the key-returning methods
+// must still honor their declared string contract (TaskRegistry keys tasks by number).
+$numericKeys = new Dictionary(["7" => "a", "9" => "b"]);
+$check($numericKeys->firstIndex(fn(string $value): bool => $value === "b") === "9", "firstIndex returns a string key even when PHP intified it");
+$check($numericKeys->indexOf("a") === "7", "indexOf returns a string key even when PHP intified it");
+
 $grouped = Dictionary::grouping(new ArrayClass(["ana", "aldo", "beto"]), fn(string $name): string => $name[0]);
 $check($grouped->count === 2, "grouping produces one entry per key");
 $check($grouped["a"]->array === ["ana", "aldo"], "grouping preserves element order inside groups");

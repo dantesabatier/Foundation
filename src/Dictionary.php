@@ -362,7 +362,8 @@ final class Dictionary extends ObjectClass implements Collection, ArrayAccess, I
         $end = $this->endIndex;
         while ($i !== $end) {
             if ($where($v[$i])) {
-                return $k[$i];
+                // PHP silently converts numeric-string array keys to int; honor the declared string contract.
+                return (string)$k[$i];
             }
             $this->formIndexAfter($i);
         }
