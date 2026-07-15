@@ -55,6 +55,15 @@ use RangeReplaceableCollectionAlgorithms {
 
 `ObjectClass` is the root class. It implements `ObjectProtocol` (runtime type introspection: `isKind`, `isMember`, `responds`), `KeyValueCoding`, `KeyValueObserving`, `Comparable`, and `JsonSerializable`. Most domain classes extend it.
 
+### Identity vs. Conceptual Equality
+
+Identity and equality are intentionally separate axes, framework-wide. The convention is settled — do not revisit it:
+
+- **`$hash` is the instance identity** (`spl_object_id`), never a value hash. No subclass overrides it — not `Number`, `Date`, `URL`, nor `UUID` — even though the base `ObjectClass::isEqual` compares hashes (which makes the default equality *identity* equality, exactly like `NSObject`).
+- **Conceptual equality — "is conceptually equal in this context to" — lives only in `isEqual(mixed)` / `compare(mixed)`**, usually as `isEqual => compare($other) === ComparisonResult::orderedSame`. Two `Number`s can be equal without being the same object.
+- **The `mixed` parameter mirrors Apple's `isEqual:(id)`** and is what makes equality polymorphic: any value can be asked against any other; incomparable values return `false` (or a stable order in `compare`, e.g. `UUID` answers `orderedDescending` for non-UUIDs). Collections compose on top of it for free — `Set`, `Dictionary`, and `ArrayClass` compare and deduplicate element-wise through `isEqual`, not through hashes, so any element that defines its conceptual equality participates in deep comparison.
+- Consequently, **the NSObject "equal objects must have equal hashes" rule does not apply here**; equal instances keeping distinct identity hashes is correct, not a bug. When porting a class that redefines equality, override `isEqual`/`compare` only and leave `$hash` alone.
+
 ### Key-Value Coding / Observing
 
 `KeyValueCodingInternal.php` implements KVC collection operators (`@sum`, `@avg`, `@count`, `@max`, `@min`, `@median`, `@distinctUnionOfObjects`, etc.). Key paths like `"department.manager.salary"` and `"@sum.attributes.size"` are resolved at runtime.
