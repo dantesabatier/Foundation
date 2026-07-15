@@ -22,17 +22,24 @@ final class UUID extends ObjectClass
     public string $debugDescription {
         get => sprintf("<%s %s %s>", $this->class, $this->hash, $this->description);
     }
+    /** @var int Two UUIDs that compare isEqual must share a hash, so it derives from the normalized string instead of the object identity. */
+    #[Override]
+    public int $hash {
+        get => crc32($this->uuidString);
+    }
 
     /**
      * Initializes a new UUID with RFC 4122 version 4 random bytes.
+     *
+     * The string is validated and stored uppercased, matching NSUUID.
      * @param string|null $uuidString The string representation of a UUID, such as E621E1F8-C36C-495A-93FC-0C247A3E6E5F.
      */
     public function __construct(?string $uuidString = null)
     {
-        if ($uuidString && !uuid_validate($uuidString)) {
+        if ($uuidString !== null && !uuid_validate($uuidString)) {
             fatal_error("Invalid argument: expecting uuid string, \"$uuidString\" given");
         }
-        $this->uuidString = $uuidString ?? uuid_generate();
+        $this->uuidString = strtoupper($uuidString ?? uuid_generate());
     }
 
     public function __serialize(): array
@@ -42,7 +49,11 @@ final class UUID extends ObjectClass
 
     public function __unserialize(array $data): void
     {
-        $this->uuidString = $data["uuidString"];
+        $uuidString = $data["uuidString"] ?? null;
+        if (!is_string($uuidString) || !uuid_validate($uuidString)) {
+            fatal_error("Invalid serialized data: expecting uuid string");
+        }
+        $this->uuidString = strtoupper($uuidString);
     }
 
     #[Override]

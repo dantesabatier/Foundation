@@ -23,25 +23,27 @@ function read_random(int $numBytes): string
 }
 
 /**
- * Returns the high-resolution current time in nanoseconds.
+ * Returns the high-resolution monotonic time in nanoseconds.
  *
- * @return float The current time as a floating-point number in nanoseconds.
+ * @return float The monotonic clock reading as a floating-point number of nanoseconds; useful for measuring elapsed time, not wall-clock time.
  */
 function nanotime(): float
 {
     [$s, $n] = hrtime();
-    return ($s + $n);
+    return ($s * 1.0e+9) + $n;
 }
 
 /**
- * Reads the current time with high precision and computes it as a float value.
+ * Reads the current wall-clock time as an RFC 4122 version 1 UUID timestamp.
  *
- * @return float The computed time value in nanoseconds as a floating-point number.
+ * Integer arithmetic throughout: the value (~2^57) exceeds the 53-bit float mantissa.
+ *
+ * @return int The number of 100-nanosecond intervals since 00:00:00 UTC on 15 October 1582, the epoch of version 1 UUIDs.
  */
-function read_time(): float
+function read_time(): int
 {
-    $time = nanotime();
-    return ($time * 1.0e+9) + ($time / 100.0) + (float)0x01B21DD213814000;
+    [$fraction, $seconds] = explode(" ", microtime());
+    return ((int)$seconds * 10_000_000) + (int)((float)$fraction * 1.0e+7) + 0x01B21DD213814000;
 }
 
 /**
@@ -95,16 +97,17 @@ function uuid_generate_time(): string
 {
     $time = read_time();
     $out = read_random(16);
-    $out[0] = chr((int)$time >> 24);
-    $out[1] = chr((int)$time >> 16);
-    $out[2] = chr((int)$time >> 8);
-    $out[3] = chr((int)$time);
-    $out[4] = chr((int)$time >> 40);
-    $out[5] = chr((int)$time >> 32);
-    $out[6] = chr((int)$time >> 56);
-    $out[7] = chr((int)$time >> 48);
-    $out[6] = chr((ord($out[6]) & 0x0f) | 0x10);
+    $out[0] = chr(($time >> 24) & 0xff);
+    $out[1] = chr(($time >> 16) & 0xff);
+    $out[2] = chr(($time >> 8) & 0xff);
+    $out[3] = chr($time & 0xff);
+    $out[4] = chr(($time >> 40) & 0xff);
+    $out[5] = chr(($time >> 32) & 0xff);
+    $out[6] = chr((($time >> 56) & 0x0f) | 0x10);
+    $out[7] = chr(($time >> 48) & 0xff);
     $out[8] = chr((ord($out[8]) & 0x3f) | 0x80);
+    // The node is random, not a MAC address; RFC 4122 §4.5 requires the multicast bit in that case.
+    $out[10] = chr(ord($out[10]) | 0x01);
     return $out
             |> bin2hex(...)
             |> (fn(string $x): array => str_split($x, 4))
