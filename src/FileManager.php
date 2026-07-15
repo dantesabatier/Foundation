@@ -527,7 +527,7 @@ final class FileManager extends ObjectClass
             FileAttributeKey::immutable => !is_writable($path),
             FileAttributeKey::size => filesize($path),
             FileAttributeKey::type => filetype($path),
-            FileAttributeKey::posixPermissions => fileperms($path) & 0o7777,
+            FileAttributeKey::posixPermissions => (int)fileperms($path) & 0o7777,
             FileAttributeKey::groupOwnerAccountID => filegroup($path),
             FileAttributeKey::ownerAccountID => fileowner($path)
         ]));

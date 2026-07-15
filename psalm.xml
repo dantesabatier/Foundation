@@ -110,6 +110,17 @@
                 <file name="src/Predicates/PredicateScanner.php"/>
             </errorLevel>
         </PossiblyInvalidArgument>
+        <RedundantCastGivenDocblockType>
+            <errorLevel type="suppress">
+                <file name="src/Dictionary.php"/>
+            </errorLevel>
+        </RedundantCastGivenDocblockType>
+        <DocblockTypeContradiction>
+            <errorLevel type="suppress">
+                <file name="src/ENVAdditions.php"/>
+                <file name="src/FileHandle.php"/>
+            </errorLevel>
+        </DocblockTypeContradiction>
         <InvalidAttribute errorLevel="suppress"/>
     </issueHandlers>
     <plugins>
