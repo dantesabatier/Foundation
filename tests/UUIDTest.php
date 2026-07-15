@@ -12,8 +12,9 @@ declare(strict_types=1);
  *  - new UUID("") must fail loudly: the empty string used to slip past the truthiness
  *    guard and become the stored uuidString;
  *  - uuidString is normalized to uppercase, matching NSUUID, regardless of input case;
- *  - hash derives from the normalized string so equal UUIDs share a hash (the inherited
- *    spl_object_id hash broke the isEqual/hash contract);
+ *  - hash stays the inherited instance identity: like Number/Date/URL, UUID expresses
+ *    conceptual equality through isEqual/compare only, so equal values collapse in Set
+ *    without sharing a hash;
  *  - __unserialize validates its payload instead of accepting any string;
  *  - uuid_generate_time() encodes the actual wall-clock time: read_time()/nanotime()
  *    used to mix unscaled seconds and nanoseconds, producing garbage timestamps.
@@ -133,13 +134,12 @@ $check($low->compare($high) === ComparisonResult::orderedAscending, "a lower UUI
 $check($high->compare($low) === ComparisonResult::orderedDescending, "a higher UUID compares descending");
 
 // ---------------------------------------------------------------------------
-$section("hash contract");
+$section("identity versus conceptual equality");
 // ---------------------------------------------------------------------------
 
-$check($upper->hash === $lower->hash, "equal UUIDs share the same hash");
-$check($upper->hash === $upper->hash, "the hash is stable across reads");
-$check($low->hash !== $high->hash, "distinct UUIDs hash differently");
-$check(new Set([$upper, $lower])->count === 1, "a Set collapses equal UUID instances");
+// hash is the instance identity (like Number/Date/URL); equality lives in isEqual.
+$check($upper->hash !== $lower->hash, "distinct instances keep distinct identity hashes even when equal");
+$check(new Set([$upper, $lower])->count === 1, "a Set still collapses equal UUID instances through isEqual");
 
 // ---------------------------------------------------------------------------
 $section("serialization");

@@ -22,11 +22,6 @@ final class UUID extends ObjectClass
     public string $debugDescription {
         get => sprintf("<%s %s %s>", $this->class, $this->hash, $this->description);
     }
-    /** @var int Two UUIDs that compare isEqual must share a hash, so it derives from the normalized string instead of the object identity. */
-    #[Override]
-    public int $hash {
-        get => crc32($this->uuidString);
-    }
 
     /**
      * Initializes a new UUID with RFC 4122 version 4 random bytes.
