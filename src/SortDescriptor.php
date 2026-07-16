@@ -51,7 +51,12 @@ final class SortDescriptor extends ObjectClass
                 |> human_readable_value(...)
                 |> (fn(string $x): string => sprintf("Invalid arguments, sort descriptors are meant to be used with %s objects exclusively, %s given", KeyValueCoding::class, $x))
                 |> fatal_error(...);
-        return ComparisonResult::from(($this->ascending ? ComparisonResult::orderedAscending->value : ComparisonResult::orderedDescending->value) * ($object1->valueForKeyPath($this->key) <=> $object2->valueForKeyPath($this->key)));
+        // The spaceship operator already yields the ascending ComparisonResult convention
+        // (-1 when object1 < object2 == orderedAscending), so an ascending descriptor
+        // returns it unchanged and a descending one negates it. Multiplying by
+        // orderedAscending->value (-1) for the ascending case inverted the order.
+        $comparison = $object1->valueForKeyPath($this->key) <=> $object2->valueForKeyPath($this->key);
+        return ComparisonResult::from($this->ascending ? $comparison : -$comparison);
     }
 
     /**
