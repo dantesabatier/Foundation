@@ -2,163 +2,147 @@
 
 declare(strict_types=1);
 
+namespace Sabatier\Foundation\Tests;
+
+use PHPUnit\Framework\TestCase;
+use Sabatier\Foundation\ComparisonResult;
+use Sabatier\Foundation\Date;
+use Sabatier\Foundation\InternalInconsistencyException;
+
 /**
- * Standalone tests for src/Date.php.
- *
- * Run with: php tests/DateTest.php
- * Exits with a non-zero status code if any check fails.
+ * Tests for src/Date.php.
  *
  * Regression guards:
  *  - timeIntervalSinceReferenceDate is a real CFAbsoluteTime (seconds since 2001-01-01
  *    UTC): absolute_time_get_current() used to return plain Unix time, which made
  *    timeIntervalSince1970 and dateWithTimeIntervalSince1970() shift every date by 31
  *    years (cookie expirations built from numeric timestamps never expired);
+ *  - the constructor takes no arguments and fails loudly on any, because PHP silently
+ *    ignores extra arguments to non-variadic functions; value-based construction goes
+ *    through the epoch-named factories;
  *  - format()/formatted() must convert to Unix time before calling the PHP formatters,
- *    which only worked by accident under the old scheme;
- *  - formatted() must not blow up when IntlDateFormatter::format() fails.
+ *    which only worked by accident under the old scheme.
  */
-
-namespace Sabatier\Foundation\Tests;
-
-use Sabatier\Foundation\Date;
-
-require __DIR__ . "/../vendor/autoload.php";
-
-final class DateTestRunner
+final class DateTest extends TestCase
 {
-    public static int $passed = 0;
-    /** @var list<string> */
-    public static array $failures = [];
-    private static string $section = "";
-
-    public static function section(string $name): void
+    protected function setUp(): void
     {
-        self::$section = $name;
+        // format() renders in the process time zone; pin it so the expectations are stable.
+        date_default_timezone_set("UTC");
     }
 
-    public static function check(bool $condition, string $message): void
+    public function testNowTracksTheSystemClock(): void
     {
-        if ($condition) {
-            self::$passed++;
-            return;
-        }
-        $failure = self::$section === "" ? $message : self::$section . ": " . $message;
-        self::$failures[] = $failure;
-        fwrite(STDERR, "FAIL $failure" . PHP_EOL);
+        $now = Date::now();
+        $this->assertLessThan(2.0, abs($now->timeIntervalSince1970 - microtime(true)), "timeIntervalSince1970 of now matches the system clock");
+        $this->assertLessThan(2.0, abs($now->timeIntervalSinceReferenceDate - (microtime(true) - 978_307_200.0)), "timeIntervalSinceReferenceDate is measured from 2001-01-01 UTC");
+        $this->assertLessThan(2.0, abs($now->timeIntervalSinceNow), "timeIntervalSinceNow of now is about zero");
     }
 
-    public static function finish(): never
+    public function testUnixEpochConversions(): void
     {
-        $failed = count(self::$failures);
-        printf("%d passed, %d failed%s", self::$passed, $failed, PHP_EOL);
-        exit($failed > 0 ? 1 : 0);
+        $unixEpoch = Date::dateWithTimeIntervalSince1970(0.0);
+        $this->assertSame(-978_307_200.0, $unixEpoch->timeIntervalSinceReferenceDate, "the Unix epoch is 978307200 seconds before the reference date");
+        $this->assertSame(0.0, $unixEpoch->timeIntervalSince1970, "timeIntervalSince1970 round-trips through the factory");
+        $this->assertSame(1_234_567_890.5, Date::dateWithTimeIntervalSince1970(1_234_567_890.5)->timeIntervalSince1970, "fractional Unix timestamps survive the round-trip");
+        $this->assertSame(978_307_200.0, Date::dateWithTimeIntervalSinceReferenceDate(0.0)->timeIntervalSince1970, "the reference date itself is 978307200 in Unix time");
+        $this->assertSame(978_307_200.0, Date::timeIntervalBetween1970AndReferenceDate, "the 1970-to-reference constant");
+    }
+
+    public function testBareConstructorIsTheCurrentInstant(): void
+    {
+        $this->assertLessThan(2.0, abs(new Date()->timeIntervalSinceNow), "the bare constructor is the current instant");
+    }
+
+    public function testConstructorArgumentsFailLoudly(): void
+    {
+        // PHP silently ignores extra arguments to non-variadic functions, so the constructor
+        // promotes them to a hard error instead of silently meaning "now" — the old
+        // `new Date($timestamp)` habit fails loudly.
+        $this->expectException(InternalInconsistencyException::class);
+        new Date(529_887_685.0);
+    }
+
+    public function testUnixFactoryFormatting(): void
+    {
+        $this->assertSame("2024-02-10 15:30:00", Date::dateWithTimeIntervalSince1970((float)strtotime("2024-02-10 15:30:00"))->format("Y-m-d H:i:s"), "the 1970 factory round-trips through format");
+        $this->assertSame("1986-10-16", Date::dateWithTimeIntervalSince1970(529_887_685.0)->format("Y-m-d"), "a literal Unix timestamp lands on its calendar date");
+    }
+
+    public function testCookieStyleExpirationSitsInTheNearFuture(): void
+    {
+        // A cookie-style numeric expiration built from Unix time must sit in the near future,
+        // not 31 years away.
+        $expiry = Date::dateWithTimeIntervalSince1970((float)time() + 3600.0);
+        $this->assertGreaterThan(3590.0, $expiry->timeIntervalSinceNow, "a Unix-based expiration one hour out reads as one hour out");
+        $this->assertLessThan(3610.0, $expiry->timeIntervalSinceNow, "a Unix-based expiration one hour out is not in the far future");
+    }
+
+    public function testFactories(): void
+    {
+        $inAMinute = Date::dateWithTimeIntervalSinceNow(60.0);
+        $this->assertGreaterThan(58.0, $inAMinute->timeIntervalSinceNow, "dateWithTimeIntervalSinceNow offsets from now");
+        $this->assertLessThan(62.0, $inAMinute->timeIntervalSinceNow, "dateWithTimeIntervalSinceNow does not overshoot");
+        $base = Date::dateWithTimeIntervalSinceReferenceDate(1000.0);
+        $this->assertSame(1000.0, $base->timeIntervalSinceReferenceDate, "dateWithTimeIntervalSinceReferenceDate stores the interval verbatim");
+        $this->assertSame(1500.0, Date::dateWithTimeIntervalSinceDate(500.0, $base)->timeIntervalSinceReferenceDate, "dateWithTimeIntervalSinceDate offsets from the given date");
+    }
+
+    public function testDistantDates(): void
+    {
+        $this->assertSame(ComparisonResult::orderedDescending, Date::distantFuture()->compare(Date::now()), "distantFuture is after now");
+        $this->assertSame(ComparisonResult::orderedAscending, Date::distantPast()->compare(Date::now()), "distantPast is before now");
+    }
+
+    public function testIntervalArithmetic(): void
+    {
+        $earlier = Date::dateWithTimeIntervalSinceReferenceDate(100.0);
+        $later = Date::dateWithTimeIntervalSinceReferenceDate(250.0);
+        $this->assertSame(150.0, $later->timeIntervalSince($earlier), "timeIntervalSince is positive when the receiver is later");
+        $this->assertSame(-150.0, $earlier->timeIntervalSince($later), "timeIntervalSince is negative when the receiver is earlier");
+        $this->assertSame(150.0, $earlier->distance($later), "distance is positive toward a later date");
+        $this->assertSame(-150.0, $later->distance($earlier), "distance is negative toward an earlier date");
+    }
+
+    public function testMutationSemantics(): void
+    {
+        $earlier = Date::dateWithTimeIntervalSinceReferenceDate(100.0);
+        $sum = $earlier->addingTimeInterval(50.0);
+        $this->assertSame(150.0, $sum->timeIntervalSinceReferenceDate, "addingTimeInterval adds seconds");
+        $this->assertSame(100.0, $earlier->timeIntervalSinceReferenceDate, "addingTimeInterval does not mutate the receiver");
+        $this->assertSame(125.0, $earlier->advanced(25.0)->timeIntervalSinceReferenceDate, "advanced is addingTimeInterval");
+        $mutable = Date::dateWithTimeIntervalSinceReferenceDate(10.0);
+        $mutable->addTimeInterval(5.0);
+        $this->assertSame(15.0, $mutable->timeIntervalSinceReferenceDate, "addTimeInterval mutates in place");
+    }
+
+    public function testEqualityAndComparison(): void
+    {
+        $earlier = Date::dateWithTimeIntervalSinceReferenceDate(100.0);
+        $later = Date::dateWithTimeIntervalSinceReferenceDate(250.0);
+        $this->assertTrue($earlier->isEqual(Date::dateWithTimeIntervalSinceReferenceDate(100.0)), "equal instants are equal");
+        $this->assertFalse($earlier->isEqual($later), "different instants are not equal");
+        $this->assertFalse($earlier->isEqual(100.0), "a non-Date value is never equal");
+        $this->assertSame(ComparisonResult::orderedAscending, $earlier->compare($later), "earlier compares ascending");
+    }
+
+    public function testFormatting(): void
+    {
+        $unixEpoch = Date::dateWithTimeIntervalSince1970(0.0);
+        $this->assertSame("1970-01-01 00:00:00", $unixEpoch->format("Y-m-d H:i:s"), "format renders the Unix epoch correctly");
+        $this->assertSame("2001-01-01 00:00:00", Date::dateWithTimeIntervalSinceReferenceDate(0.0)->format("Y-m-d H:i:s"), "format renders the reference date correctly");
+        $this->assertSame("1970-01-01T00:00:00+00:00", $unixEpoch->ISO8601Format(), "ISO8601Format renders DATE_ATOM");
+        $this->assertSame("2001-01-01 00:00:00", Date::dateWithTimeIntervalSinceReferenceDate(0.0)->description, "description is the default format");
+        $this->assertSame("2001-01-01 00:00:00", Date::dateWithTimeIntervalSinceReferenceDate(0.0)->jsonSerialize(), "jsonSerialize is the description");
+        $this->assertStringContainsString("1970", Date::dateWithTimeIntervalSince1970(0.0)->formatted(), "formatted renders the correct year");
+    }
+
+    public function testSerialization(): void
+    {
+        $original = Date::dateWithTimeIntervalSinceReferenceDate(123_456.789);
+        /** @var Date $restored */
+        $restored = unserialize(serialize($original));
+        $this->assertSame(123_456.789, $restored->timeIntervalSinceReferenceDate, "serialization round-trips the interval");
+        $this->assertTrue($restored->isEqual($original), "the restored date equals the original");
     }
 }
-
-/** Fails the process on any PHP warning/notice. */
-set_error_handler(function (int $severity, string $message, string $file, int $line): bool {
-    throw new \ErrorException($message, 0, $severity, $file, $line);
-});
-
-// format() renders in the process time zone; pin it so the expectations are stable.
-date_default_timezone_set("UTC");
-
-$check = DateTestRunner::check(...);
-$section = DateTestRunner::section(...);
-
-// ---------------------------------------------------------------------------
-$section("reference-date semantics");
-// ---------------------------------------------------------------------------
-
-$now = Date::now();
-$check(abs($now->timeIntervalSince1970 - microtime(true)) < 2.0, "timeIntervalSince1970 of now matches the system clock");
-$check(abs($now->timeIntervalSinceReferenceDate - (microtime(true) - 978_307_200.0)) < 2.0, "timeIntervalSinceReferenceDate is measured from 2001-01-01 UTC");
-$check(abs($now->timeIntervalSinceNow) < 2.0, "timeIntervalSinceNow of now is about zero");
-
-$unixEpoch = Date::dateWithTimeIntervalSince1970(0.0);
-$check($unixEpoch->timeIntervalSinceReferenceDate === -978_307_200.0, "the Unix epoch is 978307200 seconds before the reference date");
-$check($unixEpoch->timeIntervalSince1970 === 0.0, "timeIntervalSince1970 round-trips through the factory");
-$check(Date::dateWithTimeIntervalSince1970(1_234_567_890.5)->timeIntervalSince1970 === 1_234_567_890.5, "fractional Unix timestamps survive the round-trip");
-$check(Date::dateWithTimeIntervalSinceReferenceDate(0.0)->timeIntervalSince1970 === 978_307_200.0, "the reference date itself is 978307200 in Unix time");
-$check(Date::timeIntervalBetween1970AndReferenceDate === 978_307_200.0, "the 1970-to-reference constant");
-
-// The constructor only produces "now"; every value-based construction goes through the
-// factory that names its epoch. PHP silently ignores extra arguments to non-variadic
-// functions, so the constructor promotes them to a hard error instead of silently meaning
-// "now" — the old `new Date($timestamp)` habit fails loudly.
-$check(abs(new Date()->timeIntervalSinceNow) < 2.0, "the bare constructor is the current instant");
-try {
-    new Date(529_887_685.0);
-    $check(false, "a constructor argument must fail");
-} catch (\Sabatier\Foundation\InternalInconsistencyException) {
-    $check(true, "a constructor argument fails loudly instead of being ignored");
-}
-$check(Date::dateWithTimeIntervalSince1970((float)strtotime("2024-02-10 15:30:00"))->format("Y-m-d H:i:s") === "2024-02-10 15:30:00", "the 1970 factory round-trips through format");
-$check(Date::dateWithTimeIntervalSince1970(529_887_685.0)->format("Y-m-d") === "1986-10-16", "a literal Unix timestamp lands on its calendar date");
-$anchor = Date::dateWithTimeIntervalSinceReferenceDate(1000.0);
-$check(Date::dateWithTimeIntervalSinceDate(500.0, $anchor)->timeIntervalSinceReferenceDate === 1500.0, "dateWithTimeIntervalSinceDate offsets from the anchor");
-
-// A cookie-style numeric expiration built from Unix time must sit in the near future,
-// not 31 years away.
-$expiry = Date::dateWithTimeIntervalSince1970((float)time() + 3600.0);
-$check($expiry->timeIntervalSinceNow > 3590.0 && $expiry->timeIntervalSinceNow < 3610.0, "a Unix-based expiration one hour out reads as one hour out");
-
-// ---------------------------------------------------------------------------
-$section("factories");
-// ---------------------------------------------------------------------------
-
-$inAMinute = Date::dateWithTimeIntervalSinceNow(60.0);
-$check($inAMinute->timeIntervalSinceNow > 58.0 && $inAMinute->timeIntervalSinceNow < 62.0, "dateWithTimeIntervalSinceNow offsets from now");
-$base = Date::dateWithTimeIntervalSinceReferenceDate(1000.0);
-$check($base->timeIntervalSinceReferenceDate === 1000.0, "dateWithTimeIntervalSinceReferenceDate stores the interval verbatim");
-$check(Date::dateWithTimeIntervalSinceDate(500.0, $base)->timeIntervalSinceReferenceDate === 1500.0, "dateWithTimeIntervalSinceDate offsets from the given date");
-$check(Date::distantFuture()->compare(Date::now()) === \Sabatier\Foundation\ComparisonResult::orderedDescending, "distantFuture is after now");
-$check(Date::distantPast()->compare(Date::now()) === \Sabatier\Foundation\ComparisonResult::orderedAscending, "distantPast is before now");
-
-// ---------------------------------------------------------------------------
-$section("arithmetic and comparison");
-// ---------------------------------------------------------------------------
-
-$earlier = Date::dateWithTimeIntervalSinceReferenceDate(100.0);
-$later = Date::dateWithTimeIntervalSinceReferenceDate(250.0);
-$check($later->timeIntervalSince($earlier) === 150.0, "timeIntervalSince is positive when the receiver is later");
-$check($earlier->timeIntervalSince($later) === -150.0, "timeIntervalSince is negative when the receiver is earlier");
-$check($earlier->distance($later) === 150.0, "distance is positive toward a later date");
-$check($later->distance($earlier) === -150.0, "distance is negative toward an earlier date");
-
-$sum = $earlier->addingTimeInterval(50.0);
-$check($sum->timeIntervalSinceReferenceDate === 150.0, "addingTimeInterval adds seconds");
-$check($earlier->timeIntervalSinceReferenceDate === 100.0, "addingTimeInterval does not mutate the receiver");
-$check($earlier->advanced(25.0)->timeIntervalSinceReferenceDate === 125.0, "advanced is addingTimeInterval");
-$mutable = Date::dateWithTimeIntervalSinceReferenceDate(10.0);
-$mutable->addTimeInterval(5.0);
-$check($mutable->timeIntervalSinceReferenceDate === 15.0, "addTimeInterval mutates in place");
-
-$check($earlier->isEqual(Date::dateWithTimeIntervalSinceReferenceDate(100.0)), "equal instants are equal");
-$check(!$earlier->isEqual($later), "different instants are not equal");
-$check(!$earlier->isEqual(100.0), "a non-Date value is never equal");
-$check($earlier->compare($later) === \Sabatier\Foundation\ComparisonResult::orderedAscending, "earlier compares ascending");
-
-// ---------------------------------------------------------------------------
-$section("formatting");
-// ---------------------------------------------------------------------------
-
-$check($unixEpoch->format("Y-m-d H:i:s") === "1970-01-01 00:00:00", "format renders the Unix epoch correctly");
-$check(Date::dateWithTimeIntervalSinceReferenceDate(0.0)->format("Y-m-d H:i:s") === "2001-01-01 00:00:00", "format renders the reference date correctly");
-$check($unixEpoch->ISO8601Format() === "1970-01-01T00:00:00+00:00", "ISO8601Format renders DATE_ATOM");
-$check(Date::dateWithTimeIntervalSinceReferenceDate(0.0)->description === "2001-01-01 00:00:00", "description is the default format");
-$check(Date::dateWithTimeIntervalSinceReferenceDate(0.0)->jsonSerialize() === "2001-01-01 00:00:00", "jsonSerialize is the description");
-$formatted = Date::dateWithTimeIntervalSince1970(0.0)->formatted();
-$check(is_string($formatted) && str_contains($formatted, "1970"), "formatted renders the correct year");
-
-// ---------------------------------------------------------------------------
-$section("serialization");
-// ---------------------------------------------------------------------------
-
-$original = Date::dateWithTimeIntervalSinceReferenceDate(123_456.789);
-/** @var Date $restored */
-$restored = unserialize(serialize($original));
-$check($restored->timeIntervalSinceReferenceDate === 123_456.789, "serialization round-trips the interval");
-$check($restored->isEqual($original), "the restored date equals the original");
-
-DateTestRunner::finish();

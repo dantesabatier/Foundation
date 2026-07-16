@@ -25,9 +25,13 @@ phpstan analyse
 
 # Rector dry-run
 rector process --dry-run
+
+# Test suite (all, or a single file)
+phpunit
+phpunit tests/DateTest.php
 ```
 
-Correctness is enforced primarily through static analysis (Psalm level 4, PHPStan level 3), complemented by standalone test scripts in `tests/`. There is no PHPUnit: each suite is a self-contained script with its own runner class that exits non-zero on failure. Run one with `php tests/<Name>Test.php`; there is no single command to run them all, so loop over the directory if you need the full set. When fixing a bug, add a regression check to the matching suite (or create one following the existing pattern).
+Correctness is enforced through static analysis (Psalm level 4, PHPStan level 3) and the PHPUnit suite in `tests/`. PHPUnit is installed globally like the other tools and configured via `phpunit.xml` (bootstrap on `vendor/autoload.php`, `failOnWarning`/`failOnNotice` enabled, mirroring CoreData's setup). Run everything with `phpunit`; run a single suite with `phpunit tests/<Name>Test.php`. Suites are `TestCase` classes in the `Sabatier\Foundation\Tests` namespace; when fixing a bug, add a regression check to the matching suite — each suite's header docblock lists the regressions it guards.
 
 ## Architecture
 

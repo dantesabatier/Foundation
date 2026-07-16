@@ -2,22 +2,9 @@
 
 declare(strict_types=1);
 
-/**
- * Standalone end-to-end tests for the URLSession networking stack, driven against
- * PHP's built-in web server.
- *
- * Run with: php tests/URLSessionTest.php
- * Exits with a non-zero status code if any check fails.
- *
- * Regression guards:
- *  - the CURL header callback receives CURLINFO_CONTENT_LENGTH_DOWNLOAD, which PHP
- *    reports as float (-1.0 while unknown); under strict_types it must be cast before
- *    reaching didReceiveHeaderData(int). The bug made EVERY request fatal on its first
- *    header line, so any completed task below exercises it.
- */
-
 namespace Sabatier\Foundation\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Sabatier\Foundation\Networking\HTTPCookie;
 use Sabatier\Foundation\Networking\HTTPCookieStorage;
 use Sabatier\Foundation\Networking\HTTPRequestMethod;
@@ -26,65 +13,33 @@ use Sabatier\Foundation\Networking\URLRequest;
 use Sabatier\Foundation\Networking\URLSession;
 use Sabatier\Foundation\URL;
 
-require __DIR__ . "/../vendor/autoload.php";
-
-final class URLSessionTestRunner
-{
-    public static int $passed = 0;
-    /** @var list<string> */
-    public static array $failures = [];
-    private static string $section = "";
-
-    public static function section(string $name): void
-    {
-        self::$section = $name;
-    }
-
-    public static function check(bool $condition, string $message): void
-    {
-        if ($condition) {
-            self::$passed++;
-            return;
-        }
-        $failure = self::$section === "" ? $message : self::$section . ": " . $message;
-        self::$failures[] = $failure;
-        fwrite(STDERR, "FAIL $failure" . PHP_EOL);
-    }
-
-    public static function finish(): never
-    {
-        $failed = count(self::$failures);
-        printf("%d passed, %d failed%s", self::$passed, $failed, PHP_EOL);
-        exit($failed > 0 ? 1 : 0);
-    }
-}
-
 /**
- * Runs a data task to completion and returns [data, response, error].
+ * End-to-end tests for the URLSession networking stack, driven against PHP's
+ * built-in web server.
  *
- * @return array{string|null, \Sabatier\Foundation\Networking\URLResponse|null, \Sabatier\Foundation\Error|null}
+ * Regression guards:
+ *  - the CURL header callback receives CURLINFO_CONTENT_LENGTH_DOWNLOAD, which PHP
+ *    reports as float (-1.0 while unknown); under strict_types it must be cast before
+ *    reaching didReceiveHeaderData(int). The bug made EVERY request fatal on its first
+ *    header line, so any completed task below exercises it.
  */
-function await_data_task(URLSession $session, URLRequest $request): array
+final class URLSessionTest extends TestCase
 {
-    $result = null;
-    $task = $session->dataTaskWithRequest($request, function (?string $data, $response, $error) use (&$result): void {
-        $result = [$data, $response, $error];
-    });
-    $task->resume();
-    if ($result === null) {
-        $session->delegateQueue->waitUntilAllOperationsAreFinished();
-    }
-    return $result ?? [null, null, null];
-}
+    /** @var resource|null */
+    private static $server;
+    private static int $port;
+    private static string $host;
+    private static string $router;
+    private static string $unique;
+    private URLSession $session;
 
-// ---------------------------------------------------------------------------
-// Test server bootstrap
-// ---------------------------------------------------------------------------
-
-$port = 8900 + (getmypid() % 100);
-$host = "127.0.0.1:$port";
-$router = sys_get_temp_dir() . DIRECTORY_SEPARATOR . "sabatier-urlsession-router-" . getmypid() . ".php";
-file_put_contents($router, <<<'ROUTER'
+    public static function setUpBeforeClass(): void
+    {
+        self::$unique = uniqid("", true);
+        self::$port = 8900 + (getmypid() % 100);
+        self::$host = "127.0.0.1:" . self::$port;
+        self::$router = sys_get_temp_dir() . DIRECTORY_SEPARATOR . "sabatier-urlsession-router-" . getmypid() . ".php";
+        file_put_contents(self::$router, <<<'ROUTER'
 <?php
 $path = parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH);
 switch ($path) {
@@ -121,154 +76,173 @@ switch ($path) {
 }
 ROUTER);
 
-$server = proc_open(
-    [PHP_BINARY, "-S", $host, $router],
-    [1 => ["pipe", "w"], 2 => ["pipe", "w"]],
-    $pipes,
-    null,
-    null,
-    ["bypass_shell" => true]
-);
-if (!is_resource($server)) {
-    fwrite(STDERR, "unable to start the test server" . PHP_EOL);
-    exit(2);
-}
-$ready = false;
-for ($i = 0; $i < 50 && !$ready; $i++) {
-    $probe = @fsockopen("127.0.0.1", $port, $errorCode, $errorMessage, 0.2);
-    if ($probe !== false) {
-        fclose($probe);
-        $ready = true;
-        break;
+        $server = proc_open(
+            [PHP_BINARY, "-S", self::$host, self::$router],
+            [1 => ["pipe", "w"], 2 => ["pipe", "w"]],
+            $pipes,
+            null,
+            null,
+            ["bypass_shell" => true]
+        );
+        if (!is_resource($server)) {
+            @unlink(self::$router);
+            static::markTestSkipped("unable to start the test server");
+        }
+        self::$server = $server;
+        $ready = false;
+        for ($i = 0; $i < 50 && !$ready; $i++) {
+            $probe = @fsockopen("127.0.0.1", self::$port, $errorCode, $errorMessage, 0.2);
+            if ($probe !== false) {
+                fclose($probe);
+                $ready = true;
+                break;
+            }
+            usleep(100_000);
+        }
+        if (!$ready) {
+            proc_terminate($server);
+            proc_close($server);
+            self::$server = null;
+            @unlink(self::$router);
+            static::markTestSkipped("the test server never became reachable on " . self::$host);
+        }
     }
-    usleep(100_000);
-}
-if (!$ready) {
-    proc_terminate($server);
-    fwrite(STDERR, "the test server never became reachable on $host" . PHP_EOL);
-    exit(2);
-}
 
-$check = URLSessionTestRunner::check(...);
-$section = URLSessionTestRunner::section(...);
-$session = URLSession::shared();
-$unique = uniqid("", true);
-
-try {
-    // -----------------------------------------------------------------------
-    $section("data task");
-    // -----------------------------------------------------------------------
-
-    [$data, $response, $error] = await_data_task($session, new URLRequest(new URL("http://$host/hello?r=$unique")));
-    $check($error === null, "a successful request reports no error");
-    $check($data === "hello world", "the body arrives complete");
-    $check($response instanceof HTTPURLResponse, "the response is an HTTPURLResponse");
-    $check($response instanceof HTTPURLResponse && $response->statusCode === 200, "status code 200");
-
-    [$data, $response, $error] = await_data_task($session, new URLRequest(new URL("http://$host/json?r=$unique")));
-    $check($error === null && $data !== null, "json endpoint responds");
-    $decoded = $data !== null ? json_decode($data, true) : null;
-    $check(is_array($decoded) && $decoded["ok"] === true && $decoded["value"] === 42, "json body decodes");
-
-    // -----------------------------------------------------------------------
-    $section("response headers");
-    // -----------------------------------------------------------------------
-
-    [, $response, $error] = await_data_task($session, new URLRequest(new URL("http://$host/header?r=$unique")));
-    $check($error === null && $response instanceof HTTPURLResponse, "header endpoint responds");
-    $check($response instanceof HTTPURLResponse && (string)$response->allHeaderFields["X-Test-Header"] === "sabatier", "custom response header is captured");
-
-    // -----------------------------------------------------------------------
-    $section("status codes");
-    // -----------------------------------------------------------------------
-
-    [$data, $response, $error] = await_data_task($session, new URLRequest(new URL("http://$host/missing?r=$unique")));
-    $check($response instanceof HTTPURLResponse && $response->statusCode === 404, "404 is reported through the response, not as a transport error");
-    $check($data === "not found", "the 404 body is still delivered");
-
-    // -----------------------------------------------------------------------
-    $section("request body");
-    // -----------------------------------------------------------------------
-
-    $request = new URLRequest(new URL("http://$host/echo?r=$unique"));
-    $request->httpMethod = HTTPRequestMethod::post;
-    $request->httpBody = "sabatier foundation";
-    [$data, , $error] = await_data_task($session, $request);
-    $check($error === null, "POST request completes");
-    $check($data === "SABATIER FOUNDATION", "the request body reaches the server and the echo comes back");
-
-    // -----------------------------------------------------------------------
-    $section("cookies");
-    // -----------------------------------------------------------------------
-
-    [$data, , $error] = await_data_task($session, new URLRequest(new URL("http://$host/set-cookie?r=$unique")));
-    $check($error === null && $data === "cookie set", "set-cookie endpoint responds");
-    $storage = HTTPCookieStorage::shared();
-    $stored = $storage->cookies->first(fn(HTTPCookie $cookie): bool => $cookie->name === "session");
-    $check($stored instanceof HTTPCookie, "the Set-Cookie header lands in the shared cookie storage");
-    $check($stored instanceof HTTPCookie && $stored->value === "abc123", "the stored cookie keeps its value");
-
-    // Round-trip: the configuration attaches stored cookies to subsequent requests
-    // (httpShouldSetCookies), so the server must see the cookie back.
-    [$data, , $error] = await_data_task($session, new URLRequest(new URL("http://$host/show-cookies?r=$unique")));
-    $check($error === null && $data === "abc123", "stored cookies are sent back on subsequent requests");
-
-    // -----------------------------------------------------------------------
-    $section("download task");
-    // -----------------------------------------------------------------------
-
-    $downloadResult = null;
-    $task = $session->downloadTaskWithURL(new URL("http://$host/hello?download=$unique"), function (?URL $location, $response, $error) use (&$downloadResult): void {
-        // Read inside the handler: the file is only valid for its duration, as in Foundation.
-        $downloadResult = [$location !== null ? file_get_contents($location->fileSystemRepresentation) : null, $response, $error, $location?->fileSystemRepresentation];
-    });
-    $task->resume();
-    if ($downloadResult === null) {
-        $session->delegateQueue->waitUntilAllOperationsAreFinished();
+    public static function tearDownAfterClass(): void
+    {
+        if (is_resource(self::$server)) {
+            proc_terminate(self::$server);
+            proc_close(self::$server);
+            self::$server = null;
+        }
+        @unlink(self::$router);
     }
-    [$contents, $response, $error, $temporaryPath] = $downloadResult ?? [null, null, null, null];
-    $check($error === null, "download task completes without error");
-    $check($contents === "hello world", "the downloaded file holds the body");
-    $check($response instanceof HTTPURLResponse && $response->statusCode === 200, "download task reports the response");
-    $check($temporaryPath !== null && !file_exists($temporaryPath), "the temporary file is removed after the completion handler returns");
 
-    // -----------------------------------------------------------------------
-    $section("upload task");
-    // -----------------------------------------------------------------------
+    protected function setUp(): void
+    {
+        $this->session = URLSession::shared();
+    }
 
-    $uploadSource = sys_get_temp_dir() . DIRECTORY_SEPARATOR . "sabatier-upload-" . getmypid() . ".txt";
-    file_put_contents($uploadSource, "upload payload");
-    try {
-        $uploadResult = null;
-        $request = new URLRequest(new URL("http://$host/echo?upload=$unique"));
-        $request->httpMethod = HTTPRequestMethod::post;
-        $task = $session->uploadTaskWithRequest($request, URL::fileURL($uploadSource), function (?string $data, $response, $error) use (&$uploadResult): void {
-            $uploadResult = [$data, $response, $error];
+    /**
+     * Runs a data task to completion and returns [data, response, error].
+     *
+     * @return array{string|null, \Sabatier\Foundation\Networking\URLResponse|null, \Sabatier\Foundation\Error|null}
+     */
+    private function awaitDataTask(URLRequest $request): array
+    {
+        $result = null;
+        $task = $this->session->dataTaskWithRequest($request, function (?string $data, $response, $error) use (&$result): void {
+            $result = [$data, $response, $error];
         });
         $task->resume();
-        if ($uploadResult === null) {
-            $session->delegateQueue->waitUntilAllOperationsAreFinished();
+        if ($result === null) {
+            $this->session->delegateQueue->waitUntilAllOperationsAreFinished();
         }
-        [$data, , $error] = $uploadResult ?? [null, null, null];
-        $check($error === null, "upload task completes without error");
-        $check($data === "UPLOAD PAYLOAD", "the uploaded file body reaches the server");
-    } finally {
-        @unlink($uploadSource);
+        return $result ?? [null, null, null];
     }
 
-    // -----------------------------------------------------------------------
-    $section("transport errors");
-    // -----------------------------------------------------------------------
+    public function testDataTask(): void
+    {
+        $host = self::$host;
+        $unique = self::$unique;
+        [$data, $response, $error] = $this->awaitDataTask(new URLRequest(new URL("http://$host/hello?r=$unique")));
+        $this->assertNull($error, "a successful request reports no error");
+        $this->assertSame("hello world", $data, "the body arrives complete");
+        $this->assertInstanceOf(HTTPURLResponse::class, $response, "the response is an HTTPURLResponse");
+        $this->assertSame(200, $response->statusCode, "status code 200");
 
-    $unreachable = new URLRequest(new URL("http://127.0.0.1:1/unreachable"));
-    $unreachable->timeoutInterval = 3.0;
-    [$data, , $error] = await_data_task($session, $unreachable);
-    $check($error !== null, "a connection refusal surfaces as an Error");
-    $check($data === null || $data === "", "no body on transport failure");
-} finally {
-    proc_terminate($server);
-    proc_close($server);
-    @unlink($router);
+        [$data, $response, $error] = $this->awaitDataTask(new URLRequest(new URL("http://$host/json?r=$unique")));
+        $this->assertTrue($error === null && $data !== null, "json endpoint responds");
+        $decoded = $data !== null ? json_decode($data, true) : null;
+        $this->assertTrue(is_array($decoded) && $decoded["ok"] === true && $decoded["value"] === 42, "json body decodes");
+    }
+
+    public function testResponseHeaders(): void
+    {
+        [, $response, $error] = $this->awaitDataTask(new URLRequest(new URL("http://" . self::$host . "/header?r=" . self::$unique)));
+        $this->assertTrue($error === null && $response instanceof HTTPURLResponse, "header endpoint responds");
+        $this->assertTrue($response instanceof HTTPURLResponse && (string)$response->allHeaderFields["X-Test-Header"] === "sabatier", "custom response header is captured");
+    }
+
+    public function testStatusCodes(): void
+    {
+        [$data, $response] = $this->awaitDataTask(new URLRequest(new URL("http://" . self::$host . "/missing?r=" . self::$unique)));
+        $this->assertTrue($response instanceof HTTPURLResponse && $response->statusCode === 404, "404 is reported through the response, not as a transport error");
+        $this->assertSame("not found", $data, "the 404 body is still delivered");
+    }
+
+    public function testRequestBody(): void
+    {
+        $request = new URLRequest(new URL("http://" . self::$host . "/echo?r=" . self::$unique));
+        $request->httpMethod = HTTPRequestMethod::post;
+        $request->httpBody = "sabatier foundation";
+        [$data, , $error] = $this->awaitDataTask($request);
+        $this->assertNull($error, "POST request completes");
+        $this->assertSame("SABATIER FOUNDATION", $data, "the request body reaches the server and the echo comes back");
+    }
+
+    public function testCookies(): void
+    {
+        [$data, , $error] = $this->awaitDataTask(new URLRequest(new URL("http://" . self::$host . "/set-cookie?r=" . self::$unique)));
+        $this->assertTrue($error === null && $data === "cookie set", "set-cookie endpoint responds");
+        $storage = HTTPCookieStorage::shared();
+        $stored = $storage->cookies->first(fn(HTTPCookie $cookie): bool => $cookie->name === "session");
+        $this->assertInstanceOf(HTTPCookie::class, $stored, "the Set-Cookie header lands in the shared cookie storage");
+        $this->assertSame("abc123", $stored->value, "the stored cookie keeps its value");
+
+        // Round-trip: the configuration attaches stored cookies to subsequent requests
+        // (httpShouldSetCookies), so the server must see the cookie back.
+        [$data, , $error] = $this->awaitDataTask(new URLRequest(new URL("http://" . self::$host . "/show-cookies?r=" . self::$unique)));
+        $this->assertTrue($error === null && $data === "abc123", "stored cookies are sent back on subsequent requests");
+    }
+
+    public function testDownloadTask(): void
+    {
+        $downloadResult = null;
+        $task = $this->session->downloadTaskWithURL(new URL("http://" . self::$host . "/hello?download=" . self::$unique), function (?URL $location, $response, $error) use (&$downloadResult): void {
+            // Read inside the handler: the file is only valid for its duration, as in Foundation.
+            $downloadResult = [$location !== null ? file_get_contents($location->fileSystemRepresentation) : null, $response, $error, $location?->fileSystemRepresentation];
+        });
+        $task->resume();
+        if ($downloadResult === null) {
+            $this->session->delegateQueue->waitUntilAllOperationsAreFinished();
+        }
+        [$contents, $response, $error, $temporaryPath] = $downloadResult ?? [null, null, null, null];
+        $this->assertNull($error, "download task completes without error");
+        $this->assertSame("hello world", $contents, "the downloaded file holds the body");
+        $this->assertTrue($response instanceof HTTPURLResponse && $response->statusCode === 200, "download task reports the response");
+        $this->assertTrue($temporaryPath !== null && !file_exists($temporaryPath), "the temporary file is removed after the completion handler returns");
+    }
+
+    public function testUploadTask(): void
+    {
+        $uploadSource = sys_get_temp_dir() . DIRECTORY_SEPARATOR . "sabatier-upload-" . getmypid() . ".txt";
+        file_put_contents($uploadSource, "upload payload");
+        try {
+            $uploadResult = null;
+            $request = new URLRequest(new URL("http://" . self::$host . "/echo?upload=" . self::$unique));
+            $request->httpMethod = HTTPRequestMethod::post;
+            $task = $this->session->uploadTaskWithRequest($request, URL::fileURL($uploadSource), function (?string $data, $response, $error) use (&$uploadResult): void {
+                $uploadResult = [$data, $response, $error];
+            });
+            $task->resume();
+            if ($uploadResult === null) {
+                $this->session->delegateQueue->waitUntilAllOperationsAreFinished();
+            }
+            [$data, , $error] = $uploadResult ?? [null, null, null];
+            $this->assertNull($error, "upload task completes without error");
+            $this->assertSame("UPLOAD PAYLOAD", $data, "the uploaded file body reaches the server");
+        } finally {
+            @unlink($uploadSource);
+        }
+    }
+
+    public function testTransportErrors(): void
+    {
+        $unreachable = new URLRequest(new URL("http://127.0.0.1:1/unreachable"));
+        $unreachable->timeoutInterval = 3.0;
+        [$data, , $error] = $this->awaitDataTask($unreachable);
+        $this->assertNotNull($error, "a connection refusal surfaces as an Error");
+        $this->assertTrue($data === null || $data === "", "no body on transport failure");
+    }
 }
-
-URLSessionTestRunner::finish();

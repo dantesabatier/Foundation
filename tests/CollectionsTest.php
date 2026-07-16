@@ -2,11 +2,16 @@
 
 declare(strict_types=1);
 
+namespace Sabatier\Foundation\Tests;
+
+use PHPUnit\Framework\TestCase;
+use Sabatier\Foundation\ArrayClass;
+use Sabatier\Foundation\Dictionary;
+use Sabatier\Foundation\Set;
+use Sabatier\Foundation\Slice;
+
 /**
- * Standalone tests for the core collection types: ArrayClass, Dictionary, Set, and Slice.
- *
- * Run with: php tests/CollectionsTest.php
- * Exits with a non-zero status code if any check fails.
+ * Tests for src/ArrayClass.php, src/Dictionary.php, src/Set.php, and src/Slice.php.
  *
  * Regression guards:
  *  - Slice::$array passed the end index as array_slice()'s length argument, so any slice
@@ -17,217 +22,217 @@ declare(strict_types=1);
  *  - Set must accept any iterable in its constructor (URLCache builds one from
  *    Dictionary->keys).
  */
-
-namespace Sabatier\Foundation\Tests;
-
-use Sabatier\Foundation\ArrayClass;
-use Sabatier\Foundation\Dictionary;
-use Sabatier\Foundation\Set;
-use Sabatier\Foundation\Slice;
-
-require __DIR__ . "/../vendor/autoload.php";
-
-final class CollectionsTestRunner
+final class CollectionsTest extends TestCase
 {
-    public static int $passed = 0;
-    /** @var list<string> */
-    public static array $failures = [];
-    private static string $section = "";
-
-    public static function section(string $name): void
+    public function testArrayClassBasics(): void
     {
-        self::$section = $name;
+        $numbers = new ArrayClass([3, 1, 2]);
+        $this->assertSame(3, $numbers->count, "count");
+        $this->assertFalse($numbers->isEmpty, "isEmpty on populated array");
+        $this->assertTrue(new ArrayClass()->isEmpty, "isEmpty on empty array");
+        $this->assertSame(3, $numbers->first, "first");
+        $this->assertSame(2, $numbers->last, "last");
+        $this->assertSame(1, $numbers->indexOf(1), "indexOf");
+        $this->assertNull($numbers->indexOf(99), "indexOf missing element");
+        $this->assertTrue($numbers->containsElement(2), "containsElement");
+        $this->assertTrue($numbers->contains(fn(int $e): bool => $e > 2), "contains with predicate");
+        $this->assertSame(1, $numbers->min(), "min and max");
+        $this->assertSame(3, $numbers->max(), "min and max");
+        $this->assertSame("3,1,2", $numbers->join(","), "join");
     }
 
-    public static function check(bool $condition, string $message): void
+    public function testArrayClassMutation(): void
     {
-        if ($condition) {
-            self::$passed++;
-            return;
-        }
-        $failure = self::$section === "" ? $message : self::$section . ": " . $message;
-        self::$failures[] = $failure;
-        fwrite(STDERR, "FAIL $failure" . PHP_EOL);
+        $mutable = new ArrayClass([1, 2]);
+        $mutable->append(3);
+        $this->assertSame([1, 2, 3], $mutable->array, "append mutates in place");
+        $appended = $mutable->appending(4);
+        $this->assertSame([1, 2, 3, 4], $appended->array, "appending does not mutate the receiver");
+        $this->assertSame([1, 2, 3], $mutable->array, "appending does not mutate the receiver");
+        $mutable->appendContentsOf([4, 5]);
+        $this->assertSame([1, 2, 3, 4, 5], $mutable->array, "appendContentsOf");
+        $mutable->insertAt(0, 0);
+        $this->assertSame([0, 1, 2, 3, 4, 5], $mutable->array, "insertAt");
+        $mutable->removeAt(0);
+        $this->assertSame([1, 2, 3, 4, 5], $mutable->array, "removeAt");
+        $this->assertSame(5, $mutable->popLast(), "popLast returns and removes");
+        $this->assertSame([1, 2, 3, 4], $mutable->array, "popLast returns and removes");
+        $this->assertSame(1, $mutable->popFirst(), "popFirst returns and removes");
+        $this->assertSame([2, 3, 4], $mutable->array, "popFirst returns and removes");
+        $this->assertNull(new ArrayClass()->popLast(), "popLast on empty array is null");
+        $this->assertNull(new ArrayClass()->popFirst(), "popFirst on empty array is null");
     }
 
-    public static function finish(): never
+    public function testArrayClassSortAndReverse(): void
     {
-        $failed = count(self::$failures);
-        printf("%d passed, %d failed%s", self::$passed, $failed, PHP_EOL);
-        exit($failed > 0 ? 1 : 0);
+        $this->assertSame([1, 2, 3], new ArrayClass([3, 1, 2])->sort()->array, "sort ascending");
+        $this->assertSame([3, 2, 1], new ArrayClass([1, 2, 3])->reversed()->array, "reversed");
+        $original = new ArrayClass([1, 2, 3]);
+        $original->reversed();
+        $this->assertSame([1, 2, 3], $original->array, "reversed does not mutate the receiver");
+    }
+
+    public function testArrayClassFunctionalAlgorithms(): void
+    {
+        $source = new ArrayClass([1, 2, 3, 4]);
+        $this->assertSame([2, 4, 6, 8], $source->map(fn(int $e): int => $e * 2)->array, "map");
+        $this->assertSame([2, 4], $source->filter(fn(int $e): bool => $e % 2 === 0)->array, "filter");
+        $this->assertSame([20, 40], $source->compactMap(fn(int $e): ?int => $e % 2 === 0 ? $e * 10 : null)->array, "compactMap drops nulls");
+        $this->assertSame([1, 1, 2, 2, 3, 3, 4, 4], $source->flatMap(fn(int $e): array => [$e, $e])->array, "flatMap");
+        // reduce follows Swift's reduce(into:): the closure mutates the accumulator by reference.
+        $this->assertSame(10, $source->reduce(0, fn(int &$acc, int $e): int => $acc += $e), "reduce mutates the accumulator by reference");
+        $this->assertTrue($source->allSatisfy(fn(int $e): bool => $e > 0), "allSatisfy true");
+        $this->assertFalse($source->allSatisfy(fn(int $e): bool => $e > 1), "allSatisfy false");
+        $this->assertSame(3, $source->first(fn(int $e): bool => $e > 2), "first with predicate");
+        $this->assertSame(2, $source->firstIndex(fn(int $e): bool => $e > 2), "firstIndex");
+        $this->assertSame(2, $source->lastIndex(fn(int $e): bool => $e < 4), "lastIndex");
+    }
+
+    public function testArrayClassFilterStopsEarly(): void
+    {
+        // The filter closure can stop the iteration through its by-ref third parameter.
+        $source = new ArrayClass([1, 2, 3, 4]);
+        $visited = [];
+        $stopped = $source->filter(function (int $e, int $i, bool &$stop) use (&$visited): bool {
+            $visited[] = $e;
+            $stop = $e === 2;
+            return true;
+        });
+        $this->assertSame([1, 2], $visited, "filter stops early when the closure sets stop");
+        $this->assertSame([1, 2], $stopped->array, "filter keeps the elements accepted before stopping");
+    }
+
+    public function testSplitAndSeparate(): void
+    {
+        $sequence = new ArrayClass([1, 0, 2, 3, 0, 0, 4]);
+        $slices = $sequence->split(fn(int $e): bool => $e === 0);
+        $this->assertSame(3, $slices->count, "split produces one slice per non-empty subsequence");
+        // A middle slice used to leak elements past its upper bound because Slice::$array
+        // passed the end index as array_slice()'s length.
+        $this->assertSame([[1], [2, 3], [4]], $slices->map(fn(Slice $s): array => $s->array)->array, "split slices contain exactly their subsequence");
+        $this->assertSame(4, $sequence->split(fn(int $e): bool => $e === 0, omittingEmptySubsequences: false)->count, "split keeps empty subsequences on demand");
+        $this->assertSame(2, $sequence->split(fn(int $e): bool => $e === 0, 1)->count, "split honors maxSplits");
+        $this->assertSame([[1], [2, 3], [4]], $sequence->separate(0)->map(fn(Slice $s): array => $s->array)->array, "separate splits on an element");
+        $this->assertSame([[1]], new ArrayClass([0, 1, 0])->split(fn(int $e): bool => $e === 0)->map(fn(Slice $s): array => $s->array)->array, "split ignores leading and trailing separators");
+    }
+
+    public function testSliceBounds(): void
+    {
+        $sequence = new ArrayClass([1, 0, 2, 3, 0, 0, 4]);
+        $slices = $sequence->split(fn(int $e): bool => $e === 0);
+        $middle = $slices[1];
+        $this->assertSame(2, $middle->count, "slice count comes from its bounds");
+        $this->assertSame(2, $middle->startIndex, "slice start and end indices");
+        $this->assertSame(4, $middle->endIndex, "slice start and end indices");
+        $this->assertSame(2, $middle->first, "slice first");
+        $this->assertSame([2 => 2, 3 => 3], iterator_to_array($middle), "slice iteration preserves the base collection's indices");
+        $this->assertSame([3], $middle->filter(fn(int $e): bool => $e > 2)->array, "slice filter");
+        $this->assertSame("[2,3]", json_encode($middle), "slice jsonSerialize uses its own bounds");
+    }
+
+    public function testPrefixSuffixAndDrop(): void
+    {
+        $letters = new ArrayClass(["a", "b", "c", "d"]);
+        $this->assertSame(["a", "b"], $letters->prefix(2)->array, "prefix");
+        $this->assertSame(["c", "d"], $letters->suffix(2)->array, "suffix");
+        $this->assertSame(["b", "c", "d"], $letters->dropFirst(1)->array, "dropFirst");
+        $this->assertSame(["a", "b", "c"], $letters->dropLast(1)->array, "dropLast");
+        $this->assertSame(["c", "d"], $letters->drop(fn(string $e): bool => $e < "c")->array, "drop while");
+    }
+
+    public function testDictionaryBasics(): void
+    {
+        $dictionary = new Dictionary(["a" => 1, "b" => 2, "c" => 3]);
+        $this->assertSame(3, $dictionary->count, "count");
+        $this->assertSame(["a", "b", "c"], $dictionary->keys->array, "keys");
+        $this->assertSame([1, 2, 3], $dictionary->values->array, "values");
+        $this->assertSame(2, $dictionary["b"], "subscript read");
+        $this->assertNull($dictionary["missing"], "subscript read of a missing key is null");
+        $this->assertSame(3, $dictionary->valueForKey("c"), "valueForKey");
+    }
+
+    public function testDictionaryMutation(): void
+    {
+        $mutableDictionary = new Dictionary(["a" => 1]);
+        $mutableDictionary["b"] = 2;
+        $this->assertSame(2, $mutableDictionary->count, "subscript write");
+        $this->assertSame(2, $mutableDictionary["b"], "subscript write");
+        $this->assertSame(1, $mutableDictionary->updateValue(10, "a"), "updateValue returns the previous value");
+        $this->assertSame(10, $mutableDictionary["a"], "updateValue stores the new value");
+        $this->assertSame(10, $mutableDictionary->removeValueForKey("a"), "removeValueForKey returns the removed value");
+        $this->assertSame(1, $mutableDictionary->count, "removeValueForKey removes the entry");
+    }
+
+    public function testDictionaryFunctionalAlgorithms(): void
+    {
+        $dictionary = new Dictionary(["a" => 1, "b" => 2, "c" => 3]);
+        $this->assertSame(["b", "c"], $dictionary->filter(fn(int $value): bool => $value > 1)->keys->array, "filter keeps matching entries with their keys");
+        $this->assertSame(["a1", "b2", "c3"], $dictionary->map(fn(int $value, string $key): string => "$key$value")->array, "map receives value and key");
+        // Dictionary::compactMap builds an ArrayClass with append() and must drop nulls.
+        $this->assertSame([10, 30], $dictionary->compactMap(fn(int $value): ?int => $value % 2 === 1 ? $value * 10 : null)->array, "compactMap drops nulls");
+        $this->assertSame(["a" => 2, "b" => 4, "c" => 6], $dictionary->mapValues(fn(int $value): int => $value * 2)->array, "mapValues keeps keys");
+        $this->assertSame(["b" => 2, "c" => 3], $dictionary->compactMapValues(fn(int $value): ?int => $value > 1 ? $value : null)->array, "compactMapValues keeps keys and drops nulls");
+        $this->assertSame(6, $dictionary->reduce(0, fn(int &$acc, int $value): int => $acc += $value), "reduce over values");
+    }
+
+    public function testDictionaryNumericStringKeys(): void
+    {
+        // PHP converts numeric-string array keys to int internally; the key-returning methods
+        // must still honor their declared string contract (TaskRegistry keys tasks by number).
+        $numericKeys = new Dictionary(["7" => "a", "9" => "b"]);
+        $this->assertSame("9", $numericKeys->firstIndex(fn(string $value): bool => $value === "b"), "firstIndex returns a string key even when PHP intified it");
+        $this->assertSame("7", $numericKeys->indexOf("a"), "indexOf returns a string key even when PHP intified it");
+    }
+
+    public function testDictionaryGroupingMergingAndEquality(): void
+    {
+        $grouped = Dictionary::grouping(new ArrayClass(["ana", "aldo", "beto"]), fn(string $name): string => $name[0]);
+        $this->assertSame(2, $grouped->count, "grouping produces one entry per key");
+        $this->assertSame(["ana", "aldo"], $grouped["a"]->array, "grouping preserves element order inside groups");
+
+        $merged = new Dictionary(["a" => 1, "b" => 2])->merging(["b" => 20, "c" => 3], fn(int $current, int $new): int => $new);
+        $this->assertSame(["a" => 1, "b" => 20, "c" => 3], $merged->array, "merging resolves duplicates with the combine closure");
+        $this->assertTrue(new Dictionary(["a" => 1])->isEqual(new Dictionary(["a" => 1])), "isEqual on equal dictionaries");
+        $this->assertFalse(new Dictionary(["a" => 1])->isEqual(new Dictionary(["a" => 2])), "isEqual on different dictionaries");
+    }
+
+    public function testSetBasics(): void
+    {
+        $set = new Set([1, 1, 2, 3, 3]);
+        $this->assertSame(3, $set->count, "constructor deduplicates");
+        $this->assertTrue($set->containsElement(2), "containsElement");
+        $this->assertSame(2, $set->member(2), "member returns the stored element");
+        $this->assertNull($set->member(99), "member of a missing element is null");
+    }
+
+    public function testSetInsertAndRemove(): void
+    {
+        $set = new Set([1, 1, 2, 3, 3]);
+        $insertion = $set->insert(4);
+        $this->assertTrue($insertion["inserted"], "insert of a new element");
+        $this->assertSame(4, $set->count, "insert of a new element");
+        $duplicate = $set->insert(4);
+        $this->assertFalse($duplicate["inserted"], "insert of a duplicate is rejected");
+        $this->assertSame(4, $set->count, "insert of a duplicate is rejected");
+        $this->assertSame(4, $duplicate["elementAfterInsert"], "insert of a duplicate returns the existing element");
+        $set->remove(4);
+        $this->assertSame(3, $set->count, "remove");
+        $this->assertFalse($set->containsElement(4), "remove");
+    }
+
+    public function testSetConstructionFromIterable(): void
+    {
+        // URLCache builds a Set from Dictionary->keys: the constructor must accept any iterable.
+        $fromKeys = new Set(new Dictionary(["x" => 1, "y" => 2])->keys);
+        $this->assertSame(2, $fromKeys->count, "construction from Dictionary keys");
+        $this->assertTrue($fromKeys->containsElement("x"), "construction from Dictionary keys");
+        $this->assertTrue($fromKeys->containsElement("y"), "construction from Dictionary keys");
+    }
+
+    public function testSetMapAndFilter(): void
+    {
+        $set = new Set([1, 2, 3]);
+        $this->assertSame(2, $set->map(fn(int $e): int => $e % 2)->count, "map deduplicates its results");
+        $this->assertSame(2, $set->filter(fn(int $e): bool => $e > 1)->count, "filter returns a Set");
     }
 }
-
-/** Fails the process on any PHP warning/notice. */
-set_error_handler(function (int $severity, string $message, string $file, int $line): bool {
-    throw new \ErrorException($message, 0, $severity, $file, $line);
-});
-
-$check = CollectionsTestRunner::check(...);
-$section = CollectionsTestRunner::section(...);
-
-// ---------------------------------------------------------------------------
-$section("ArrayClass basics");
-// ---------------------------------------------------------------------------
-
-$numbers = new ArrayClass([3, 1, 2]);
-$check($numbers->count === 3, "count");
-$check($numbers->isEmpty === false, "isEmpty on populated array");
-$check(new ArrayClass()->isEmpty === true, "isEmpty on empty array");
-$check($numbers->first === 3, "first");
-$check($numbers->last === 2, "last");
-$check($numbers->indexOf(1) === 1, "indexOf");
-$check($numbers->indexOf(99) === null, "indexOf missing element");
-$check($numbers->containsElement(2) === true, "containsElement");
-$check($numbers->contains(fn(int $e): bool => $e > 2) === true, "contains with predicate");
-$check($numbers->min() === 1 && $numbers->max() === 3, "min and max");
-$check($numbers->join(",") === "3,1,2", "join");
-
-$mutable = new ArrayClass([1, 2]);
-$mutable->append(3);
-$check($mutable->array === [1, 2, 3], "append mutates in place");
-$appended = $mutable->appending(4);
-$check($appended->array === [1, 2, 3, 4] && $mutable->array === [1, 2, 3], "appending does not mutate the receiver");
-$mutable->appendContentsOf([4, 5]);
-$check($mutable->array === [1, 2, 3, 4, 5], "appendContentsOf");
-$mutable->insertAt(0, 0);
-$check($mutable->array === [0, 1, 2, 3, 4, 5], "insertAt");
-$mutable->removeAt(0);
-$check($mutable->array === [1, 2, 3, 4, 5], "removeAt");
-$check($mutable->popLast() === 5 && $mutable->array === [1, 2, 3, 4], "popLast returns and removes");
-$check($mutable->popFirst() === 1 && $mutable->array === [2, 3, 4], "popFirst returns and removes");
-$check(new ArrayClass()->popLast() === null, "popLast on empty array is null");
-$check(new ArrayClass()->popFirst() === null, "popFirst on empty array is null");
-
-$check(new ArrayClass([3, 1, 2])->sort()->array === [1, 2, 3], "sort ascending");
-$check(new ArrayClass([1, 2, 3])->reversed()->array === [3, 2, 1], "reversed");
-$original = new ArrayClass([1, 2, 3]);
-$original->reversed();
-$check($original->array === [1, 2, 3], "reversed does not mutate the receiver");
-
-// ---------------------------------------------------------------------------
-$section("ArrayClass functional algorithms");
-// ---------------------------------------------------------------------------
-
-$source = new ArrayClass([1, 2, 3, 4]);
-$check($source->map(fn(int $e): int => $e * 2)->array === [2, 4, 6, 8], "map");
-$check($source->filter(fn(int $e): bool => $e % 2 === 0)->array === [2, 4], "filter");
-$check($source->compactMap(fn(int $e): ?int => $e % 2 === 0 ? $e * 10 : null)->array === [20, 40], "compactMap drops nulls");
-$check($source->flatMap(fn(int $e): array => [$e, $e])->array === [1, 1, 2, 2, 3, 3, 4, 4], "flatMap");
-// reduce follows Swift's reduce(into:): the closure mutates the accumulator by reference.
-$check($source->reduce(0, fn(int &$acc, int $e): int => $acc += $e) === 10, "reduce mutates the accumulator by reference");
-$check($source->allSatisfy(fn(int $e): bool => $e > 0) === true, "allSatisfy true");
-$check($source->allSatisfy(fn(int $e): bool => $e > 1) === false, "allSatisfy false");
-$check($source->first(fn(int $e): bool => $e > 2) === 3, "first with predicate");
-$check($source->firstIndex(fn(int $e): bool => $e > 2) === 2, "firstIndex");
-$check($source->lastIndex(fn(int $e): bool => $e < 4) === 2, "lastIndex");
-
-// The filter closure can stop the iteration through its by-ref third parameter.
-$visited = [];
-$stopped = $source->filter(function (int $e, int $i, bool &$stop) use (&$visited): bool {
-    $visited[] = $e;
-    $stop = $e === 2;
-    return true;
-});
-$check($visited === [1, 2], "filter stops early when the closure sets stop");
-$check($stopped->array === [1, 2], "filter keeps the elements accepted before stopping");
-
-// ---------------------------------------------------------------------------
-$section("split / separate and Slice bounds");
-// ---------------------------------------------------------------------------
-
-$sequence = new ArrayClass([1, 0, 2, 3, 0, 0, 4]);
-$slices = $sequence->split(fn(int $e): bool => $e === 0);
-$check($slices->count === 3, "split produces one slice per non-empty subsequence");
-// A middle slice used to leak elements past its upper bound because Slice::$array
-// passed the end index as array_slice()'s length.
-$check($slices->map(fn(Slice $s): array => $s->array)->array === [[1], [2, 3], [4]], "split slices contain exactly their subsequence");
-$check($sequence->split(fn(int $e): bool => $e === 0, omittingEmptySubsequences: false)->count === 4, "split keeps empty subsequences on demand");
-$check($sequence->split(fn(int $e): bool => $e === 0, 1)->count === 2, "split honors maxSplits");
-$check($sequence->separate(0)->map(fn(Slice $s): array => $s->array)->array === [[1], [2, 3], [4]], "separate splits on an element");
-$check(new ArrayClass([0, 1, 0])->split(fn(int $e): bool => $e === 0)->map(fn(Slice $s): array => $s->array)->array === [[1]], "split ignores leading and trailing separators");
-
-$middle = $slices[1];
-$check($middle->count === 2, "slice count comes from its bounds");
-$check($middle->startIndex === 2 && $middle->endIndex === 4, "slice start and end indices");
-$check($middle->first === 2, "slice first");
-$check(iterator_to_array($middle) === [2 => 2, 3 => 3], "slice iteration preserves the base collection's indices");
-$check($middle->filter(fn(int $e): bool => $e > 2)->array === [3], "slice filter");
-$check(json_encode($middle) === "[2,3]", "slice jsonSerialize uses its own bounds");
-
-$letters = new ArrayClass(["a", "b", "c", "d"]);
-$check($letters->prefix(2)->array === ["a", "b"], "prefix");
-$check($letters->suffix(2)->array === ["c", "d"], "suffix");
-$check($letters->dropFirst(1)->array === ["b", "c", "d"], "dropFirst");
-$check($letters->dropLast(1)->array === ["a", "b", "c"], "dropLast");
-$check($letters->drop(fn(string $e): bool => $e < "c")->array === ["c", "d"], "drop while");
-
-// ---------------------------------------------------------------------------
-$section("Dictionary");
-// ---------------------------------------------------------------------------
-
-$dictionary = new Dictionary(["a" => 1, "b" => 2, "c" => 3]);
-$check($dictionary->count === 3, "count");
-$check($dictionary->keys->array === ["a", "b", "c"], "keys");
-$check($dictionary->values->array === [1, 2, 3], "values");
-$check($dictionary["b"] === 2, "subscript read");
-$check($dictionary["missing"] === null, "subscript read of a missing key is null");
-$check($dictionary->valueForKey("c") === 3, "valueForKey");
-
-$mutableDictionary = new Dictionary(["a" => 1]);
-$mutableDictionary["b"] = 2;
-$check($mutableDictionary->count === 2 && $mutableDictionary["b"] === 2, "subscript write");
-$check($mutableDictionary->updateValue(10, "a") === 1, "updateValue returns the previous value");
-$check($mutableDictionary["a"] === 10, "updateValue stores the new value");
-$check($mutableDictionary->removeValueForKey("a") === 10, "removeValueForKey returns the removed value");
-$check($mutableDictionary->count === 1, "removeValueForKey removes the entry");
-
-$check($dictionary->filter(fn(int $value): bool => $value > 1)->keys->array === ["b", "c"], "filter keeps matching entries with their keys");
-$check($dictionary->map(fn(int $value, string $key): string => "$key$value")->array === ["a1", "b2", "c3"], "map receives value and key");
-// Dictionary::compactMap builds an ArrayClass with append() and must drop nulls.
-$check($dictionary->compactMap(fn(int $value): ?int => $value % 2 === 1 ? $value * 10 : null)->array === [10, 30], "compactMap drops nulls");
-$check($dictionary->mapValues(fn(int $value): int => $value * 2)->array === ["a" => 2, "b" => 4, "c" => 6], "mapValues keeps keys");
-$check($dictionary->compactMapValues(fn(int $value): ?int => $value > 1 ? $value : null)->array === ["b" => 2, "c" => 3], "compactMapValues keeps keys and drops nulls");
-$check($dictionary->reduce(0, fn(int &$acc, int $value): int => $acc += $value) === 6, "reduce over values");
-
-// PHP converts numeric-string array keys to int internally; the key-returning methods
-// must still honor their declared string contract (TaskRegistry keys tasks by number).
-$numericKeys = new Dictionary(["7" => "a", "9" => "b"]);
-$check($numericKeys->firstIndex(fn(string $value): bool => $value === "b") === "9", "firstIndex returns a string key even when PHP intified it");
-$check($numericKeys->indexOf("a") === "7", "indexOf returns a string key even when PHP intified it");
-
-$grouped = Dictionary::grouping(new ArrayClass(["ana", "aldo", "beto"]), fn(string $name): string => $name[0]);
-$check($grouped->count === 2, "grouping produces one entry per key");
-$check($grouped["a"]->array === ["ana", "aldo"], "grouping preserves element order inside groups");
-
-$merged = new Dictionary(["a" => 1, "b" => 2])->merging(["b" => 20, "c" => 3], fn(int $current, int $new): int => $new);
-$check($merged->array === ["a" => 1, "b" => 20, "c" => 3], "merging resolves duplicates with the combine closure");
-$check(new Dictionary(["a" => 1])->isEqual(new Dictionary(["a" => 1])), "isEqual on equal dictionaries");
-$check(!new Dictionary(["a" => 1])->isEqual(new Dictionary(["a" => 2])), "isEqual on different dictionaries");
-
-// ---------------------------------------------------------------------------
-$section("Set");
-// ---------------------------------------------------------------------------
-
-$set = new Set([1, 1, 2, 3, 3]);
-$check($set->count === 3, "constructor deduplicates");
-$check($set->containsElement(2) === true, "containsElement");
-$check($set->member(2) === 2, "member returns the stored element");
-$check($set->member(99) === null, "member of a missing element is null");
-
-$insertion = $set->insert(4);
-$check($insertion["inserted"] === true && $set->count === 4, "insert of a new element");
-$duplicate = $set->insert(4);
-$check($duplicate["inserted"] === false && $set->count === 4, "insert of a duplicate is rejected");
-$check($duplicate["elementAfterInsert"] === 4, "insert of a duplicate returns the existing element");
-$set->remove(4);
-$check($set->count === 3 && !$set->containsElement(4), "remove");
-
-// URLCache builds a Set from Dictionary->keys: the constructor must accept any iterable.
-$fromKeys = new Set(new Dictionary(["x" => 1, "y" => 2])->keys);
-$check($fromKeys->count === 2 && $fromKeys->containsElement("x") && $fromKeys->containsElement("y"), "construction from Dictionary keys");
-
-$check($set->map(fn(int $e): int => $e % 2)->count === 2, "map deduplicates its results");
-$check($set->filter(fn(int $e): bool => $e > 1)->count === 2, "filter returns a Set");
-
-CollectionsTestRunner::finish();

@@ -2,11 +2,14 @@
 
 declare(strict_types=1);
 
+namespace Sabatier\Foundation\Tests;
+
+use PHPUnit\Framework\TestCase;
+use Sabatier\Foundation\FileHandle;
+use Sabatier\Foundation\URL;
+
 /**
- * Standalone tests for src/FileHandle.php.
- *
- * Run with: php tests/FileHandleTest.php
- * Exits with a non-zero status code if any check fails.
+ * Tests for src/FileHandle.php.
  *
  * Regression guards:
  *  - the reading factory used to throw instead of returning null for a missing file
@@ -17,126 +20,84 @@ declare(strict_types=1);
  *    its contract promises;
  *  - offsetInFile is a hooked property (was the offset() method).
  */
-
-namespace Sabatier\Foundation\Tests;
-
-use Sabatier\Foundation\FileHandle;
-use Sabatier\Foundation\URL;
-
-require __DIR__ . "/../vendor/autoload.php";
-
-final class FileHandleTestRunner
+final class FileHandleTest extends TestCase
 {
-    public static int $passed = 0;
-    /** @var list<string> */
-    public static array $failures = [];
-    private static string $section = "";
+    private string $directory;
+    private string $existing;
 
-    public static function section(string $name): void
+    protected function setUp(): void
     {
-        self::$section = $name;
-    }
-
-    public static function check(bool $condition, string $message): void
-    {
-        if ($condition) {
-            self::$passed++;
-            return;
+        $this->directory = sys_get_temp_dir() . DIRECTORY_SEPARATOR . "sabatier-filehandle-test-" . getmypid();
+        if (!is_dir($this->directory)) {
+            mkdir($this->directory);
         }
-        $failure = self::$section === "" ? $message : self::$section . ": " . $message;
-        self::$failures[] = $failure;
-        fwrite(STDERR, "FAIL $failure" . PHP_EOL);
+        $this->existing = $this->directory . DIRECTORY_SEPARATOR . "existing.txt";
+        file_put_contents($this->existing, "hello world");
     }
 
-    public static function finish(): never
+    protected function tearDown(): void
     {
-        $failed = count(self::$failures);
-        printf("%d passed, %d failed%s", self::$passed, $failed, PHP_EOL);
-        exit($failed > 0 ? 1 : 0);
+        @unlink($this->existing);
+        @unlink($this->directory . DIRECTORY_SEPARATOR . "written.txt");
+        @unlink($this->directory . DIRECTORY_SEPARATOR . "updated.txt");
+        @rmdir($this->directory);
     }
-}
 
-/** Fails the process on any PHP warning/notice, so a resurfaced double-fclose is caught. */
-set_error_handler(function (int $severity, string $message, string $file, int $line): bool {
-    throw new \ErrorException($message, 0, $severity, $file, $line);
-});
+    public function testFactories(): void
+    {
+        // A missing file must produce null, not an exception escaping the factory.
+        $this->assertNull(FileHandle::fileHandleForReadingFromURL(URL::fileURL($this->directory . DIRECTORY_SEPARATOR . "missing.txt")), "reading factory returns null for a missing file");
+        $this->assertInstanceOf(FileHandle::class, FileHandle::fileHandleForReadingFromURL(URL::fileURL($this->existing)), "reading factory opens an existing file");
+        $this->assertSame(FileHandle::standardOutput(), FileHandle::standardOutput(), "standardOutput is a shared instance");
+    }
 
-$check = FileHandleTestRunner::check(...);
-$section = FileHandleTestRunner::section(...);
+    public function testReading(): void
+    {
+        $reader = FileHandle::fileHandleForReadingFromURL(URL::fileURL($this->existing));
+        $this->assertSame(0, $reader->offsetInFile, "offsetInFile starts at 0");
+        $this->assertSame("hello", $reader->read(5), "read returns the requested bytes");
+        $this->assertSame(5, $reader->offsetInFile, "read advances offsetInFile");
+        $this->assertSame(" world", $reader->readToEnd(), "readToEnd reads from the current offset");
+        $reader->seek(6);
+        $this->assertSame(6, $reader->offsetInFile, "seek moves the file pointer");
+        $this->assertSame("world", $reader->availableData, "availableData reads from the current offset to the end");
+        $this->assertSame(11, $reader->seekToEnd(), "seekToEnd returns the file size");
+        $reader->close();
+    }
 
-$directory = sys_get_temp_dir() . DIRECTORY_SEPARATOR . "sabatier-filehandle-test-" . getmypid();
-mkdir($directory);
-$existing = $directory . DIRECTORY_SEPARATOR . "existing.txt";
-file_put_contents($existing, "hello world");
-
-try {
-    // -----------------------------------------------------------------------
-    $section("factories");
-    // -----------------------------------------------------------------------
-
-    // A missing file must produce null, not an exception escaping the factory.
-    $check(FileHandle::fileHandleForReadingFromURL(URL::fileURL($directory . DIRECTORY_SEPARATOR . "missing.txt")) === null, "reading factory returns null for a missing file");
-    $check(FileHandle::fileHandleForReadingFromURL(URL::fileURL($existing)) instanceof FileHandle, "reading factory opens an existing file");
-    $check(FileHandle::standardOutput() === FileHandle::standardOutput(), "standardOutput is a shared instance");
-
-    // -----------------------------------------------------------------------
-    $section("reading");
-    // -----------------------------------------------------------------------
-
-    $reader = FileHandle::fileHandleForReadingFromURL(URL::fileURL($existing));
-    $check($reader->offsetInFile === 0, "offsetInFile starts at 0");
-    $check($reader->read(5) === "hello", "read returns the requested bytes");
-    $check($reader->offsetInFile === 5, "read advances offsetInFile");
-    $check($reader->readToEnd() === " world", "readToEnd reads from the current offset");
-    $reader->seek(6);
-    $check($reader->offsetInFile === 6, "seek moves the file pointer");
-    $check($reader->availableData === "world", "availableData reads from the current offset to the end");
-    $check($reader->seekToEnd() === 11, "seekToEnd returns the file size");
-    $reader->close();
-
-    // -----------------------------------------------------------------------
-    $section("closing");
-    // -----------------------------------------------------------------------
-
-    $closable = FileHandle::fileHandleForReadingFromURL(URL::fileURL($existing));
-    $closable->close();
-    try {
+    public function testCloseIsIdempotent(): void
+    {
+        // The destructor also calls close(); with the handle already closed it must not fail.
+        $closable = FileHandle::fileHandleForReadingFromURL(URL::fileURL($this->existing));
         $closable->close();
-        $check(true, "close is idempotent");
-    } catch (\Throwable) {
-        $check(false, "close is idempotent");
+        $closable->close();
+        $this->assertTrue(true, "close is idempotent");
+        unset($closable);
+        $this->assertTrue(true, "destruction after an explicit close does not fail");
     }
-    // The destructor also calls close(); with the handle already closed it must not fail.
-    unset($closable);
-    $check(true, "destruction after an explicit close does not fail");
 
-    // -----------------------------------------------------------------------
-    $section("writing");
-    // -----------------------------------------------------------------------
+    public function testWriting(): void
+    {
+        $written = $this->directory . DIRECTORY_SEPARATOR . "written.txt";
+        file_put_contents($written, "");
+        $writer = FileHandle::fileHandleForWritingToURL(URL::fileURL($written));
+        $this->assertInstanceOf(FileHandle::class, $writer, "writing factory opens the file");
+        $writer->write("data");
+        $writer->synchronize();
+        $this->assertSame("data", file_get_contents($written), "write persists the data");
+        $writer->truncate(2);
+        $writer->close();
+        $this->assertSame("da", file_get_contents($written), "truncate shortens the file");
+    }
 
-    $written = $directory . DIRECTORY_SEPARATOR . "written.txt";
-    file_put_contents($written, "");
-    $writer = FileHandle::fileHandleForWritingToURL(URL::fileURL($written));
-    $check($writer instanceof FileHandle, "writing factory opens the file");
-    $writer->write("data");
-    $writer->synchronize();
-    $check(file_get_contents($written) === "data", "write persists the data");
-    $writer->truncate(2);
-    $writer->close();
-    $check(file_get_contents($written) === "da", "truncate shortens the file");
-
-    $updated = $directory . DIRECTORY_SEPARATOR . "updated.txt";
-    file_put_contents($updated, "old");
-    $updater = FileHandle::fileHandleForUpdatingURL(URL::fileURL($updated));
-    $updater->write("new content");
-    $updater->seek(0);
-    $check($updater->read(3) === "new", "updating handle can write and read back");
-    $updater->close();
-} finally {
-    @unlink($existing);
-    @unlink($directory . DIRECTORY_SEPARATOR . "written.txt");
-    @unlink($directory . DIRECTORY_SEPARATOR . "updated.txt");
-    @rmdir($directory);
+    public function testUpdating(): void
+    {
+        $updated = $this->directory . DIRECTORY_SEPARATOR . "updated.txt";
+        file_put_contents($updated, "old");
+        $updater = FileHandle::fileHandleForUpdatingURL(URL::fileURL($updated));
+        $updater->write("new content");
+        $updater->seek(0);
+        $this->assertSame("new", $updater->read(3), "updating handle can write and read back");
+        $updater->close();
+    }
 }
-
-FileHandleTestRunner::finish();
