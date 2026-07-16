@@ -94,7 +94,7 @@ trait MutableCollectionAlgorithms
     public function dropFirst(int $k): Slice
     {
         assert($k >= 0, "Invalid argument: k must be zero or greater");
-        return new Slice($this, new Range($k, $this->endIndex));
+        return new Slice($this, new Range(min($k, $this->count), $this->endIndex));
     }
 
     public function dropLast(int $k): Slice

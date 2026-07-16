@@ -20,7 +20,10 @@ use Sabatier\Foundation\Slice;
  *  - ArrayClass::split(), Dictionary::compactMap(), and Slice::filter() now build their
  *    results with append() and must keep their exact semantics;
  *  - Set must accept any iterable in its constructor (URLCache builds one from
- *    Dictionary->keys).
+ *    Dictionary->keys);
+ *  - ArrayClass::dropFirst() built an inverted Range and threw when the drop count
+ *    exceeded the element count; it now clamps the count and returns an empty subsequence,
+ *    honouring its documented contract (dropLast already clamped its bound).
  */
 final class CollectionsTest extends TestCase
 {
@@ -138,6 +141,16 @@ final class CollectionsTest extends TestCase
         $this->assertSame(["b", "c", "d"], $letters->dropFirst(1)->array, "dropFirst");
         $this->assertSame(["a", "b", "c"], $letters->dropLast(1)->array, "dropLast");
         $this->assertSame(["c", "d"], $letters->drop(fn(string $e): bool => $e < "c")->array, "drop while");
+
+        // dropFirst/dropLast must clamp the drop count to the element count instead of
+        // building an inverted Range: k greater than or equal to the count yields an empty
+        // subsequence, and k of zero drops nothing.
+        $this->assertSame(["a", "b", "c", "d"], $letters->dropFirst(0)->array, "dropFirst(0) drops nothing");
+        $this->assertSame([], $letters->dropFirst($letters->count)->array, "dropFirst(count) is empty");
+        $this->assertSame([], $letters->dropFirst($letters->count + 1)->array, "dropFirst beyond count is empty");
+        $this->assertSame(["a", "b", "c", "d"], $letters->dropLast(0)->array, "dropLast(0) drops nothing");
+        $this->assertSame([], $letters->dropLast($letters->count)->array, "dropLast(count) is empty");
+        $this->assertSame([], $letters->dropLast($letters->count + 1)->array, "dropLast beyond count is empty");
     }
 
     public function testDictionaryBasics(): void
