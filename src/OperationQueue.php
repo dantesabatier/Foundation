@@ -101,12 +101,14 @@ final class OperationQueue extends ObjectClass
             return;
         }
         if (!$operation->isReady) {
+            // Reschedule once its dependencies finish. The dependencies are not pulled into this
+            // queue — like NSOperationQueue, an operation only waits on them via readiness; the
+            // caller is responsible for running them (here or in another queue).
             $operation->observe("isReady", KeyValueObservingOptions::new, function (Operation $operation, KeyValueObservedChange $change): void {
                 if ($change->newValue) {
                     $this->schedule();
                 }
             });
-            $this->addOperations($operation->dependencies);
         }
     }
 

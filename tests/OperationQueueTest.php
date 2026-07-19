@@ -50,6 +50,14 @@ final class RecordingOperation extends Operation
  *    that also leaked every queue, since __destruct could never run). It now reads a static
  *    OperationQueue::$current that Operation::start() sets around each operation and restores
  *    afterwards, so it reports the running operation's queue and null outside any operation.
+ *  - addOperation pulled a not-ready operation's dependencies into this queue
+ *    (addOperations($operation->dependencies)), running them here and reassigning their queue.
+ *    NSOperationQueue does not: an operation only waits on its dependencies via readiness, and
+ *    the caller runs them. The dependencies must no longer be enqueued as a side effect.
+ *  - Operation::cancel() fatally errored on any operation with dependencies: the isCancelled
+ *    setter did setValueForKey on the dependencies, but isCancelled is private(set) so KVC
+ *    could not write it. It now cascades cancel() to the dependencies instead (guarded against
+ *    cycles by cancel()'s own early return).
  */
 final class OperationQueueTest extends TestCase
 {
@@ -224,12 +232,77 @@ final class OperationQueueTest extends TestCase
         });
         $dependent->addDependency($dependency);
 
-        // Adding the dependent pulls its dependencies into the queue on its own, so the
-        // dependency must not be added a second time.
+        // The caller adds both operations; the queue only orders them via readiness, so the
+        // dependent must not start until its dependency has finished — regardless of add order.
         $queue->addOperation($dependent);
+        $queue->addOperation($dependency);
         $queue->waitUntilAllOperationsAreFinished();
 
         $this->assertSame(["dependency", "dependent"], $order, "a dependency finishes before the operation that depends on it");
+    }
+
+    public function testCancellingANotReadyOperationRemovesItFromTheQueue(): void
+    {
+        $queue = new OperationQueue();
+        $queue->maxConcurrentOperationCount = 5;
+
+        // The dependency parks and never finishes, so the dependent stays not-ready — the
+        // "queued but not yet executing" state that Operation::cancel() documents it can drop.
+        $dependency = new RecordingOperation(function (): void {
+            Fiber::suspend();
+            Fiber::suspend();
+        });
+        $ran = false;
+        $dependent = new RecordingOperation(function () use (&$ran): void {
+            $ran = true;
+        });
+        $dependent->addDependency($dependency);
+        $queue->addOperation($dependency);
+        $queue->addOperation($dependent);
+        $queue->addOperationWithBlock(function (): void {
+        });
+
+        $this->assertFalse($dependent->isReady, "the dependent waits, not yet ready");
+
+        $dependent->cancel();
+
+        $this->assertFalse($ran, "the cancelled dependent never ran its body");
+        $this->assertFalse($queue->operations->contains(fn(Operation $op): bool => $op === $dependent), "cancelling a not-yet-executing operation drops it from the queue");
+    }
+
+    public function testCancellingAnOperationWithDependenciesCascadesWithoutError(): void
+    {
+        $a = new RecordingOperation(function (): void {
+        });
+        $b = new RecordingOperation(function (): void {
+        });
+        $c = new RecordingOperation(function (): void {
+        });
+        $a->addDependency($b);
+        $b->addDependency($c);
+
+        // Would fatal (KVC write to a private(set) property) before the fix; must cascade instead.
+        $a->cancel();
+
+        $this->assertTrue($a->isCancelled, "the cancelled operation is cancelled");
+        $this->assertTrue($b->isCancelled, "cancel cascades to a direct dependency");
+        $this->assertTrue($c->isCancelled, "cancel cascades transitively through the dependency chain");
+    }
+
+    public function testCancellingAcrossACyclicDependencyTerminates(): void
+    {
+        $x = new RecordingOperation(function (): void {
+        });
+        $y = new RecordingOperation(function (): void {
+        });
+        $x->addDependency($y);
+        $y->addDependency($x);
+
+        // cancel()'s early return on an already-cancelled operation must break the cycle.
+        $x->cancel();
+
+        $this->assertTrue($x->isCancelled, "cyclic dependencies do not prevent cancellation");
+        $this->assertTrue($y->isCancelled, "the cycle is fully cancelled without infinite recursion");
     }
 
     public function testFinishedOperationsLeaveTheQueue(): void
