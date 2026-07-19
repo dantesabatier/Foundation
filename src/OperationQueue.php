@@ -26,9 +26,14 @@ final class OperationQueue extends ObjectClass
 {
     /** @var int The default maximum number of operations to invoke concurrently in a queue. */
     public const int defaultMaxConcurrentOperationCount = 1;
-    /** @var ArrayClass<OperationQueue>|null $queues */
-    private static ?ArrayClass $queues = null;
     private static ?OperationQueue $main = null;
+    /**
+     * The queue whose operation is running on the current fiber, or null outside any operation.
+     * Set and restored by Operation::start() around each operation's execution, so nested
+     * queues (an operation that drives another queue) unwind to the right caller.
+     * @internal
+     */
+    public static ?OperationQueue $current = null;
     /** @var ArrayClass<Operation> $operations The operations currently in the queue. */
     private(set) ArrayClass $operations {
         get => $this->operations ??= new ArrayClass();
@@ -37,34 +42,9 @@ final class OperationQueue extends ObjectClass
     public int $maxConcurrentOperationCount = self::defaultMaxConcurrentOperationCount;
     /** @var string|null The name of the operation queue. */
     public ?string $name = null;
-    /** @internal */
-    public bool $isCurrentQueue = false;
     #[Override]
     public string $description {
         get => sprintf("<%s %s>", $this->class, $this->name ?? $this->hash);
-    }
-
-    public function __construct()
-    {
-        self::allQueues()->append($this);
-    }
-
-    public function __destruct()
-    {
-        self::allQueues()->remove($this);
-    }
-
-    public function __clone()
-    {
-        self::allQueues()->append($this);
-    }
-
-    /**
-     * @return ArrayClass<OperationQueue>
-     */
-    private static function allQueues(): ArrayClass
-    {
-        return self::$queues ??= new ArrayClass();
     }
 
     /**
@@ -85,7 +65,7 @@ final class OperationQueue extends ObjectClass
      */
     public static function current(): ?OperationQueue
     {
-        return self::allQueues()->first(fn(OperationQueue $queue): bool => $queue->isCurrentQueue);
+        return self::$current;
     }
 
     /**
@@ -100,13 +80,26 @@ final class OperationQueue extends ObjectClass
         !$operation->isExecuting ?: fatal_error("Operation is already executing.");
         !$operation->isFinished ?: fatal_error("Operation is already finished.");
         $this->operations->append($operation);
-        $this->operations->sort(fn(Operation $op0, Operation $op1): int => $op0->queuePriority->value <=> $op1->queuePriority->value);
+        $this->operations->sort(fn(Operation $op0, Operation $op1): int => $op1->queuePriority->value <=> $op0->queuePriority->value);
         $operation->observe("isFinished", KeyValueObservingOptions::new, function (Operation $operation, KeyValueObservedChange $change): void {
             if ($change->newValue) {
                 $this->operations->remove($operation);
             }
         });
+        // A canceled operation never reports isFinished, so without this it would linger forever
+        // and hang waitUntilAllOperationsAreFinished. Only drop it if it has not started running.
+        $operation->observe("isCancelled", KeyValueObservingOptions::new, function (Operation $operation, KeyValueObservedChange $change): void {
+            if ($change->newValue && !$operation->isExecuting) {
+                $this->operations->remove($operation);
+            }
+        });
         $operation->queue = $this;
+        if ($operation->isCancelled) {
+            // Already canceled before being added: the isCancelled observer never fires (no
+            // change), so drop it here instead.
+            $this->operations->remove($operation);
+            return;
+        }
         if (!$operation->isReady) {
             $operation->observe("isReady", KeyValueObservingOptions::new, function (Operation $operation, KeyValueObservedChange $change): void {
                 if ($change->newValue) {
@@ -124,7 +117,9 @@ final class OperationQueue extends ObjectClass
     {
         $executing = $this->operations->filter(fn(Operation $op): bool => $op->isExecuting)->count;
         if ($executing < $this->maxConcurrentOperationCount) {
-            foreach ($this->operations as $operation) {
+            // Snapshot the backing array: start() below can finish an operation synchronously,
+            // whose isFinished observer removes it from $operations mid-iteration.
+            foreach ($this->operations->array as $operation) {
                 if ($operation->isReady && !$operation->isExecuting && !$operation->isFinished && !$operation->isCancelled) {
                     $operation->start();
                     $executing++;
@@ -134,11 +129,12 @@ final class OperationQueue extends ObjectClass
                 }
             }
         }
-        while ($this->operations->contains(fn(Operation $op): bool => $op->fiber?->isSuspended() === true)) {
-            foreach ($this->operations as $operation) {
-                if ($operation->isExecuting && $operation->fiber?->isSuspended()) {
-                    $operation->fiber->resume();
-                }
+        // One resume per suspended fiber, then return: looping until none are suspended would
+        // spin at 100% CPU on a fiber that parks on an event that never arrives. Snapshot via
+        // ->array because a resumed fiber can finish and its observer then mutates $operations.
+        foreach ($this->operations->array as $operation) {
+            if ($operation->isExecuting && $operation->fiber?->isSuspended()) {
+                $operation->fiber->resume();
             }
         }
     }
@@ -191,8 +187,14 @@ final class OperationQueue extends ObjectClass
      */
     public function waitUntilAllOperationsAreFinished(): void
     {
-        while (!$this->operations->isEmpty) {
+        for (;;) {
             $this->schedule();
+            if ($this->operations->isEmpty) {
+                break;
+            }
+            // Yield the core between passes: schedule() may be waiting on operations whose
+            // fibers are parked on external I/O, and spinning here would peg one core at 100%.
+            usleep(1000);
         }
     }
 }

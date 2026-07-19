@@ -87,15 +87,21 @@ abstract class Operation extends ObjectClass
             return;
         }
         $this->fiber = new Fiber(function (): void {
-            $this->queue->isCurrentQueue = true;
-            $this->isExecuting = true;
-            $this->main();
-            $this->isExecuting = false;
-            if ($completionBlock = $this->completionBlock) {
-                $completionBlock();
+            // Restore the previous current queue, not null: an operation may itself drive
+            // another queue, and that nesting must unwind to the right caller.
+            $previous = OperationQueue::$current;
+            OperationQueue::$current = $this->queue;
+            try {
+                $this->isExecuting = true;
+                $this->main();
+                $this->isExecuting = false;
+                if ($completionBlock = $this->completionBlock) {
+                    $completionBlock();
+                }
+                $this->isFinished = true;
+            } finally {
+                OperationQueue::$current = $previous;
             }
-            $this->isFinished = true;
-            $this->queue->isCurrentQueue = false;
         });
         $this->fiber->start();
     }
