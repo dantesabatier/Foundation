@@ -38,20 +38,20 @@ final class ProgressFraction extends ObjectClass
 
     private static function fromDouble(float $double): array
     {
-        $denominator = 131072;
-        $numerator = $double / (1.0 / (float)$denominator);
-        return [$numerator, $numerator];
+        $denominator = 131072.0;
+        $numerator = $double / (1.0 / $denominator);
+        return [$numerator, $denominator];
     }
 
     private static function greatestCommonDivisor(float $inA, float $inB): float
     {
         $a = $inA;
         $b = $inB;
-        do {
+        while ($b != 0) {
             $tmp = $b;
-            $b = $a % $b;
+            $b = fmod($a, $b);
             $a = $tmp;
-        } while ($b !== 0);
+        }
         return $a;
     }
 
@@ -118,27 +118,52 @@ final class ProgressFraction extends ObjectClass
         return $other instanceof ProgressFraction && $this->total === $other->total && $this->completed === $other->completed;
     }
 
+    /**
+     * Detects a non-finite result of a checked float operation, mirroring the overflow
+     * reporting of the original integer-based fraction arithmetic.
+     * @param float $result
+     * @return array{float, bool}
+     */
+    private static function overflowChecked(float $result): array
+    {
+        return is_finite($result) ? [$result, false] : [$result, true];
+    }
+
     public function add(ProgressFraction $addend): ProgressFraction
     {
         /** @psalm-suppress ArgumentTypeCoercion */
-        return $this->math($addend, fn(float $l, float $r): float => $l + $r, fn(): array => []);
+        return $this->math($addend, fn(float $l, float $r): float => $l + $r, fn(float $l, float $r): array => self::overflowChecked($l + $r));
     }
 
     public function subtract(ProgressFraction $subtracting): ProgressFraction
     {
         /** @psalm-suppress ArgumentTypeCoercion */
-        return $this->math($subtracting, fn(float $l, float $r): float => $l - $r, fn(): array => []);
+        return $this->math($subtracting, fn(float $l, float $r): float => $l - $r, fn(float $l, float $r): array => self::overflowChecked($l - $r));
     }
 
     public function multiply(ProgressFraction $factor): ProgressFraction
     {
-        /** @psalm-suppress ArgumentTypeCoercion */
-        return $this->math($factor, fn(float $l, float $r): float => $l * $r, fn(): array => []);
+        if ($this->total == 0 || $factor->total == 0) {
+            return new ProgressFraction();
+        }
+        if ($this->overflowed || $factor->overflowed) {
+            return ProgressFraction::fraction($this->fractionCompleted * $factor->fractionCompleted, true);
+        }
+        [$completed, $completedOverflow] = self::overflowChecked($this->completed * $factor->completed);
+        [$total, $totalOverflow] = self::overflowChecked($this->total * $factor->total);
+        return new ProgressFraction($completed, $total, $completedOverflow || $totalOverflow);
     }
 
     public function divide(ProgressFraction $divisor): ProgressFraction
     {
-        /** @psalm-suppress ArgumentTypeCoercion */
-        return $this->math($divisor, fn(float $l, float $r): float => $l / $r, fn(): array => []);
+        if ($this->total == 0 || $divisor->total == 0 || $divisor->completed == 0) {
+            return new ProgressFraction();
+        }
+        if ($this->overflowed || $divisor->overflowed) {
+            return ProgressFraction::fraction($this->fractionCompleted / $divisor->fractionCompleted, true);
+        }
+        [$completed, $completedOverflow] = self::overflowChecked($this->completed * $divisor->total);
+        [$total, $totalOverflow] = self::overflowChecked($this->total * $divisor->completed);
+        return new ProgressFraction($completed, $total, $completedOverflow || $totalOverflow);
     }
 }

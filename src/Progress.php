@@ -94,7 +94,7 @@ final class Progress extends ObjectClass
     }
     /** @var float The fraction of the overall work that the progress object completes, including work from its suboperations. */
     public float $fractionCompleted {
-        get => $this->fraction->total > 0 ? $this->fraction->fractionCompleted : $this->fraction->add($this->childFraction)->fractionCompleted;
+        get => $this->overallFraction()->fractionCompleted;
     }
     private ?Progress $parent;
     /** @var Set<Progress> */
@@ -246,7 +246,7 @@ final class Progress extends ObjectClass
      */
     public function performAsCurrent(/** @noinspection PhpUnusedParameterInspection */ float $unitCount, Closure $work)
     {
-        return null;
+        return $work();
     }
 
     /**
