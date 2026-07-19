@@ -206,5 +206,5 @@ interface Sequence extends Traversable, Countable, Comparable, ExpressibleByArra
      * @param string $selector The selector to call on each object.
      * @param mixed $argument The argument to pass to the selector.
      */
-    public function makeObjectsPerformSelector(string $selector, mixed $argument): void;
+    public function makeObjectsPerformSelector(string $selector, mixed $argument = null): void;
 }

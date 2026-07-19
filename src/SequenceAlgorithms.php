@@ -200,7 +200,7 @@ trait SequenceAlgorithms
         }
     }
 
-    public function makeObjectsPerformSelector(string $selector, mixed $argument): void
+    public function makeObjectsPerformSelector(string $selector, mixed $argument = null): void
     {
         $this->forEach(fn(mixed $e): mixed => $e->$selector($argument));
     }
