@@ -185,6 +185,21 @@ function canonical(string $string): string
 }
 
 /**
+ * Converts the given string to a lowercase, ASCII slug by transliterating diacritics and collapsing every run of
+ * non-alphanumeric characters into a single separator. Leading and trailing separators are trimmed.
+ *
+ * @param string $string The input string to be slugified.
+ * @param string $separator The separator used to join words. Defaults to a hyphen.
+ * @return string The slugified version of the input string, or an empty string if it contains no alphanumeric characters.
+ */
+function slug(string $string, string $separator = "-"): string
+{
+    return strtolower(canonical($string))
+            |> (fn(string $x): string => (string)preg_replace("/[^a-z0-9]+/", $separator, $x))
+            |> (fn(string $x): string => trim($x, $separator));
+}
+
+/**
  * Converts a string to camel case by capitalizing the first letter of each word after a separator
  * (space, underscore, or hyphen) and removing the separators.
  * @param string $string The input string to be converted to camel case.
