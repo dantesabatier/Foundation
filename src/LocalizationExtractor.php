@@ -49,9 +49,19 @@ final readonly class LocalizationExtractor
         }
         $listFile = $fileManager->temporaryDirectory->appendingPathComponent("php_files_" . $this->bundle->bundleIdentifier)->appendingPathExtension("txt")->path;
         $fileManager->createFile($listFile, $filenames->join(PHP_EOL));
+        $resourceURL = $this->bundle->bundleURL->appendingPathComponent("Resources");
         foreach ($this->languages as $language) {
-            $messages = $this->bundle->resourceURL->appendingPathComponent($language)->appendingPathComponent("LC_MESSAGES")->appendingPathComponent("Localizable");
+            $directory = $resourceURL->appendingPathComponent($language)->appendingPathComponent("LC_MESSAGES");
+            if (!$fileManager->fileExists($directory->path)) {
+                $fileManager->createDirectory($directory, true, new Dictionary([FileAttributeKey::posixPermissions => 0777]));
+            }
+            $messages = $directory->appendingPathComponent("Localizable");
             $pot = $messages->appendingPathExtension("po")->path;
+            // xgettext -j (join) fusiona sobre un catálogo existente; en la primera
+            // extracción de un bundle todavía no existe, así que lo sembramos vacío.
+            if (!$fileManager->fileExists($pot)) {
+                $fileManager->createFile($pot, "");
+            }
             exec("xgettext --keyword=localized_string -d Localizable --from-code=UTF-8 --no-location --no-wrap -j --files-from=$listFile -o $pot", $potOutput, $potStatus);
             $potStatus === 0 ?: fatal_error("xgettext failed with status $potStatus");
             $mo = $messages->appendingPathExtension("mo")->path;
