@@ -57,8 +57,6 @@ final readonly class LocalizationExtractor
             }
             $messages = $directory->appendingPathComponent("Localizable");
             $pot = $messages->appendingPathExtension("po")->path;
-            // xgettext -j (join) fusiona sobre un catálogo existente; en la primera
-            // extracción de un bundle todavía no existe, así que lo sembramos vacío.
             if (!$fileManager->fileExists($pot)) {
                 $fileManager->createFile($pot, "");
             }
