@@ -21,7 +21,7 @@ use SplFileInfo;
  */
 final class URL extends ObjectClass
 {
-    private const array ENCODED_PATH_SCHEMES = ["http", "https", "ftp", "ftps", "ws", "wss", "file"];
+    private const array encodedPathSchemes = ["http", "https", "ftp", "ftps", "ws", "wss", "file"];
 
     private string $string;
     /** @var array{scheme?: string, host?: string, port?: int, user?: string, pass?: string, path?: string, query?: string, fragment?: string}|null The cached raw components of the absolute string, as returned by parse_url(). */
@@ -365,7 +365,7 @@ final class URL extends ObjectClass
      */
     private function encodedPathComponent(string $component): string
     {
-        if (!in_array($this->scheme, self::ENCODED_PATH_SCHEMES, true)) {
+        if (!in_array($this->scheme, self::encodedPathSchemes, true)) {
             return $component;
         }
         return explode("/", $component)
