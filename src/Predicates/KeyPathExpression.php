@@ -28,7 +28,7 @@ final class KeyPathExpression extends FunctionExpression
     public function __construct(mixed $keyPath, Expression $operand)
     {
         $selector = "valueForKeyPath";
-        if ($keyPath instanceof KeyPathSpecifierExpression) {
+        if ($keyPath instanceof KeyPathSpecifierExpression || $keyPath instanceof KeyPathExpression) {
             $keyPath = $keyPath->keyPath;
             if (!str_contains($keyPath, ".")) {
                 $selector = "valueForKey";
