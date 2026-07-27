@@ -30,17 +30,22 @@ final class FlattenSequence extends ObjectClass implements Sequence, IteratorAgg
     public string $description {
         get => sprintf("<%s %s <%s>>", $this->class, $this->base::class, human_readable_value($this->base));
     }
+    /** @var int<0, max> */
+    #[Override]
     public int $count {
         get => $this->count();
     }
+    #[Override]
     public bool $isEmpty {
         get => $this->count === 0;
     }
     /** @var Element|null $first */
+    #[Override]
     public mixed $first {
         get => $this->first();
     }
     /** @var list<Element> */
+    #[Override]
     public array $array {
         get => iterator_to_array($this);
     }

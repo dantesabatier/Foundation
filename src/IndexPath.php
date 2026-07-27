@@ -60,30 +60,39 @@ final class IndexPath extends ObjectClass implements MutableCollection, ArrayAcc
     public string $description {
         get => "[{$this->join(", ")}]";
     }
+    /** @var int<0, max> */
+    #[Override]
     public int $count {
         get => count($this->reserved);
     }
+    #[Override]
     public bool $isEmpty {
         get => $this->count === 0;
     }
     /** @var int|null $first */
+    #[Override]
     public mixed $first {
         get => $this->first();
     }
     /** @var int|null $last */
+    #[Override]
     public mixed $last {
         get => $this->last();
     }
+    #[Override]
     public int $startIndex {
         get => 0;
     }
+    #[Override]
     public int $endIndex {
         get => $this->count;
     }
+    #[Override]
     public Range $indices {
         get => new Range($this->startIndex, $this->endIndex);
     }
-    /** @var int[] */
+    /** @var list<int> */
+    #[Override]
     public array $array {
         get => $this->reserved;
     }
@@ -234,7 +243,7 @@ final class IndexPath extends ObjectClass implements MutableCollection, ArrayAcc
     }
 
     #[Override]
-    public function makeObjectsPerformSelector(string $selector, mixed $argument): void
+    public function makeObjectsPerformSelector(string $selector, mixed $argument = null): void
     {
         unsupported($this, __FUNCTION__);
     }

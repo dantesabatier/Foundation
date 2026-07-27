@@ -47,7 +47,7 @@ final readonly class LocalizationExtractor
             }
             $filenames->append($url->path);
         }
-        $listFile = $fileManager->temporaryDirectory->appendingPathComponent("php_files_" . $this->bundle->bundleIdentifier)->appendingPathExtension("txt")->path;
+        $listFile = $fileManager->temporaryDirectory->appendingPathComponent("php_files_{$this->bundle->bundleIdentifier}")->appendingPathExtension("txt")->path;
         $fileManager->createFile($listFile, $filenames->join(PHP_EOL));
         $resourceURL = $this->bundle->bundleURL->appendingPathComponent("Resources");
         foreach ($this->languages as $language) {

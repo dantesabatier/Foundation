@@ -58,30 +58,39 @@ final class CollectionDifference extends ObjectClass implements MutableCollectio
     public string $description {
         get => "[{$this->join(", ")}]";
     }
+    /** @var int<0, max> */
+    #[Override]
     public int $count {
         get => count($this->reserved);
     }
+    #[Override]
     public bool $isEmpty {
         get => $this->count === 0;
     }
     /** @var CollectionDifferenceChange|null $first */
+    #[Override]
     public mixed $first {
         get => $this->first();
     }
     /** @var CollectionDifferenceChange|null $last */
+    #[Override]
     public mixed $last {
         get => $this->last();
     }
+    #[Override]
     public int $startIndex {
         get => 0;
     }
+    #[Override]
     public int $endIndex {
         get => $this->count;
     }
+    #[Override]
     public Range $indices {
         get => new Range($this->startIndex, $this->endIndex);
     }
-    /** @var CollectionDifferenceChange[] */
+    /** @var list<CollectionDifferenceChange> */
+    #[Override]
     public array $array {
         get => $this->reserved;
     }

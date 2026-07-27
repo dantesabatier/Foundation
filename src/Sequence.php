@@ -24,7 +24,7 @@ use Traversable;
  */
 interface Sequence extends Traversable, Countable, Comparable, ExpressibleByArrayLiteral
 {
-    /** @var int The number of elements in the sequence. */
+    /** @var int<0, max> The number of elements in the sequence. */
     public int $count {
         get;
     }

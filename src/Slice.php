@@ -27,26 +27,34 @@ final class Slice extends ObjectClass implements Collection, IteratorAggregate
         reduce as private sequenceReduce;
     }
 
+    /** @var int<0, max> */
+    #[Override]
     public int $count {
         get => $this->bounds->count;
     }
+    #[Override]
     public bool $isEmpty {
         get => $this->bounds->isEmpty;
     }
     /** @var Element|null $first */
+    #[Override]
     public mixed $first {
         get => $this->first();
     }
+    #[Override]
     public int $startIndex {
         get => $this->bounds->lowerBound;
     }
+    #[Override]
     public int $endIndex {
         get => $this->bounds->upperBound;
     }
+    #[Override]
     public Range $indices {
         get => $this->bounds;
     }
     /** @var list<Element> */
+    #[Override]
     private(set) array $array {
         get => $this->array ??= array_slice($this->base->array, $this->startIndex, $this->endIndex - $this->startIndex);
     }

@@ -42,26 +42,34 @@ final class Dictionary extends ObjectClass implements Collection, ArrayAccess, I
         sorted as private collectionSorted;
     }
 
+    /** @var int<0, max> */
+    #[Override]
     public int $count {
         get => count($this->reserved);
     }
+    #[Override]
     public bool $isEmpty {
         get => $this->count === 0;
     }
     /** @var Element|null $first */
+    #[Override]
     public mixed $first {
         get => $this->first();
     }
+    #[Override]
     public int $startIndex {
         get => 0;
     }
+    #[Override]
     public int $endIndex {
         get => $this->count;
     }
+    #[Override]
     public Range $indices {
         get => new Range($this->startIndex, $this->endIndex);
     }
     /** @var array<string, Element> */
+    #[Override]
     public array $array {
         get => $this->reserved;
     }
