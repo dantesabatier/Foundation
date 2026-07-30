@@ -299,7 +299,7 @@ final class PredicateScanner extends Scanner
                         break;
                     case "K":
                         $this->scanLocation += 1;
-                        return Expression::expressionForKeyPath($this->arguments->popFirst());
+                        return Expression::expressionForKeyPath((string)$this->arguments->popFirst());
                     case "@":
                     case "s":
                     case "c":
