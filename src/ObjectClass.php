@@ -252,6 +252,9 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
     #[Override]
     public function validateValueForKey(mixed &$value, string $key): bool
     {
+        if ($value instanceof SensitiveValue) {
+            return false;
+        }
         $selector = "validate" . ucfirst($key);
         if ($this->responds($selector)) {
             return $this->perform($selector, [&$value]);
