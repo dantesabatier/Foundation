@@ -84,6 +84,13 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
         return method_exists($this, $selector);
     }
 
+    #[Pure]
+    #[Override]
+    final public function hasProperty(string $key): bool
+    {
+        return property_exists($this, $key);
+    }
+
     #[Override]
     final public function conforms(string $protocol): bool
     {
@@ -296,7 +303,7 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
     #[Override]
     public function valueForKey(string $key): mixed
     {
-        if (property_exists($this, $key)) {
+        if ($this->hasProperty($key)) {
             return $this->$key;
         }
         return $this->valueForUndefinedKey($key);
@@ -308,7 +315,7 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
         if (!$this->validateValueForKey($value, $key)) {
             return;
         }
-        if (property_exists($this, $key)) {
+        if ($this->hasProperty($key)) {
             $this->willChangeValueForKey($key, KeyValueChange::replacement, $value);
             $this->$key = $value;
             $this->didChangeValueForKey($key, KeyValueChange::replacement, $value);

@@ -56,6 +56,17 @@ interface ObjectProtocol extends CustomDebugStringConvertible, CanonicalStringCo
     public function responds(string $selector): bool;
 
     /**
+     * Returns a Boolean value that indicates whether the receiver declares a given property.
+     *
+     * Mirrors the property axis that Cocoa's `respondsToSelector:` conflates with methods. Reports
+     * declared properties — including virtual and hooked properties (PHP 8.4+) — and matches what
+     * `valueForKey()` treats as a direct property access rather than an undefined key.
+     * @param string $key The name of a property.
+     * @return bool true if the receiver declares `$key` as a property, otherwise false.
+     */
+    public function hasProperty(string $key): bool;
+
+    /**
      * Returns a Boolean value that indicates whether the receiver conforms to a given protocol.
      * @param class-string $protocol A protocol object that represents a particular protocol.
      * @return bool true if the receiver conforms to aProtocol, otherwise false.
