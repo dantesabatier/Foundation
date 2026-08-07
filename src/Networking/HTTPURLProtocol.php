@@ -190,7 +190,7 @@ class HTTPURLProtocol extends NativeProtocol
         }
         $easyHandle->setFollowLocation(false);
         $easyHandle->setRequestMethod($request->httpMethod);
-        $easyHandle->setTimeout((int)$request->timeoutInterval);
+        $easyHandle->setTimeout((int)max($request->timeoutInterval, $this->task->session->configuration->timeoutIntervalForRequest));
         $easyHandle->setAutomaticBodyDecompression(true);
         $easyHandle->setNoBody($request->httpMethod === HTTPRequestMethod::head);
         /** @var Dictionary<string> $customHeaders */
