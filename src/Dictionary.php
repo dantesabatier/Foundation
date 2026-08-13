@@ -17,6 +17,7 @@ use Closure;
 use IteratorAggregate;
 use Override;
 use Sabatier\Foundation\Predicates\Predicate;
+use stdClass;
 use Traversable;
 
 /**
@@ -115,8 +116,10 @@ final class Dictionary extends ObjectClass implements Collection, ArrayAccess, I
      * When $preserveNull is false, null values are treated as absent values and are
      * therefore not stored in the resulting collection hierarchy.
      *
-     * @param array<array-key, mixed> $array
-     *     The source array to convert.
+     * @param array<array-key, mixed>|stdClass $array
+     *     The source value to convert. Pass the `stdClass` that `json_decode` returns without the
+     *     associative flag to keep every nested `{}` a Dictionary: decoded associatively, an empty
+     *     object and an empty list are the same empty array and the distinction is already lost.
      *
      * @param bool $preserveNull
      *     Whether explicit null values should be preserved using the Nil placeholder.
@@ -124,9 +127,9 @@ final class Dictionary extends ObjectClass implements Collection, ArrayAccess, I
      *     collection hierarchy.
      *
      * @return Dictionary<mixed>
-     *     A recursively converted Dictionary representation of the given array.
+     *     A recursively converted Dictionary representation of the given value.
      */
-    public static function dictionaryWithArray(array $array, bool $preserveNull = true): Dictionary
+    public static function dictionaryWithArray(array|stdClass $array, bool $preserveNull = true): Dictionary
     {
         return new ArrayConverter($array, $preserveNull)->dictionary;
     }

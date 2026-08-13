@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Sabatier\Foundation;
 
 use Override;
+use stdClass;
 
 /** @internal */
 final class SequentialArrayStrategy implements ArrayConversionStrategy
@@ -20,18 +21,20 @@ final class SequentialArrayStrategy implements ArrayConversionStrategy
     }
 
     #[Override]
-    public function convert(array $array, bool $preserveNull = true): ArrayClass
+    public function convert(array|stdClass $value, bool $preserveNull = true): ArrayClass
     {
         /** @var ArrayClass<mixed> $arrayClass */
         $arrayClass = new ArrayClass();
-        foreach ($array as $key => $value) {
-            if (is_array($value)) {
-                $arrayClass[$key] = is_sequential($value) ? $this->convert($value, $preserveNull) : $this->nestedConversionStrategy->convert($value, $preserveNull);
+        foreach ($value instanceof stdClass ? get_object_vars($value) : $value as $key => $element) {
+            if (is_array($element) || $element instanceof stdClass) {
+                // A stdClass becomes a Dictionary even when empty: that is what separates it from a
+                // list, and is_sequential() answers true for every empty array.
+                $arrayClass[$key] = $element instanceof stdClass || !is_sequential($element) ? $this->nestedConversionStrategy->convert($element, $preserveNull) : $this->convert($element, $preserveNull);
             } else {
-                if ($value === null && $preserveNull) {
-                    $value = Nil::nil();
+                if ($element === null && $preserveNull) {
+                    $element = Nil::nil();
                 }
-                $arrayClass[$key] = $value;
+                $arrayClass[$key] = $element;
             }
         }
         return $arrayClass;

@@ -9,6 +9,7 @@ use Override;
 use Sabatier\Foundation\Dictionary;
 use Sabatier\Foundation\ObjectClass;
 use Sabatier\Foundation\URL;
+use stdClass;
 
 /**
  * A URL load request that is independent of protocol or URL scheme.
@@ -51,9 +52,17 @@ class URLRequest extends ObjectClass
     }
 
     /**
-     * @return array<string, mixed>
+     * The request body decoded according to its `Content-Type`.
+     *
+     * A JSON body is decoded without the associative flag, so an object arrives as a `stdClass`
+     * and a list as an array: decoded associatively the two collapse into the same empty array
+     * once empty, and `{}` becomes indistinguishable from `[]`. The other media types have no
+     * such notion and stay arrays. Feed the result to {@see Dictionary::dictionaryWithArray()},
+     * which reads that distinction and gives an empty `{}` a `Dictionary` of its own.
+     *
+     * @return array<string, mixed>|stdClass
      */
-    public function getParsedBody(): array
+    public function getParsedBody(): array|stdClass
     {
         $contentType = $this->valueForHttpHeaderField("Content-Type") ?? "text/plain";
         $mediaType = $contentType;
@@ -66,7 +75,7 @@ class URLRequest extends ObjectClass
                 return $result;
             })(),
             "multipart/form-data" => $_POST,
-            "application/json" => json_decode($this->httpBody ?? "[]", true) ?? [],
+            "application/json" => json_decode($this->httpBody ?? "[]") ?? [],
             default => []
         };
     }
