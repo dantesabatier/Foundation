@@ -22,6 +22,8 @@ final class URLResourceKey
     final const string fileSizeKey = "fileSize";
     /** @var string Key for determining whether the file is an alias, returned as a Boolean Number object (read-only). */
     final const string isAliasFileKey = "isAliasFile";
+    /** @var string The key for determining whether the resource is a file package. */
+    final const string isPackageKey = "isPackage";
     /** @var string Key for determining whether the resource is a regular file, as opposed to a directory or a symbolic link (read-only). */
     final const string isRegularFileKey = "isRegularFile";
     /** @var string The time at which the resource's attributes were most recently modified, returned as a Date object if the volume supports attribute modification dates, or null if attribute modification dates are unsupported (read-only). */
