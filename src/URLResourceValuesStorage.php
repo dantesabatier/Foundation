@@ -107,6 +107,9 @@ final class URLResourceValuesStorage
                 $result[$key] = $info->getSize();
             } elseif ($key === URLResourceKey::isRegularFileKey) {
                 $result[$key] = $info->isFile();
+            } elseif ($key === URLResourceKey::isPackageKey) {
+                // A directory carrying an extension is opaque by convention, the way ".momd" or ".rtfd" are: the extension is what declares it a unit rather than a folder to descend into. Nothing registers those extensions, so the shape of the name is all there is to go on.
+                $result[$key] = $info->isDir() && $url->pathExtension !== "";
             } elseif ($key === URLResourceKey::attributeModificationDateKey) {
                 $result[$key] = Date::dateWithTimeIntervalSince1970((float)$info->getMTime());
             } elseif ($key === URLResourceKey::creationDateKey) {
