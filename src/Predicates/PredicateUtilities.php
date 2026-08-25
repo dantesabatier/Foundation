@@ -134,7 +134,7 @@ final class PredicateUtilities
             return new Number(0);
         }
         $count = $values->count;
-        $avg = abs($values->sum()) / $count;
+        $avg = $values->sum() / $count;
         $sum = $values->map(fn(Number|int|float $element): int|float => (pn($element) - $avg) ** 2)->sum();
         return $sum ? new Number(sqrt($sum / ($count - 1))) : new Number($sum);
     }
@@ -286,17 +286,21 @@ final class PredicateUtilities
      */
     public static function dateDiff(string $unit, Date|string|null $d1, Date|string|null $d2): Number
     {
-        $unit = match ($unit) {
-            "YEAR" => "y",
-            "MONTH" => "m",
-            "DAY" => "d",
-            "HOUR" => "h",
-            "MINUTE" => "i",
-            "SECOND" => "s",
-            "MICROSECOND" => "f",
-            default => $unit
-        };
-        return new Number(new DateTime((string)$d1)->diff(new DateTime((string)$d2))->$unit ?? 0);
+        $from = new DateTime((string)$d1);
+        $to = new DateTime((string)$d2);
+        $components = $from->diff($to);
+        $sign = $components->invert ? -1 : 1;
+        $seconds = $to->getTimestamp() - $from->getTimestamp();
+        return new Number(match ($unit) {
+            "YEAR" => $sign * $components->y,
+            "MONTH" => $sign * ($components->y * 12 + $components->m),
+            "DAY" => $sign * (int)$components->days,
+            "HOUR" => intdiv($seconds, 3600),
+            "MINUTE" => intdiv($seconds, 60),
+            "SECOND" => $seconds,
+            "MICROSECOND" => $seconds * 1000000,
+            default => 0
+        });
     }
 
     public static function quarter(?Date $date): ?Number
