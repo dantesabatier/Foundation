@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace Sabatier\Foundation\Tests;
 
+use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use ReflectionMethod;
 use Sabatier\Foundation\ArrayClass;
 use Sabatier\Foundation\Date;
 use Sabatier\Foundation\Predicates\Expression;
@@ -29,8 +32,7 @@ final class ExpressionOperatorTest extends TestCase
 {
     protected function setUp(): void
     {
-        // The date helpers round-trip through DateTime/Date in the process time zone;
-        // pin it so the expectations are stable.
+        // The date helpers round-trip through DateTime/Date in the process time zone; pin it so the expectations are stable.
         date_default_timezone_set("UTC");
     }
 
@@ -49,7 +51,7 @@ final class ExpressionOperatorTest extends TestCase
     public function testEveryOperatorFunctionIsStatic(): void
     {
         foreach (ExpressionOperatorType::cases() as $case) {
-            $method = new \ReflectionMethod(PredicateUtilities::class, $case->name);
+            $method = new ReflectionMethod(PredicateUtilities::class, $case->name);
             $this->assertTrue(
                 $method->isStatic(),
                 "PredicateUtilities::{$case->name}() must be static: ExpressionOperator dispatches to it statically."
@@ -86,7 +88,7 @@ final class ExpressionOperatorTest extends TestCase
         yield "second" => ["SECOND", "2020-03-15 10:30:02", "2020-03-15 10:29:58"];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider("dateUnitProvider")]
+    #[DataProvider("dateUnitProvider")]
     public function testDateAddAndSubHandleEveryUnit(string $unit, string $added, string $subtracted): void
     {
         $this->assertSame($added, $this->evaluate("dateadd:", ["2020-03-15 10:30:00", 2, $unit])->description);
@@ -95,7 +97,7 @@ final class ExpressionOperatorTest extends TestCase
 
     public function testUnknownUnitIsRejected(): void
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
 
         $this->evaluate("dateadd:", ["2020-03-15 10:30:00", 1, "FORTNIGHT"]);
     }

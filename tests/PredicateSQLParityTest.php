@@ -7,6 +7,7 @@ namespace Sabatier\Foundation\Tests;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Sabatier\Foundation\ArrayClass;
+use Sabatier\Foundation\Date;
 use Sabatier\Foundation\Predicates\Expression;
 use Sabatier\Foundation\Predicates\ExpressionOperator;
 use Sabatier\Foundation\Predicates\PredicateUtilities;
@@ -96,10 +97,7 @@ final class PredicateSQLParityTest extends TestCase
      */
     public static function numericCoercionProvider(): iterable
     {
-        // MariaDB converts numbers to text implicitly in its string functions, and
-        // Expression::expressionForConstantValue() normalises "7" to int 7, so a key
-        // path onto a numeric column reaches these functions as int/float. Verified:
-        // SELECT UPPER(1), LENGTH(123), REVERSE(123), LPAD(7,3,'0'), ...
+        // MariaDB converts numbers to text implicitly in its string functions, and Expression::expressionForConstantValue() normalises "7" to int 7, so a key path onto a numeric column reaches these functions as int/float. Verified: SELECT UPPER(1), LENGTH(123), REVERSE(123), LPAD(7,3,'0'), ...
         yield "uppercase" => ["uppercase:", [1], "1"];
         yield "lowercase" => ["lowercase:", [1], "1"];
         yield "length" => ["length:", [123], "3"];
@@ -126,8 +124,7 @@ final class PredicateSQLParityTest extends TestCase
 
     public function testConcatWithNothingToJoinIsEmpty(): void
     {
-        // MariaDB rejects CONCAT_WS with no values at all; the in-memory fallback has
-        // no parser to reject it, so it must at least not raise.
+        // MariaDB rejects CONCAT_WS with no values at all; the in-memory fallback has no parser to reject it, so it must at least not raise.
         $this->assertSame("", (string)$this->evaluate("concat:", ["-"]));
     }
 
@@ -231,7 +228,7 @@ final class PredicateSQLParityTest extends TestCase
     #[DataProvider("dateComponentParityProvider")]
     public function testDateComponentsMatchMariaDB(string $function, int $expected): void
     {
-        $date = \Sabatier\Foundation\Date::dateWithTimeIntervalSince1970((float)mktime(0, 0, 0, 3, 15, 2021));
+        $date = Date::dateWithTimeIntervalSince1970((float)mktime(0, 0, 0, 3, 15, 2021));
 
         $this->assertSame($expected, PredicateUtilities::$function($date)?->intValue);
     }
@@ -239,7 +236,7 @@ final class PredicateSQLParityTest extends TestCase
     public function testLastDayMatchesMariaDB(): void
     {
         // SELECT LAST_DAY('2021-03-15') -> 2021-03-31
-        $date = \Sabatier\Foundation\Date::dateWithTimeIntervalSince1970((float)mktime(0, 0, 0, 3, 15, 2021));
+        $date = Date::dateWithTimeIntervalSince1970((float)mktime(0, 0, 0, 3, 15, 2021));
 
         $this->assertSame("2021-03-31", PredicateUtilities::lastDay($date)?->format("Y-m-d"));
     }

@@ -54,8 +54,7 @@ final class PredicateUtilitiesTest extends TestCase
         yield "days across years" => ["DAY", "2020-01-01 00:00:00", "2022-03-15 00:00:00", 804];
         yield "months across years" => ["MONTH", "2020-01-01 00:00:00", "2022-03-15 00:00:00", 26];
         yield "years" => ["YEAR", "2020-01-01 00:00:00", "2022-03-15 00:00:00", 2];
-        // Calendar boundaries: a shorter following month does not complete a month, and a
-        // day short of the anniversary does not complete a year.
+        // Calendar boundaries: a shorter following month does not complete a month, and a day short of the anniversary does not complete a year.
         yield "incomplete month" => ["MONTH", "2024-01-31 00:00:00", "2024-02-29 00:00:00", 0];
         yield "incomplete year" => ["YEAR", "2024-02-29 00:00:00", "2025-02-28 00:00:00", 0];
         yield "negative seconds" => ["SECOND", "2024-01-01 09:00:45", "2024-01-01 09:00:00", -45];
@@ -79,9 +78,7 @@ final class PredicateUtilitiesTest extends TestCase
 
     public function testDateDiffSurvivesTheGuardedProductionExpression(): void
     {
-        // The production expression greatest(ifNull(datediff(SECOND, start, end), 0), 0)
-        // collapsed to 0 for every interval of a minute or more while dateDiff returned
-        // a component: the guards cannot tell a real zero from a wrong one.
+        // The production expression greatest(ifNull(datediff(SECOND, start, end), 0), 0) collapsed to 0 for every interval of a minute or more while dateDiff returned a component: the guards cannot tell a real zero from a wrong one.
         $elapsed = PredicateUtilities::greatest(
             PredicateUtilities::ifNull(PredicateUtilities::dateDiff("SECOND", "2024-01-01 09:00:00", "2024-01-01 17:00:00"), 0),
             0

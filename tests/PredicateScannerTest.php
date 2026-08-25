@@ -88,8 +88,7 @@ final class PredicateScannerTest extends TestCase
 
     public function testParenthesesOverrideThePrecedence(): void
     {
-        // a false and c true: "(a AND b) OR c" holds on c alone, while forcing the OR
-        // to the right of the AND makes the false a decide the whole predicate.
+        // a false and c true: "(a AND b) OR c" holds on c alone, while forcing the OR to the right of the AND makes the false a decide the whole predicate.
         $object = new Dictionary(["a" => 0, "b" => 0, "c" => 3]);
 
         $this->assertTrue(Predicate::format("a == 1 AND b == 2 OR c == 3")->evaluate($object));
