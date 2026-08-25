@@ -417,99 +417,102 @@ final class PredicateUtilities
     }
 
     #[Pure]
-    public static function uppercase(string $string): string
+    public static function uppercase(string|int|float $string): string
     {
-        return strtoupper($string);
+        return strtoupper((string)$string);
     }
 
     #[Pure]
-    public static function lowercase(string $string): string
+    public static function lowercase(string|int|float $string): string
     {
-        return strtolower($string);
+        return strtolower((string)$string);
     }
 
-    public static function canonical(string $string): string
+    public static function canonical(string|int|float $string): string
     {
-        return canonical($string);
+        return canonical((string)$string);
     }
 
-    public static function concat(string $separator = "", ArrayClass $arguments = new ArrayClass()): string
+    public static function concat(string $separator = "", mixed ...$values): string
     {
-        return $arguments->join($separator);
+        // CONCAT_WS skips null values rather than rendering them as empty strings.
+        return new ArrayClass(array_values(array_filter($values, fn(mixed $value): bool => $value !== null)))
+            ->map(fn(mixed $value): string => human_readable_value($value))
+            ->join($separator);
     }
 
-    public static function substring(string $string, int $index): string
+    public static function substring(string|int|float $string, int $index): string
     {
-        return substring_to_index($string, $index);
+        return substring_to_index((string)$string, $index);
     }
 
-    public static function replace(string $string, string $search, string $replace): string
+    public static function replace(string|int|float $string, string|int|float $search, string|int|float $replace): string
     {
-        return str_replace($search, $replace, $string);
+        return str_replace((string)$search, (string)$replace, (string)$string);
     }
 
-    public static function length(string $string): int
+    public static function length(string|int|float $string): int
     {
-        return strlen($string);
+        return strlen((string)$string);
     }
 
-    public static function trim(string $string): string
+    public static function trim(string|int|float $string): string
     {
-        return trim($string);
+        return trim((string)$string);
     }
 
     /**
-     * @param string $subject
+     * @param string|int|float $subject
      * @param non-empty-string $pattern
-     * @param string $replace
+     * @param string|int|float $replace
      * @return string
      */
-    public static function regexpReplace(string $subject, #[Language("RegExp")] string $pattern, string $replace): string
+    public static function regexpReplace(string|int|float $subject, #[Language("RegExp")] string $pattern, string|int|float $replace): string
     {
-        return (string)preg_replace($pattern, $replace, $subject);
+        return (string)preg_replace($pattern, (string)$replace, (string)$subject);
     }
 
     #[Pure]
-    public static function lpad(string $string, int $length, string $pad): string
+    public static function lpad(string|int|float $string, int $length, string|int|float $pad): string
     {
-        return str_pad($string, $length, $pad, STR_PAD_LEFT);
+        return str_pad((string)$string, $length, (string)$pad, STR_PAD_LEFT);
     }
 
     #[Pure]
-    public static function rpad(string $string, int $length, string $pad): string
+    public static function rpad(string|int|float $string, int $length, string|int|float $pad): string
     {
-        return str_pad($string, $length, $pad);
+        return str_pad((string)$string, $length, (string)$pad);
     }
 
     #[Pure]
-    public static function left(string $string, int $length): string
+    public static function left(string|int|float $string, int $length): string
     {
-        return substr($string, 0, $length);
+        return substr((string)$string, 0, $length);
     }
 
     #[Pure]
-    public static function right(string $string, int $length): string
+    public static function right(string|int|float $string, int $length): string
     {
-        return substr($string, -$length);
+        return substr((string)$string, -$length);
     }
 
     #[Pure]
-    public static function instr(string $string, string $substring): int
+    public static function instr(string|int|float $string, string|int|float $substring): int
     {
-        $pos = strpos($string, $substring);
+        $pos = strpos((string)$string, (string)$substring);
         return $pos === false ? 0 : $pos + 1;
     }
 
     #[Pure]
-    public static function reverse(string $string): string
+    public static function reverse(string|int|float $string): string
     {
-        return strrev($string);
+        return strrev((string)$string);
     }
 
     #[Pure]
-    public static function repeat(string $string, int $count): string
+    public static function repeat(string|int|float $string, int $count): string
     {
-        return str_repeat($string, $count);
+        return str_repeat((string)$string, $count);
     }
 
     public static function uuid(): UUID
