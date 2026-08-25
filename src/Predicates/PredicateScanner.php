@@ -71,7 +71,7 @@ final class PredicateScanner extends Scanner
      */
     private function parsePredicate(): ?Predicate
     {
-        return $this->parseAnd();
+        return $this->parseOr();
     }
 
     /**
@@ -79,9 +79,9 @@ final class PredicateScanner extends Scanner
      */
     private function parseAnd(): ?Predicate
     {
-        $left = $this->parseOr();
+        $left = $this->parseNot();
         while ($this->scanKeyword("AND") || $this->scanKeyword("&&")) {
-            $right = $this->parseOr();
+            $right = $this->parseNot();
             if ($right instanceof CompoundPredicate && ($right->compoundPredicateType === CompoundPredicateLogicalType::and)) {
                 if ($left instanceof CompoundPredicate && ($left->compoundPredicateType === CompoundPredicateLogicalType::and)) {
                     $left->subpredicates->appendContentsOf($right->subpredicates);
@@ -128,9 +128,9 @@ final class PredicateScanner extends Scanner
      */
     private function parseOr(): ?Predicate
     {
-        $left = $this->parseNot();
+        $left = $this->parseAnd();
         while ($this->scanKeyword("OR") || $this->scanKeyword("||")) {
-            $right = $this->parseNot();
+            $right = $this->parseAnd();
             if ($right instanceof CompoundPredicate && ($right->compoundPredicateType === CompoundPredicateLogicalType::or)) {
                 if ($left instanceof CompoundPredicate && ($left->compoundPredicateType === CompoundPredicateLogicalType::or)) {
                     $left->subpredicates->appendContentsOf($right->subpredicates);
