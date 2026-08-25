@@ -356,7 +356,7 @@ final class PredicateUtilities
     /**
      * @throws Exception
      */
-    public function dateAdd(Date|string|null $date, int $interval, string $unit): Date
+    public static function dateAdd(Date|string|null $date, int $interval, string $unit): Date
     {
         $format = match (strtoupper($unit)) {
             "YEAR" => "P{$interval}Y",
@@ -373,7 +373,7 @@ final class PredicateUtilities
     /**
      * @throws Exception
      */
-    public function dateSub(Date|string|null $date, int $interval, string $unit): Date
+    public static function dateSub(Date|string|null $date, int $interval, string $unit): Date
     {
         $format = match (strtoupper($unit)) {
             "YEAR" => "P{$interval}Y",
