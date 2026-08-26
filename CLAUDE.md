@@ -8,17 +8,11 @@ Sabatier Foundation is a PHP port of Apple's Foundation framework. It provides S
 
 ## Commands
 
-Development tools (Psalm, PHPStan, PHP-CS-Fixer, PHP_CodeSniffer, Rector) are installed **globally** via Composer (`%APPDATA%\Composer\vendor\bin`), not in the project's `vendor/` directory — `vendor/` only holds the autoloader. Do not run `composer install` to get them; invoke the global binaries directly:
+Development tools (Psalm, PHPStan, Rector) are installed **globally** via Composer (`%APPDATA%\Composer\vendor\bin`), not in the project's `vendor/` directory — `vendor/` only holds the autoloader. Do not run `composer install` to get them; invoke the global binaries directly:
 
 ```bash
 # Static analysis (configured via psalm.xml)
 psalm
-
-# Code style check
-phpcs
-
-# Code style fix
-php-cs-fixer fix
 
 # PHPStan analysis
 phpstan analyse

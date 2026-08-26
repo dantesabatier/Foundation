@@ -7,11 +7,11 @@ Tools are installed globally and available in PATH.
 ```bash
 psalm --show-info=true --force-jit  # Psalm level 4 (config: psalm.xml)
 phpstan analyse                     # PHPStan level 3 (config: phpstan.neon)
-php-cs-fixer fix                    # Code style (PSR12, config: .php-cs-fixer.dist.php)
 rector process --dry-run            # Code quality check (config: rector.php)
+phpunit                             # Test suite (all, or a single file)
 ```
 
-All tools installed globally and available in PATH. No test suite exists — correctness is enforced entirely through static analysis.
+All tools installed globally and available in PATH. There is no formatter — match the surrounding code (PSR-12, double-quoted strings, short array syntax).
 
 ## PHP Requirements
 
