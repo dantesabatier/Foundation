@@ -6,7 +6,6 @@ Tools are installed globally and available in PATH.
 
 ```bash
 psalm --show-info=true --force-jit  # Psalm level 4 (config: psalm.xml)
-phpstan analyse                     # PHPStan level 3 (config: phpstan.neon)
 rector process --dry-run            # Code quality check (config: rector.php)
 phpunit                             # Test suite (all, or a single file)
 ```
@@ -37,7 +36,6 @@ Single-package repo, all code under `src/`:
 ## Static Analysis
 
 - Psalm suppressions (~30) in `psalm.xml` — mostly networking code where CURL complexity defeats inference
-- PHPStan suppressions in `phpstan.neon`
 - Before adding new suppressions, try making code type-safe first
 - Custom Psalm plugin registered via `composer.json` extra: `Sabatier\Foundation\Plugins\Psalm\Plugin`
 
