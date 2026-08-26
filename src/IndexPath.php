@@ -19,7 +19,6 @@ use Sabatier\Foundation\Predicates\Predicate;
 final class IndexPath extends ObjectClass implements MutableCollection, ArrayAccess, Iterator
 {
     use MutableCollectionAlgorithms {
-        compare as private sequenceCompare;
         filter as private sequenceFilter;
         allSatisfy as private sequenceAllSatisfy;
         contains as private sequenceContains;
