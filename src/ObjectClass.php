@@ -27,6 +27,8 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
 {
     /** @var KeyValueObservance[] $observances */
     private array $observances = [];
+    /** @var array<string, mixed> $valuesBeingChanged The value each key held when willChangeValueForKey() announced the change, so didChangeValueForKey() can report the one that was replaced rather than the one replacing it. */
+    private array $valuesBeingChanged = [];
     /** @var array<string, mixed> */
     public static array $staticAssociatedValues = [];
     /** @var array<string, mixed> */
@@ -152,7 +154,9 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
     public function observe(string $keyPath, #[ExpectedValues(flagsFromClass: KeyValueObservingOptions::class)] int $options = KeyValueObservingOptions::new, ?Closure $handler = null): KeyValueObservation
     {
         $observation = new KeyValueObservation($this, $keyPath);
-        $this->observances[] = new KeyValueObservance($observation, $keyPath, $options, handler: $handler);
+        $observance = new KeyValueObservance($observation, $keyPath, $options, handler: $handler);
+        $this->observances[] = $observance;
+        $this->notifyInitialValue($observance);
         return $observation;
     }
 
@@ -165,7 +169,34 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
     public function addObserver(object $observer, string $keyPath, #[ExpectedValues(flagsFromClass: KeyValueObservingOptions::class)] int $options = KeyValueObservingOptions::new, mixed $context = null): void
     {
         if (static::automaticallyNotifiesObserversForKey($keyPath)) {
-            $this->observances[] = new KeyValueObservance($observer, $keyPath, $options, $context);
+            $observance = new KeyValueObservance($observer, $keyPath, $options, $context);
+            $this->observances[] = $observance;
+            $this->notifyInitialValue($observance);
+        }
+    }
+
+    /**
+     * Sends the one-off notification {@see KeyValueObservingOptions::initial} asks for, reporting the value the key already holds so an observer can prime itself from the same code path that handles later changes.
+     *
+     * @param KeyValueObservance $observance The observance just registered.
+     */
+    private function notifyInitialValue(KeyValueObservance $observance): void
+    {
+        if (!($observance->options & KeyValueObservingOptions::initial)) {
+            return;
+        }
+        $keyPath = $observance->keyPath;
+        $change = new KeyValueObservedChange();
+        if ($observance->options & KeyValueObservingOptions::new) {
+            $change->newValue = $this->valueForKeyPath($keyPath);
+        }
+        $observer = $observance->observer;
+        if ($observer instanceof KeyValueObservation) {
+            if ($handler = $observance->handler) {
+                $handler($this, $change);
+            }
+        } elseif ($observer instanceof KeyValueObserving) {
+            $observer->observeValue($keyPath, $this, $change, $observance->context);
         }
     }
 
@@ -180,6 +211,11 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
     #[Override]
     public function willChangeValueForKey(string $key, KeyValueChange $changeKind = KeyValueChange::setting, mixed $changedValue = null): void
     {
+        // Remember what the key holds before it is overwritten: this is the only moment the previous value is still readable, and didChangeValueForKey() needs it to report oldValue. Guarded by isset() rather than hasProperty(), because a declared but uninitialised typed property answers true to the latter and throws when read — which is the state every description object is in while it is being populated.
+        $wantsOldValue = array_any($this->observances, fn(KeyValueObservance $candidate): bool => $candidate->keyPath === $key && ($candidate->options & KeyValueObservingOptions::old) !== 0);
+        if ($wantsOldValue && isset($this->$key)) {
+            $this->valuesBeingChanged[$key] = $this->$key;
+        }
         foreach ($this->observances as $observance) {
             $keyPath = $observance->keyPath;
             if ($keyPath === $key) {
@@ -188,8 +224,8 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
                 if ($observance->options & KeyValueObservingOptions::new) {
                     $change->newValue = $changedValue;
                 }
-                if ($observance->options & KeyValueObservingOptions::old && $changeKind !== KeyValueChange::setting) {
-                    $change->oldValue = $this->valueForKey($key);
+                if ($observance->options & KeyValueObservingOptions::old) {
+                    $change->oldValue = $this->valuesBeingChanged[$key] ?? null;
                 }
                 if ($observance->options & KeyValueObservingOptions::prior) {
                     $change->isPrior = true;
@@ -219,7 +255,12 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
                     $change->newValue = $this->valueForKey($key);
                 }
                 if ($options & KeyValueObservingOptions::old) {
-                    $change->oldValue = $changedValue;
+                    // The value willChangeValueForKey() recorded, not $changedValue: callers pass the value being written, which is the new one, so reporting that here labelled the replacement as the replaced. A collection mutation is the exception — it has no scalar property to read back and passes the inserted or removed members as $changedValue, which is what "old" means for it.
+                    $change->oldValue = match (true) {
+                        array_key_exists($key, $this->valuesBeingChanged) => $this->valuesBeingChanged[$key],
+                        $changeKind === KeyValueChange::insertion, $changeKind === KeyValueChange::removal => $changedValue,
+                        default => null
+                    };
                 }
                 if ($options & KeyValueObservingOptions::prior) {
                     $change->isPrior = false;
@@ -234,6 +275,7 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
                 }
             }
         }
+        unset($this->valuesBeingChanged[$key]);
     }
 
     #[Override]
@@ -316,9 +358,10 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
             return;
         }
         if ($this->hasProperty($key)) {
-            $this->willChangeValueForKey($key, KeyValueChange::replacement, $value);
+            // Assigning a value is a setting, not a replacement: replacement describes an indexed element swapped inside a collection, which is what FaultingSet reports for its own mutations.
+            $this->willChangeValueForKey($key, KeyValueChange::setting, $value);
             $this->$key = $value;
-            $this->didChangeValueForKey($key, KeyValueChange::replacement, $value);
+            $this->didChangeValueForKey($key, KeyValueChange::setting, $value);
             return;
         }
         $this->setValueForUndefinedKey($value, $key);
