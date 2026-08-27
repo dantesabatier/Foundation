@@ -25,13 +25,15 @@ use Sabatier\Foundation\Predicates\Predicate;
  * CoreData's SQLCaseSensitivityTest and SQLWildcardEscapingTest, which pin the contract
  * from the SQL side.
  *
- * The parity is not total, and testLikeLeaksRegexMetacharactersInMemory records where it
- * ends: in memory the pattern reaches string_matches() already marked as quoted, so a
- * regex metacharacter inside it survives ("abc" LIKE "a.c" holds), while the SQL side
- * escapes only "%" and "_" and compares the dot literally. Documented rather than
- * changed, because closing it means picking which layer moves.
- *
  * Regression guards:
+ *  - LikePredicateOperator inherited MatchingPredicateOperator's evaluation, which forces
+ *    CompareOptions::quoted to tell string_search() the pattern is already escaped so it
+ *    skips preg_quote(). That is right for MATCHES, whose argument really is a regular
+ *    expression, and wrong for LIKE: the metacharacters expanded in memory while the SQL
+ *    side compared them literally, so "abc" LIKE "a.c" held in memory and matched nothing
+ *    through the store, and a bare "*" reached the regex engine as a quantifier with
+ *    nothing to repeat and raised a compilation warning. LIKE clears the flag now, which
+ *    is what makes every character in its pattern a literal;
  *  - InPredicateOperator typed its comparison closure as string, so "n IN {1,5,9}"
  *    raised a TypeError for a numeric collection. Only collections of strings worked.
  *    It compares through is_equal() now, keeping the options-aware string comparison for
@@ -107,20 +109,25 @@ final class ComparisonPredicateTest extends TestCase
     /**
      * @return iterable<string, array{string, string, bool}>
      */
-    public static function likeRegexLeakProvider(): iterable
+    public static function likeRegexProvider(): iterable
     {
-        // In memory LIKE reaches string_matches() through MatchingPredicateOperator,
-        // which forces CompareOptions::quoted — so the pattern is NOT preg_quote'd and
-        // regex metacharacters survive into the compiled pattern. The SQL side escapes
-        // only "%" and "_", so these patterns are the ones where the two layers part
-        // company; they are pinned as they behave, not as they ought to.
-        yield "a dot matches any character" => ["abc", "a.c", true];
-        yield "a regex quantifier expands" => ["hello", "h.*o", true];
-        yield "a character class expands" => ["hello", "h[ae]llo", true];
+        // A regex metacharacter is a literal too, which is the half of the contract LIKE
+        // used to break: it inherited MATCHES' forced CompareOptions::quoted, so the
+        // pattern skipped preg_quote() and the metacharacters expanded in memory while
+        // the SQL side compared them literally.
+        yield "a dot does not match any character" => ["abc", "a.c", false];
+        yield "a dot matches a dot" => ["a.c", "a.c", true];
+        yield "a quantifier does not expand" => ["hello", "h.*o", false];
+        yield "a character class does not expand" => ["hello", "h[ae]llo", false];
+        // A bare "*" used to reach the regex engine as a quantifier with nothing to
+        // repeat, raising a preg_match_all() compilation warning; failOnWarning is on, so
+        // the warning alone would fail this.
+        yield "a bare asterisk is a literal asterisk" => ["*", "*", true];
+        yield "an asterisk matches itself" => ["h*", "h*", true];
     }
 
-    #[DataProvider("likeRegexLeakProvider")]
-    public function testLikeLeaksRegexMetacharactersInMemory(string $value, string $pattern, bool $expected): void
+    #[DataProvider("likeRegexProvider")]
+    public function testLikeTreatsRegexMetacharactersAsLiterals(string $value, string $pattern, bool $expected): void
     {
         $this->assertSame($expected, $this->evaluate("s LIKE \"$pattern\"", ["s" => $value]));
     }
