@@ -13,15 +13,25 @@ use Sabatier\Foundation\Predicates\Predicate;
  * Tests for src/Predicates/ComparisonPredicate.php and the PredicateOperator subclasses
  * its evaluation dispatches to.
  *
+ * LIKE deliberately expands no wildcard, in either syntax: "*" and "?" are
+ * NSPredicate's, "%" and "_" are SQL's, and none of them stands for anything. That is
+ * what makes an exact-looking LIKE on a value holding a literal "%" or "_" work, which
+ * is common in SKUs, folios and part numbers, and CoreData lowers it to SQL
+ * `LIKE BINARY` with those two characters escaped for exactly that reason. Teaching
+ * either layer to expand "*" or "?" breaks the parity and makes one predicate answer
+ * differently depending on whether it reached the database — which is why the wildcard
+ * support attempted here was reverted. A caller who wants a prefix or substring search
+ * uses BEGINSWITH / CONTAINS / ENDSWITH, and one who wants a regex uses MATCHES. See
+ * CoreData's SQLCaseSensitivityTest and SQLWildcardEscapingTest, which pin the contract
+ * from the SQL side.
+ *
+ * The parity is not total, and testLikeLeaksRegexMetacharactersInMemory records where it
+ * ends: in memory the pattern reaches string_matches() already marked as quoted, so a
+ * regex metacharacter inside it survives ("abc" LIKE "a.c" holds), while the SQL side
+ * escapes only "%" and "_" and compares the dot literally. Documented rather than
+ * changed, because closing it means picking which layer moves.
+ *
  * Regression guards:
- *  - LikePredicateOperator was an empty subclass of MatchingPredicateOperator, so LIKE
- *    evaluated its argument as a regular expression instead of a wildcard pattern. None
- *    of the wildcards worked ("hello" LIKE "h*" was false), some patterns additionally
- *    emitted a preg_match_all() compilation warning because the bare "*" reached the
- *    regex engine as a quantifier with nothing to repeat, and the operator only ever
- *    matched on literal equality. The pattern is now quoted, "*" and "?" are reinstated
- *    as ".*" and ".", and it is passed as already-quoted so string_search() does not
- *    escape them straight back;
  *  - InPredicateOperator typed its comparison closure as string, so "n IN {1,5,9}"
  *    raised a TypeError for a numeric collection. Only collections of strings worked.
  *    It compares through is_equal() now, keeping the options-aware string comparison for
@@ -70,29 +80,47 @@ final class ComparisonPredicateTest extends TestCase
      */
     public static function likeProvider(): iterable
     {
-        // Expectations are MariaDB LIKE results with "%" written as "*" and "_" as "?".
-        yield "trailing wildcard" => ["hello", "h*", true];
-        yield "leading wildcard" => ["hello", "*o", true];
-        yield "surrounding wildcards" => ["hello", "*ell*", true];
-        yield "single character wildcard" => ["hello", "h?llo", true];
-        yield "no wildcard, equal" => ["hello", "hello", true];
-        yield "wildcard in the middle" => ["hello", "h*o", true];
-        yield "bare wildcard" => ["hello", "*", true];
-        yield "wildcard between literals" => ["hello", "he*lo", true];
-        yield "no match" => ["hello", "x*", false];
-        // A dot is a literal in a wildcard pattern, not the regex metacharacter:
-        // SELECT 'a.c' LIKE 'a.c' -> 1 while SELECT 'abc' LIKE 'a.c' -> 0.
-        yield "literal dot matches" => ["a.c", "a.c", true];
-        yield "literal dot does not match any character" => ["abc", "a.c", false];
-        // LIKE is case sensitive without an explicit option.
+        // Neither of the two wildcard syntaxes a caller might reach for works: "*" and
+        // "?" are NSPredicate's, and "%" and "_" are SQL's, and none of them expands.
+        yield "exact match" => ["hello", "hello", true];
+        yield "different value" => ["hello", "world", false];
+        yield "nspredicate asterisk does not expand" => ["hello", "h*", false];
+        yield "nspredicate question mark does not expand" => ["hello", "h?llo", false];
+        yield "sql percent does not expand" => ["hello", "h%", false];
+        yield "sql underscore does not expand" => ["hello", "h_llo", false];
+        // The values SQLWildcardEscapingTest protects: an exact-looking LIKE on a value
+        // holding a literal "%" or "_" has to find it, which is why the SQL side escapes
+        // them rather than expanding them.
+        yield "a literal percent matches itself" => ["50%OFF", "50%OFF", true];
+        yield "a literal underscore matches itself" => ["AUDIT_TEST", "AUDIT_TEST", true];
+        yield "underscore does not stand in for a character" => ["AUDITxTEST", "AUDIT_TEST", false];
         yield "case sensitive" => ["hello", "HELLO", false];
-        yield "case sensitive with wildcard" => ["hello", "h*LO", false];
-        // Anchored at both ends: a prefix alone is not a match.
-        yield "partial pattern is not a match" => ["hello", "hell", false];
+        yield "a prefix alone is not a match" => ["hello", "hell", false];
     }
 
     #[DataProvider("likeProvider")]
-    public function testLikeTreatsItsArgumentAsAWildcardPattern(string $value, string $pattern, bool $expected): void
+    public function testLikeExpandsNoWildcard(string $value, string $pattern, bool $expected): void
+    {
+        $this->assertSame($expected, $this->evaluate("s LIKE \"$pattern\"", ["s" => $value]));
+    }
+
+    /**
+     * @return iterable<string, array{string, string, bool}>
+     */
+    public static function likeRegexLeakProvider(): iterable
+    {
+        // In memory LIKE reaches string_matches() through MatchingPredicateOperator,
+        // which forces CompareOptions::quoted — so the pattern is NOT preg_quote'd and
+        // regex metacharacters survive into the compiled pattern. The SQL side escapes
+        // only "%" and "_", so these patterns are the ones where the two layers part
+        // company; they are pinned as they behave, not as they ought to.
+        yield "a dot matches any character" => ["abc", "a.c", true];
+        yield "a regex quantifier expands" => ["hello", "h.*o", true];
+        yield "a character class expands" => ["hello", "h[ae]llo", true];
+    }
+
+    #[DataProvider("likeRegexLeakProvider")]
+    public function testLikeLeaksRegexMetacharactersInMemory(string $value, string $pattern, bool $expected): void
     {
         $this->assertSame($expected, $this->evaluate("s LIKE \"$pattern\"", ["s" => $value]));
     }
@@ -100,15 +128,7 @@ final class ComparisonPredicateTest extends TestCase
     public function testLikeHonoursTheCaseInsensitiveOption(): void
     {
         $this->assertTrue($this->evaluate("s LIKE[c] \"HELLO\"", ["s" => "hello"]));
-        $this->assertTrue($this->evaluate("s LIKE[c] \"H*O\"", ["s" => "hello"]));
-    }
-
-    public function testLikeDoesNotWarnOnABareWildcard(): void
-    {
-        // The bare "*" used to reach the regex engine as a quantifier with nothing to
-        // repeat, so this raised a preg_match_all() compilation warning. failOnWarning
-        // is enabled, which makes the warning itself a failure.
-        $this->assertTrue($this->evaluate("s LIKE \"*\"", ["s" => "anything"]));
+        $this->assertFalse($this->evaluate("s LIKE[c] \"WORLD\"", ["s" => "hello"]));
     }
 
     /**
@@ -164,7 +184,7 @@ final class ComparisonPredicateTest extends TestCase
 
     public function testMatchesEvaluatesARegularExpression(): void
     {
-        // MATCHES is the operator that really does take a regex, which is what LIKE was wrongly sharing an implementation with. It matches against the whole string, so a pattern that only covers part of it does not match on its own.
+        // MATCHES is the operator that takes a regex — the one to reach for when LIKE's literal comparison is not what is wanted. It matches against the whole string, so a pattern that only covers part of it does not match on its own.
         $this->assertTrue($this->evaluate("s MATCHES \"^h.*o$\"", ["s" => "hello"]));
         $this->assertTrue($this->evaluate("s MATCHES \".*ll.*\"", ["s" => "hello"]));
         $this->assertFalse($this->evaluate("s MATCHES \"^x\"", ["s" => "hello"]));
