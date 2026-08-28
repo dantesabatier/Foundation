@@ -15,6 +15,10 @@ final class UndoManager extends ObjectClass
     private(set) int $levelsOfUndo = 0 {
         set {
             $this->levelsOfUndo = $value;
+            // A limit of 0 means no limit, so there is nothing to trim; without this guard setting it to 0 emptied both stacks instead of lifting the cap.
+            if ($value === 0) {
+                return;
+            }
             while ($this->undoStack->count > $value) {
                 $this->undoStack->removeAt(0);
             }
@@ -81,6 +85,8 @@ final class UndoManager extends ObjectClass
     {
         $parent = $this->group;
         $this->group = new UndoGroup($parent);
+        // groupingLevel counts the open groups, and nothing was maintaining it: it stayed at 0 for the lifetime of the manager, so undo() never closed the group opened for it and always failed with "Undo with nested groups" — the plain register-then-undo flow could not complete.
+        $this->groupingLevel++;
         if (!$this->isUndoing && !$this->isRedoing) {
             NotificationCenter::default()->postNotificationName(UndoManagerDidOpenUndoGroupNotification, $this);
         }
@@ -170,6 +176,8 @@ final class UndoManager extends ObjectClass
             $groupToUndo = $this->undoStack->popLast();
         }
         assert($groupToUndo instanceof UndoGroup);
+        // Raised for the duration of the undo, the way redo() raises isRedoing: it is what tells endUndoGrouping() to file the actions the undone operation re-registers onto the redo stack instead of the undo stack. Nothing set it before, so a redo was never possible — the re-registered group landed back on the undo stack and the redo stack stayed empty.
+        $this->isUndoing = true;
         $this->begin();
         $groupToUndo->perform();
         $this->endUndoGrouping();
@@ -242,17 +250,20 @@ final class UndoManager extends ObjectClass
         NotificationCenter::default()->postNotificationName(UndoManagerDidCloseUndoGroupNotification, $this);
         $parent = $group->parent;
         $this->group = $parent;
+        $this->groupingLevel--;
         $group->parent = null;
         if (!$parent instanceof UndoGroup) {
+            // A limit of 0 is no limit: comparing it against the count made the condition true precisely when the stack was empty, and the drop-the-oldest call then indexed past the end.
+            $limit = $this->levelsOfUndo;
             if ($this->isUndoing) {
-                if ($this->levelsOfUndo === $this->redoStack->count && !$group->actions->isEmpty) {
+                if ($limit > 0 && $this->redoStack->count >= $limit && !$group->actions->isEmpty) {
                     $this->redoStack->removeAt(0);
                 }
                 if (!$group->actions->isEmpty) {
                     $this->redoStack->append($group);
                 }
             } else {
-                if ($this->levelsOfUndo === $this->undoStack->count && !$group->actions->isEmpty) {
+                if ($limit > 0 && $this->undoStack->count >= $limit && !$group->actions->isEmpty) {
                     $this->undoStack->removeAt(0);
                 }
                 if (!$group->actions->isEmpty) {
@@ -364,7 +375,7 @@ final class UndoManager extends ObjectClass
      */
     public function undoMenuTitle(string $actionName): string
     {
-        $name = localized_string("Redo");
+        $name = localized_string("Undo");
         if ($actionName === "") {
             return $name;
         }
@@ -380,7 +391,7 @@ final class UndoManager extends ObjectClass
      */
     public function redoMenuTitle(string $actionName): string
     {
-        $name = localized_string("Undo");
+        $name = localized_string("Redo");
         if ($actionName === "") {
             return $name;
         }

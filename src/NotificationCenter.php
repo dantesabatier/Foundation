@@ -72,10 +72,8 @@ final class NotificationCenter
      */
     public function removeObserver(mixed $observer, ?string $name = null, mixed $object = null): void
     {
-        if (!($element = $this->observers->first(fn(NotificationObserver $notificationObserver): bool => $notificationObserver->observer === $observer && $notificationObserver->name === $name && $notificationObserver->observed === $object))) {
-            $element = $observer;
-        }
-        $this->observers->remove($element);
+        // A null name or object is "any", not "matches null": passing neither has to drop every entry this observer registered, and matching them literally meant nothing was ever removed unless the entry itself had been registered with a null name. Removal is also not limited to the first match — an observer registered for several names loses all of them at once. The observer is either the object passed to addObserver() or the opaque entry addObserverForName() handed back, which is the entry itself.
+        $this->observers->removeAll(fn(NotificationObserver $candidate): bool => ($candidate === $observer || $candidate->observer === $observer) && ($name === null || $candidate->name === $name) && ($object === null || $candidate->observed === $object));
     }
 
     /**
