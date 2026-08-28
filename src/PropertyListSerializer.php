@@ -7,6 +7,7 @@ namespace Sabatier\Foundation;
 use BackedEnum;
 use DOMDocument;
 use DOMElement;
+use DOMException;
 use DOMImplementation;
 use DOMNode;
 use JetBrains\PhpStorm\ExpectedValues;
@@ -28,22 +29,39 @@ final readonly class PropertyListSerializer
         $this->document = $document;
     }
 
+    /**
+     * Builds an element carrying character data.
+     *
+     * DOMDocument::createElement() parses its second argument as markup rather than escaping it, so a value holding an ampersand produced an unterminated entity reference and returned false — the whole value was dropped — while one holding "&amp;" was decoded to "&" on the way in and came back short. A text node escapes instead of parsing.
+     *
+     * @param string $name The element name.
+     * @param string $value The character data the element carries.
+     * @return DOMElement The element with the value as its text.
+     * @throws DOMException
+     */
+    private function elementWithValue(string $name, string $value): DOMElement
+    {
+        $element = $this->document->createElement($name);
+        $element->appendChild($this->document->createTextNode($value));
+        return $element;
+    }
+
     /** @noinspection PhpUnhandledExceptionInspection */
     private function append(mixed $obj, DOMElement $element): void
     {
         $document = $this->document;
         if (is_null($obj)) {
-            $element->appendChild($document->createElement("string", (string)$obj));
+            $element->appendChild($this->elementWithValue("string", (string)$obj));
         } elseif (is_string($obj)) {
-            $element->appendChild($document->createElement("string", $obj));
+            $element->appendChild($this->elementWithValue("string", $obj));
         } elseif (is_bool($obj)) {
             $element->appendChild($document->createElement(human_readable_value($obj)));
         } elseif (is_int($obj)) {
-            $element->appendChild($document->createElement("integer", (string)$obj));
+            $element->appendChild($this->elementWithValue("integer", (string)$obj));
         } elseif (is_float($obj)) {
-            $element->appendChild($document->createElement("real", (string)$obj));
+            $element->appendChild($this->elementWithValue("real", (string)$obj));
         } elseif ($obj instanceof Date) {
-            $element->appendChild($document->createElement("date", (string)$obj));
+            $element->appendChild($this->elementWithValue("date", (string)$obj));
         } elseif ($obj instanceof Value || $obj instanceof BackedEnum) {
             $this->append($obj->value, $element);
         } elseif ($obj instanceof ArrayClass || $obj instanceof Set || $obj instanceof Dictionary || is_array($obj)) {
@@ -51,7 +69,7 @@ final readonly class PropertyListSerializer
             $element->appendChild($parent);
             foreach ($obj as $key => $value) {
                 if (is_string($key)) {
-                    $parent->appendChild($document->createElement("key", $key));
+                    $parent->appendChild($this->elementWithValue("key", $key));
                 }
                 $this->append($value, $parent);
             }
