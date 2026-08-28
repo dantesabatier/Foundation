@@ -9,7 +9,7 @@ This project brings the robust, object-oriented architecture and expressive APIs
 - **Swift-like Collections**: Enhanced `ArrayClass`, `Dictionary`, and `Set` with support for `map`, `filter`, `reduce`, `compactMap`, and more.
 - **Key-Value Coding (KVC) & Observing (KVO)**: Full implementation of dynamic property access and observation, including collection operators like `@sum`, `@avg`, and `@distinctUnionOfObjects`.
 - **File Management**: A powerful `FileManager` API that mirrors `NSFileManager`, including URL-based paths and delegate support.
-- **Advanced Predicates**: Complex data filtering and evaluation using a port of `NSPredicate`.
+- **Advanced Predicates**: Complex data filtering and evaluation using a port of `NSPredicate`. The grammar is documented in [PREDICATES.md](PREDICATES.md).
 - **Strongly Typed**: Built from the ground up for **PHPStan** and **Psalm**, ensuring type safety even in complex collection hierarchies.
 - **Modern PHP**: Utilizes PHP 8.4 features such as *Property Hooks* and *Asymmetric Visibility* for a cleaner, more declarative syntax.
 
