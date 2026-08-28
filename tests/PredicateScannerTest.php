@@ -96,6 +96,34 @@ final class PredicateScannerTest extends TestCase
     }
 
     /**
+     * @return iterable<string, array{string, bool}>
+     */
+    public static function comparisonOperatorProvider(): iterable
+    {
+        // n is 3. The two-character operators have to be matched before the one-character
+        // ones that open them: "<" used to consume the "<" of "<>" and leave "> 3" behind,
+        // so the documented "<>" spelling of != could not parse at all.
+        yield "angle-bracket not equal, false" => ["n <> 3", false];
+        yield "angle-bracket not equal, true" => ["n <> 5", true];
+        yield "bang not equal, false" => ["n != 3", false];
+        yield "bang not equal, true" => ["n != 5", true];
+        yield "less than" => ["n < 5", true];
+        yield "less than, false" => ["n < 2", false];
+        yield "greater than" => ["n > 2", true];
+        yield "greater than, false" => ["n > 5", false];
+        yield "less than or equal" => ["n <= 3", true];
+        yield "greater than or equal" => ["n >= 3", true];
+        yield "reversed less than or equal" => ["n =< 3", true];
+        yield "reversed greater than or equal" => ["n => 3", true];
+    }
+
+    #[DataProvider("comparisonOperatorProvider")]
+    public function testEveryComparisonOperatorSpelling(string $format, bool $expected): void
+    {
+        $this->assertSame($expected, Predicate::format($format)->evaluate(new Dictionary(["n" => 3])));
+    }
+
+    /**
      * @return iterable<string, array{string, string}>
      */
     public static function formatProvider(): iterable

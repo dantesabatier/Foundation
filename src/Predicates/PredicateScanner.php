@@ -170,16 +170,17 @@ final class PredicateScanner extends Scanner
             $negate = true;
         }
         $left = $this->parseExpression();
+        // Longest match first: "<" would otherwise consume the opening character of "<>" and leave "> 3" behind, so the two-character operators have to be tried before the one-character ones.
         if ($this->scanString("<=") || $this->scanString("=<")) {
             $operator = PredicateOperatorType::lessThanOrEqualTo;
         } elseif ($this->scanString(">=") || $this->scanString("=>")) {
             $operator = PredicateOperatorType::greaterThanOrEqualTo;
+        } elseif ($this->scanString("!=") || $this->scanString("<>")) {
+            $operator = PredicateOperatorType::notEqualTo;
         } elseif ($this->scanString("<")) {
             $operator = PredicateOperatorType::lessThan;
         } elseif ($this->scanString(">")) {
             $operator = PredicateOperatorType::greaterThan;
-        } elseif ($this->scanString("!=") || $this->scanString("<>")) {
-            $operator = PredicateOperatorType::notEqualTo;
         } elseif ($this->scanString("==") || $this->scanString("=")) {
             $operator = PredicateOperatorType::equalTo;
         } elseif ($this->scanKeyword("LIKE")) {
