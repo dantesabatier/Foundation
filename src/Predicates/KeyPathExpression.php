@@ -30,7 +30,8 @@ final class KeyPathExpression extends FunctionExpression
         $selector = "valueForKeyPath";
         if ($keyPath instanceof KeyPathSpecifierExpression || $keyPath instanceof KeyPathExpression) {
             $keyPath = $keyPath->keyPath;
-            if (!str_contains($keyPath, ".")) {
+            // A collection operator has to go through valueForKeyPath(), which is the only one that interprets the leading "@": valueForKey() maps the key over each element instead, so "sales.total.@sum" reached a collection of floats and raised "must be of type ?KeyValueCoding, float given". Having no dot is not enough to pick the plain accessor — "@sum" has none either.
+            if (!str_contains($keyPath, ".") && !str_starts_with($keyPath, "@")) {
                 $selector = "valueForKey";
             }
         }
