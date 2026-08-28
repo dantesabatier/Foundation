@@ -18,6 +18,12 @@ use function Sabatier\Foundation\string_is_equal;
 /** @internal */
 final class EqualityPredicateOperator extends PredicateOperator
 {
+    #[Override]
+    public string $symbol {
+        // performPrimitiveOperation() compares through string_is_equal() with these options, so the symbol has to carry them: without this "s ==[cd] \"JOSE\"" read back as "s = 'JOSE'" and looked case-sensitive while still matching "josé".
+        get => $this->symbolWithOptions(parent::$symbol::get());
+    }
+
     public function __construct(PredicateOperatorType $operatorType, ComparisonPredicateModifier $modifier = ComparisonPredicateModifier::direct, #[ExpectedValues(flagsFromClass: ComparisonPredicateOptions::class)] int $options = ComparisonPredicateOptions::none, public readonly bool $isNegation = false)
     {
         parent::__construct($operatorType, $modifier, $options);

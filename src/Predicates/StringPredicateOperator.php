@@ -20,27 +20,7 @@ class StringPredicateOperator extends PredicateOperator
 {
     #[Override]
     public string $symbol {
-        get {
-            $symbol = parent::$symbol::get();
-            $options = $this->options;
-            if ($options) {
-                $symbol .= "[";
-                if ($options & ComparisonPredicateOptions::caseInsensitive) {
-                    $symbol .= "c";
-                    if ($options & ComparisonPredicateOptions::diacriticInsensitive) {
-                        $symbol .= "d";
-                        if ($options & ComparisonPredicateOptions::normalized) {
-                            $symbol .= "n";
-                        }
-                    }
-                }
-                if ($options & ComparisonPredicateOptions::localeSensitive) {
-                    $symbol .= "l";
-                }
-                $symbol .= "]";
-            }
-            return $symbol;
-        }
+        get => $this->symbolWithOptions(parent::$symbol::get());
     }
 
     public function __construct(PredicateOperatorType $operatorType, ComparisonPredicateModifier $modifier = ComparisonPredicateModifier::direct, #[ExpectedValues(flagsFromClass: ComparisonPredicateOptions::class)] int $options = ComparisonPredicateOptions::none)

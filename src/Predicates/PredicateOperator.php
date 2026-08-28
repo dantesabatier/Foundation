@@ -63,6 +63,36 @@ class PredicateOperator extends ObjectClass
     {
     }
 
+    /**
+     * Appends the bracketed option letters an operator was built with to its symbol, so a predicate reads back the way it was written.
+     *
+     * Each letter implies the ones before it, which is the spelling the scanner accepts: there is no `[d]` or `[n]` without `c`.
+     *
+     * @param string $symbol The bare operator symbol.
+     * @return string The symbol with its option suffix, or unchanged when the operator carries no options.
+     */
+    protected function symbolWithOptions(string $symbol): string
+    {
+        $options = $this->options;
+        if (!$options) {
+            return $symbol;
+        }
+        $letters = "";
+        if ($options & ComparisonPredicateOptions::caseInsensitive) {
+            $letters .= "c";
+            if ($options & ComparisonPredicateOptions::diacriticInsensitive) {
+                $letters .= "d";
+                if ($options & ComparisonPredicateOptions::normalized) {
+                    $letters .= "n";
+                }
+            }
+        }
+        if ($options & ComparisonPredicateOptions::localeSensitive) {
+            $letters .= "l";
+        }
+        return $letters === "" ? $symbol : sprintf("%s[%s]", $symbol, $letters);
+    }
+
     public static function newOperator(PredicateOperatorType $type, ComparisonPredicateModifier $modifier = ComparisonPredicateModifier::direct, #[ExpectedValues(flagsFromClass: ComparisonPredicateOptions::class)] int $options = ComparisonPredicateOptions::none): PredicateOperator
     {
         return match ($type) {

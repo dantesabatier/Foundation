@@ -23,6 +23,12 @@ use function Sabatier\Foundation\typeof;
 final class InPredicateOperator extends PredicateOperator
 {
     #[Override]
+    public string $symbol {
+        // The options reach in_string() and string_is_equal() below, so the symbol has to show them.
+        get => $this->symbolWithOptions(parent::$symbol::get());
+    }
+
+    #[Override]
     protected function performPrimitiveOperation(mixed $left, mixed $right): bool
     {
         $options = $this->compareOptions;

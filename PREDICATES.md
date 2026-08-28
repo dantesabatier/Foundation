@@ -145,9 +145,10 @@ Predicate::$debugHandler = function (string $line): void { echo $line, PHP_EOL; 
   the operator has to come last** — `employees.salary.@sum` works,
   `employees.@sum.salary` raises, even though `valueForKeyPath(…)` accepts both orders.
   `employees.@sum` alone has nothing to add up and raises either way.
-- `predicateFormat` does not re-emit the comparison modifiers, so a predicate built from
-  `name ==[cd] "JOSE"` prints as `name = 'JOSE'`. The comparison itself still honours
-  them; only the round-trip through the format string loses them.
+
+The comparison modifiers survive `predicateFormat` for every operator that accepts them,
+including `==`, `!=` and `IN`, so re-parsing a format produces a predicate that answers
+the same thing.
 
 ## Examples
 
