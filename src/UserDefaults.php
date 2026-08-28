@@ -194,7 +194,7 @@ final class UserDefaults
      * @return float The double value associated with the specified key. If the key doesn't exist, this method returns 0.
      * This method automatically coerces certain values into equivalent double values (if one can be determined). The Boolean value true becomes 1.0 and false becomes 0.0. An integer becomes the equivalent double (for example, 2 becomes 2.0). A string that represents a floating point number becomes the equivalent double (for example, "123.4" becomes 123.4).
      */
-    public function doble(string $key): float
+    public function double(string $key): float
     {
         $object = $this->object($key);
         if (is_bool($object) || is_numeric($object)) {
