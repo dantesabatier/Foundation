@@ -163,8 +163,8 @@ final class PredicateScanner extends Scanner
         } elseif ($this->scanKeyword("ALL")) {
             $modifier = ComparisonPredicateModifier::all;
         } elseif ($this->scanKeyword("SOME")) {
-            $modifier = ComparisonPredicateModifier::all;
-            $negate = true;
+            // SOME is a synonym for ANY, not the negation of ALL: mapping it to "NOT ALL" inverted the answer wherever the two differ — over {5,5,5} "SOME nums == 5" replied false.
+            $modifier = ComparisonPredicateModifier::any;
         } elseif ($this->scanKeyword("NONE")) {
             $modifier = ComparisonPredicateModifier::any;
             $negate = true;

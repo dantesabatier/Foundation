@@ -535,34 +535,48 @@ final class PredicateUtilities
         return is_equal($a, $b) ? null : $a;
     }
 
-    public static function bitwiseAndWith(int $n1, int $n2): Number
+    /**
+     * Narrows an operand to the integer a bitwise operation needs.
+     *
+     * The expression engine hands these functions whatever a key path or a constant evaluated to, which is routinely a float, so a plain int parameter raised a TypeError for every bitwise expression that reached it. MariaDB rounds rather than truncates before operating — 2.7 & 1 answers 1, not 0 — so match that.
+     *
+     * @param Number|int|float $value The operand as the expression produced it.
+     * @return int The operand as an integer.
+     */
+    private static function bitwiseOperand(Number|int|float $value): int
     {
-        return new Number($n1 & $n2);
+        return (int)round(pn($value));
     }
 
-    public static function bitwiseOrWith(int $n1, int $n2): Number
+    public static function bitwiseAndWith(Number|int|float $n1, Number|int|float $n2): Number
     {
-        return new Number($n1 | $n2);
+        return new Number(self::bitwiseOperand($n1) & self::bitwiseOperand($n2));
     }
 
-    public static function bitwiseXorWith(int $n1, int $n2): Number
+    public static function bitwiseOrWith(Number|int|float $n1, Number|int|float $n2): Number
     {
-        return new Number($n1 ^ $n2);
+        return new Number(self::bitwiseOperand($n1) | self::bitwiseOperand($n2));
     }
 
-    public static function leftshiftBy(int $n1, int $n2): Number
+    public static function bitwiseXorWith(Number|int|float $n1, Number|int|float $n2): Number
     {
-        return new Number($n1 << $n2);
+        return new Number(self::bitwiseOperand($n1) ^ self::bitwiseOperand($n2));
     }
 
-    public static function rightshiftBy(int $n1, int $n2): Number
+    public static function leftshiftBy(Number|int|float $n1, Number|int|float $n2): Number
     {
-        return new Number($n1 >> $n2);
+        return new Number(self::bitwiseOperand($n1) << self::bitwiseOperand($n2));
     }
 
-    public static function onesComplement(int $number): Number
+    public static function rightshiftBy(Number|int|float $n1, Number|int|float $n2): Number
     {
-        return new Number(((1 << ((int)(log($number) / log(2)) + 1)) - 1) ^ $number);
+        return new Number(self::bitwiseOperand($n1) >> self::bitwiseOperand($n2));
+    }
+
+    public static function onesComplement(Number|int|float $number): Number
+    {
+        $operand = self::bitwiseOperand($number);
+        return new Number(((1 << ((int)(log($operand) / log(2)) + 1)) - 1) ^ $operand);
     }
 
     public static function chs(int $number): Number
