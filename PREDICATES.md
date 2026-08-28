@@ -17,14 +17,14 @@ the database run it. The condition never changes.
 
 ## Comparison operators
 
-| Operator | Meaning |
-|---|---|
-| `==`, `=` | equal |
-| `!=`, `<>` | not equal |
-| `<`, `>` | less than, greater than |
-| `<=`, `=<` | less than or equal |
-| `>=`, `=>` | greater than or equal |
-| `IN` | membership in a collection |
+| Operator                   | Meaning                    |
+|----------------------------|----------------------------|
+| `==`, `=`                  | equal                      |
+| `!=`, `<>`                 | not equal                  |
+| `<`, `>`                   | less than, greater than    |
+| `<=`, `=<`                 | less than or equal         |
+| `>=`, `=>`                 | greater than or equal      |
+| `IN`                       | membership in a collection |
 | `BETWEEN { lower, upper }` | inclusive range, both ends |
 
 ## Compound predicates
@@ -46,11 +46,11 @@ the database run it. The condition never changes.
 String comparisons are case- and diacritic-sensitive by default. Append a modifier
 immediately after the operator:
 
-| Modifier | Effect |
-|---|---|
-| `[c]` | case-insensitive |
-| `[cd]` | also diacritic-insensitive |
-| `[cdn]` | also normalized |
+| Modifier | Effect                     |
+|----------|----------------------------|
+| `[c]`    | case-insensitive           |
+| `[cd]`   | also diacritic-insensitive |
+| `[cdn]`  | also normalized            |
 
 Each letter implies the ones before it, so `[d]` and `[n]` are not valid on their own.
 The locale-sensitive `l` is **not supported**: a predicate carrying it raises rather than
@@ -102,19 +102,33 @@ symbols. Their operands are rounded to integers.
 
 ## Tracing an evaluation
 
-Setting `Predicate::$debugDefault = true` logs every step of an evaluation — which
+Setting `Predicate::$debugDefault = true` traces every step of an evaluation — which
 accessor each key path segment went through, what it produced, and how the operator
-compared the two sides:
+compared the two sides. Lines are indented by depth, so a compound predicate brackets the
+subpredicates beneath it:
 
 ```
-keyPath: Dictionary::valueForKey(employees)  => [<Employee 5>, <Employee 6>]
-keyPath: Set::valueForKey(salary)            => [100, 200]
-keyPath: Set::valueForKeyPath(@sum)          => 300
-equalTo (direct): (Number)300 = (float)300   => true
+and (2 subpredicates)
+    keyPath: Dictionary::valueForKey(employees) => [<Employee 5>, <Employee 6>]
+    keyPath: Set::valueForKey(salary)           => [100, 200]
+    keyPath: Set::valueForKeyPath(@sum)         => 300
+    constantValue                               => 250
+  greaterThan (direct): (Number)300 > (float)250 => true
+  …
+and => true
 ```
 
-It is the quickest way to see why a predicate answers what it answers, and where one
-stops when it raises.
+Two details do most of the work. The accessor is named, which is what distinguishes a
+segment resolved through `valueForKey` from one resolved through `valueForKeyPath`. And
+each operand carries its type, so `(Number)300 = (float)300` shows a comparison that a
+bare `300 = 300` would hide.
+
+By default a line reaches `error_log()`, which is the server log. Assign
+`Predicate::$debugHandler` to send it somewhere else — a console, a buffer, a test:
+
+```php
+Predicate::$debugHandler = function (string $line): void { echo $line, PHP_EOL; };
+```
 
 ## Known limits
 

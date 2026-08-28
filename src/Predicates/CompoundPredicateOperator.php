@@ -15,6 +15,7 @@ use JetBrains\PhpStorm\ExpectedValues;
 use Override;
 use Sabatier\Foundation\ArrayClass;
 use Sabatier\Foundation\Dictionary;
+use function Sabatier\Foundation\human_readable_value;
 
 /** @internal */
 final class CompoundPredicateOperator extends PredicateOperator
@@ -53,12 +54,20 @@ final class CompoundPredicateOperator extends PredicateOperator
     public function evaluatePredicates(ArrayClass $predicates, mixed $object = null, ?Dictionary $substitutionVariables = null): bool
     {
         if (!$predicates->isEmpty) {
-            $evaluations = $predicates->map(fn(Predicate $predicate): bool => $predicate->evaluate($object, $substitutionVariables));
-            return match ($this->compoundPredicateType) {
+            if (Predicate::$debugDefault) {
+                Predicate::debug(sprintf("%s %s (%d subpredicates)", $this->debugDescription, $this->compoundPredicateType->name, $predicates->count));
+            }
+            // Nested so each subpredicate's own trace is indented under the line announcing the compound, which is what makes the structure of a many-term predicate readable.
+            $evaluations = Predicate::debugNested(fn(): ArrayClass => $predicates->map(fn(Predicate $predicate): bool => $predicate->evaluate($object, $substitutionVariables)));
+            $result = match ($this->compoundPredicateType) {
                 CompoundPredicateLogicalType::not => !$evaluations->first,
                 CompoundPredicateLogicalType::and => !$evaluations->containsElement(false),
                 CompoundPredicateLogicalType::or => $evaluations->containsElement(true),
             };
+            if (Predicate::$debugDefault) {
+                Predicate::debug(sprintf("%s %s => %s", $this->debugDescription, $this->compoundPredicateType->name, human_readable_value($result)));
+            }
+            return $result;
         }
         return true;
     }

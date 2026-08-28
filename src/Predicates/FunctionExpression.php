@@ -81,7 +81,7 @@ class FunctionExpression extends Expression
         if ($operand instanceof ExpressionOperator) {
             $value = $operand->expressionValue($object, $context);
             if (Predicate::$debugDefault) {
-                error_log(sprintf("Foundation: %s %s: %s(%s) => %s", $this->debugDescription, $this->expressionType->name, $selector, $arguments->join(", "), human_readable_value($value)));
+                Predicate::debug(sprintf("%s %s: %s(%s) => %s", $this->debugDescription, $this->expressionType->name, $selector, $arguments->join(", "), human_readable_value($value)));
             }
             return $value;
         }
@@ -89,7 +89,7 @@ class FunctionExpression extends Expression
         $arguments = $arguments->map(fn(Expression $expression): mixed => $expression->expressionValue($object, $context));
         $value = $obj->$selector(...$arguments);
         if (Predicate::$debugDefault) {
-            error_log(sprintf("Foundation: %s %s: %s::%s(%s) => %s", $this->debugDescription, $this->expressionType->name, typeof($obj), $selector, $arguments->join(", "), human_readable_value($value)));
+            Predicate::debug(sprintf("%s %s: %s::%s(%s) => %s", $this->debugDescription, $this->expressionType->name, typeof($obj), $selector, $arguments->join(", "), human_readable_value($value)));
         }
         return $value;
     }

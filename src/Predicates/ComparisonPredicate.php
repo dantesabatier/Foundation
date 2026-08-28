@@ -68,7 +68,10 @@ final class ComparisonPredicate extends Predicate
     #[Override]
     public function evaluate(mixed $object = null, ?Dictionary $substitutionVariables = null): bool
     {
-        return $this->predicateOperator->performOperation($this->leftExpression->expressionValue($object, $substitutionVariables), $this->rightExpression->expressionValue($object, $substitutionVariables));
+        // Both operands are resolved one level deeper, so the key paths and functions feeding a comparison are indented under the line reporting it.
+        $left = Predicate::debugNested(fn(): mixed => $this->leftExpression->expressionValue($object, $substitutionVariables));
+        $right = Predicate::debugNested(fn(): mixed => $this->rightExpression->expressionValue($object, $substitutionVariables));
+        return $this->predicateOperator->performOperation($left, $right);
     }
 
     #[Override]

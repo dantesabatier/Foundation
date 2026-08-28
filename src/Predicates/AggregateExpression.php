@@ -40,8 +40,8 @@ final class AggregateExpression extends Expression
         if (Predicate::$debugDefault) {
             $value
                 |> human_readable_value(...)
-                |> (fn(string $x): string => sprintf("Foundation: %s %s: %s", $this->debugDescription, $this->expressionType->name, $x))
-                |> error_log(...);
+                |> (fn(string $x): string => sprintf("%s %s => %s", $this->debugDescription, $this->expressionType->name, $x))
+                |> Predicate::debug(...);
         }
         return $value;
     }

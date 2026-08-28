@@ -45,6 +45,8 @@ final class SetExpression extends Expression
             $right = new Set($right);
         }
         $expressionType = $this->expressionType;
+        // The operand is mutated in place, so the trace has to remember what it held: logging $left afterwards showed the result in the operand position too, and the line read "the result combined with the right operand gives the result".
+        $operand = Predicate::$debugDefault ? human_readable_value($left) : "";
         if ($expressionType === ExpressionType::minusSet) {
             $left->subtract($right);
         } elseif ($expressionType === ExpressionType::intersectSet) {
@@ -53,7 +55,7 @@ final class SetExpression extends Expression
             $left->formUnion($right);
         }
         if (Predicate::$debugDefault) {
-            error_log(sprintf("Foundation: %s %s %s %s => %s", $this->debugDescription, human_readable_value($left), $expressionType->name, human_readable_value($right), human_readable_value($left)));
+            Predicate::debug(sprintf("%s %s: %s %s => %s", $this->debugDescription, $expressionType->name, $operand, human_readable_value($right), human_readable_value($left)));
         }
         return $left;
     }

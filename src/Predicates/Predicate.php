@@ -19,6 +19,10 @@ class Predicate extends ObjectClass
 {
     /** @internal */
     public static bool $debugDefault = false;
+    /** @var Closure(string): void|null $debugHandler Where a debug line goes. When null it reaches error_log(), which is the server log; assign a closure to send the trace somewhere a test or a console can read it. */
+    public static ?Closure $debugHandler = null;
+    /** @var int $debugDepth How deep the evaluation currently is, so a line can be indented to show where it sits in a compound predicate. */
+    private static int $debugDepth = 0;
     /** @var string The predicate's format string. */
     public string $predicateFormat {
         get => request_concrete_implementation($this, __PROPERTY__);
@@ -41,6 +45,42 @@ class Predicate extends ObjectClass
     public static function format(string $format, ArrayClass $arguments = new ArrayClass()): ?Predicate
     {
         return new PredicateScanner($format, $arguments)->predicate;
+    }
+
+    /**
+     * Emits one line of the evaluation trace, indented to the depth it was reached at.
+     *
+     * @param string $message The line to emit, without the framework prefix or indentation.
+     * @internal
+     */
+    public static function debug(string $message): void
+    {
+        $line = sprintf("Foundation: %s%s", str_repeat("  ", self::$debugDepth), $message);
+        if ($handler = self::$debugHandler) {
+            $handler($line);
+            return;
+        }
+        error_log($line);
+    }
+
+    /**
+     * Runs a step of an evaluation one level deeper, so anything it traces is indented under the line that announced it.
+     *
+     * @param Closure(): mixed $step The evaluation to run.
+     * @return mixed Whatever the step produced.
+     * @internal
+     */
+    public static function debugNested(Closure $step): mixed
+    {
+        if (!self::$debugDefault) {
+            return $step();
+        }
+        self::$debugDepth++;
+        try {
+            return $step();
+        } finally {
+            self::$debugDepth--;
+        }
     }
 
     /**

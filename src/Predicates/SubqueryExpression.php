@@ -44,7 +44,7 @@ final class SubqueryExpression extends Expression
         $predicate = $this->predicate->withSubstitutionVariables($context);
         $value = $collection->filter(fn(mixed $obj): bool => $predicate->evaluate($obj, $context));
         if (Predicate::$debugDefault) {
-            error_log(sprintf("Foundation: %s %s: %s %s => %s", $this->debugDescription, $this->expressionType->name, $collection->join(", "), $predicate->predicateFormat, human_readable_value($value)));
+            Predicate::debug(sprintf("%s %s: %s %s => %s", $this->debugDescription, $this->expressionType->name, $collection->join(", "), $predicate->predicateFormat, human_readable_value($value)));
         }
         return $value;
     }
