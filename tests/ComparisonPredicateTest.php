@@ -82,17 +82,14 @@ final class ComparisonPredicateTest extends TestCase
      */
     public static function likeProvider(): iterable
     {
-        // Neither of the two wildcard syntaxes a caller might reach for works: "*" and
-        // "?" are NSPredicate's, and "%" and "_" are SQL's, and none of them expands.
+        // Neither of the two wildcard syntaxes a caller might reach for works: "*" and "?" are NSPredicate's, and "%" and "_" are SQL's, and none of them expands.
         yield "exact match" => ["hello", "hello", true];
         yield "different value" => ["hello", "world", false];
         yield "nspredicate asterisk does not expand" => ["hello", "h*", false];
         yield "nspredicate question mark does not expand" => ["hello", "h?llo", false];
         yield "sql percent does not expand" => ["hello", "h%", false];
         yield "sql underscore does not expand" => ["hello", "h_llo", false];
-        // The values SQLWildcardEscapingTest protects: an exact-looking LIKE on a value
-        // holding a literal "%" or "_" has to find it, which is why the SQL side escapes
-        // them rather than expanding them.
+        // The values SQLWildcardEscapingTest protects: an exact-looking LIKE on a value holding a literal "%" or "_" has to find it, which is why the SQL side escapes them rather than expanding them.
         yield "a literal percent matches itself" => ["50%OFF", "50%OFF", true];
         yield "a literal underscore matches itself" => ["AUDIT_TEST", "AUDIT_TEST", true];
         yield "underscore does not stand in for a character" => ["AUDITxTEST", "AUDIT_TEST", false];
@@ -111,17 +108,12 @@ final class ComparisonPredicateTest extends TestCase
      */
     public static function likeRegexProvider(): iterable
     {
-        // A regex metacharacter is a literal too, which is the half of the contract LIKE
-        // used to break: it inherited MATCHES' forced CompareOptions::quoted, so the
-        // pattern skipped preg_quote() and the metacharacters expanded in memory while
-        // the SQL side compared them literally.
+        // A regex metacharacter is a literal too, which is the half of the contract LIKE used to break: it inherited MATCHES' forced CompareOptions::quoted, so the pattern skipped preg_quote() and the metacharacters expanded in memory while the SQL side compared them literally.
         yield "a dot does not match any character" => ["abc", "a.c", false];
         yield "a dot matches a dot" => ["a.c", "a.c", true];
         yield "a quantifier does not expand" => ["hello", "h.*o", false];
         yield "a character class does not expand" => ["hello", "h[ae]llo", false];
-        // A bare "*" used to reach the regex engine as a quantifier with nothing to
-        // repeat, raising a preg_match_all() compilation warning; failOnWarning is on, so
-        // the warning alone would fail this.
+        // A bare "*" used to reach the regex engine as a quantifier with nothing to repeat, raising a preg_match_all() compilation warning; failOnWarning is on, so the warning alone would fail this.
         yield "a bare asterisk is a literal asterisk" => ["*", "*", true];
         yield "an asterisk matches itself" => ["h*", "h*", true];
     }
@@ -200,8 +192,7 @@ final class ComparisonPredicateTest extends TestCase
 
     public function testBetweenIsInclusiveAtBothEnds(): void
     {
-        // SELECT 5 BETWEEN 1 AND 10, 5 BETWEEN 5 AND 10, 5 BETWEEN 1 AND 5,
-        //        5 BETWEEN 5 AND 5, 5 BETWEEN 6 AND 10 -> 1, 1, 1, 1, 0
+        // SELECT 5 BETWEEN 1 AND 10, 5 BETWEEN 5 AND 10, 5 BETWEEN 1 AND 5, 5 BETWEEN 5 AND 5, 5 BETWEEN 6 AND 10 -> 1, 1, 1, 1, 0
         $this->assertTrue($this->evaluate("n BETWEEN {1,10}", ["n" => 5]));
         $this->assertTrue($this->evaluate("n BETWEEN {5,10}", ["n" => 5]), "lower bound");
         $this->assertTrue($this->evaluate("n BETWEEN {1,5}", ["n" => 5]), "upper bound");
@@ -226,8 +217,7 @@ final class ComparisonPredicateTest extends TestCase
 
     public function testComparisonAgainstAMissingKeyIsFalse(): void
     {
-        // A Dictionary answers null for a missing key, and the operators must treat that
-        // as "no match" rather than raising.
+        // A Dictionary answers null for a missing key, and the operators must treat that as "no match" rather than raising.
         $this->assertFalse($this->evaluate("missing == 5", ["n" => 5]));
         $this->assertFalse($this->evaluate("missing BEGINSWITH \"a\"", ["n" => 5]));
         $this->assertFalse($this->evaluate("missing LIKE \"a*\"", ["n" => 5]));

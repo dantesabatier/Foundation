@@ -100,9 +100,7 @@ final class PredicateScannerTest extends TestCase
      */
     public static function comparisonOperatorProvider(): iterable
     {
-        // n is 3. The two-character operators have to be matched before the one-character
-        // ones that open them: "<" used to consume the "<" of "<>" and leave "> 3" behind,
-        // so the documented "<>" spelling of != could not parse at all.
+        // n is 3. The two-character operators have to be matched before the one-character ones that open them: "<" used to consume the "<" of "<>" and leave "> 3" behind, so the documented "<>" spelling of != could not parse at all.
         yield "angle-bracket not equal, false" => ["n <> 3", false];
         yield "angle-bracket not equal, true" => ["n <> 5", true];
         yield "bang not equal, false" => ["n != 3", false];

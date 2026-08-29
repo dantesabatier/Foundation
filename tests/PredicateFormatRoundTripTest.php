@@ -51,8 +51,7 @@ final class PredicateFormatRoundTripTest extends TestCase
      */
     public static function plainProvider(): iterable
     {
-        // An operator with no options must print exactly as before — the suffix appears
-        // only when there is something to report.
+        // An operator with no options must print exactly as before — the suffix appears only when there is something to report.
         yield "equal" => ["s == \"X\"", "s = 'X'"];
         yield "not equal" => ["s != \"X\"", "s != 'X'"];
         yield "less than" => ["s < 5", "s < 5"];
@@ -102,8 +101,7 @@ final class PredicateFormatRoundTripTest extends TestCase
 
     public function testTheFormatIsStableAcrossASecondRoundTrip(): void
     {
-        // Parsing the format again must yield the same format, or the representation is
-        // still losing something.
+        // Parsing the format again must yield the same format, or the representation is still losing something.
         $first = Predicate::format("s ==[cd] \"JOSE\"")->predicateFormat;
         $second = Predicate::format($first)->predicateFormat;
 

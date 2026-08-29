@@ -206,8 +206,7 @@ final class NotificationCenterTest extends TestCase
 
     public function testAnObserverMayUnregisterItselfWhileBeingNotified(): void
     {
-        // The dispatch iterates a snapshot, so removing an entry mid-post must not make the
-        // loop skip the entry that follows it.
+        // The dispatch iterates a snapshot, so removing an entry mid-post must not make the loop skip the entry that follows it.
         $center = new NotificationCenter();
         $delivered = 0;
         $token = null;

@@ -83,8 +83,7 @@ final class PredicateDebugTest extends TestCase
 
     public function testEveryLineReportsItsResult(): void
     {
-        // The uniform shape: each line ends in "=> <result>", including the constant and
-        // aggregate expressions that used to print a bare value.
+        // The uniform shape: each line ends in "=> <result>", including the constant and aggregate expressions that used to print a bare value.
         Predicate::format("n IN {1, 3, 5}")->evaluate(new Dictionary(["n" => 3]));
 
         foreach ($this->lines as $line) {
@@ -100,8 +99,7 @@ final class PredicateDebugTest extends TestCase
 
         $union = array_values(array_filter($this->lines, static fn(string $line): bool => str_contains($line, "unionSet")));
         $this->assertCount(1, $union);
-        // The left operand as it was, then the right, then the union — not the result three
-        // times over.
+        // The left operand as it was, then the right, then the union — not the result three times over.
         $this->assertStringContainsString("[1, 2] [3, 4] => [1, 2, 3, 4]", $union[0]);
     }
 
@@ -132,8 +130,7 @@ final class PredicateDebugTest extends TestCase
 
     public function testTheTraceNamesTheAccessorEachKeyPathWentThrough(): void
     {
-        // The distinction that matters when a collection operator misresolves: which of the
-        // two accessors a segment took.
+        // The distinction that matters when a collection operator misresolves: which of the two accessors a segment took.
         $object = new Dictionary(["payments" => new Set([new Paid(100.0), new Paid(200.0)])]);
 
         Predicate::format("payments.amount.@sum == 300")->evaluate($object);
@@ -145,8 +142,7 @@ final class PredicateDebugTest extends TestCase
 
     public function testTheTraceCarriesTheTypeOfEachOperand(): void
     {
-        // "(Number)300 = (float)300" is what makes a strict-type mismatch visible; a bare
-        // "300 = 300" would not.
+        // "(Number)300 = (float)300" is what makes a strict-type mismatch visible; a bare "300 = 300" would not.
         Predicate::format("n == 3")->evaluate(new Dictionary(["n" => 3]));
 
         $comparison = array_values(array_filter($this->lines, static fn(string $line): bool => str_contains($line, "equalTo")));

@@ -189,8 +189,7 @@ final class ScannerTest extends TestCase
 
     public function testTabsAreSkipped(): void
     {
-        // charactersToBeSkipped covers the tab, which PredicateScanner deliberately
-        // narrows; a change here would silently change what a format string accepts.
+        // charactersToBeSkipped covers the tab, which PredicateScanner deliberately narrows; a change here would silently change what a format string accepts.
         $scanner = new Scanner("\t\t42");
         $value = 0;
 
@@ -236,8 +235,7 @@ final class ScannerTest extends TestCase
 
     public function testScanLocationCanBeRewound(): void
     {
-        // PredicateScanner rewinds the location to back out of a candidate parse, so
-        // assigning it has to make the same input scannable again.
+        // PredicateScanner rewinds the location to back out of a candidate parse, so assigning it has to make the same input scannable again.
         $scanner = new Scanner("hola mundo");
         $into = null;
         $scanner->scanString("hola", $into);

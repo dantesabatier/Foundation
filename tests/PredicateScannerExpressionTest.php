@@ -48,8 +48,7 @@ final class PredicateScannerExpressionTest extends TestCase
         yield "ALL fails on one member" => ["ALL nums > 2", [1, 5, 9], false];
         yield "NONE holds when nothing matches" => ["NONE nums > 100", [1, 5, 9], true];
         yield "NONE fails when one matches" => ["NONE nums > 5", [1, 5, 9], false];
-        // SOME is ANY: it must hold whenever at least one member matches, including when
-        // every member does.
+        // SOME is ANY: it must hold whenever at least one member matches, including when every member does.
         yield "SOME matches one member" => ["SOME nums == 5", [1, 5, 9], true];
         yield "SOME with every member matching" => ["SOME nums == 5", [5, 5, 5], true];
         yield "SOME with no match" => ["SOME nums == 5", [1, 2, 3], false];
@@ -146,10 +145,7 @@ final class PredicateScannerExpressionTest extends TestCase
 
     public function testALeadingParenthesisIsReadAsAPredicateGroup(): void
     {
-        // A "(" at the start of a comparison always opens a predicate group, never a
-        // parenthesised expression, so "(n) == 2" and "(n + 1) * 2 == 6" cannot parse while
-        // the same parentheses inside an expression can. Resolving it needs lookahead in the
-        // grammar without breaking "(a == 1 AND b == 2)", so it is recorded, not changed.
+        // A "(" at the start of a comparison always opens a predicate group, never a parenthesised expression, so "(n) == 2" and "(n + 1) * 2 == 6" cannot parse while the same parentheses inside an expression can. Resolving it needs lookahead in the grammar without breaking "(a == 1 AND b == 2)", so it is recorded, not changed.
         $this->expectException(InternalInconsistencyException::class);
 
         Predicate::format("(n + 1) * 2 == 6")->predicateFormat;
@@ -171,8 +167,7 @@ final class PredicateScannerExpressionTest extends TestCase
     #[DataProvider("bitwiseProvider")]
     public function testBitwiseFunctionsEvaluate(string $format, int $value, bool $expected): void
     {
-        // These raised a TypeError before: the engine produced a float for the key path and
-        // the functions declared int.
+        // These raised a TypeError before: the engine produced a float for the key path and the functions declared int.
         $this->assertSame($expected, $this->evaluate($format, ["n" => $value]));
     }
 

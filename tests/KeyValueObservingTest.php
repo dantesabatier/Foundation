@@ -119,8 +119,7 @@ final class KeyValueObservingTest extends TestCase
 
     public function testManualWillAndDidChangeCarryThePreviousValue(): void
     {
-        // The flow the interface documents for a property that opts out of automatic
-        // notification: the setter announces the change itself, with the default kind.
+        // The flow the interface documents for a property that opts out of automatic notification: the setter announces the change itself, with the default kind.
         $account = new ObservedAccount();
         $observer = new RecordingObserver();
         $account->addObserver($observer, "balance", KeyValueObservingOptions::new | KeyValueObservingOptions::old);
@@ -137,9 +136,7 @@ final class KeyValueObservingTest extends TestCase
 
     public function testAnnouncingAChangeOnAnUninitialisedPropertyDoesNotThrow(): void
     {
-        // hasProperty() answers true for a declared typed property that was never assigned,
-        // and reading it raises "must not be accessed before initialization". Every CoreData
-        // description object passes through that state while being populated.
+        // hasProperty() answers true for a declared typed property that was never assigned, and reading it raises "must not be accessed before initialization". Every CoreData description object passes through that state while being populated.
         $account = new ObservedAccount();
         $observer = new RecordingObserver();
         $account->addObserver($observer, "uninitialised", KeyValueObservingOptions::new | KeyValueObservingOptions::old);

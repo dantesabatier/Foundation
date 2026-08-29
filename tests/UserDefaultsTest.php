@@ -71,8 +71,7 @@ final class UserDefaultsTest extends TestCase
 
     public function testDoubleAndFloatAgree(): void
     {
-        // Both exist because Cocoa has floatForKey: and doubleForKey:; in PHP they are the
-        // same type, so they must not disagree.
+        // Both exist because Cocoa has floatForKey: and doubleForKey:; in PHP they are the same type, so they must not disagree.
         $this->defaults->setDouble(2.5, $this->write("amount"));
 
         $this->assertSame($this->defaults->float("amount"), $this->defaults->double("amount"));
@@ -125,8 +124,7 @@ final class UserDefaultsTest extends TestCase
 
     public function testAValueSurvivesSynchronizeAndAFreshInstance(): void
     {
-        // The value has to reach disk, which is where the plist escaping matters: a string
-        // holding an ampersand used to be lost on the way out.
+        // The value has to reach disk, which is where the plist escaping matters: a string holding an ampersand used to be lost on the way out.
         $suite = sprintf("foundation-persist-%d", getmypid());
         $writer = new UserDefaults($suite);
         $writer->setObject("Ventas & Marketing", "area");

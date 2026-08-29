@@ -105,8 +105,7 @@ final class UndoManagerTest extends TestCase
 
         $this->assertSame(0, $manager->groupingLevel);
 
-        // With groupsByEvent on, beginUndoGrouping() opens the event group as well as the
-        // explicit one, so it takes two closes to get back to zero.
+        // With groupsByEvent on, beginUndoGrouping() opens the event group as well as the explicit one, so it takes two closes to get back to zero.
         $manager->beginUndoGrouping();
         $this->assertSame(2, $manager->groupingLevel);
 
@@ -198,14 +197,9 @@ final class UndoManagerTest extends TestCase
 
     public function testManyRegistrationsNeitherDropNorRaise(): void
     {
-        // The default levelsOfUndo of 0 means "no limit", and the limit check used to fire
-        // exactly when the stack was empty and then index past its end. Registering a run of
-        // actions must simply work.
+        // The default levelsOfUndo of 0 means "no limit", and the limit check used to fire exactly when the stack was empty and then index past its end. Registering a run of actions must simply work.
         //
-        // Without a run loop the event group opened by the first registerUndo() is never
-        // closed on its own, so consecutive changes accumulate into that one group and undo
-        // reverts them together; testClosedGroupsNestIntoTheOpenEventGroup records the same
-        // effect for explicitly bracketed groups.
+        // Without a run loop the event group opened by the first registerUndo() is never closed on its own, so consecutive changes accumulate into that one group and undo reverts them together; testClosedGroupsNestIntoTheOpenEventGroup records the same effect for explicitly bracketed groups.
         $manager = new UndoManager();
         $document = $this->document($manager);
 
@@ -222,12 +216,7 @@ final class UndoManagerTest extends TestCase
 
     public function testClosedGroupsNestIntoTheOpenEventGroup(): void
     {
-        // groupsByEvent leaves an event group open for the whole run, and a group closed
-        // inside it folds its actions into that parent rather than becoming a top-level
-        // step. Cocoa closes the event group at the end of each run loop pass; there is no
-        // run loop here, so the one undo reverts the whole run. Pinned as it behaves — the
-        // step granularity a caller gets without a run loop is a design question, not
-        // something these tests should decide.
+        // groupsByEvent leaves an event group open for the whole run, and a group closed inside it folds its actions into that parent rather than becoming a top-level step. Cocoa closes the event group at the end of each run loop pass; there is no run loop here, so the one undo reverts the whole run. Pinned as it behaves — the step granularity a caller gets without a run loop is a design question, not something these tests should decide.
         $manager = new UndoManager();
         $document = $this->document($manager);
 
@@ -246,8 +235,7 @@ final class UndoManagerTest extends TestCase
 
     public function testAnUndoRegistersItsOwnInverse(): void
     {
-        // The mechanism the redo stack depends on: the value the undo applies is itself
-        // recorded, so the change can be replayed.
+        // The mechanism the redo stack depends on: the value the undo applies is itself recorded, so the change can be replayed.
         $manager = new UndoManager();
         $document = $this->document($manager);
         $document->setText("v1");

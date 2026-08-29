@@ -196,8 +196,7 @@ final class PropertyListSerializationTest extends TestCase
 
     public function testArchivingAnArchiveIsIdempotent(): void
     {
-        // Archiving something already archived must not double-encode it, so a value that
-        // passes through the archiver twice still unarchives to the original.
+        // Archiving something already archived must not double-encode it, so a value that passes through the archiver twice still unarchives to the original.
         $once = KeyedArchiver::archivedData("hola");
         $twice = KeyedArchiver::archivedData($once);
 
