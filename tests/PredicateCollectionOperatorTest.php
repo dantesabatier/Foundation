@@ -9,6 +9,7 @@ use PHPUnit\Framework\TestCase;
 use Sabatier\Foundation\ArrayClass;
 use Sabatier\Foundation\Date;
 use Sabatier\Foundation\Dictionary;
+use Sabatier\Foundation\InternalInconsistencyException;
 use Sabatier\Foundation\ObjectClass;
 use Sabatier\Foundation\Predicates\Expression;
 use Sabatier\Foundation\Predicates\Predicate;
@@ -84,9 +85,7 @@ final class PredicateCollectionOperatorTest extends TestCase
 
     public function testCollectionOperatorsOverACollectionOfScalars(): void
     {
-        // The elements need not be objects: @count only counts them, and @sum reduces them
-        // directly. This is the shape that made the defect obvious, since the accessor
-        // demanded KeyValueCoding of each element and a number is not one.
+        // The elements need not be objects: @count only counts them, and @sum reduces them directly. This is the shape that made the defect obvious, since the accessor demanded KeyValueCoding of each element and a number is not one.
         $object = new Dictionary(["nums" => new ArrayClass([1, 2, 3])]);
 
         $this->assertTrue(Predicate::format("nums.@count == 3")->evaluate($object));
@@ -95,10 +94,7 @@ final class PredicateCollectionOperatorTest extends TestCase
 
     public function testCountAcceptsAnyElementWhileSumNeedsNumbers(): void
     {
-        // The two operators differ in what they require of the elements. @count only counts
-        // them, so anything will do. @sum and @avg reduce them, so they need numbers — over
-        // a collection of objects the key path has to reach the number itself
-        // ("@sum.salary"), which is the form a to-many attribute takes.
+        // The two operators differ in what they require of the elements. @count only counts them, so anything will do. @sum and @avg reduce them, so they need numbers — over a collection of objects the key path has to reach the number itself ("@sum.salary"), which is the form a to-many attribute takes.
         $employees = $this->department()->employees;
         $strings = new Dictionary(["c" => new ArrayClass(["a", "b"])]);
         $objects = new Dictionary(["c" => $employees]);
@@ -110,8 +106,7 @@ final class PredicateCollectionOperatorTest extends TestCase
 
     public function testSummingObjectsWithoutAKeyPathRaises(): void
     {
-        // "@sum" straight over objects has nothing to add up; the key path must continue to
-        // the attribute being summed.
+        // "@sum" straight over objects has nothing to add up; the key path must continue to the attribute being summed.
         $objects = new Dictionary(["c" => $this->department()->employees]);
 
         $this->expectException(TypeError::class);
@@ -121,9 +116,7 @@ final class PredicateCollectionOperatorTest extends TestCase
 
     public function testCollectionOperatorsNeedAFoundationCollection(): void
     {
-        // A native PHP array is not KeyValueCoding, so it cannot answer a collection
-        // operator at all — the value has to be an ArrayClass, Set or Dictionary. Pinned so
-        // the requirement is visible rather than surfacing as a puzzling key-path error.
+        // A native PHP array is not KeyValueCoding, so it cannot answer a collection operator at all — the value has to be an ArrayClass, Set or Dictionary. Pinned so the requirement is visible rather than surfacing as a puzzling key-path error.
         $object = new Dictionary(["nums" => [1, 2, 3]]);
 
         $this->expectException(UndefinedKeyException::class);
@@ -133,8 +126,7 @@ final class PredicateCollectionOperatorTest extends TestCase
 
     public function testTheSameKeyPathAgreesWithValueForKeyPath(): void
     {
-        // The predicate route and the direct KVC route must answer the same thing; they
-        // disagreed because only the latter interpreted the "@".
+        // The predicate route and the direct KVC route must answer the same thing; they disagreed because only the latter interpreted the "@".
         $department = $this->department();
 
         $this->assertSame(600, $department->valueForKeyPath("employees.salary.@sum")?->intValue);
@@ -143,9 +135,7 @@ final class PredicateCollectionOperatorTest extends TestCase
 
     public function testChainedCollectionOperators(): void
     {
-        // Two operators in one key path, which is what a nested to-many needs: crossing two
-        // relationships yields a collection of collections, so it has to be flattened before
-        // it can be reduced. @sum alone would receive a Set of Sets.
+        // Two operators in one key path, which is what a nested to-many needs: crossing two relationships yields a collection of collections, so it has to be flattened before it can be reduced. @sum alone would receive a Set of Sets.
         $left = new Department(new Set([new Employee("a", 10.0), new Employee("b", 20.0)]));
         $right = new Department(new Set([new Employee("c", 30.0)]));
         $company = new Dictionary(["departments" => new Set([$left, $right])]);
@@ -156,18 +146,27 @@ final class PredicateCollectionOperatorTest extends TestCase
         $this->assertSame(60.0, (float)(string)$salaries->sum());
     }
 
-    public function testReducingAFlattenedTwoLevelKeyPathIsNotSupported(): void
+    public function testAKeyPathTakesASingleCollectionOperator(): void
     {
-        // Appending a reducing operator to the flattening one raises rather than summing the
-        // flattened values. It predates the selector fix — verified against the previous
-        // revision — and closing it means teaching the operator chain to carry the
-        // intermediate collection, which is a change to how key paths are resolved rather
-        // than which accessor is chosen. Recorded so the limit is visible.
-        $company = new Dictionary(["departments" => new Set([new Department(new Set([new Employee("a", 10.0)]))])]);
+        // The remainder feeds the operator rather than following it — "@sum.salary" gathers each element's salary and reduces that — so it has to resolve to a collection. A second operator in the remainder does not: "salary.@sum" reduces to a number before the outer operator runs. That is reported now; it used to trip an assertion, and with assertions off in production it surfaced as "Call to undefined method Number::joined()".
+        $employees = $this->department()->employees;
 
-        $this->expectException(TypeError::class);
+        $this->expectException(InternalInconsistencyException::class);
+        $this->expectExceptionMessageMatches("/single collection operator/");
 
-        $company->valueForKeyPath("departments.employees.@unionOfObjects.salary.@sum");
+        $employees->valueForKeyPath("@unionOfObjects.salary.@sum");
+    }
+
+    public function testTheSupportedOperatorFormsResolve(): void
+    {
+        // One operator per key path, with or without a remainder to gather.
+        $employees = $this->department()->employees;
+
+        $this->assertSame(3, $employees->valueForKeyPath("@count")?->intValue);
+        $this->assertSame(600, $employees->valueForKeyPath("@sum.salary")?->intValue);
+        $this->assertSame(200, $employees->valueForKeyPath("@avg.salary")?->intValue);
+        $this->assertSame(300, $employees->valueForKeyPath("@max.salary")?->intValue);
+        $this->assertSame(100, $employees->valueForKeyPath("@min.salary")?->intValue);
     }
 
     public function testSubqueryCountInsideAPredicate(): void

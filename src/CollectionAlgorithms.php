@@ -100,9 +100,10 @@ trait CollectionAlgorithms
         $value = $this;
         $remainderPath = $components->remainderPath;
         if ($remainderPath) {
+            // The remainder feeds the operator rather than following it: "@sum.salary" gathers each element's salary and reduces that. So it has to resolve to a collection, and a remainder carrying a second operator does not — "@unionOfObjects.salary.@sum" leaves "salary.@sum", which reduces to a number before the outer operator ever runs. One operator per key path is the contract; say so instead of failing inside the operator on a value it cannot use.
             /** @noinspection PhpMultipleClassDeclarationsInspection */
             $value = parent::valueForKeyPath($remainderPath);
-            assert($value instanceof self);
+            $value instanceof self ?: fatal_error(sprintf("Invalid argument: the key path \"%s\" of the \"%s\" operator must resolve to a \"%s\", (%s)%s given. A key path takes a single collection operator.", $remainderPath, $key, typeof($this), typeof($value), human_readable_value($value)));
         }
         return match ($operator) {
             KeyValueOperator::averageKeyValueOperator, KeyValueOperator::countKeyValueOperator, KeyValueOperator::maximumKeyValueOperator, KeyValueOperator::minimumKeyValueOperator, KeyValueOperator::sumKeyValueOperator, KeyValueOperator::medianKeyValueOperator, KeyValueOperator::modeKeyValueOperator, KeyValueOperator::standardDeviationKeyValueOperator => PredicateUtilities::$operator($value),

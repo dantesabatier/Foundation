@@ -135,9 +135,13 @@ Predicate::$debugHandler = function (string $line): void { echo $line, PHP_EOL; 
 - A `(` at the start of a comparison always opens a predicate group, never a
   parenthesised expression, so `(n) == 2` and `(n + 1) * 2 == 6` do not parse. The same
   parentheses inside an expression do: `2 * (n + 1) == 6`.
-- A reducing operator cannot follow a flattening one:
-  `departments.employees.@unionOfObjects.salary.@sum` raises. Flatten to the values and
-  reduce separately.
+- A key path handed to `valueForKeyPath(…)` takes a **single** collection operator. The
+  segment after it feeds it rather than following it — `@sum.salary` gathers each
+  element's salary and reduces that — so a second operator in there leaves a number where
+  the outer one expects a collection, and the call reports it. Predicates are unaffected:
+  the parser resolves a key path segment by segment, handing each operator the value the
+  previous one produced, which is why
+  `sales.@unionOfObjects.total.@sum` evaluates inside a predicate.
 - A collection operator needs a Foundation collection — `ArrayClass`, `Set` or
   `Dictionary`. A native PHP array cannot answer one.
 - `@count` counts elements of any kind, but `@sum` and `@avg` reduce them, so over a
