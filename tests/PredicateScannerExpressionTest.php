@@ -132,6 +132,10 @@ final class PredicateScannerExpressionTest extends TestCase
         // Multiplication binds tighter than addition, so this is n + (1 * 2).
         yield "multiplication before addition" => ["n + 1 * 2 == 4", "add:to:(n, multiply:by:(1, 2)) = 4", true];
         yield "parentheses inside an expression" => ["2 * (n + 1) == 6", "multiply:by:(2, add:to:(n, 1)) = 6", true];
+        yield "modulus shares multiplication precedence" => ["10 * 5 % 3 == 2", "modulus:by:(multiply:by:(10, 5), 3) = 2", true];
+        yield "power binds before modulus" => ["2 ** 3 % 3 == 2", "modulus:by:(raise:toPower:(2, 3), 3) = 2", true];
+        yield "power is right associative" => ["2 ** 3 ** 2 == 512", "raise:toPower:(2, raise:toPower:(3, 2)) = 512", true];
+        yield "unary minus applies to one operand" => ["-n + 3 == 1", "add:to:(chs:(n), 3) = 1", true];
     }
 
     #[DataProvider("arithmeticProvider")]
@@ -216,6 +220,22 @@ final class PredicateScannerExpressionTest extends TestCase
     {
         $this->assertSame("n IN {1, 2, 3}", Predicate::format("n IN {1,2,3}")->predicateFormat);
         $this->assertTrue($this->evaluate("n IN {1,2,3}", ["n" => 2]));
+    }
+
+    public function testAggregateLiteralPreservesNullElements(): void
+    {
+        $this->assertTrue(Predicate::format("{NULL, 1}[SIZE] == 2")->evaluate());
+        $this->assertTrue(Predicate::format("{NULL, 1}[FIRST] == NULL")->evaluate());
+    }
+
+    public function testFormatArgumentsAreNotConsumed(): void
+    {
+        $arguments = new ArrayClass(["n", 5]);
+
+        $predicate = Predicate::format("%K == %@", $arguments);
+
+        $this->assertSame("n = 5", $predicate->predicateFormat);
+        $this->assertSame(["n", 5], $arguments->array);
     }
 
     public function testAVariableSurvivesIntoTheFormat(): void

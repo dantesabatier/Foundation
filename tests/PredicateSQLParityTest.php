@@ -110,7 +110,7 @@ final class PredicateSQLParityTest extends TestCase
         yield "repeat" => ["repeat:", [12, 2], "1212"];
         yield "replace" => ["replace:", [121, 1, 9], "929"];
         yield "instr" => ["instr:", [12345, 34], "3"];
-        yield "substring" => ["substring:", [12345, 2], "12"];
+        yield "substring" => ["substring:", [12345, 2], "2345"];
     }
 
     /**

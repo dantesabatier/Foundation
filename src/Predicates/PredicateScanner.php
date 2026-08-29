@@ -28,6 +28,7 @@ use function Sabatier\Foundation\typeof;
 /** @internal */
 final class PredicateScanner extends Scanner
 {
+    private readonly ArrayClass $arguments;
     public ?Predicate $predicate {
         get {
             try {
@@ -44,9 +45,10 @@ final class PredicateScanner extends Scanner
     #[Override]
     public string $charactersToBeSkipped = " \r\n";
 
-    public function __construct(string $format, private readonly ArrayClass $arguments)
+    public function __construct(string $format, ArrayClass $arguments)
     {
         parent::__construct($format);
+        $this->arguments = clone $arguments;
     }
 
     private function scanKeyword(string $keyword): bool
@@ -64,6 +66,30 @@ final class PredicateScanner extends Scanner
         }
         $this->scanLocation = $scanLocation;
         return false;
+    }
+
+    private function scanSingleQuotedString(): string
+    {
+        $value = "";
+        while (!$this->isAtEnd) {
+            $character = mb_substr($this->string, $this->scanLocation, 1);
+            $this->scanLocation++;
+            if ($character === "'") {
+                return $value;
+            }
+            if ($character !== "\\" || $this->isAtEnd) {
+                $value .= $character;
+                continue;
+            }
+            $escaped = mb_substr($this->string, $this->scanLocation, 1);
+            if ($escaped === "\\" || $escaped === "'") {
+                $this->scanLocation++;
+                $value .= $escaped;
+            } else {
+                $value .= $character;
+            }
+        }
+        fatal_error("Invalid argument: missing closing \"'\" at index $this->scanLocation");
     }
 
     /**
@@ -246,7 +272,7 @@ final class PredicateScanner extends Scanner
             return Expression::expressionForConstantValue($number);
         }
         if ($this->scanString("-")) {
-            $expression = $this->parseExpression();
+            $expression = $this->parseFunctionalExpression();
             assert($expression instanceof Expression);
             return Expression::expressionForFunction("chs:", new ArrayClass([$expression]));
         }
@@ -355,13 +381,7 @@ final class PredicateScanner extends Scanner
             return Expression::expressionForConstantValue($value);
         }
         if ($this->scanString("'")) {
-            $value = "";
-            $characters = $this->charactersToBeSkipped;
-            $this->charactersToBeSkipped = "";
-            $this->scanUpString("'", $value);
-            $this->scanString("'") ?: fatal_error("Invalid argument: missing closing \"'\" at index $this->scanLocation");
-            $this->charactersToBeSkipped = $characters;
-            return Expression::expressionForConstantValue($value);
+            return Expression::expressionForConstantValue($this->scanSingleQuotedString());
         }
         if ($this->scanString("@")) {
             if (!($keyPath = $this->parseSimpleExpression()?->keyPath)) {
@@ -499,35 +519,15 @@ final class PredicateScanner extends Scanner
     /**
      * @throws Exception
      */
-    private function parseModulusExpression(): ?Expression
-    {
-        $left = $this->parseFunctionalExpression();
-        while (true) {
-            if ($this->scanString("%")) {
-                $right = $this->parseFunctionalExpression();
-                assert($right instanceof Expression);
-                $left = Expression::expressionForFunction("modulus:by:", new ArrayClass([$left, $right]));
-            } else {
-                return $left;
-            }
-        }
-    }
-
-    /**
-     * @throws Exception
-     */
     private function parsePowerExpression(): ?Expression
     {
-        $left = $this->parseModulusExpression();
-        while (true) {
-            if ($this->scanString("**")) {
-                $right = $this->parseModulusExpression();
-                assert($right instanceof Expression);
-                $left = Expression::expressionForFunction("raise:toPower:", new ArrayClass([$left, $right]));
-            } else {
-                return $left;
-            }
+        $left = $this->parseFunctionalExpression();
+        if ($this->scanString("**")) {
+            $right = $this->parsePowerExpression();
+            assert($right instanceof Expression);
+            return Expression::expressionForFunction("raise:toPower:", new ArrayClass([$left, $right]));
         }
+        return $left;
     }
 
     /**
@@ -545,6 +545,10 @@ final class PredicateScanner extends Scanner
                 $right = $this->parsePowerExpression();
                 assert($right instanceof Expression);
                 $left = Expression::expressionForFunction("divide:by:", new ArrayClass([$left, $right]));
+            } elseif ($this->scanString("%")) {
+                $right = $this->parsePowerExpression();
+                assert($right instanceof Expression);
+                $left = Expression::expressionForFunction("modulus:by:", new ArrayClass([$left, $right]));
             } else {
                 return $left;
             }

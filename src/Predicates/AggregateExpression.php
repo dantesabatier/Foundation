@@ -36,7 +36,7 @@ final class AggregateExpression extends Expression
     #[Override]
     public function expressionValue(mixed $object = null, ?Dictionary $context = null): ArrayClass
     {
-        $value = $this->collection->compactMap(fn(Expression $expression): mixed => $expression->expressionValue($object, $context));
+        $value = $this->collection->map(fn(Expression $expression): mixed => $expression->expressionValue($object, $context));
         if (Predicate::$debugDefault) {
             $value
                 |> human_readable_value(...)

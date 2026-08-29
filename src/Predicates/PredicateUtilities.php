@@ -32,7 +32,6 @@ use function Sabatier\Foundation\fatal_error;
 use function Sabatier\Foundation\human_readable_value;
 use function Sabatier\Foundation\is_equal;
 use function Sabatier\Foundation\pn;
-use function Sabatier\Foundation\substring_to_index;
 use const Sabatier\Foundation\NotFound;
 
 /** @internal */
@@ -443,7 +442,10 @@ final class PredicateUtilities
 
     public static function substring(string|int|float $string, int $index): string
     {
-        return substring_to_index((string)$string, $index);
+        if ($index === 0) {
+            return "";
+        }
+        return substr((string)$string, $index > 0 ? $index - 1 : $index);
     }
 
     public static function replace(string|int|float $string, string|int|float $search, string|int|float $replace): string
@@ -579,9 +581,9 @@ final class PredicateUtilities
         return new Number(((1 << ((int)(log($operand) / log(2)) + 1)) - 1) ^ $operand);
     }
 
-    public static function chs(int $number): Number
+    public static function chs(Number|int|float $number): Number
     {
-        return new Number(-$number);
+        return new Number(-pn($number));
     }
 
     public static function index(ArrayClass $values, mixed $index): mixed

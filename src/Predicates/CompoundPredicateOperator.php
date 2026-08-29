@@ -53,22 +53,32 @@ final class CompoundPredicateOperator extends PredicateOperator
 
     public function evaluatePredicates(ArrayClass $predicates, mixed $object = null, ?Dictionary $substitutionVariables = null): bool
     {
-        if (!$predicates->isEmpty) {
-            if (Predicate::$debugDefault) {
-                Predicate::debug(sprintf("%s %s (%d subpredicates)", $this->debugDescription, $this->compoundPredicateType->name, $predicates->count));
-            }
-            // Nested so each subpredicate's own trace is indented under the line announcing the compound, which is what makes the structure of a many-term predicate readable.
-            $evaluations = Predicate::debugNested(fn(): ArrayClass => $predicates->map(fn(Predicate $predicate): bool => $predicate->evaluate($object, $substitutionVariables)));
-            $result = match ($this->compoundPredicateType) {
-                CompoundPredicateLogicalType::not => !$evaluations->first,
-                CompoundPredicateLogicalType::and => !$evaluations->containsElement(false),
-                CompoundPredicateLogicalType::or => $evaluations->containsElement(true),
-            };
-            if (Predicate::$debugDefault) {
-                Predicate::debug(sprintf("%s %s => %s", $this->debugDescription, $this->compoundPredicateType->name, human_readable_value($result)));
-            }
-            return $result;
+        $type = $this->compoundPredicateType;
+        if ($predicates->isEmpty) {
+            return $type === CompoundPredicateLogicalType::and;
         }
-        return true;
+        if (Predicate::$debugDefault) {
+            Predicate::debug(sprintf("%s %s (%d subpredicates)", $this->debugDescription, $type->name, $predicates->count));
+        }
+        // Evaluate incrementally so AND and OR do not execute branches after their result is known.
+        $result = Predicate::debugNested(function () use ($type, $predicates, $object, $substitutionVariables): bool {
+            if ($type === CompoundPredicateLogicalType::not) {
+                return !$predicates->first->evaluate($object, $substitutionVariables);
+            }
+            foreach ($predicates as $predicate) {
+                $value = $predicate->evaluate($object, $substitutionVariables);
+                if ($type === CompoundPredicateLogicalType::and && !$value) {
+                    return false;
+                }
+                if ($type === CompoundPredicateLogicalType::or && $value) {
+                    return true;
+                }
+            }
+            return $type === CompoundPredicateLogicalType::and;
+        });
+        if (Predicate::$debugDefault) {
+            Predicate::debug(sprintf("%s %s => %s", $this->debugDescription, $type->name, human_readable_value($result)));
+        }
+        return $result;
     }
 }

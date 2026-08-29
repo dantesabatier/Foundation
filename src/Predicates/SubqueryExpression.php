@@ -38,11 +38,21 @@ final class SubqueryExpression extends Expression
         $collection = $this->collectionExpression->expressionValue($object, $context) ?? new ArrayClass();
         assert($collection instanceof Collection);
         $this->collection = $collection;
-        $context ??= new Dictionary();
-        /** @psalm-suppress InvalidArgument */
-        $context[$this->variable] ??= Expression::expressionForEvaluatedObject();
-        $predicate = $this->predicate->withSubstitutionVariables($context);
-        $value = $collection->filter(fn(mixed $obj): bool => $predicate->evaluate($obj, $context));
+        /** @var Dictionary<mixed> $bindings */
+        $bindings = $context ?? new Dictionary();
+        $hadVariable = $bindings->offsetExists($this->variable);
+        $previousValue = $bindings[$this->variable];
+        $bindings[$this->variable] = Expression::expressionForEvaluatedObject();
+        try {
+            $predicate = $this->predicate->withSubstitutionVariables($bindings);
+            $value = $collection->filter(fn(mixed $obj): bool => $predicate->evaluate($obj, $bindings));
+        } finally {
+            if ($hadVariable) {
+                $bindings[$this->variable] = $previousValue;
+            } else {
+                $bindings->offsetUnset($this->variable);
+            }
+        }
         if (Predicate::$debugDefault) {
             Predicate::debug(sprintf("%s %s: %s %s => %s", $this->debugDescription, $this->expressionType->name, $collection->join(", "), $predicate->predicateFormat, human_readable_value($value)));
         }

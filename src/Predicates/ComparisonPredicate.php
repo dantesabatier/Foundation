@@ -87,7 +87,7 @@ final class ComparisonPredicate extends Predicate
             $this->leftExpression->accept($visitor, $flags);
             $this->rightExpression->accept($visitor, $flags);
         }
-        if ($flags & PredicateVisitorFlags::operators) {
+        if (($flags & PredicateVisitorFlags::operators) && !($flags & PredicateVisitorFlags::operatorsBefore)) {
             $this->predicateOperator->accept($visitor, $flags);
         }
     }

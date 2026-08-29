@@ -22,6 +22,7 @@ final class ConstantValueExpression extends Expression
         get {
             $constantValue = $this->constantValue;
             if (is_string($constantValue)) {
+                $constantValue = str_replace(["\\", "'"], ["\\\\", "\\'"], $constantValue);
                 return "'$constantValue'";
             }
             return human_readable_value($constantValue);

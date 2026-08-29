@@ -178,6 +178,42 @@ final class PredicateCollectionOperatorTest extends TestCase
         $this->assertTrue($predicate->evaluate($department));
     }
 
+    public function testSetExpressionsDoNotMutateTheirOperands(): void
+    {
+        $tags = new Set(["a", "b"]);
+        $object = new Dictionary(["tags" => $tags]);
+        $left = Expression::expressionForKeyPath("tags");
+
+        $union = Expression::expressionForUnionSet($left, Expression::expressionForConstantValue(new Set(["c"])))->expressionValue($object);
+        $intersection = Expression::expressionForIntersectSet($left, Expression::expressionForConstantValue(new Set(["b"])))->expressionValue($object);
+        $difference = Expression::expressionForMinusSet($left, Expression::expressionForConstantValue(new Set(["a"])))->expressionValue($object);
+
+        $this->assertSame(["a", "b", "c"], $union->array);
+        $this->assertSame(["b"], $intersection->array);
+        $this->assertSame(["b"], $difference->array);
+        $this->assertSame(["a", "b"], $tags->array);
+    }
+
+    public function testSubqueryShadowsAndRestoresItsVariable(): void
+    {
+        $department = $this->department();
+        $outer = new Employee("outer", 0.0);
+        $variables = new Dictionary(["\$e" => $outer]);
+        $predicate = Predicate::format("SUBQUERY(employees, \$e, \$e.salary > 150).@count == 2");
+
+        $this->assertTrue($predicate->evaluate($department, $variables));
+        $this->assertSame($outer, $variables["\$e"]);
+    }
+
+    public function testSubqueryRemovesATemporaryVariableAfterEvaluation(): void
+    {
+        $variables = new Dictionary();
+        $predicate = Predicate::format("SUBQUERY(employees, \$e, \$e.salary > 150).@count == 2");
+
+        $this->assertTrue($predicate->evaluate($this->department(), $variables));
+        $this->assertFalse($variables->offsetExists("\$e"));
+    }
+
     /**
      * The whole grammar in one predicate, adapted from the manual bench in Raya's
      * Predicate.php: substitution variables, the ALL and NONE modifiers with case and

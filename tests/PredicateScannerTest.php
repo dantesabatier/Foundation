@@ -6,7 +6,9 @@ namespace Sabatier\Foundation\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Sabatier\Foundation\ArrayClass;
 use Sabatier\Foundation\Dictionary;
+use Sabatier\Foundation\Predicates\CompoundPredicate;
 use Sabatier\Foundation\Predicates\Predicate;
 
 /**
@@ -180,5 +182,19 @@ final class PredicateScannerTest extends TestCase
         $this->expectExceptionMessageMatches("/(closing|parse)/i");
 
         Predicate::format("(a == 1 AND b == 2")->predicateFormat;
+    }
+
+    public function testEmptyCompoundPredicatesUseTheirLogicalIdentities(): void
+    {
+        $this->assertTrue(CompoundPredicate::andPredicateWithSubpredicates(new ArrayClass())->evaluate());
+        $this->assertFalse(CompoundPredicate::orPredicateWithSubpredicates(new ArrayClass())->evaluate());
+    }
+
+    public function testCompoundPredicatesShortCircuit(): void
+    {
+        $mustNotRun = Predicate::block(fn(): bool => throw new \LogicException("unreachable predicate evaluated"));
+
+        $this->assertFalse(CompoundPredicate::andPredicateWithSubpredicates(new ArrayClass([Predicate::value(false), $mustNotRun]))->evaluate());
+        $this->assertTrue(CompoundPredicate::orPredicateWithSubpredicates(new ArrayClass([Predicate::value(true), $mustNotRun]))->evaluate());
     }
 }

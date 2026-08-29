@@ -107,4 +107,13 @@ final class PredicateFormatRoundTripTest extends TestCase
 
         $this->assertSame($first, $second);
     }
+
+    public function testApostrophesSurviveAFormatRoundTrip(): void
+    {
+        $predicate = Predicate::format("name == \"O'Reilly\\Books\"");
+        $formatted = $predicate->predicateFormat;
+
+        $this->assertSame("name = 'O\\'Reilly\\\\Books'", $formatted);
+        $this->assertSame($formatted, Predicate::format($formatted)->predicateFormat);
+    }
 }

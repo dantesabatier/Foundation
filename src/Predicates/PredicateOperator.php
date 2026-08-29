@@ -164,12 +164,6 @@ class PredicateOperator extends ObjectClass
         if ($right instanceof Stringable) {
             $right = (string)$right;
         }
-        if (is_string($left) && is_numeric($right)) {
-            $left = strlen($left);
-        }
-        if (is_string($right) && is_numeric($left)) {
-            $right = strlen($right);
-        }
         if (is_numeric($left)) {
             $left = (string)$left;
         }

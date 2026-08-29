@@ -38,6 +38,8 @@ final class SetExpression extends Expression
         if ($left instanceof ArrayClass) {
             /** @var Set $left */
             $left = new Set($left);
+        } elseif ($left instanceof Set) {
+            $left = new Set($left);
         }
         $right = $this->right->expressionValue($object, $context) ?? new Set();
         if ($right instanceof ArrayClass) {
@@ -45,7 +47,6 @@ final class SetExpression extends Expression
             $right = new Set($right);
         }
         $expressionType = $this->expressionType;
-        // The operand is mutated in place, so the trace has to remember what it held: logging $left afterwards showed the result in the operand position too, and the line read "the result combined with the right operand gives the result".
         $operand = Predicate::$debugDefault ? human_readable_value($left) : "";
         if ($expressionType === ExpressionType::minusSet) {
             $left->subtract($right);

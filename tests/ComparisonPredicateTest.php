@@ -222,4 +222,10 @@ final class ComparisonPredicateTest extends TestCase
         $this->assertFalse($this->evaluate("missing BEGINSWITH \"a\"", ["n" => 5]));
         $this->assertFalse($this->evaluate("missing LIKE \"a*\"", ["n" => 5]));
     }
+
+    public function testNumbersAreNotComparedToStringLengths(): void
+    {
+        $this->assertFalse($this->evaluate("n == \"aa\"", ["n" => 2]));
+        $this->assertFalse($this->evaluate("s == 2", ["s" => "aa"]));
+    }
 }
