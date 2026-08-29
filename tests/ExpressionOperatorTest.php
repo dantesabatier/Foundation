@@ -51,9 +51,15 @@ final class ExpressionOperatorTest extends TestCase
     public function testEveryOperatorFunctionIsStatic(): void
     {
         foreach (ExpressionOperatorType::cases() as $case) {
-            $method = new ReflectionMethod(PredicateUtilities::class, $case->name);
+            // Asserted before reflecting on it: an operator with no function at all would
+            // otherwise raise ReflectionException here, and the run would report that
+            // instead of naming the case that is missing.
             $this->assertTrue(
-                $method->isStatic(),
+                method_exists(PredicateUtilities::class, $case->name),
+                "PredicateUtilities::{$case->name}() must exist: ExpressionOperator dispatches to it by name."
+            );
+            $this->assertTrue(
+                new ReflectionMethod(PredicateUtilities::class, $case->name)->isStatic(),
                 "PredicateUtilities::{$case->name}() must be static: ExpressionOperator dispatches to it statically."
             );
         }
