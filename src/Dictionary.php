@@ -12,7 +12,6 @@ declare(strict_types=1);
 namespace Sabatier\Foundation;
 
 use ArrayAccess;
-use ArrayIterator;
 use Closure;
 use IteratorAggregate;
 use Override;
@@ -81,7 +80,7 @@ final class Dictionary extends ObjectClass implements Collection, ArrayAccess, I
 
     /** @var ArrayClass<string> $keys An array containing just the keys of the dictionary. */
     public ArrayClass $keys {
-        get => new ArrayClass(array_keys($this->reserved));
+        get => new ArrayClass(array_keys($this->reserved))->map(fn(int|string $key): string => (string)$key);
     }
     /** @var ArrayClass<Element> $values An array containing just the values of the dictionary. */
     public ArrayClass $values {
@@ -628,7 +627,9 @@ final class Dictionary extends ObjectClass implements Collection, ArrayAccess, I
     #[Override]
     public function getIterator(): Traversable
     {
-        return new ArrayIterator($this->reserved);
+        foreach ($this->reserved as $key => $value) {
+            yield (string)$key => $value;
+        }
     }
 
     /**

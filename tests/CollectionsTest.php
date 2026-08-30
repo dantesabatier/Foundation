@@ -193,6 +193,14 @@ final class CollectionsTest extends TestCase
         // PHP converts numeric-string array keys to int internally; the key-returning methods
         // must still honor their declared string contract (TaskRegistry keys tasks by number).
         $numericKeys = new Dictionary(["7" => "a", "9" => "b"]);
+        $iteratedKeys = [];
+        foreach ($numericKeys as $key => $value) {
+            $this->assertIsString($key, "iteration exposes string keys even when PHP intified them");
+            $iteratedKeys[] = $key;
+        }
+        $this->assertSame(["7", "9"], $numericKeys->keys->array, "keys returns strings even when PHP intified them");
+        $this->assertSame(["7", "9"], $iteratedKeys, "iteration returns strings even when PHP intified them");
+        $this->assertSame(["7a", "9b"], $numericKeys->map(fn(string $value, string $key): string => "$key$value")->array, "callbacks receive string keys even when PHP intified them");
         $this->assertSame("9", $numericKeys->firstIndex(fn(string $value): bool => $value === "b"), "firstIndex returns a string key even when PHP intified it");
         $this->assertSame("7", $numericKeys->indexOf("a"), "indexOf returns a string key even when PHP intified it");
     }
