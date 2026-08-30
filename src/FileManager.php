@@ -275,16 +275,19 @@ final class FileManager extends ObjectClass
      */
     public function removeItem(URL $fileURL): bool
     {
-        return ($this->fileExists($fileURL->path) || is_link($fileURL->path)) && unsafe_value(function () use ($fileURL): bool {
-                $process = function () use ($fileURL): bool {
+        /** @var ArrayClass<string> $keys */
+        $keys = new ArrayClass([URLResourceKey::isSymbolicLinkKey, URLResourceKey::isDirectoryKey]);
+        $values = $fileURL->resourceValues(new Set($keys));
+        return ($this->fileExists($fileURL->path) || $values->isSymbolicLink) && unsafe_value(function () use ($fileURL, $keys, $values): bool {
+                $process = function () use ($fileURL, $keys, $values): bool {
                     $path = $fileURL->path;
-                    if (is_link($path)) {
-                        return PHP_OS_FAMILY === "Windows" && is_dir($path) ? rmdir($path) : unlink($path);
+                    if ($values->isSymbolicLink) {
+                        return TARGET_OS_WINDOWS && $values->isDirectory ? rmdir($path) : unlink($path);
                     }
-                    if (!$fileURL->hasDirectoryPath) {
+                    if (!$values->isDirectory) {
                         return unlink($path);
                     }
-                    if ($enumerator = $this->enumerator($fileURL)) {
+                    if ($enumerator = $this->enumerator($fileURL, $keys)) {
                         foreach ($enumerator as $url) {
                             $this->removeItem($url);
                         }

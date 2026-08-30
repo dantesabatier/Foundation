@@ -7,7 +7,9 @@ namespace Sabatier\Foundation\Tests;
 use PHPUnit\Framework\TestCase;
 use Sabatier\Foundation\FileAttributeKey;
 use Sabatier\Foundation\FileManager;
+use Sabatier\Foundation\Set;
 use Sabatier\Foundation\URL;
+use Sabatier\Foundation\URLResourceKey;
 
 /**
  * Tests for src/FileManager.php and the directory enumeration built on URL.
@@ -72,7 +74,7 @@ final class FileManagerTest extends TestCase
             @rmdir($path);
             return;
         }
-        @unlink($path);
+        @unlink($path) || @rmdir($path);
     }
 
     public function testExistenceChecks(): void
@@ -188,11 +190,36 @@ final class FileManagerTest extends TestCase
         $this->assertTrue($this->manager->fileExists($this->root . DIRECTORY_SEPARATOR . "a.txt"), "removeItem keeps the link target");
     }
 
+    public function testRemovalOfDirectoryContainingAWindowsDirectoryJunction(): void
+    {
+        if (!TARGET_OS_WINDOWS) {
+            $this->markTestSkipped("directory junctions are specific to Windows");
+        }
+        $targetPath = $this->root . DIRECTORY_SEPARATOR . "junction-target";
+        $containerPath = $this->root . DIRECTORY_SEPARATOR . "junction-container";
+        $junctionPath = $containerPath . DIRECTORY_SEPARATOR . "junction";
+        mkdir($targetPath);
+        mkdir($containerPath);
+        file_put_contents($targetPath . DIRECTORY_SEPARATOR . "marker.txt", "target");
+        exec(sprintf("cmd /d /c mklink /J %s %s", escapeshellarg($junctionPath), escapeshellarg($targetPath)), $output, $status);
+        if ($status !== 0) {
+            $this->markTestSkipped("directory junctions are not supported in this environment");
+        }
+
+        $junctionURL = URL::fileURL($junctionPath);
+        $values = $junctionURL->resourceValues(new Set([URLResourceKey::isSymbolicLinkKey, URLResourceKey::isDirectoryKey]));
+        $this->assertTrue($values->isSymbolicLink, "URL resource values identify the junction as a symbolic link");
+        $this->assertTrue($values->isDirectory, "URL resource values identify the junction as a directory");
+        $this->assertTrue($this->manager->removeItem(URL::fileURL($containerPath)), "removeItem removes a directory containing a junction");
+        $this->assertFileDoesNotExist($containerPath, "removeItem deletes the container and its junction");
+        $this->assertFileExists($targetPath . DIRECTORY_SEPARATOR . "marker.txt", "removeItem keeps the junction target");
+    }
+
     public function testDeletability(): void
     {
         $this->assertTrue($this->manager->isDeletableFile($this->root . DIRECTORY_SEPARATOR . "a.txt"), "isDeletableFile is true for a file in a writable directory");
         $this->assertFalse($this->manager->isDeletableFile($this->root . DIRECTORY_SEPARATOR . "missing.bin"), "isDeletableFile is false for a missing file");
-        if (PHP_OS_FAMILY !== "Windows") {
+        if (!TARGET_OS_WINDOWS) {
             // POSIX only: Windows ignores the write bit on directories.
             $lockedPath = $this->root . DIRECTORY_SEPARATOR . "locked";
             mkdir($lockedPath);

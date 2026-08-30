@@ -12,18 +12,6 @@ use MessageFormatter;
 use NumberFormatter;
 use Stringable;
 
-if (!defined("TARGET_OS_WINDOWS")) {
-    define("TARGET_OS_WINDOWS", str_contains(PHP_OS, "WIN"));
-}
-
-if (!defined("RUNNING_FROM_CLI")) {
-    define("RUNNING_FROM_CLI", ((PHP_SAPI === "cli") || (stristr(PHP_SAPI, "cgi") && getenv("TERM"))));
-}
-
-if (!defined("HAS_ESCAPE_SEQUENCES")) {
-    define("HAS_ESCAPE_SEQUENCES", RUNNING_FROM_CLI && (function_exists("posix_isatty") ? posix_isatty(STDOUT) : (getenv("ANSICON") !== false || getenv("ConEmuANSI") === "ON")));
-}
-
 /**
  * Logs a debug message to the standard output.
  *
