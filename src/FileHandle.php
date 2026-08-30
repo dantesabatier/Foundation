@@ -54,14 +54,7 @@ final class FileHandle extends ObjectClass
      */
     public static function fileHandleForReadingFromURL(URL $url): ?FileHandle
     {
-        try {
-            if (!($handle = unsafe_value(fn(): mixed => fopen($url->path, "r")))) {
-                return null;
-            }
-        } catch (Exception) {
-            return null;
-        }
-        return new FileHandle($handle);
+        return new FileHandle(unsafe_value(fn(): mixed => fopen($url->path, "r")));
     }
 
     /**
@@ -74,14 +67,7 @@ final class FileHandle extends ObjectClass
      */
     public static function fileHandleForWritingToURL(URL $url): ?FileHandle
     {
-        try {
-            if (!($handle = unsafe_value(fn(): mixed => fopen($url->path, "w")))) {
-                return null;
-            }
-        } catch (Exception) {
-            return null;
-        }
-        return new FileHandle($handle);
+        return new FileHandle(unsafe_value(fn(): mixed => fopen($url->path, "w")));
     }
 
     /**
@@ -94,54 +80,47 @@ final class FileHandle extends ObjectClass
      */
     public static function fileHandleForUpdatingURL(URL $url): ?FileHandle
     {
-        try {
-            if (!($handle = unsafe_value(fn(): mixed => fopen($url->path, "w+")))) {
-                return null;
-            }
-        } catch (Exception) {
-            return null;
-        }
-        return new FileHandle($handle);
+        return new FileHandle(unsafe_value(fn(): mixed => fopen($url->path, "w+")));
     }
 
     /**
      * The shared file handle associated with the standard error file.
      *
-     * Conventionally this is a terminal device where the system sends error messages. There's one standard error file handle per process; it's a shared instance.
+     * Conventionally, this is a terminal device where the system sends error messages. There's one standard error file handle per process; it's a shared instance.
      * When using this method to create a file handle object, the file handle owns its associated file descriptor and is responsible for closing it.
      * @return FileHandle The shared file handle associated with the standard error file.
      */
     public static function standardError(): FileHandle
     {
-        return self::$standardError ??= new FileHandle(fopen("php://stderr", "w"));
+        return self::$standardError ??= new FileHandle(unsafe_value(fn(): mixed => fopen("php://stderr", "w")));
     }
 
     /**
      * The file handle associated with the standard input file.
      *
-     * Conventionally this is a terminal device on which the user enters a stream of data. There's one standard input file handle per process; it's a shared instance.
+     * Conventionally, this is a terminal device on which the user enters a stream of data. There's one standard input file handle per process; it's a shared instance.
      * When using this method to create a file handle object, the file handle owns its associated file descriptor and is responsible for closing it.
      * @return FileHandle The shared file handle associated with the standard input file.
      */
     public static function standardInput(): FileHandle
     {
-        return self::$standardInput ??= new FileHandle(fopen("php://stdin", "r"));
+        return self::$standardInput ??= new FileHandle(unsafe_value(fn(): mixed => fopen("php://stdin", "r")));
     }
 
     /**
      * The file handle associated with the standard output file.
      *
-     * Conventionally this is a terminal device that receives a stream of data from a program. There's one standard output file handle per process; it's a shared instance.
+     * Conventionally, this is a terminal device that receives a stream of data from a program. There's one standard output file handle per process; it's a shared instance.
      * When using this method to create a file handle object, the file handle owns its associated file descriptor and is responsible for closing it.
      * @return FileHandle The shared file handle associated with the standard output file.
      */
     public static function standardOutput(): FileHandle
     {
-        return self::$standardOutput ??= new FileHandle(fopen("php://stdout", "w"));
+        return self::$standardOutput ??= new FileHandle(unsafe_value(fn(): mixed => fopen("php://stdout", "w")));
     }
 
     /**
-     * Reads the available data synchronously up to the end of file or maximum number of bytes.
+     * Reads the available data synchronously up to the end of the file or maximum number of bytes.
      *
      * This method invokes {@see read()} as part of its implementation.
      * @return string|null The data available through the file handle up to the maximum size that can be represented by a string or, if a communications channel, until an end-of-file indicator is returned.
@@ -155,7 +134,7 @@ final class FileHandle extends ObjectClass
     /**
      * Reads data synchronously up to the specified number of bytes.
      *
-     * If the handle represents a file, this method returns the data obtained by reading length bytes starting at the current file pointer. If length bytes aren't available, this method returns the data from the current file pointer to the end of the file. If the handle is a communications channel, the method reads up to length bytes from the channel. Returns an empty string if the handle is at the file's end or if the communications channel returns an end-of-file indicator.
+     * If the handle represents a file, this method returns the data obtained by reading length bytes starting at the current file pointer. If length bytes aren't available, this method returns the data from the current file pointer to the end of the file. If the handle is a communications channel, the method reads up-to-length bytes from the channel. Returns an empty string if the handle is at the file's end or if the communications channel returns an end-of-file indicator.
      * @param int $count The number of bytes to read from the file handle.
      * @return string|null The data available through the receiver up to a maximum of length bytes, or the maximum size that can be represented by a string, whichever is the smaller.
      * @throws Exception This method throws an error if attempts to determine the file-handle type fail or if attempts to read from the file or channel fail.
@@ -232,7 +211,7 @@ final class FileHandle extends ObjectClass
     /**
      * Truncates or extends the file represented by the file handle to a specified offset within the file and puts the file pointer at that position.
      *
-     * If the file is extended (if offset is beyond the current end of file), the added characters are null bytes.
+     * If the file is extended (if `$offset` is beyond the current end of file), the added characters are null bytes.
      * @param int $offset The offset within the file that marks the new end of the file.
      * @throws Exception
      */
