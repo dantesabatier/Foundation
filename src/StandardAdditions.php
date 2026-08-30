@@ -605,6 +605,25 @@ function is_hidden(string $filename): bool
 }
 
 /**
+ * Determines whether the specified path is a Windows directory junction.
+ *
+ * Symbolic links reported by {@see is_link()} are not considered directory junctions.
+ * This function always returns false on non-Windows platforms and for paths that do not exist.
+ *
+ * @param string $path The filesystem path to inspect.
+ * @return bool Returns true if the path is a Windows directory junction; otherwise, false.
+ */
+function is_directory_junction(string $path): bool
+{
+    if (!TARGET_OS_WINDOWS || is_link($path) || !file_exists($path)) {
+        return false;
+    }
+    $attributes = lstat($path);
+    // PHP reports Windows directory junctions with a lstat(...) mode of 0.
+    return $attributes !== false && $attributes["mode"] === 0;
+}
+
+/**
  * Determines if the given value is a serialized string.
  *
  * @param mixed $value The value to be evaluated.

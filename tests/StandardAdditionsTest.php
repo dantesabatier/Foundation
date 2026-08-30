@@ -16,6 +16,7 @@ use function Sabatier\Foundation\camelcase;
 use function Sabatier\Foundation\compare;
 use function Sabatier\Foundation\document_root_directory;
 use function Sabatier\Foundation\in_range;
+use function Sabatier\Foundation\is_directory_junction;
 use function Sabatier\Foundation\is_equal;
 use function Sabatier\Foundation\is_hidden;
 use function Sabatier\Foundation\is_serialized;
@@ -188,6 +189,35 @@ final class StandardAdditionsTest extends TestCase
             $this->assertFalse(is_serialized($invalid), "rejects invalid input: $invalid");
         }
         $this->assertFalse(is_serialized(42), "rejects non-string values");
+    }
+
+    public function testIsDirectoryJunction(): void
+    {
+        $directory = sys_get_temp_dir() . DIRECTORY_SEPARATOR . uniqid("standard-additions-junction-", true);
+        $target = $directory . DIRECTORY_SEPARATOR . "target";
+        $junction = $directory . DIRECTORY_SEPARATOR . "junction";
+        mkdir($directory);
+        mkdir($target);
+
+        try {
+            $this->assertFalse(is_directory_junction($directory), "a regular directory is not a directory junction");
+            $this->assertFalse(is_directory_junction($directory . DIRECTORY_SEPARATOR . "missing"), "a missing path is not a directory junction");
+            if (!TARGET_OS_WINDOWS) {
+                return;
+            }
+            if (!function_exists("exec")) {
+                $this->markTestSkipped("exec is required to create a Windows directory junction");
+            }
+            exec(sprintf("cmd /d /c mklink /J %s %s", escapeshellarg($junction), escapeshellarg($target)), $output, $status);
+            if ($status !== 0) {
+                $this->markTestSkipped("directory junctions are not supported in this environment");
+            }
+            $this->assertTrue(is_directory_junction($junction), "a Windows directory junction is identified as such");
+        } finally {
+            @rmdir($junction);
+            @rmdir($target);
+            @rmdir($directory);
+        }
     }
 
     public function testArrayRemove(): void

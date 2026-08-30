@@ -95,7 +95,7 @@ final class URLResourceValuesStorage
         /** @var string $key */
         foreach ($keys as $key) {
             if ($key === URLResourceKey::isDirectoryKey) {
-                $result[$key] = $info->isDir() || ($isDirectoryJunction ??= $this->isDirectoryJunction($path));
+                $result[$key] = $info->isDir() || ($isDirectoryJunction ??= is_directory_junction($path));
             } elseif ($key === URLResourceKey::parentDirectoryURLKey) {
                 if ($directory = $info->getPathInfo()?->getRealPath()) {
                     $result[$key] = URL::fileURL($directory);
@@ -103,7 +103,7 @@ final class URLResourceValuesStorage
             } elseif ($key === URLResourceKey::fileResourceTypeKey) {
                 $result[$key] = $info->getType();
             } elseif ($key === URLResourceKey::isAliasFileKey || $key === URLResourceKey::isSymbolicLinkKey) {
-                $result[$key] = $info->isLink() || ($isDirectoryJunction ??= $this->isDirectoryJunction($path));
+                $result[$key] = $info->isLink() || ($isDirectoryJunction ??= is_directory_junction($path));
             } elseif ($key === URLResourceKey::fileSizeKey) {
                 $result[$key] = $info->getSize();
             } elseif ($key === URLResourceKey::isRegularFileKey) {
@@ -130,16 +130,6 @@ final class URLResourceValuesStorage
             }
         }
         return $result;
-    }
-
-    private function isDirectoryJunction(string $path): bool
-    {
-        if (!TARGET_OS_WINDOWS || is_link($path) || !file_exists($path)) {
-            return false;
-        }
-        $attributes = lstat($path);
-        // PHP reports Windows directory junctions with a lstat(...) mode of 0.
-        return $attributes !== false && $attributes["mode"] === 0;
     }
 
     public function write(Dictionary $keysAndValues, URL $url): void
