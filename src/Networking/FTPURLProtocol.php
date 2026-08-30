@@ -81,13 +81,8 @@ final class FTPURLProtocol extends NativeProtocol
                     $easyHandle->setRequestBodyLength(0);
                     break;
                 case TaskBodyRawValue::data:
-                    $stream = fopen("php://memory", "r+");
-                    if ($stream === false) {
-                        throw new Exception("Failed to open php://memory stream");
-                    }
-                    if (fwrite($stream, $body->data ?? "") === false) {
-                        throw new Exception("Failed to write body data to php://memory stream");
-                    }
+                    $stream = fopen("php://memory", "r+") ?: throw new Exception("Failed to open php://memory stream");
+                    fwrite($stream, $body->data ?? "") ?: throw new Exception("Failed to write body data to php://memory stream");
                     rewind($stream);
                     $easyHandle->setUpload(true);
                     $easyHandle->setInputFile($stream);
@@ -96,10 +91,7 @@ final class FTPURLProtocol extends NativeProtocol
                     break;
                 case TaskBodyRawValue::file:
                     $filePath = $body->fileURL?->path ?? throw new Exception("TaskBody::file has a null fileURL");
-                    $stream = fopen($filePath, "rb");
-                    if ($stream === false) {
-                        throw new Exception("Cannot open file for FTP upload: $filePath");
-                    }
+                    $stream = fopen($filePath, "rb") ?: throw new Exception("Cannot open file for FTP upload: $filePath");
                     $easyHandle->setUpload(true);
                     $easyHandle->setInputFile($stream);
                     if ($length = $body->getBodyLength()) {
@@ -110,9 +102,7 @@ final class FTPURLProtocol extends NativeProtocol
                     }
                     break;
                 case TaskBodyRawValue::stream:
-                    if (!is_resource($body->stream)) {
-                        throw new Exception("TaskBody::stream does not contain a valid resource");
-                    }
+                    is_resource($body->stream) ?: throw new Exception("TaskBody::stream does not contain a valid resource");
                     $easyHandle->setUpload(true);
                     $easyHandle->setInputFile($body->stream);
                     $easyHandle->setRequestBodyLength(URLResponseUnknownLength);

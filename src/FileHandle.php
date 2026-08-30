@@ -58,7 +58,7 @@ final class FileHandle extends ObjectClass
             return null;
         }
         try {
-            return new FileHandle(unsafe_value(fn(): mixed => fopen($url->path, "r")));
+            return new FileHandle(unsafe_value(fn(): mixed => fopen($url->path, "rb")));
         } catch (Exception) {
             return null;
         }
@@ -138,6 +138,16 @@ final class FileHandle extends ObjectClass
     public static function standardOutput(): FileHandle
     {
         return self::$standardOutput ??= new FileHandle(unsafe_value(fn(): mixed => fopen("php://stdout", "w")));
+    }
+
+    /**
+     * Returns a new, empty file handle whose contents are stored in memory.
+     *
+     * The returned handle supports both reading and writing and has its file pointer set to the beginning.
+     */
+    public static function inMemory(): FileHandle
+    {
+        return new FileHandle(unsafe_value(fn(): mixed => fopen("php://memory", "w+b")));
     }
 
     /**

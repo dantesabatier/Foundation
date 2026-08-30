@@ -51,6 +51,26 @@ final class FileHandleTest extends TestCase
         $this->assertSame(FileHandle::standardOutput(), FileHandle::standardOutput(), "standardOutput is a shared instance");
     }
 
+    public function testInMemoryHandlesAreIndependent(): void
+    {
+        $first = FileHandle::inMemory();
+        $second = FileHandle::inMemory();
+
+        $first->write("first");
+        $second->write("second");
+        $first->seek(0);
+        $second->seek(0);
+
+        $this->assertNotSame($first, $second, "each factory call returns a new handle");
+        $this->assertSame("first", $first->readToEnd(), "the first handle retains its own contents");
+        $this->assertSame("second", $second->readToEnd(), "the second handle retains its own contents");
+
+        $first->close();
+        $second->seek(0);
+        $this->assertSame("second", $second->readToEnd(), "closing one handle does not affect another");
+        $second->close();
+    }
+
     public function testReading(): void
     {
         $reader = FileHandle::fileHandleForReadingFromURL(URL::fileURL($this->existing));

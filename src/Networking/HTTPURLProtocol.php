@@ -166,8 +166,7 @@ class HTTPURLProtocol extends NativeProtocol
                     if ($data = $body->data) {
                         $easyHandle->set($data, CURLOPT_POSTFIELDS);
                     } elseif ($fileURL = $body->fileURL) {
-                        // Upload the raw file contents as the request body (Foundation semantics),
-                        // not a multipart form field. The read callback streams from CURLOPT_INFILE.
+                        // Upload the raw file contents as the request body (Foundation semantics), not a multipart form field. The read callback streams from CURLOPT_INFILE.
                         $easyHandle->setInputFile(unsafe_value(fn(): mixed => fopen($fileURL->fileSystemRepresentation, "r")));
                         $easyHandle->setUpload(true);
                     } elseif (($stream = $body->stream) !== null) {
