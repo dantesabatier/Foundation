@@ -82,7 +82,7 @@ final class FTPURLProtocol extends NativeProtocol
                     break;
                 case TaskBodyRawValue::data:
                     $stream = fopen("php://memory", "r+") ?: throw new Exception("Failed to open php://memory stream");
-                    fwrite($stream, $body->data ?? "") ?: throw new Exception("Failed to write body data to php://memory stream");
+                    fwrite($stream, $body->data ?? "") !== false ?: throw new Exception("Failed to write body data to php://memory stream");
                     rewind($stream);
                     $easyHandle->setUpload(true);
                     $easyHandle->setInputFile($stream);
