@@ -13,7 +13,7 @@ use function Sabatier\Foundation\human_readable_value;
  */
 final class URLProtectionSpace extends ObjectClass
 {
-    final public const array authenticationMethods = [
+    public const array authenticationMethods = [
         URLAuthenticationMethodDefault,
         URLAuthenticationMethodHTTPBasic,
         URLAuthenticationMethodHTTPDigest,

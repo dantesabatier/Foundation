@@ -10,7 +10,7 @@ use Sabatier\Foundation\URL;
 /** @internal */
 final class DiskEntry
 {
-    final public const string pathExtension = "storedcachedurlresponse";
+    public const string pathExtension = "storedcachedurlresponse";
     private(set) Date $date {
         get => $this->date ??= new Date();
     }

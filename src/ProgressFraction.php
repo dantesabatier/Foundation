@@ -90,7 +90,7 @@ final class ProgressFraction extends ObjectClass
      */
     private function math(ProgressFraction $fraction, Closure $whichOperator, Closure $whichOverflow): ProgressFraction
     {
-        !($this->total == 0 && $fraction->total == 0) ?: fatal_error("Attempt to add or subtract invalid fraction");
+        $this->total != 0 || $fraction->total != 0 ?: fatal_error("Attempt to add or subtract invalid fraction");
         if ($this->total == 0) {
             return $fraction;
         }

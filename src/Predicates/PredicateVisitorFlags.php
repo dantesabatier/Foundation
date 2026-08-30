@@ -12,10 +12,10 @@ namespace Sabatier\Foundation\Predicates;
 
 final class PredicateVisitorFlags
 {
-    final const int expressions = 1;
-    final const int operators = 2;
-    final const int internalNodes = 4;
-    final const int operatorsBefore = 8;
-    final const int common = PredicateVisitorFlags::expressions | PredicateVisitorFlags::operators | PredicateVisitorFlags::internalNodes;
-    final const int all = PredicateVisitorFlags::common | PredicateVisitorFlags::operatorsBefore;
+    const int expressions = 1;
+    const int operators = 2;
+    const int internalNodes = 4;
+    const int operatorsBefore = 8;
+    const int common = PredicateVisitorFlags::expressions | PredicateVisitorFlags::operators | PredicateVisitorFlags::internalNodes;
+    const int all = PredicateVisitorFlags::common | PredicateVisitorFlags::operatorsBefore;
 }

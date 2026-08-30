@@ -15,7 +15,7 @@ use Override;
 final class Date extends ObjectClass
 {
     /** @var float The number of seconds from 1 January 1970 to the reference date, 1 January 2001. */
-    final public const float timeIntervalBetween1970AndReferenceDate = kCFAbsoluteTimeIntervalSince1970;
+    public const float timeIntervalBetween1970AndReferenceDate = kCFAbsoluteTimeIntervalSince1970;
     /** @var float The interval between the date value and 00:00:00 UTC on 1 January 2001. This property's value is negative if the date object is earlier than the system's absolute reference date (00:00:00 UTC on 1 January 2001). */
     private(set) float $timeIntervalSinceReferenceDate;
     /** @var float The time interval between the date value and the current date and time. If the date is earlier than the current date and time, this property's value is negative. */

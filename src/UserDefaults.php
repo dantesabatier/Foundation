@@ -12,11 +12,11 @@ final class UserDefaults
     private static ?UserDefaults $standard = null;
     /** @var Dictionary<ApplicationPreferences>|null */
     private static ?Dictionary $standardUserPreferences = null;
-    final public const string argumentDomain = ArgumentDomain;
-    final public const string globalDomain = GlobalDomain;
-    final public const string registrationDomain = RegistrationDomain;
-    final public const string didChangeNotification = UserDefaultsDidChangeNotification;
-    final public const string sizeLimitExceededNotification = UserDefaultsSizeLimitExceededNotification;
+    public const string argumentDomain = ArgumentDomain;
+    public const string globalDomain = GlobalDomain;
+    public const string registrationDomain = RegistrationDomain;
+    public const string didChangeNotification = UserDefaultsDidChangeNotification;
+    public const string sizeLimitExceededNotification = UserDefaultsSizeLimitExceededNotification;
     private readonly string $suiteName;
 
     /**

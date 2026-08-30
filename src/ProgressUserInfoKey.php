@@ -12,21 +12,21 @@ namespace Sabatier\Foundation;
 final class ProgressUserInfoKey
 {
     /** @var string A key with a corresponding value that represents the time remaining, in seconds. */
-    final const string estimatedTimeRemainingKey = "estimatedTimeRemainingKey";
+    const string estimatedTimeRemainingKey = "estimatedTimeRemainingKey";
     /** @var string A key with a corresponding value that indicates the speed of data processing, in bytes per second. */
-    final const string throughputKey = "throughputKey";
+    const string throughputKey = "throughputKey";
     /** @var string A key with a corresponding value that is an image, typically an icon to represent the file. */
-    final const string fileAnimationImageKey = "fileAnimationImageKey";
+    const string fileAnimationImageKey = "fileAnimationImageKey";
     /** @var string A key with a corresponding value that indicates the starting location of the image onscreen. */
-    final const string fileAnimationImageOriginalRectKey = "fileAnimationImageOriginalRectKey";
+    const string fileAnimationImageOriginalRectKey = "fileAnimationImageOriginalRectKey";
     /** @var string A key with a corresponding value that represents the number of completed files. */
-    final const string fileCompletedCountKey = "fileCompletedCountKey";
+    const string fileCompletedCountKey = "fileCompletedCountKey";
     /** @var string A key with a corresponding value that must be an image, typically an icon to represent the file. */
-    final const string fileIconKey = "fileIconKey";
+    const string fileIconKey = "fileIconKey";
     /** @var string A key with a corresponding value that indicates the kind of file operation a progress object represents. */
-    final const string fileOperationKindKey = "fileOperationKindKey";
+    const string fileOperationKindKey = "fileOperationKindKey";
     /** @var string A key with a corresponding value that represents the total number of files within a file operation. */
-    final const string fileTotalCountKey = "fileTotalCountKey";
+    const string fileTotalCountKey = "fileTotalCountKey";
     /** @var string A key with a corresponding value that represents the file URL of a file operation for the progress object. */
-    final const string fileURLKey = "fileURLKey";
+    const string fileURLKey = "fileURLKey";
 }

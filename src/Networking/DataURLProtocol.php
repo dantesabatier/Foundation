@@ -96,9 +96,7 @@ final class DataURLProtocol extends URLProtocol
                                 }
                                 return true;
                             case ";":
-                                if ($mimeType === null) {
-                                    $mimeType = str_contains($part, "/") ? $part : $defaultMimeType;
-                                }
+                                $mimeType ??= str_contains($part, "/") ? $part : $defaultMimeType;
                                 if ($foundCharsetKey) {
                                     $charSet = $part;
                                     $foundCharsetKey = false;
