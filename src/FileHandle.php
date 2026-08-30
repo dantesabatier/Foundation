@@ -57,7 +57,11 @@ final class FileHandle extends ObjectClass
         if (!FileManager::default()->fileExists($url->path, $isDirectory) || $isDirectory) {
             return null;
         }
-        return new FileHandle(unsafe_value(fn(): mixed => fopen($url->path, "r")));
+        try {
+            return new FileHandle(unsafe_value(fn(): mixed => fopen($url->path, "r")));
+        } catch (Exception) {
+            return null;
+        }
     }
 
     /**
@@ -73,7 +77,11 @@ final class FileHandle extends ObjectClass
         if (!FileManager::default()->fileExists($url->path, $isDirectory) || $isDirectory || !FileManager::default()->isWritableFile($url->path)) {
             return null;
         }
-        return new FileHandle(unsafe_value(fn(): mixed => fopen($url->path, "w")));
+        try {
+            return new FileHandle(unsafe_value(fn(): mixed => fopen($url->path, "w")));
+        } catch (Exception) {
+            return null;
+        }
     }
 
     /**
@@ -89,7 +97,11 @@ final class FileHandle extends ObjectClass
         if (!FileManager::default()->fileExists($url->path, $isDirectory) || $isDirectory || !FileManager::default()->isWritableFile($url->path)) {
             return null;
         }
-        return new FileHandle(unsafe_value(fn(): mixed => fopen($url->path, "w+")));
+        try {
+            return new FileHandle(unsafe_value(fn(): mixed => fopen($url->path, "w+")));
+        } catch (Exception) {
+            return null;
+        }
     }
 
     /**
