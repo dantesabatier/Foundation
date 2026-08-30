@@ -20,6 +20,7 @@ use Rector\DeadCode\Rector\ClassMethod\RemoveUselessParamTagRector;
 use Rector\DeadCode\Rector\ClassMethod\RemoveUselessReturnTagRector;
 use Rector\DeadCode\Rector\ClassMethod\RemoveUselessUnionReturnDocblockRector;
 use Rector\DeadCode\Rector\If_\RemoveAlwaysTrueIfConditionRector;
+use Rector\DeadCode\Rector\Property\RemoveDefaultValueFromAssignedPropertyRector;
 use Rector\DeadCode\Rector\Property\RemoveUnusedPrivatePropertyRector;
 use Rector\DeadCode\Rector\StmtsAwareInterface\RemoveDeadInstanceOfAssertRector;
 use Rector\Exception\Configuration\InvalidConfigurationException;
@@ -60,6 +61,7 @@ try {
             RemoveMixedDocblockOverruledByNativeTypeRector::class,
             RemoveUselessUnionReturnDocblockRector::class,
             RemoveDeadInstanceOfAssertRector::class,
+            RemoveDefaultValueFromAssignedPropertyRector::class,
             RemoveUnusedPromotedPropertyRector::class => [
                 __DIR__ . "/src/ArrayConverter.php"
             ],
