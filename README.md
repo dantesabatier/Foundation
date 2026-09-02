@@ -1,8 +1,8 @@
 # Foundation for PHP
 
-A faithful, high-level port of Apple's **Foundation** framework to PHP.
+A port of Apple's **Foundation** framework to PHP — faithful to its design, not to its syntax.
 
-This project brings the object-oriented architecture and expressive APIs of Swift/Objective-C Foundation to the PHP ecosystem, built on modern language features — property hooks, asymmetric visibility, enums, the pipe operator — with no external runtime dependencies.
+Collections modelled on Swift's standard library, key-value coding and observing, an `NSPredicate`-compatible filtering language, file management, and a `URLSession`-style HTTP/FTP/WebSocket client. Built on property hooks, asymmetric visibility, enums and the pipe operator, with no external runtime dependencies.
 
 Requires **PHP 8.5+**.
 
@@ -244,9 +244,11 @@ $a->isEqual($b);          // true  — conceptually equal
 $a->hash === $b->hash;    // false — different objects
 ```
 
-`$hash` is `spl_object_id()`, and no subclass overrides it — not `Number`, `Date`, `URL` or `UUID`. Conceptual equality lives only in `isEqual(mixed)` / `compare(mixed)`, mirroring Apple's `isEqual:(id)`: any value may be asked against any other, and incomparable values answer `false`.
+`$hash` answers `spl_object_id()`, and no subclass overrides it — not `Number`, `Date`, `URL` or `UUID`. It tells you *which object this is*, and nothing about what it holds. Conceptual equality lives only in `isEqual(mixed)` / `compare(mixed)`. The parameter is `mixed` deliberately: any value may be asked against any other, and incomparable values answer `false` rather than raising.
 
-Consequently **the NSObject rule that equal objects must have equal hashes does not apply here.** Equal instances keeping distinct identity hashes is correct, not a bug. Collections compose on top of `isEqual` rather than hashes, so `Set`, `Dictionary` and `ArrayClass` deduplicate and compare element-wise through whatever equality an element defines. When porting a class that redefines equality, override `isEqual`/`compare` and leave `$hash` alone.
+So **the familiar rule that equal objects must produce equal hashes does not hold here, and is not meant to.** Two `Number`s holding 5 are equal and remain distinguishable as objects; that is the point of keeping the two axes apart, not an oversight to be fixed.
+
+Nothing depends on the rule, because nothing in the framework looks up by hash. `Set`, `Dictionary` and `ArrayClass` deduplicate and compare element-wise through `isEqual`, so any type that defines its own equality participates in deep comparison for free — including your own. When you write a class that redefines equality, override `isEqual`/`compare` and leave `$hash` alone.
 
 ## Static analysis
 
