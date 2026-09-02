@@ -218,18 +218,21 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
         }
         foreach ($this->observances as $observance) {
             $keyPath = $observance->keyPath;
-            if ($keyPath === $key) {
+            // Only an observer that asked for the pre-change notification gets one. Notifying every observance here sent two notifications for a single change to observers that never requested the pair, and the second one — the real, post-change notification — arrived indistinguishable from the first except for isPrior, which those observers have no reason to read.
+            if ($keyPath === $key && ($observance->options & KeyValueObservingOptions::prior)) {
                 $change = new KeyValueObservedChange();
                 $change->kind = $changeKind;
                 if ($observance->options & KeyValueObservingOptions::new) {
-                    $change->newValue = $changedValue;
+                    // A collection mutation reports the members being inserted or removed, and this is the only notification that can: after the change they are no longer readable from the collection, so didChangeValueForKey() — which reports what the key now holds — would answer with the survivors. A plain setting reports nothing here, matching the change dictionary the prior option documents, which "never contains an newKey entry".
+                    $change->newValue = match ($changeKind) {
+                        KeyValueChange::insertion, KeyValueChange::removal => $changedValue,
+                        default => null
+                    };
                 }
                 if ($observance->options & KeyValueObservingOptions::old) {
                     $change->oldValue = $this->valuesBeingChanged[$key] ?? null;
                 }
-                if ($observance->options & KeyValueObservingOptions::prior) {
-                    $change->isPrior = true;
-                }
+                $change->isPrior = true;
                 $observer = $observance->observer;
                 if ($observer instanceof KeyValueObservation) {
                     if ($handler = $observance->handler) {
