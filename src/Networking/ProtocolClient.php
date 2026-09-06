@@ -31,6 +31,9 @@ final class ProtocolClient implements URLProtocolClient
         $task = $protocol->task;
         $session = $task->session;
         $task->response = $response;
+        if ($request = $task->currentRequest) {
+            $protocol::setProperty("", "responseData", $request);
+        }
         $this->cachePolicy = $policy;
         if ($session->configuration->urlCache) {
             switch ($policy) {
@@ -138,6 +141,10 @@ final class ProtocolClient implements URLProtocolClient
 
     public function urlProtocolTaskDidFailWithError(URLSessionTask $task, Error $error): void
     {
+        if ($task->state === URLSessionTaskState::completed) {
+            return;
+        }
+        $task->error = $error;
         $session = $task->session;
         $behaviour = $session->behaviour($task);
         switch ($behaviour->rawValue) {
@@ -190,7 +197,8 @@ final class ProtocolClient implements URLProtocolClient
         if (!($request = $task->currentRequest)) {
             fatal_error();
         }
-        $protocol::setProperty($data, "responseData", $request);
+        $responseData = (string)$protocol::property("responseData", $request);
+        $protocol::setProperty($responseData . $data, "responseData", $request);
         switch ($this->cachePolicy) {
             case URLCacheStoragePolicy::allowed:
             case URLCacheStoragePolicy::allowedInMemoryOnly:

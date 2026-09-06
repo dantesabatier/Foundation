@@ -33,9 +33,13 @@ final class URLCache extends ObjectClass
 {
     private static ?URLCache $shared = null;
     /** @var int The current size of the on-disk cache, in bytes. */
-    private(set) int $currentDiskUsage = 0;
+    public int $currentDiskUsage {
+        get => $this->diskEntries(new ArrayClass([URLResourceKey::fileSizeKey]))->map(fn(DiskEntry $entry): int => $entry->url->resourceValues(new Set([URLResourceKey::fileSizeKey]))->fileSize ?? 0)->sum();
+    }
     /** @var int The current size of the in-memory cache, in bytes. */
-    private(set) int $currentMemoryUsage = 0;
+    public int $currentMemoryUsage {
+        get => $this->inMemoryCacheContents->map(fn(CacheEntry $entry): int => $entry->cost)->sum();
+    }
     private ?URL $cacheDirectory;
     /** @var ArrayClass<string> */
     private ArrayClass $inMemoryCacheOrder {
@@ -114,12 +118,18 @@ final class URLCache extends ObjectClass
         if (!($host = $request->url->host)) {
             return null;
         }
-        $data = strtolower($host);
+        $data = strtolower($request->url->scheme);
+        $data .= "\0";
+        $data .= strtolower($host);
         $data .= "\0";
         $data .= $request->url->port ?? -1;
         $data .= "\0";
         $data .= $request->url->path;
-        return base64_encode($data);
+        $data .= "\0";
+        $data .= $request->url->query ?? "";
+        $data .= "\0";
+        $data .= $request->httpMethod;
+        return md5($data);
     }
 
     /**
@@ -262,12 +272,13 @@ final class URLCache extends ObjectClass
             $serialized = null;
         }
         $entry = new CacheEntry($identifier, $cachedResponse, $serialized);
-        if ($inMemory && $entry->cost < $this->memoryCapacity) {
+        $this->removeCachedResponse($request);
+        if ($inMemory && $this->memoryCapacity > 0 && $entry->cost <= $this->memoryCapacity) {
             $this->evictFromMemoryCacheAssumingLockHeld($this->memoryCapacity - $entry->cost);
             $this->inMemoryCacheOrder->append($identifier);
             $this->inMemoryCacheContents[$identifier] = $entry;
         }
-        if ($onDisk && $serialized && $entry->cost < $this->diskCapacity) {
+        if ($onDisk && $serialized && $entry->cost <= $this->diskCapacity) {
             try {
                 $this->evictFromDiskCache($this->diskCapacity - $entry->cost);
                 $locators = $this->diskContentLocators($request, new Date());
@@ -276,7 +287,7 @@ final class URLCache extends ObjectClass
                 }
                 if ($identifier = $locators?->identifier) {
                     $entriesToRemove = $this->diskEntries()->filter(fn(DiskEntry $entry): bool => $entry->identifier === $identifier)->sort(fn(DiskEntry $e0, DiskEntry $e1): int => compare($e0->date, $e1->date));
-                    $entriesToRemove->popFirst();
+                    $entriesToRemove->popLast();
                     $entriesToRemove->forEach(fn(DiskEntry $entry) => FileManager::default()->removeItem($entry->url));
                 }
             } catch (Exception) {

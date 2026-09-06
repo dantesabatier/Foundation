@@ -330,7 +330,10 @@ abstract class URLSessionTask extends ObjectClass
      */
     public function resume(): void
     {
-        if ($this->state === URLSessionTaskState::canceling || $this->state === URLSessionTaskState::completed) {
+        if (match ($this->state) {
+            URLSessionTaskState::running, URLSessionTaskState::canceling, URLSessionTaskState::completed => true,
+            URLSessionTaskState::suspended => false,
+        }) {
             return;
         }
         if ($this->suspendCount > 0) {
@@ -376,12 +379,14 @@ abstract class URLSessionTask extends ObjectClass
         if ($this->state === URLSessionTaskState::canceling || $this->state === URLSessionTaskState::completed) {
             return;
         }
-        $this->updateTaskState();
+        $this->state = URLSessionTaskState::canceling;
         $this->getProtocol(function (?URLProtocol $protocol): void {
+            $this->error = new Error(CocoaErrorDomain, UserCancelledError, new Dictionary([URLErrorFailingURLErrorKey => $this->originalRequest?->url]));
             if (!$protocol instanceof URLProtocol) {
+                /** @noinspection PhpUnhandledExceptionInspection */
+                new ProtocolClient()->urlProtocolTaskDidFailWithError($this, $this->error);
                 return;
             }
-            $this->error = new Error(CocoaErrorDomain, UserCancelledError, new Dictionary([URLErrorFailingURLErrorKey => $this->originalRequest?->url]));
             $protocol->stopLoading();
             /** @noinspection PhpUnhandledExceptionInspection */
             $protocol->client?->urlProtocolDidFailWithError($protocol, $this->error);
