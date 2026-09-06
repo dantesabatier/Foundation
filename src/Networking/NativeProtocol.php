@@ -193,6 +193,7 @@ abstract class NativeProtocol extends URLProtocol implements EasyHandleDelegate
         if ($error instanceof Error) {
             if ($this->internalState->rawValue !== InternalStateRawValue::transferFailed) {
                 $this->internalState = InternalState::transferFailed();
+                $this->completeTaskWithError($error);
                 $this->failWithError($error, $this->request);
             }
             return;

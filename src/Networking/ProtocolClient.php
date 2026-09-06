@@ -29,6 +29,9 @@ final class ProtocolClient implements URLProtocolClient
     public function urlProtocolDidReceiveCacheStoragePolicy(URLProtocol $protocol, URLResponse $response, URLCacheStoragePolicy $policy): void
     {
         $task = $protocol->task;
+        if ($task->state === URLSessionTaskState::completed) {
+            return;
+        }
         $session = $task->session;
         $task->response = $response;
         if ($request = $task->currentRequest) {
@@ -52,7 +55,10 @@ final class ProtocolClient implements URLProtocolClient
                 /** @var URLSessionDelegate $delegate */
                 $delegate = $behaviour->taskDelegate;
                 if ($delegate instanceof URLSessionDataDelegate && $task instanceof URLSessionDataTask) {
-                    $delegate->urlSessionDataTaskDidReceiveResponse($session, $task, $response, function (URLSessionResponseDisposition $disposition): void {
+                    $delegate->urlSessionDataTaskDidReceiveResponse($session, $task, $response, function (URLSessionResponseDisposition $disposition) use ($task): void {
+                        if ($disposition === URLSessionResponseDisposition::cancel) {
+                            $task->cancel();
+                        }
                     });
                 } elseif ($delegate instanceof URLSessionWebSocketDelegate && $task instanceof URLSessionWebSocketTask) {
                     $delegate->urlSessionWebSocketTaskDidOpenWithProtocol($session, $task, $task->protocolPicked);
@@ -159,12 +165,12 @@ final class ProtocolClient implements URLProtocolClient
                 if ($task->state === URLSessionTaskState::completed) {
                     return;
                 }
+                $task->state = URLSessionTaskState::completed;
                 /** @var URLSessionDelegate $delegate */
                 $delegate = $behaviour->taskDelegate;
                 if ($delegate instanceof URLSessionTaskDelegate) {
                     $delegate->urlSessionTaskDidComplete($session, $task, $error);
                 }
-                $task->state = URLSessionTaskState::completed;
                 $session->taskRegistry->remove($task);
                 break;
             case TaskBehaviourRawValue::downloadCompletionHandler:
@@ -175,6 +181,7 @@ final class ProtocolClient implements URLProtocolClient
                 /** @var DownloadCompletionHandler $downloadCompletionHandler */
                 $downloadCompletionHandler = $behaviour->downloadCompletionHandler;
                 $downloadCompletionHandler(null, null, $error);
+                $session->taskRegistry->remove($task);
                 break;
             case TaskBehaviourRawValue::dataCompletionHandler:
                 if ($task->state === URLSessionTaskState::completed) {
@@ -194,6 +201,9 @@ final class ProtocolClient implements URLProtocolClient
     public function urlProtocolDidLoad(URLProtocol $protocol, string $data): void
     {
         $task = $protocol->task;
+        if ($task->state === URLSessionTaskState::completed) {
+            return;
+        }
         if (!($request = $task->currentRequest)) {
             fatal_error();
         }
@@ -230,6 +240,9 @@ final class ProtocolClient implements URLProtocolClient
     public function urlProtocolDidFinishLoading(URLProtocol $protocol): void
     {
         $task = $protocol->task;
+        if ($task->state === URLSessionTaskState::completed) {
+            return;
+        }
         $session = $task->session;
         $response = $task->response;
         if ($response instanceof HTTPURLResponse && $response->statusCode === HTTPStatusCode::unauthorized && ($protectionSpace = URLProtectionSpace::create($response))) {
@@ -294,6 +307,7 @@ final class ProtocolClient implements URLProtocolClient
                 if ($task->state === URLSessionTaskState::completed) {
                     return;
                 }
+                $task->state = URLSessionTaskState::completed;
                 $delegate = $behaviour->taskDelegate;
                 if ($delegate instanceof URLSessionTaskDelegate) {
                     if ($delegate instanceof URLSessionDownloadDelegate && $task instanceof URLSessionDownloadTask) {
@@ -306,7 +320,6 @@ final class ProtocolClient implements URLProtocolClient
                     }
                     $delegate->urlSessionTaskDidComplete($session, $task);
                 }
-                $task->state = URLSessionTaskState::completed;
                 $session->taskRegistry->remove($task);
                 break;
             case TaskBehaviourRawValue::dataCompletionHandler:
@@ -323,6 +336,7 @@ final class ProtocolClient implements URLProtocolClient
                 if ($task->state === URLSessionTaskState::completed) {
                     return;
                 }
+                $task->state = URLSessionTaskState::completed;
                 /** @var DownloadCompletionHandler $downloadCompletionHandler */
                 $downloadCompletionHandler = $behaviour->downloadCompletionHandler;
                 /** @var URL|null $location */

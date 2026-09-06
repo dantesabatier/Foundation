@@ -11,6 +11,7 @@ use Sabatier\Foundation\Dictionary;
 use Sabatier\Foundation\Error;
 use Sabatier\Foundation\OperationQueue;
 use Sabatier\Foundation\URL;
+use Throwable;
 use function Sabatier\Foundation\fatal_error;
 use function Sabatier\Foundation\unsupported;
 
@@ -31,6 +32,7 @@ final class URLSession implements URLSessionProtocol
     }
     private(set) ?string $identifier = null;
     private bool $invalidated = false;
+    private bool $didNotifyInvalidation = false;
     private int $nextTaskIdentifier = 1;
 
     /**
@@ -314,18 +316,17 @@ final class URLSession implements URLSessionProtocol
         });
     }
 
+    /**
+     * Prevents new tasks and invalidates the session after all outstanding tasks finish.
+     * @throws Throwable
+     */
     public function finishTasksAndInvalidate(): void
     {
+        if ($this === self::$shared || $this->invalidated) {
+            return;
+        }
         $this->invalidated = true;
-        $invalidateSessionCallback = function (): void {
-            $obj = $this;
-            if (!($sessionDelegate = $obj->delegate)) {
-                return;
-            }
-            $obj->delegateQueue->addOperationWithBlock(function () use ($obj, $sessionDelegate): void {
-                $sessionDelegate->urlSessionDidBecomeInvalidWithError($obj);
-            });
-        };
+        $invalidateSessionCallback = $this->notifyInvalidation(...);
         if (!$this->taskRegistry->isEmpty) {
             $this->taskRegistry->notify($invalidateSessionCallback);
         } else {
@@ -335,6 +336,7 @@ final class URLSession implements URLSessionProtocol
 
     /**
      * Cancels all outstanding tasks and then invalidates the session.
+     * @throws Throwable
      */
     public function invalidateAndCancel(): void
     {
@@ -342,7 +344,17 @@ final class URLSession implements URLSessionProtocol
             return;
         }
         $this->invalidated = true;
-        $this->taskRegistry->allTask->forEach(fn(URLSessionTask $task) => $task->cancel());
+        $this->taskRegistry->allTask->values->forEach(fn(URLSessionTask $task) => $task->cancel());
+        $this->notifyInvalidation();
+    }
+
+    /** @throws Throwable */
+    private function notifyInvalidation(): void
+    {
+        if ($this->didNotifyInvalidation) {
+            return;
+        }
+        $this->didNotifyInvalidation = true;
         if (!$sessionDelegate = $this->delegate) {
             return;
         }

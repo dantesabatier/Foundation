@@ -189,7 +189,7 @@ class HTTPURLProtocol extends NativeProtocol
         }
         $easyHandle->setFollowLocation(false);
         $easyHandle->setRequestMethod($request->httpMethod);
-        $easyHandle->setTimeout((int)max($request->timeoutInterval, $this->task->session->configuration->timeoutIntervalForRequest));
+        $easyHandle->setTimeout((int)min($request->timeoutInterval, $this->task->session->configuration->timeoutIntervalForRequest));
         $easyHandle->setAutomaticBodyDecompression(true);
         $easyHandle->setNoBody($request->httpMethod === HTTPRequestMethod::head);
         /** @var Dictionary<string> $customHeaders */
@@ -241,6 +241,7 @@ class HTTPURLProtocol extends NativeProtocol
         }
         $task = $this->task;
         $this->redirectCount += 1;
+        $task->session->remove($this->easyHandle);
         if ($this->redirectCount > 16) {
             $this->internalState = InternalState::transferFailed();
             $error = new Error(URLErrorDomain, URLErrorHTTPTooManyRedirects);
@@ -311,7 +312,7 @@ class HTTPURLProtocol extends NativeProtocol
             default:
                 return null;
         }
-        $request->url = new URL($location);
+        $request->url = new URL($location, $request->url);
         return $request;
     }
 

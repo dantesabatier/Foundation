@@ -12,10 +12,14 @@ use Sabatier\Foundation\Networking\HTTPURLResponse;
 use Sabatier\Foundation\Networking\URLProtocol;
 use Sabatier\Foundation\Networking\URLSession;
 use Sabatier\Foundation\Networking\URLSessionConfiguration;
+use Sabatier\Foundation\Networking\URLSessionDataDelegate;
+use Sabatier\Foundation\Networking\URLSessionDelegate;
+use Sabatier\Foundation\Networking\URLSessionResponseDisposition;
 use Sabatier\Foundation\Networking\URLSessionTask;
 use Sabatier\Foundation\Networking\URLSessionTaskState;
 use Sabatier\Foundation\Tests\Fixtures\StubURLProtocol;
 use Sabatier\Foundation\URL;
+use Throwable;
 
 require_once __DIR__ . "/Fixtures/StubURLProtocol.php";
 
@@ -139,5 +143,127 @@ final class URLSessionProtocolTest extends TestCase
     public static function cancellationStates(): array
     {
         return [[false, "https://stub.example.com/pending"], [true, "https://stub.example.com/pending"], [false, "https://unsupported.example.com/pending"]];
+    }
+
+    #[DataProvider("delegateCancellation")]
+    public function testDelegateCallbackOrder(?string $cancelAt): void
+    {
+        $events = new ArrayClass();
+        $delegate = $this->createMock(URLSessionDataDelegate::class);
+        $delegate->expects($this->once())->method("urlSessionDataTaskDidReceiveResponse")->willReturnCallback(function ($session, $task, $response, $completion) use ($events, $cancelAt): void {
+            $events->append("response");
+            $completion($cancelAt === "response" ? URLSessionResponseDisposition::cancel : URLSessionResponseDisposition::allow);
+        });
+        $delegate->expects($this->exactly(match ($cancelAt) { "response" => 0, "data" => 1, default => 2 }))->method("urlSessionDataTaskReceiveData")->willReturnCallback(function ($session, $task, $data) use ($events, $cancelAt): void {
+            $events->append($data);
+            if ($cancelAt === "data") {
+                $task->cancel();
+            }
+        });
+        $delegate->expects($this->once())->method("urlSessionTaskDidComplete")->willReturnCallback(function ($session, $task, $error) use ($events, $cancelAt): void {
+            $events->append("complete");
+            $this->assertSame(URLSessionTaskState::completed, $task->state);
+            $this->assertSame($cancelAt !== null, $error instanceof Error);
+        });
+        $session = new URLSession($this->session->configuration, $delegate);
+        $task = $session->dataTaskWithURL(new URL("https://stub.example.com/data"));
+        $task->resume();
+        $this->protocol($task)->respond(new ArrayClass(["first", "second"]));
+        $this->assertSame(match ($cancelAt) {
+            "response" => "response,complete",
+            "data" => "response,first,complete",
+            default => "response,first,second,complete",
+        }, $events->join(","));
+        $this->assertTrue($session->taskRegistry->isEmpty);
+    }
+
+    public static function delegateCancellation(): array
+    {
+        return [[null], ["response"], ["data"]];
+    }
+
+    /** @throws Throwable */
+    public function testFinishTasksWaitsForCompletionAndNotifiesOnce(): void
+    {
+        $events = new ArrayClass();
+        $delegate = $this->createMock(URLSessionDelegate::class);
+        $delegate->expects($this->once())->method("urlSessionDidBecomeInvalidWithError")->willReturnCallback(function () use ($events): void {
+            $events->append("invalid");
+        });
+        $session = new URLSession($this->session->configuration, $delegate);
+        $task = $session->dataTaskWithURL(new URL("https://stub.example.com/data"), function () use ($events): void {
+            $events->append("complete");
+        });
+        $task->resume();
+        $session->finishTasksAndInvalidate();
+        $session->delegateQueue->waitUntilAllOperationsAreFinished();
+        $this->assertTrue($events->isEmpty);
+        $this->protocol($task)->respond(new ArrayClass(["data"]));
+        $session->delegateQueue->waitUntilAllOperationsAreFinished();
+        $session->finishTasksAndInvalidate();
+        $session->delegateQueue->waitUntilAllOperationsAreFinished();
+        $this->assertSame("complete,invalid", $events->join(","));
+    }
+
+    /** @throws Throwable */
+    public function testInvalidationCancelsEveryOutstandingTask(): void
+    {
+        $delegate = $this->createMock(URLSessionDelegate::class);
+        $delegate->expects($this->once())->method("urlSessionDidBecomeInvalidWithError");
+        $session = new URLSession($this->session->configuration, $delegate);
+        $calls = 0;
+        $tasks = new ArrayClass();
+        for ($i = 0; $i < 3; $i++) {
+            $tasks->append($session->dataTaskWithURL(new URL("https://stub.example.com/$i"), function ($data, $response, $error) use (&$calls): void {
+                $this->assertInstanceOf(Error::class, $error);
+                $calls += 1;
+            }));
+        }
+        $tasks[0]->resume();
+        $session->invalidateAndCancel();
+        $session->invalidateAndCancel();
+        $session->delegateQueue->waitUntilAllOperationsAreFinished();
+        $this->assertSame(3, $calls);
+        $this->assertTrue($session->taskRegistry->isEmpty);
+        $tasks->forEach(fn(URLSessionTask $task) => $this->assertSame(URLSessionTaskState::completed, $task->state));
+    }
+
+    #[DataProvider("downloadOutcomes")]
+    public function testDownloadCompletionRemovesTheTask(bool $fail): void
+    {
+        $calls = 0;
+        $task = $this->session->downloadTaskWithURL(new URL("https://stub.example.com/download"), function ($location, $response, $error) use (&$calls, $fail): void {
+            $calls += 1;
+            $this->assertSame($fail, $error instanceof Error);
+        });
+        $task->resume();
+        $protocol = $this->protocol($task);
+        if ($fail) {
+            $protocol->fail(new Error("StubError", 1));
+        } else {
+            $protocol->respond(new ArrayClass());
+        }
+        $this->assertSame(1, $calls);
+        $this->assertSame(URLSessionTaskState::completed, $task->state);
+        $this->assertTrue($this->session->taskRegistry->isEmpty);
+    }
+
+    public static function downloadOutcomes(): array
+    {
+        return [[false], [true]];
+    }
+
+    /** @throws Throwable */
+    public function testCancellationAfterGracefulInvalidationNotifiesOnce(): void
+    {
+        $delegate = $this->createMock(URLSessionDelegate::class);
+        $delegate->expects($this->once())->method("urlSessionDidBecomeInvalidWithError");
+        $session = new URLSession($this->session->configuration, $delegate);
+        $task = $session->dataTaskWithURL(new URL("https://stub.example.com/pending"));
+        $session->finishTasksAndInvalidate();
+        $session->invalidateAndCancel();
+        $session->delegateQueue->waitUntilAllOperationsAreFinished();
+        $this->assertSame(URLSessionTaskState::completed, $task->state);
+        $this->assertTrue($session->taskRegistry->isEmpty);
     }
 }

@@ -11,7 +11,9 @@ use Sabatier\Foundation\Networking\HTTPRequestMethod;
 use Sabatier\Foundation\Networking\HTTPURLResponse;
 use Sabatier\Foundation\Networking\URLRequest;
 use Sabatier\Foundation\Networking\URLSession;
+use Sabatier\Foundation\Networking\URLSessionConfiguration;
 use Sabatier\Foundation\URL;
+use const Sabatier\Foundation\URLErrorTimedOut;
 
 /**
  * End-to-end tests for the URLSession networking stack, driven against PHP's
@@ -43,6 +45,18 @@ final class URLSessionTest extends TestCase
 <?php
 $path = parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH);
 switch ($path) {
+    case "/redirect":
+        header("Location: /hello?redirected=" . ($_GET["r"] ?? ""), true, 302);
+        break;
+    case "/slow":
+        sleep(2);
+        echo "late response";
+        break;
+    case "/truncated":
+        header("Content-Length: 100");
+        header("Connection: close");
+        echo "short";
+        break;
     case "/hello":
         header("Content-Type: text/plain");
         echo "hello world";
@@ -120,7 +134,9 @@ ROUTER);
 
     protected function setUp(): void
     {
-        $this->session = URLSession::shared();
+        $configuration = new URLSessionConfiguration();
+        $configuration->urlCache = null;
+        $this->session = new URLSession($configuration);
     }
 
     /**
@@ -244,5 +260,38 @@ ROUTER);
         [$data, , $error] = $this->awaitDataTask($unreachable);
         $this->assertNotNull($error, "a connection refusal surfaces as an Error");
         $this->assertTrue($data === null || $data === "", "no body on transport failure");
+    }
+
+    public function testRelativeRedirectReachesTheDestination(): void
+    {
+        [$data, $response, $error] = $this->awaitDataTask(new URLRequest(new URL("http://" . self::$host . "/redirect?r=" . self::$unique)));
+        $this->assertNull($error);
+        $this->assertSame("hello world", $data);
+        $this->assertInstanceOf(HTTPURLResponse::class, $response);
+        $this->assertSame(200, $response->statusCode);
+        $this->assertSame("/hello", $response->url->path);
+    }
+
+    public function testTruncatedResponseReportsATransportError(): void
+    {
+        [$data, , $error] = $this->awaitDataTask(new URLRequest(new URL("http://" . self::$host . "/truncated?r=" . self::$unique)));
+        $this->assertNotNull($error);
+        $this->assertNull($data);
+        [$data, , $error] = $this->awaitDataTask(new URLRequest(new URL("http://" . self::$host . "/hello?after=truncated")));
+        $this->assertNull($error);
+        $this->assertSame("hello world", $data);
+    }
+
+    public function testRequestTimeoutIsRespected(): void
+    {
+        $request = new URLRequest(new URL("http://" . self::$host . "/slow?r=" . self::$unique));
+        $request->timeoutInterval = 1;
+        [$data, , $error] = $this->awaitDataTask($request);
+        $this->assertNotNull($error);
+        $this->assertSame(URLErrorTimedOut, $error->code);
+        $this->assertNull($data);
+        [$data, , $error] = $this->awaitDataTask(new URLRequest(new URL("http://" . self::$host . "/hello?after=timeout")));
+        $this->assertNull($error);
+        $this->assertSame("hello world", $data);
     }
 }
