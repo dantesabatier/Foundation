@@ -1,18 +1,23 @@
 <?php
+/** @noinspection HttpUrlsUsage */
 
 declare(strict_types=1);
 
 namespace Sabatier\Foundation\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Sabatier\Foundation\Error;
 use Sabatier\Foundation\Networking\HTTPCookie;
 use Sabatier\Foundation\Networking\HTTPCookieStorage;
 use Sabatier\Foundation\Networking\HTTPRequestMethod;
+use Sabatier\Foundation\Networking\HTTPStatusCode;
 use Sabatier\Foundation\Networking\HTTPURLResponse;
 use Sabatier\Foundation\Networking\URLRequest;
+use Sabatier\Foundation\Networking\URLResponse;
 use Sabatier\Foundation\Networking\URLSession;
 use Sabatier\Foundation\Networking\URLSessionConfiguration;
 use Sabatier\Foundation\URL;
+use Throwable;
 use const Sabatier\Foundation\URLErrorTimedOut;
 
 /**
@@ -100,11 +105,11 @@ ROUTER);
         );
         if (!is_resource($server)) {
             @unlink(self::$router);
-            static::markTestSkipped("unable to start the test server");
+            self::markTestSkipped("unable to start the test server");
         }
         self::$server = $server;
         $ready = false;
-        for ($i = 0; $i < 50 && !$ready; $i++) {
+        for ($i = 0; $i < 50; $i++) {
             $probe = @fsockopen("127.0.0.1", self::$port, $errorCode, $errorMessage, 0.2);
             if ($probe !== false) {
                 fclose($probe);
@@ -118,7 +123,7 @@ ROUTER);
             proc_close($server);
             self::$server = null;
             @unlink(self::$router);
-            static::markTestSkipped("the test server never became reachable on " . self::$host);
+            self::markTestSkipped("the test server never became reachable on " . self::$host);
         }
     }
 
@@ -140,9 +145,8 @@ ROUTER);
     }
 
     /**
-     * Runs a data task to completion and returns [data, response, error].
-     *
-     * @return array{string|null, \Sabatier\Foundation\Networking\URLResponse|null, \Sabatier\Foundation\Error|null}
+     * @return array{string|null, URLResponse|null, Error|null}
+     * @throws Throwable
      */
     private function awaitDataTask(URLRequest $request): array
     {
@@ -157,6 +161,7 @@ ROUTER);
         return $result ?? [null, null, null];
     }
 
+    /** @throws Throwable */
     public function testDataTask(): void
     {
         $host = self::$host;
@@ -167,26 +172,29 @@ ROUTER);
         $this->assertInstanceOf(HTTPURLResponse::class, $response, "the response is an HTTPURLResponse");
         $this->assertSame(200, $response->statusCode, "status code 200");
 
-        [$data, $response, $error] = $this->awaitDataTask(new URLRequest(new URL("http://$host/json?r=$unique")));
+        [$data, , $error] = $this->awaitDataTask(new URLRequest(new URL("http://$host/json?r=$unique")));
         $this->assertTrue($error === null && $data !== null, "json endpoint responds");
-        $decoded = $data !== null ? json_decode($data, true) : null;
+        $decoded = json_decode($data, true);
         $this->assertTrue(is_array($decoded) && $decoded["ok"] === true && $decoded["value"] === 42, "json body decodes");
     }
 
+    /** @throws Throwable */
     public function testResponseHeaders(): void
     {
         [, $response, $error] = $this->awaitDataTask(new URLRequest(new URL("http://" . self::$host . "/header?r=" . self::$unique)));
         $this->assertTrue($error === null && $response instanceof HTTPURLResponse, "header endpoint responds");
-        $this->assertTrue($response instanceof HTTPURLResponse && (string)$response->allHeaderFields["X-Test-Header"] === "sabatier", "custom response header is captured");
+        $this->assertSame("sabatier", (string)$response->allHeaderFields["X-Test-Header"], "custom response header is captured");
     }
 
+    /** @throws Throwable */
     public function testStatusCodes(): void
     {
         [$data, $response] = $this->awaitDataTask(new URLRequest(new URL("http://" . self::$host . "/missing?r=" . self::$unique)));
-        $this->assertTrue($response instanceof HTTPURLResponse && $response->statusCode === 404, "404 is reported through the response, not as a transport error");
+        $this->assertTrue($response instanceof HTTPURLResponse && $response->statusCode === HTTPStatusCode::notFound, "404 is reported through the response, not as a transport error");
         $this->assertSame("not found", $data, "the 404 body is still delivered");
     }
 
+    /** @throws Throwable */
     public function testRequestBody(): void
     {
         $request = new URLRequest(new URL("http://" . self::$host . "/echo?r=" . self::$unique));
@@ -197,6 +205,7 @@ ROUTER);
         $this->assertSame("SABATIER FOUNDATION", $data, "the request body reaches the server and the echo comes back");
     }
 
+    /** @throws Throwable */
     public function testCookies(): void
     {
         [$data, , $error] = $this->awaitDataTask(new URLRequest(new URL("http://" . self::$host . "/set-cookie?r=" . self::$unique)));
@@ -206,12 +215,12 @@ ROUTER);
         $this->assertInstanceOf(HTTPCookie::class, $stored, "the Set-Cookie header lands in the shared cookie storage");
         $this->assertSame("abc123", $stored->value, "the stored cookie keeps its value");
 
-        // Round-trip: the configuration attaches stored cookies to subsequent requests
-        // (httpShouldSetCookies), so the server must see the cookie back.
+        // Round-trip: the configuration attaches stored cookies to subsequent requests (httpShouldSetCookies), so the server must see the cookie back.
         [$data, , $error] = $this->awaitDataTask(new URLRequest(new URL("http://" . self::$host . "/show-cookies?r=" . self::$unique)));
         $this->assertTrue($error === null && $data === "abc123", "stored cookies are sent back on subsequent requests");
     }
 
+    /** @throws Throwable */
     public function testDownloadTask(): void
     {
         $downloadResult = null;
@@ -226,10 +235,11 @@ ROUTER);
         [$contents, $response, $error, $temporaryPath] = $downloadResult ?? [null, null, null, null];
         $this->assertNull($error, "download task completes without error");
         $this->assertSame("hello world", $contents, "the downloaded file holds the body");
-        $this->assertTrue($response instanceof HTTPURLResponse && $response->statusCode === 200, "download task reports the response");
+        $this->assertTrue($response instanceof HTTPURLResponse && $response->statusCode === HTTPStatusCode::ok, "download task reports the response");
         $this->assertTrue($temporaryPath !== null && !file_exists($temporaryPath), "the temporary file is removed after the completion handler returns");
     }
 
+    /** @throws Throwable */
     public function testUploadTask(): void
     {
         $uploadSource = sys_get_temp_dir() . DIRECTORY_SEPARATOR . "sabatier-upload-" . getmypid() . ".txt";
@@ -253,6 +263,7 @@ ROUTER);
         }
     }
 
+    /** @throws Throwable */
     public function testTransportErrors(): void
     {
         $unreachable = new URLRequest(new URL("http://127.0.0.1:1/unreachable"));
@@ -262,6 +273,7 @@ ROUTER);
         $this->assertTrue($data === null || $data === "", "no body on transport failure");
     }
 
+    /** @throws Throwable */
     public function testRelativeRedirectReachesTheDestination(): void
     {
         [$data, $response, $error] = $this->awaitDataTask(new URLRequest(new URL("http://" . self::$host . "/redirect?r=" . self::$unique)));
@@ -272,6 +284,7 @@ ROUTER);
         $this->assertSame("/hello", $response->url->path);
     }
 
+    /** @throws Throwable */
     public function testTruncatedResponseReportsATransportError(): void
     {
         [$data, , $error] = $this->awaitDataTask(new URLRequest(new URL("http://" . self::$host . "/truncated?r=" . self::$unique)));
@@ -282,6 +295,7 @@ ROUTER);
         $this->assertSame("hello world", $data);
     }
 
+    /** @throws Throwable */
     public function testRequestTimeoutIsRespected(): void
     {
         $request = new URLRequest(new URL("http://" . self::$host . "/slow?r=" . self::$unique));

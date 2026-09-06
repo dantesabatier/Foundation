@@ -41,7 +41,14 @@ final class EasyHandle
     private bool $isClosing = false;
     /** @var resource|null */
     private mixed $inputStream = null;
+    public float $timeoutIntervalSpent {
+        get => $this->get(CURLINFO_TOTAL_TIME);
+    }
+    public URLSessionWebSocketOperation $webSocketFlags {
+        get => $this->operation;
+    }
 
+    /** @param EasyHandleDelegate $delegate */
     public function __construct(public readonly EasyHandleDelegate $delegate)
     {
         $this->pauseState = new EasyHandlePauseState();
@@ -237,11 +244,6 @@ final class EasyHandle
         }
     }
 
-    public function getTimeoutIntervalSpent(): float
-    {
-        return $this->get(CURLINFO_TOTAL_TIME);
-    }
-
     public function pauseReceive(): void
     {
         $pauseState = $this->pauseState;
@@ -401,11 +403,6 @@ final class EasyHandle
             fclose($inputStream);
             $this->inputStream = null;
         }
-    }
-
-    public function getWebSocketFlags(): URLSessionWebSocketOperation
-    {
-        return $this->operation;
     }
 
     /**

@@ -56,6 +56,11 @@
       "src/Networking/ProxyTypes.php"
     ]
   },
+  "autoload-dev": {
+    "psr-4": {
+      "Sabatier\\Foundation\\Tests\\": "tests/"
+    }
+  },
   "extra": {
     "branch-alias": {
       "dev-master": "1.0-dev"

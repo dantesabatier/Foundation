@@ -54,6 +54,7 @@ final class URLSessionProtocolTest extends TestCase
     /**
      * @param array<string> $chunks
      * @param string $expected
+     * @throws Throwable
      */
     #[DataProvider("responseChunks")]
     public function testCompletionReceivesTheWholeBody(array $chunks, string $expected): void
@@ -83,6 +84,7 @@ final class URLSessionProtocolTest extends TestCase
         return [[["hello"], "hello"], [["hel", "lo"], "hello"], [["0", ""], "0"], [[], ""]];
     }
 
+    /** @throws Throwable */
     public function testFailureCompletesAndRemovesTheTask(): void
     {
         $failure = new Error("StubError", 1);
@@ -120,6 +122,7 @@ final class URLSessionProtocolTest extends TestCase
         $this->assertSame(URLSessionTaskState::completed, $task->state);
     }
 
+    /** @throws Throwable */
     #[DataProvider("cancellationStates")]
     public function testCancellationCompletesOnce(bool $resume, string $url): void
     {

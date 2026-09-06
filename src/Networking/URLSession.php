@@ -30,6 +30,7 @@ final class URLSession implements URLSessionProtocol
     private(set) TaskRegistry $taskRegistry {
         get => $this->taskRegistry ??= new TaskRegistry();
     }
+    /** @var string|null The identifier of the session. */
     private(set) ?string $identifier = null;
     private bool $invalidated = false;
     private bool $didNotifyInvalidation = false;
@@ -247,6 +248,7 @@ final class URLSession implements URLSessionProtocol
     /**
      * Empties all cookies, caches and credential stores, removes disk files, flushes in-progress downloads to disk and ensures that future requests occur on a new socket.
      * @param Closure(): void $completionHandler The completion handler to call when the reset operation is complete.
+     * @throws Throwable
      */
     public function reset(Closure $completionHandler): void
     {
@@ -257,6 +259,11 @@ final class URLSession implements URLSessionProtocol
         $this->flush($completionHandler);
     }
 
+    /**
+     * Calls the completion handler on the delegate queue.
+     * @param Closure(): void $completionHandler The completion handler.
+     * @throws Throwable
+     */
     public function flush(Closure $completionHandler): void
     {
         $this->delegateQueue->addOperationWithBlock(function () use ($completionHandler): void {
@@ -267,31 +274,25 @@ final class URLSession implements URLSessionProtocol
     /**
      * Asynchronously calls a completion callback with all data, upload, and download tasks in a session.
      * @param Closure(ArrayClass<URLSessionDataTask>, ArrayClass<URLSessionUploadTask>, ArrayClass<URLSessionDownloadTask>): void $completionHandler The completion handler to call with the list of tasks.
+     * @throws Throwable
      */
     public function getTasksWithCompletionHandler(Closure $completionHandler): void
     {
         $this->getAllTasks(function (ArrayClass $tasks) use ($completionHandler): void {
             /** @var ArrayClass<URLSessionDataTask> $dataTasks */
-            $dataTasks = new ArrayClass();
+            $dataTasks = $tasks->filter(fn(URLSessionTask $task): bool => $task instanceof URLSessionDataTask && !$task instanceof URLSessionUploadTask);
             /** @var ArrayClass<URLSessionUploadTask> $uploadTasks */
-            $uploadTasks = new ArrayClass();
+            $uploadTasks = $tasks->filter(fn(URLSessionTask $task): bool => $task instanceof URLSessionUploadTask);
             /** @var ArrayClass<URLSessionDownloadTask> $downloadTasks */
-            $downloadTasks = new ArrayClass();
-            foreach ($tasks as $task) {
-                if ($task instanceof URLSessionUploadTask) {
-                    $uploadTasks->append($task);
-                } elseif ($task instanceof URLSessionDownloadTask) {
-                    $downloadTasks->append($task);
-                } elseif ($task instanceof URLSessionDataTask) {
-                    $dataTasks->append($task);
-                }
-            }
+            $downloadTasks = $tasks->filter(fn(URLSessionTask $task): bool => $task instanceof URLSessionDownloadTask);
             $completionHandler($dataTasks, $uploadTasks, $downloadTasks);
         });
     }
 
     /**
+     * Returns the active data, upload, and download tasks.
      * @return array{dataTasks: ArrayClass<URLSessionDataTask>, uploadTasks: ArrayClass<URLSessionUploadTask>, downloadTasks: ArrayClass<URLSessionDownloadTask>}
+     * @throws Throwable
      */
     public function tasks(): array
     {
@@ -308,6 +309,7 @@ final class URLSession implements URLSessionProtocol
     /**
      * Asynchronously calls a completion callback with all tasks in a session
      * @param Closure(ArrayClass<URLSessionTask>): void $completionHandler The completion handler to call with the list of tasks.
+     * @throws Throwable
      */
     public function getAllTasks(Closure $completionHandler): void
     {
