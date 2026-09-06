@@ -14,6 +14,7 @@ final class CacheControlDirectives
     public bool $noCache = false;
     public bool $noStore = false;
 
+    /** @param string $headerValue */
     public function __construct(public readonly string $headerValue)
     {
         $isWithArgument = function (string $part, string $named): ?int {

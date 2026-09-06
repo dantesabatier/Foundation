@@ -108,31 +108,28 @@ final class HTTPCookieStorage extends ObjectClass
         return FileManager::default()->documentRootDirectory->appendingPathComponent($bundleName)->appendingPathComponent($fileName);
     }
 
+    /** @param Dictionary<mixed> $properties */
     private function createCookie(Dictionary $properties): HTTPCookie
     {
-        /** @var Dictionary<mixed> $cookieProperties */
-        $cookieProperties = new Dictionary();
-        foreach ($properties as $key => $value) {
+        $cookieProperties = $properties->mapValues(function (mixed $value, string $key): mixed {
             if ($key === HTTPCookiePropertyKey::expires) {
-                if (is_numeric($value)) {
-                    $cookieProperties[$key] = Date::dateWithTimeIntervalSince1970((float)$value);
-                }
-            } else {
-                $cookieProperties[$key] = $value;
+                return is_numeric($value) ? Date::dateWithTimeIntervalSince1970((float)$value) : null;
             }
-        }
+            return $value;
+        });
         return new HTTPCookie($cookieProperties);
     }
 
     private function loadPersistedCookies(): void
     {
-        if (!($cookieFileURL = $this->cookieFileURL)) {
+        if (!($cookieFileURL = $this->cookieFileURL) instanceof URL) {
             return;
         }
         /** @var Dictionary<Dictionary<mixed>> $cookies */
         $cookies = PropertyListSerialization::propertyListWithURL($cookieFileURL) ?? new Dictionary();
-        foreach ($cookies as $key => $value) {
-            $this->allCookies[$key] = $this->createCookie($value);
+        foreach ($cookies as $value) {
+            $cookie = $this->createCookie($value);
+            $this->allCookies[$this->cookieKey($cookie)] = $cookie;
         }
     }
 
@@ -168,7 +165,7 @@ final class HTTPCookieStorage extends ObjectClass
      */
     public function deleteCookie(HTTPCookie $cookie): void
     {
-        $this->allCookies->removeValueForKey("$cookie->domain$cookie->path$cookie->name");
+        $this->allCookies->removeValueForKey($this->cookieKey($cookie));
         $this->updatePersistentStore();
     }
 
@@ -184,8 +181,8 @@ final class HTTPCookieStorage extends ObjectClass
         if ($this->cookieAcceptPolicy === HTTPCookieAcceptPolicy::never) {
             return;
         }
-        $key = "$cookie->domain$cookie->path$cookie->name";
-        if ($this->allCookies[$key]) {
+        $key = $this->cookieKey($cookie);
+        if ($this->allCookies[$key] instanceof HTTPCookie) {
             $this->allCookies->updateValue($cookie, $key);
         } else {
             $this->allCookies[$key] = $cookie;
@@ -210,10 +207,10 @@ final class HTTPCookieStorage extends ObjectClass
         if ($this->cookieAcceptPolicy === HTTPCookieAcceptPolicy::never || !($host = $url?->host)) {
             return;
         }
-        if ($this->cookieAcceptPolicy === HTTPCookieAcceptPolicy::onlyFromMainDocumentDomain && (!($documentHost = $mainDocumentURL?->host) || !string_has_suffix($documentHost, $host, CompareOptions::caseInsensitive))) {
+        if ($this->cookieAcceptPolicy === HTTPCookieAcceptPolicy::onlyFromMainDocumentDomain && (!($documentHost = $mainDocumentURL?->host) || (!string_is_equal($documentHost, $host, CompareOptions::caseInsensitive) && !string_has_suffix($documentHost, ".$host", CompareOptions::caseInsensitive)))) {
             return;
         }
-        $cookies = $cookies->filter(fn(HTTPCookie $cookie): bool => str_starts_with($cookie->domain, ".") ? string_has_suffix($host, $cookie->domain, CompareOptions::caseInsensitive) : string_is_equal($cookie->domain, $host, CompareOptions::caseInsensitive));
+        $cookies = $cookies->filter(fn(HTTPCookie $cookie): bool => $this->matchesDomain($cookie, $host));
         $cookies->forEach(fn(HTTPCookie $cookie) => $this->setCookie($cookie));
     }
 
@@ -236,7 +233,7 @@ final class HTTPCookieStorage extends ObjectClass
      */
     public function getCookiesFor(URLSessionTask $task, Closure $completionHandler): void
     {
-        if (!($request = $task->originalRequest)) {
+        if (!($request = $task->originalRequest) instanceof URLRequest) {
             $completionHandler(null);
             return;
         }
@@ -257,7 +254,27 @@ final class HTTPCookieStorage extends ObjectClass
         if (!($host = $url->host)) {
             return null;
         }
-        return $this->allCookies->filter(fn(HTTPCookie $cookie): bool => str_starts_with($cookie->domain, ".") ? string_has_suffix($host, $cookie->domain, CompareOptions::caseInsensitive) : string_is_equal($cookie->domain, $host, CompareOptions::caseInsensitive))->values;
+        $path = $url->path ?: "/";
+        return $this->allCookies->filter(function (HTTPCookie $cookie) use ($host, $path, $url): bool {
+            if (!$this->matchesDomain($cookie, $host) || (($expiresDate = $cookie->expiresDate) && $expiresDate->timeIntervalSinceNow <= 0)) {
+                return false;
+            }
+            if ($cookie->isSecure && !in_array(strtolower($url->scheme), ["https", "wss"], true)) {
+                return false;
+            }
+            return $path === $cookie->path || str_starts_with($path, str_ends_with($cookie->path, "/") ? $cookie->path : $cookie->path . "/");
+        })->values;
+    }
+
+    private function cookieKey(HTTPCookie $cookie): string
+    {
+        return serialize([strtolower($cookie->domain), $cookie->path, $cookie->name]);
+    }
+
+    private function matchesDomain(HTTPCookie $cookie, string $host): bool
+    {
+        $domain = ltrim($cookie->domain, ".");
+        return string_is_equal($domain, $host, CompareOptions::caseInsensitive) || (str_starts_with($cookie->domain, ".") && filter_var($host, FILTER_VALIDATE_IP) === false && string_has_suffix($host, ".$domain", CompareOptions::caseInsensitive));
     }
 
     /**

@@ -63,7 +63,10 @@ final class HTTPCookie extends ObjectClass
      */
     public function __construct(Dictionary $properties)
     {
-        if (!($name = $properties[HTTPCookiePropertyKey::name]) || !($value = $properties[HTTPCookiePropertyKey::value]) || !($path = $properties[HTTPCookiePropertyKey::path])) {
+        $name = $properties[HTTPCookiePropertyKey::name];
+        $value = $properties[HTTPCookiePropertyKey::value];
+        $path = $properties[HTTPCookiePropertyKey::path];
+        if (!is_string($name) || $name === "" || !is_string($value) || empty($path)) {
             fatal_error();
         }
         /** @var string|null $domain */
@@ -80,7 +83,7 @@ final class HTTPCookie extends ObjectClass
         $this->path = $path;
         $this->domain = $domain ?? fatal_error();
         $this->isSecure = !empty($properties[HTTPCookiePropertyKey::secure]);
-        $this->version = (int)($properties[HTTPCookiePropertyKey::version] === 1);
+        $this->version = (int)((int)$properties[HTTPCookiePropertyKey::version] === 1);
         /** @var string|null $port */
         $port = $properties[HTTPCookiePropertyKey::port];
         if ($port !== null) {
@@ -94,26 +97,22 @@ final class HTTPCookie extends ObjectClass
             $this->portList = null;
         }
         $expiresDate = null;
-        if ($maximumAge = $properties[HTTPCookiePropertyKey::maximumAge]) {
-            $secondsFromNow = (float)$maximumAge;
-            if ($this->version === 1) {
-                $expiresDate = Date::dateWithTimeIntervalSinceNow($secondsFromNow);
-            }
+        $maximumAge = $properties[HTTPCookiePropertyKey::maximumAge];
+        if ((is_string($maximumAge) || is_int($maximumAge)) && preg_match("/^-?[0-9]+$/D", (string)$maximumAge) === 1) {
+            $expiresDate = Date::dateWithTimeIntervalSinceNow((float)$maximumAge);
         } else {
+            $maximumAge = null;
             /** @var Date|string|null $expires */
             $expires = $properties[HTTPCookiePropertyKey::expires];
             if ($expires instanceof Date) {
                 $expiresDate = $expires;
-            } elseif ($expires) {
-                $expiresDate = Date::dateWithTimeIntervalSince1970((float)strtotime($expires));
+            } elseif (is_string($expires) && ($timestamp = strtotime($expires)) !== false) {
+                $expiresDate = Date::dateWithTimeIntervalSince1970((float)$timestamp);
             }
         }
         $this->expiresDate = $expiresDate;
-        if ($discard = $properties[HTTPCookiePropertyKey::discard]) {
-            $this->isSessionOnly = $discard === "TRUE";
-        } else {
-            $this->isSessionOnly = $properties[HTTPCookiePropertyKey::maximumAge] === null && $this->expiresDate === null && $this->version >= 1;
-        }
+        $discard = $properties[HTTPCookiePropertyKey::discard];
+        $this->isSessionOnly = $discard === "TRUE" || $discard === true || $expiresDate === null;
         $this->comment = $properties[HTTPCookiePropertyKey::comment];
         /** @var URL|string|null $commentURL */
         $commentURL = $properties[HTTPCookiePropertyKey::commentURL];
@@ -169,40 +168,51 @@ final class HTTPCookie extends ObjectClass
      *
      * This method ignores irrelevant header fields in headerFields, allowing dictionaries to contain additional data.
      * If $headerFields doesn't specify a domain for a given cookie, the cookie is created with a default domain value of URL.
-     * If $headerFields doesn't specify a path for a given cookie, the cookie is created with a default path value of "/".
+     * If $headerFields doesn't specify a path for a given cookie, the cookie is created with the directory path of URL, or "/" when the URL has no directory.
      * @param Dictionary<string> $headerFields The header fields used to create the HTTPCookie objects.
      * @param URL $url The URL associated with the created cookies.
      * @return ArrayClass<HTTPCookie> The array of created cookies.
      */
     public static function cookies(Dictionary $headerFields, URL $url): ArrayClass
     {
-        if (!($cookies = $headerFields["Set-Cookie"])) {
+        if (!($cookies = $headerFields->valueForCaseInsensitiveKey("Set-Cookie"))) {
             return new ArrayClass();
         }
         /** @var ArrayClass<HTTPCookie> $httpCookies */
         $httpCookies = new ArrayClass();
         $scanner = new Scanner($cookies);
         $scanner->charactersToBeSkipped = "\t\n\r";
-        if ($scanner->scanUpString(";", $pair) && $pair) {
+        if ($scanner->scanUpCharacters(";", $pair) && $pair) {
             $components = self::splitNameValue($pair);
             [$name, $value] = $components;
+            if ($name === "" || $value === null || !$url->host) {
+                return $httpCookies;
+            }
             /** @var Dictionary<mixed> $properties */
             $properties = new Dictionary();
             $properties[HTTPCookiePropertyKey::name] = $name;
             $properties[HTTPCookiePropertyKey::value] = $value;
             $properties[HTTPCookiePropertyKey::originURL] = $url;
-            $scanner->scanLocation += 1;
-            while ($scanner->scanUpCharacters(";", $pair) && $pair) {
+            while ($scanner->scanString(";")) {
+                if (!$scanner->scanUpCharacters(";", $pair) || !$pair) {
+                    continue;
+                }
                 $components = self::splitNameValue($pair);
                 [$name, $value] = $components;
-                $name = ucwords($name);
+                $name = match (strtolower($name)) {
+                    "httponly" => HTTPCookiePropertyKey::httpOnly,
+                    "samesite" => HTTPCookiePropertyKey::sameSitePolicy,
+                    "commenturl" => HTTPCookiePropertyKey::commentURL,
+                    "max-age" => HTTPCookiePropertyKey::maximumAge,
+                    default => ucfirst(strtolower($name)),
+                };
                 switch ($name) {
                     case HTTPCookiePropertyKey::secure:
                     case HTTPCookiePropertyKey::discard:
                     case HTTPCookiePropertyKey::httpOnly:
-                    case HTTPCookiePropertyKey::sameSitePolicy:
                         $properties[$name] = "TRUE";
                         break;
+                    case HTTPCookiePropertyKey::sameSitePolicy:
                     case HTTPCookiePropertyKey::comment:
                     case HTTPCookiePropertyKey::commentURL:
                     case HTTPCookiePropertyKey::domain:
@@ -216,25 +226,19 @@ final class HTTPCookie extends ObjectClass
                     default:
                         break;
                 }
-                $scanner->scanLocation += 1;
             }
             $properties[HTTPCookiePropertyKey::version] ??= 1;
             /** @var string|null $domain */
             $domain = $properties[HTTPCookiePropertyKey::domain];
-            if ($domain) {
-                if (!str_starts_with($domain, ".") && filter_var($domain, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
-                    $properties[HTTPCookiePropertyKey::domain] = ".$domain";
-                }
+            if (!empty($domain)) {
+                $domain = strtolower(ltrim($domain, "."));
+                $properties[HTTPCookiePropertyKey::domain] = filter_var($domain, FILTER_VALIDATE_IP) ? $domain : ".$domain";
             } else {
-                $properties[HTTPCookiePropertyKey::domain] = $url->host;
-            }
-            /** @var string $domain */
-            $domain = $properties[HTTPCookiePropertyKey::domain];
-            if (!str_starts_with($domain, ".")) {
-                $properties[HTTPCookiePropertyKey::domain] = strtolower($domain);
+                $properties[HTTPCookiePropertyKey::domain] = strtolower($url->host);
             }
             if (!($path = $properties[HTTPCookiePropertyKey::path]) || !str_starts_with((string)$path, "/")) {
-                $properties[HTTPCookiePropertyKey::path] = "/";
+                $lastSlash = strrpos($url->path, "/");
+                $properties[HTTPCookiePropertyKey::path] = $lastSlash ? substr($url->path, 0, $lastSlash) : "/";
             }
             $httpCookies->append(new HTTPCookie($properties));
         }

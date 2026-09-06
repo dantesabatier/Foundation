@@ -11,6 +11,7 @@ use Sabatier\Foundation\URL;
 /** @internal */
 final readonly class ResponseHeaderLines
 {
+    /** @param ArrayClass<string> $lines */
     public function __construct(public ArrayClass $lines = new ArrayClass())
     {
     }

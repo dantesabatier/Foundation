@@ -16,6 +16,7 @@ final class PercentDecoder implements Iterator
 {
     private int $index = 0;
 
+    /** @param string $string */
     public function __construct(private readonly string $string)
     {
     }
