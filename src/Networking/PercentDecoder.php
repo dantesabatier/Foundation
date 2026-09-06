@@ -27,23 +27,21 @@ final class PercentDecoder implements Iterator
         if ($c !== "%") {
             return PercentDecoderElement::asciiCharacter($c);
         }
-        $this->next();
-        if (!$this->valid()) {
+        if ($this->index + 2 >= strlen($this->string)) {
             return PercentDecoderElement::invalid();
         }
-        $h = $this->string[$this->index];
-        $this->next();
-        if (!$this->valid()) {
+        $h = $this->string[$this->index + 1];
+        $l = $this->string[$this->index + 2];
+        if (!ctype_xdigit($h . $l)) {
             return PercentDecoderElement::invalid();
         }
-        $l = $this->string[$this->index];
         return PercentDecoderElement::decodedByte("$c$h$l");
     }
 
     #[Override]
     public function next(): void
     {
-        $this->index += 1;
+        $this->index += ($this->string[$this->index] ?? null) === "%" ? 3 : 1;
     }
 
     #[Override]

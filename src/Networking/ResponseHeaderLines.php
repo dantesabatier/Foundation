@@ -28,7 +28,7 @@ final readonly class ResponseHeaderLines
         [$head, $tail] = $components;
         [$version, $statusCode] = explode(" ", (string)$head);
         return new HTTPURLResponse($url, (int)$statusCode, $version, $tail->reduce(new Dictionary(), function (Dictionary $headerFields, string $header): Dictionary {
-            $components = explode(":", $header);
+            $components = explode(":", $header, 2);
             if (count($components) === 2) {
                 [$key, $value] = $components;
                 $headerFields[trim($key)] = trim($value);

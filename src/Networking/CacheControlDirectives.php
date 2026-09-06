@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Sabatier\Foundation\Networking;
 
-use Closure;
 use Sabatier\Foundation\ArrayClass;
 
 /** @internal */
@@ -17,21 +16,15 @@ final class CacheControlDirectives
 
     public function __construct(public readonly string $headerValue)
     {
-        $isWithArgument = function (string $part, string $named, Closure $converter): mixed {
+        $isWithArgument = function (string $part, string $named): ?int {
             if (str_starts_with($part, "$named=")) {
                 $split = explode("=", $part);
                 if (count($split) === 2) {
                     $argument = $split[1];
-                    if ($argument[0] !== "\"") {
-                        return $converter($argument);
+                    if (strlen($argument) >= 2 && str_starts_with($argument, "\"") && str_ends_with($argument, "\"")) {
+                        $argument = substr($argument, 1, -1);
                     }
-                    if ($argument[strlen($argument) - 1] !== "\"") {
-                        return $converter($argument);
-                    }
-                    if (strlen($argument) >= 2) {
-                        return substr($argument, 1, strlen($argument) - 2);
-                    }
-                    return null;
+                    return $argument !== "" && ctype_digit($argument) ? (int)$argument : null;
                 }
             }
             return null;
@@ -45,9 +38,9 @@ final class CacheControlDirectives
                 $this->noCache = true;
             } elseif ($part === "no-store") {
                 $this->noStore = true;
-            } elseif ($maxAge = $isWithArgument($part, "max-age", fn(string $e0): int => (int)$e0)) {
+            } elseif (($maxAge = $isWithArgument($part, "max-age")) !== null) {
                 $this->maxAge = $maxAge;
-            } elseif ($sharedMaxAge = $isWithArgument($part, "s-maxage", fn(string $e0): int => (int)$e0)) {
+            } elseif (($sharedMaxAge = $isWithArgument($part, "s-maxage")) !== null) {
                 $this->sharedMaxAge = $sharedMaxAge;
             }
         }
