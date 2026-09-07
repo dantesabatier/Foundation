@@ -34,7 +34,10 @@ final class URLComponents extends ObjectClass
         get {
             $scheme = $this->scheme;
             if ($scheme) {
-                $scheme .= "://";
+                $scheme .= match ($scheme) {
+                    "data" => ":",
+                    default => "://",
+                };
             }
             $user = $this->user;
             $password = $this->password;
@@ -50,7 +53,7 @@ final class URLComponents extends ObjectClass
                 $host .= ":";
             }
             $path = $this->path;
-            if ($path) {
+            if ($path && $this->scheme !== "data") {
                 $tu = "";
                 $tok = strtok($path, "\\/");
                 while ($tok !== false) {
@@ -117,6 +120,7 @@ final class URLComponents extends ObjectClass
         }
     }
 
+    /** @param string|null $string The URL string to parse, or null to create empty components. */
     public function __construct(?string $string = null)
     {
         if ($string && ($components = parse_url($string))) {
@@ -124,8 +128,7 @@ final class URLComponents extends ObjectClass
                 if ($key === "pass") {
                     $key = "password";
                 } elseif ($key === "scheme") {
-                    // The scheme is case-insensitive per RFC 3986 section 6.2.2.1; canonicalize it
-                    // so downstream comparisons ("file", "https", ...) hold.
+                    // The scheme is case-insensitive per RFC 3986 section 6.2.2.1; canonicalize it so downstream comparisons ("file", "https", ...) hold.
                     $value = strtolower((string)$value);
                 }
                 if ($value !== "") {
@@ -140,6 +143,7 @@ final class URLComponents extends ObjectClass
      *
      * If the URLComponents have an authority component (user, password, host or port) and a path component, then the path must either begin with "/" or be an empty string.
      * If the URLComponents does not have an authority component (user, password, host or port) and has a path component, the path component must not start with "//". If those requirements are not met, null is returned.
+     * @param URL|null $baseURL The base URL for resolving relative components, or null to create an absolute URL.
      */
     public function urlRelativeTo(?URL $baseURL): ?URL
     {

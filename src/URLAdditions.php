@@ -9,7 +9,7 @@ namespace Sabatier\Foundation;
  *
  * This is a lightweight pre-validation check to determine if a string
  * is worth parsing as a URL. It only validates that the string starts
- * with a recognized URL scheme followed by "://".
+ * with a recognized URL scheme and the syntax that scheme requires.
  *
  * This does NOT perform full URL validation - use parse_url() or your
  * URL object constructor after this check passes to validate the
@@ -33,6 +33,7 @@ namespace Sabatier\Foundation;
  *
  * <code>
  *  is_parseable_url("https://example.com"); // true
+ *  is_parseable_url("data:,hello"); // true
  *  is_parseable_url("sql://database"); // true
  *  is_parseable_url("php://input"); // true
  *  is_parseable_url("x-coredata://data"); // true
@@ -42,7 +43,7 @@ namespace Sabatier\Foundation;
  */
 function is_parseable_url(string $url): bool
 {
-    return preg_match("/^(https?|ftps?|wss?|sftp|ssh|file|data|sql|redis|mongodb|postgresql|mysql|ssl|tcp|amqps?|ldaps?|php|git|x-coredata):\\/\\//i", $url) === 1;
+    return string_has_prefix($url, "data:", CompareOptions::caseInsensitive) || preg_match("/^(https?|ftps?|wss?|sftp|ssh|file|sql|redis|mongodb|postgresql|mysql|ssl|tcp|amqps?|ldaps?|php|git|x-coredata):\\/\\//i", $url) === 1;
 }
 
 /**

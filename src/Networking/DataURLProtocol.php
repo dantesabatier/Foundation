@@ -53,6 +53,7 @@ final class DataURLProtocol extends URLProtocol
         $mimeType = null;
         $charSet = null;
         $base64 = false;
+        $usesDefaultMediaType = false;
         $iterator = new PercentDecoder(substring_from_index($dataBody, 5));
         $validate = function (string $mimeType): bool {
             if (str_starts_with($mimeType, "/")) {
@@ -76,8 +77,9 @@ final class DataURLProtocol extends URLProtocol
             }
             return $lastChar !== "/";
         };
-        $decodeHeader = function () use ($iterator, $validate, &$mimeType, &$charSet, &$base64): bool {
+        $decodeHeader = function () use ($iterator, $validate, &$mimeType, &$charSet, &$base64, &$usesDefaultMediaType): bool {
             $defaultMimeType = "text/plain";
+            $defaultCharSet = "US-ASCII";
             $part = "";
             $foundCharsetKey = false;
             foreach ($iterator as $element) {
@@ -91,12 +93,27 @@ final class DataURLProtocol extends URLProtocol
                                 } else {
                                     $base64 = $part === ";base64";
                                 }
-                                if ($mimeType === null || !$validate($mimeType)) {
+                                if ($mimeType === null) {
+                                    if ($validate($part)) {
+                                        $mimeType = $part;
+                                    } else {
+                                        $mimeType = $defaultMimeType;
+                                        $usesDefaultMediaType = true;
+                                    }
+                                } elseif (!$validate($mimeType)) {
                                     $mimeType = $defaultMimeType;
+                                    $usesDefaultMediaType = true;
                                 }
+                                if ($usesDefaultMediaType && $charSet === null) {
+                                    $charSet = $defaultCharSet;
+                                }
+                                $iterator->next();
                                 return true;
                             case ";":
-                                $mimeType ??= str_contains($part, "/") ? $part : $defaultMimeType;
+                                if ($mimeType === null) {
+                                    $usesDefaultMediaType = !str_contains($part, "/");
+                                    $mimeType = $usesDefaultMediaType ? $defaultMimeType : $part;
+                                }
                                 if ($foundCharsetKey) {
                                     $charSet = $part;
                                     $foundCharsetKey = false;
@@ -138,7 +155,8 @@ final class DataURLProtocol extends URLProtocol
                 }
                 $iterator->next();
             }
-            return base64_decode($base64encoded);
+            $data = base64_decode($base64encoded, true);
+            return $data === false ? null : $data;
         };
         $decodeStringBody = function () use ($iterator): ?string {
             $data = "";
@@ -162,8 +180,8 @@ final class DataURLProtocol extends URLProtocol
         if (!$decodeHeader()) {
             return null;
         }
-        /** @psalm-suppress RedundantCondition */
-        if (!($data = $base64 ? $decodeBase64Body() : $decodeStringBody())) {
+        /** @var bool $base64 */
+        if (($data = $base64 ? $decodeBase64Body() : $decodeStringBody()) === null) {
             return null;
         }
         return [new URLResponse($url, $mimeType, strlen($data), $charSet), $data];

@@ -16,7 +16,8 @@ use Sabatier\Foundation\URLQueryItem;
  * The query-item parsing section is a regression guard: a query pair must split
  * on the first "=" only, a valueless parameter must not raise a warning, an empty
  * value must be preserved as distinct from an absent one, and a duplicated name
- * must yield one item per occurrence.
+ * must yield one item per occurrence. Data URLs guard the opaque scheme form, whose
+ * path must not acquire an authority separator or path normalization.
  */
 final class URLComponentsTest extends TestCase
 {
@@ -133,6 +134,14 @@ final class URLComponentsTest extends TestCase
     {
         // The scheme is case-insensitive per RFC 3986 and is canonicalized to lowercase on parse.
         $this->assertSame("https", new URLComponents("HTTPS://example.com/a")->scheme, "the scheme is canonicalized to lowercase");
+    }
+
+    public function testDataURLKeepsItsOpaqueSchemeForm(): void
+    {
+        $components = new URLComponents("DATA:text/plain,one//two/");
+        $this->assertSame("data", $components->scheme);
+        $this->assertSame("text/plain,one//two/", $components->path);
+        $this->assertSame("data:text/plain,one//two/", $components->string);
     }
 
     public function testQueryOfZeroSurvives(): void
