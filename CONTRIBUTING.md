@@ -51,6 +51,25 @@ Rector is used for dry-run inspection only; nothing in the repository is generat
 rector process --dry-run
 ```
 
+## Measuring coverage
+
+Coverage requires Xdebug with coverage mode enabled. Reports include the source files configured in `phpunit.xml`, including files the tests never execute.
+
+When Xdebug is already loaded:
+
+```bash
+XDEBUG_MODE=coverage phpunit --coverage-clover .phpunit.cache/coverage.xml --coverage-text
+```
+
+On Windows, an installed Xdebug DLL can be loaded for one run without editing `php.ini`. Adjust the DLL path to your PHP installation:
+
+```powershell
+$phpunitPath = Join-Path (composer global config bin-dir --absolute) "phpunit"
+php -d zend_extension=C:/tools/php85/ext/php_xdebug.dll -d xdebug.mode=coverage $phpunitPath --coverage-clover .phpunit.cache/coverage.xml --coverage-text
+```
+
+Compare the covered and executable line counts for each area before and after a change. Line coverage does not establish branch coverage or prove that all protocol scenarios work. Local HTTP server subprocesses are not instrumented by these commands; coverage describes the client and library running under PHPUnit.
+
 ## What a change should carry
 
 **Every bug fix needs a regression test.** Add it to the suite matching the class you changed, and extend that suite's header docblock — each one lists the regressions it guards, in prose, explaining what the defect was and why the fix is right. That docblock is the reason a future reader does not undo your work.

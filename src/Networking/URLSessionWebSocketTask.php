@@ -44,6 +44,13 @@ final class URLSessionWebSocketTask extends URLSessionTask
     /** @var array{URLSessionWebSocketTaskCloseCode, string}|null */
     private ?array $closeMessage = null;
 
+    /**
+     * Creates a WebSocket task in the specified session.
+     * @param URLSession $session The session that owns the task.
+     * @param URLRequest $request The handshake request.
+     * @param int $taskIdentifier The identifier assigned by the session.
+     * @param TaskBody|null $body The request body, if any.
+     */
     public function __construct(URLSession $session, URLRequest $request, int $taskIdentifier, ?TaskBody $body = null)
     {
         parent::__construct($session, $request, $taskIdentifier, $body);
@@ -75,14 +82,20 @@ final class URLSessionWebSocketTask extends URLSessionTask
     public function receive(Closure $completionHandler): void
     {
         $this->receiveCompletionHandlers->append($completionHandler);
+        $this->doPendingWork();
+        if (!$this->receiveCompletionHandlers->containsElement($completionHandler)) {
+            return;
+        }
         $this->getProtocol(function (?URLProtocol $protocol) use ($completionHandler): void {
             if ($protocol instanceof WebSocketURLProtocol) {
                 try {
                     $protocol->receiveWebSocketData();
                 } catch (Exception) {
+                    $this->receiveCompletionHandlers->remove($completionHandler);
                     $completionHandler(null, new Error(URLErrorDomain, URLErrorBadServerResponse));
                 }
             } else {
+                $this->receiveCompletionHandlers->remove($completionHandler);
                 $completionHandler(null, new Error(URLErrorDomain, URLErrorNetworkConnectionLost));
             }
         });
@@ -97,13 +110,20 @@ final class URLSessionWebSocketTask extends URLSessionTask
     public function sendPing(Closure $pongReceiveHandler): void
     {
         $this->pongCompletionHandlers->append($pongReceiveHandler);
+        $this->doPendingWork();
+        if (!$this->pongCompletionHandlers->containsElement($pongReceiveHandler)) {
+            return;
+        }
         $this->getProtocol(function (?URLProtocol $protocol) use ($pongReceiveHandler): void {
             if ($protocol instanceof WebSocketURLProtocol) {
                 try {
                     $protocol->sendWebSocketData("", URLSessionWebSocketOperation::ping);
                 } catch (Exception) {
+                    $this->pongCompletionHandlers->remove($pongReceiveHandler);
+                    $pongReceiveHandler(new Error(URLErrorDomain, URLErrorNetworkConnectionLost));
                 }
             } else {
+                $this->pongCompletionHandlers->remove($pongReceiveHandler);
                 $pongReceiveHandler(new Error(URLErrorDomain, URLErrorNetworkConnectionLost));
             }
         });
@@ -141,6 +161,7 @@ final class URLSessionWebSocketTask extends URLSessionTask
     public function cancelWithReason(URLSessionWebSocketTaskCloseCode $closeCode, ?string $reason): void
     {
         $this->close($closeCode, $reason);
+        parent::cancel();
     }
 
     /** @internal */
@@ -182,6 +203,8 @@ final class URLSessionWebSocketTask extends URLSessionTask
             $this->sendBuffer->removeAll();
             $this->receiveCompletionHandlers->forEach(fn(Closure $receiveCompletionHandler) => $receiveCompletionHandler(null, $taskError));
             $this->receiveCompletionHandlers->removeAll();
+            $this->pongCompletionHandlers->forEach(fn(Closure $pongCompletionHandler) => $pongCompletionHandler($taskError));
+            $this->pongCompletionHandlers->removeAll();
             $this->getProtocol(function (?URLProtocol $protocol): void {
                 if ($this->handshakeCompleted && $protocol instanceof WebSocketURLProtocol) {
                     $this->sendCloseMessage($protocol);

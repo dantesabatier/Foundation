@@ -21,6 +21,10 @@ final class URLCredentialStorage extends ObjectClass
     /** @var Dictionary<URLCredential> */
     private Dictionary $defaultCredentials;
 
+    /**
+     * Creates a credential storage instance.
+     * @param bool $isEphemeral Whether the storage belongs to an ephemeral session.
+     */
     public function __construct(public readonly bool $isEphemeral = false)
     {
         $this->allCredentials = new Dictionary();
@@ -44,7 +48,7 @@ final class URLCredentialStorage extends ObjectClass
      */
     public function defaultCredential(URLProtectionSpace $space): ?URLCredential
     {
-        return $this->defaultCredentials[(string)$space];
+        return $this->defaultCredentials[self::key($space)];
     }
 
     /**
@@ -88,8 +92,9 @@ final class URLCredentialStorage extends ObjectClass
             return;
         }
         $needsNotification = false;
-        $key = (string)$space;
-        if (($user = $credential->user) && ($current = $this->allCredentials[$key]) && $current[$user] === $credential) {
+        $key = self::key($space);
+        $user = $credential->user;
+        if (($current = $this->allCredentials[$key]) && $current[$user] === $credential) {
             $current[$user] = null;
             $needsNotification = true;
             if ($current->isEmpty) {
@@ -129,7 +134,7 @@ final class URLCredentialStorage extends ObjectClass
      */
     public function credentials(URLProtectionSpace $space): ?Dictionary
     {
-        return $this->allCredentials[(string)$space];
+        return $this->allCredentials[self::key($space)];
     }
 
     /**
@@ -144,18 +149,22 @@ final class URLCredentialStorage extends ObjectClass
         $completionHandler($this->credentials($space));
     }
 
+    private static function key(URLProtectionSpace|string $space): string
+    {
+        return is_string($space) ? $space : serialize($space);
+    }
+
     private function setWhileLocked(URLCredential $credential, URLProtectionSpace $space, bool $isDefault = false): bool
     {
-        $modified = false;
-        $key = (string)$space;
-        if ($user = $credential->user) {
-            /** @var Dictionary<URLCredential> $current */
-            $current = $this->allCredentials[$key] ?? new Dictionary();
-            $modified = $current[$user] !== $credential;
-            $current[$user] = $credential;
-            $this->allCredentials[$key] = $current;
-        }
-        if ($isDefault || $this->defaultCredentials[$key] === null) {
+        $key = self::key($space);
+        $user = $credential->user;
+        /** @var Dictionary<URLCredential> $current */
+        $current = $this->allCredentials[$key] ?? new Dictionary();
+        $modified = $current[$user] !== $credential;
+        $current[$user] = $credential;
+        $this->allCredentials[$key] = $current;
+        $defaultCredential = $this->defaultCredentials[$key];
+        if ($isDefault || $defaultCredential === null || $defaultCredential->user === $user) {
             $modified = $modified || $this->defaultCredentials[$key] !== $credential;
             $this->defaultCredentials[$key] = $credential;
         }
