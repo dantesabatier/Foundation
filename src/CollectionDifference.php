@@ -96,11 +96,11 @@ final class CollectionDifference extends ObjectClass implements MutableCollectio
     }
     /** @var ArrayClass<CollectionDifferenceChange> The insertions contained by this difference, from the lowest offset to the highest. */
     public ArrayClass $insertions {
-        get => $this->filter(fn(CollectionDifferenceChange $change) => $change->type === CollectionDifferenceChangeType::insert);
+        get => $this->filter(fn(CollectionDifferenceChange $change) => $change->type === CollectionDifferenceChangeType::insert)->sorted([new SortDescriptor("offset", true)]);
     }
     /** @var ArrayClass<CollectionDifferenceChange> The removals contained by this difference, from the lowest offset to the highest. */
     public ArrayClass $removals {
-        get => $this->filter(fn(CollectionDifferenceChange $change) => $change->type === CollectionDifferenceChangeType::remove)->reversed();
+        get => $this->filter(fn(CollectionDifferenceChange $change) => $change->type === CollectionDifferenceChangeType::remove)->sorted([new SortDescriptor("offset", true)]);
     }
 
     /**
@@ -125,24 +125,24 @@ final class CollectionDifference extends ObjectClass implements MutableCollectio
      */
     public function inferringMoves(): CollectionDifference
     {
-        /** @var ArrayClass<CollectionDifferenceChange> $newChanges */
-        $newChanges = new ArrayClass();
         $removals = $this->removals->map(fn(CollectionDifferenceChange $change) => clone $change);
         $insertions = $this->insertions->map(fn(CollectionDifferenceChange $change) => clone $change);
-        foreach ($insertions as $insert) {
-            foreach ($removals as $idx => $remove) {
-                if ($insert->element === $remove->element) {
-                    $move = new CollectionDifferenceChange(CollectionDifferenceChangeType::move, $insert->element, $remove->offset, $insert->offset);
-                    $newChanges->append($move);
-                    $removals->removeAt($idx);
-                    $insertions->remove($insert);
-                    break;
-                }
+        $moves = $removals->compactMap(function (CollectionDifferenceChange $removal) use ($removals, $insertions): ?CollectionDifferenceChange {
+            if ($removals->filter(fn(CollectionDifferenceChange $candidate): bool => is_equal($candidate->element, $removal->element))->count !== 1) {
+                return null;
             }
-        }
-        $newChanges->appendContentsOf($removals);
-        $newChanges->appendContentsOf($insertions);
-        $newChanges = new ArrayClass($newChanges->map(fn(CollectionDifferenceChange $change) => $change)->sorted([new SortDescriptor("offset", true)]));
+            $matchingInsertions = $insertions->filter(fn(CollectionDifferenceChange $candidate): bool => is_equal($candidate->element, $removal->element));
+            if ($matchingInsertions->count !== 1) {
+                return null;
+            }
+            /** @var CollectionDifferenceChange $insertion */
+            $insertion = $matchingInsertions->first;
+            return new CollectionDifferenceChange(CollectionDifferenceChangeType::move, $removal->element, $removal->offset, $insertion->offset);
+        });
+        /** @var ArrayClass<CollectionDifferenceChange> $newChanges */
+        $newChanges = $removals->filter(fn(CollectionDifferenceChange $removal): bool => !$moves->contains(fn(CollectionDifferenceChange $move): bool => $move->offset === $removal->offset))->reversed();
+        $newChanges->appendContentsOf($moves);
+        $newChanges->appendContentsOf($insertions->filter(fn(CollectionDifferenceChange $insertion): bool => !$moves->contains(fn(CollectionDifferenceChange $move): bool => $move->targetOffset === $insertion->offset)));
         return new CollectionDifference($newChanges);
     }
 
@@ -151,8 +151,11 @@ final class CollectionDifference extends ObjectClass implements MutableCollectio
      */
     public function inverse(): CollectionDifference
     {
-        return new CollectionDifference($this->map(fn(CollectionDifferenceChange $change): CollectionDifferenceChange => new CollectionDifferenceChange($change->type === CollectionDifferenceChangeType::insert ? CollectionDifferenceChangeType::remove
-            : CollectionDifferenceChangeType::insert, $change->element, $change->offset))->reversed());
+        return new CollectionDifference($this->map(fn(CollectionDifferenceChange $change): CollectionDifferenceChange => match ($change->type) {
+            CollectionDifferenceChangeType::insert => new CollectionDifferenceChange(CollectionDifferenceChangeType::remove, $change->element, $change->offset, $change->targetOffset),
+            CollectionDifferenceChangeType::remove => new CollectionDifferenceChange(CollectionDifferenceChangeType::insert, $change->element, $change->offset, $change->targetOffset),
+            CollectionDifferenceChangeType::move => new CollectionDifferenceChange(CollectionDifferenceChangeType::move, $change->element, $change->targetOffset ?? $change->offset, $change->offset),
+        })->reversed());
     }
 
     /**
