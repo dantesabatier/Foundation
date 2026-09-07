@@ -5,6 +5,8 @@ declare(strict_types=1);
 
 namespace Sabatier\Foundation\Tests;
 
+use Closure;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Sabatier\Foundation\Error;
 use Sabatier\Foundation\Networking\HTTPCookie;
@@ -13,11 +15,18 @@ use Sabatier\Foundation\Networking\HTTPRequestMethod;
 use Sabatier\Foundation\Networking\HTTPStatusCode;
 use Sabatier\Foundation\Networking\HTTPURLResponse;
 use Sabatier\Foundation\Networking\URLRequest;
+use Sabatier\Foundation\Networking\URLCredential;
+use Sabatier\Foundation\Networking\URLCredentialPersistence;
+use Sabatier\Foundation\Networking\URLCredentialStorage;
+use Sabatier\Foundation\Networking\URLProtectionSpace;
 use Sabatier\Foundation\Networking\URLResponse;
 use Sabatier\Foundation\Networking\URLSession;
 use Sabatier\Foundation\Networking\URLSessionConfiguration;
+use Sabatier\Foundation\Networking\URLSessionAuthChallengeDisposition;
+use Sabatier\Foundation\Networking\URLSessionTaskDelegate;
 use Sabatier\Foundation\URL;
 use Throwable;
+use const Sabatier\Foundation\Networking\URLAuthenticationMethodHTTPBasic;
 use const Sabatier\Foundation\URLErrorTimedOut;
 
 /**
@@ -29,6 +38,10 @@ use const Sabatier\Foundation\URLErrorTimedOut;
  *    reports as float (-1.0 while unknown); under strict_types it must be cast before
  *    reaching didReceiveHeaderData(int). The bug made EVERY request fatal on its first
  *    header line, so any completed task below exercises it.
+ *  - an authentication retry must discard the preceding 401 response and body, remove the
+ *    completed transfer before starting another one, and keep Authorization out of the
+ *    original request. Missing and rejected credentials must complete exactly once instead
+ *    of leaving the session unable to run its next task.
  */
 final class URLSessionTest extends TestCase
 {
@@ -50,6 +63,15 @@ final class URLSessionTest extends TestCase
 <?php
 $path = parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH);
 switch ($path) {
+    case "/private":
+        if (($_SERVER["HTTP_AUTHORIZATION"] ?? "") !== "Basic " . base64_encode("alice:secret")) {
+            header("WWW-Authenticate: Basic realm=\"members\"");
+            http_response_code(401);
+            echo "authentication required";
+        } else {
+            echo "authenticated";
+        }
+        break;
     case "/redirect":
         header("Location: /hello?redirected=" . ($_GET["r"] ?? ""), true, 302);
         break;
@@ -307,5 +329,125 @@ ROUTER);
         [$data, , $error] = $this->awaitDataTask(new URLRequest(new URL("http://" . self::$host . "/hello?after=timeout")));
         $this->assertNull($error);
         $this->assertSame("hello world", $data);
+    }
+
+    /** @throws Throwable */
+    #[DataProvider("passwords")]
+    public function testBasicAuthenticationUsesStoredCredentials(?string $password): void
+    {
+        $configuration = new URLSessionConfiguration();
+        $configuration->urlCache = null;
+        $storage = new URLCredentialStorage();
+        $configuration->urlCredentialStorage = $storage;
+        $space = new URLProtectionSpace("127.0.0.1", self::$port, protocol: "http", realm: "members", authenticationMethod: URLAuthenticationMethodHTTPBasic);
+        if ($password !== null) {
+            $storage->set(new URLCredential("alice", $password, URLCredentialPersistence::forSession), $space, null);
+        }
+        $this->session = new URLSession($configuration);
+        $request = new URLRequest(new URL("http://" . self::$host . "/private"));
+        $request->setValueForHttpHeaderField("original", "X-Test");
+        [$data, $response, $error] = $this->awaitDataTask($request);
+        $this->assertNull($request->valueForHttpHeaderField("Authorization"));
+        $this->assertSame("original", $request->valueForHttpHeaderField("X-Test"));
+        if ($password === "wrong") {
+            $this->assertInstanceOf(Error::class, $error);
+        } else {
+            $this->assertNull($error);
+            $this->assertInstanceOf(HTTPURLResponse::class, $response);
+            $this->assertSame($password === null ? HTTPStatusCode::unauthorized : HTTPStatusCode::ok, $response->statusCode);
+            $this->assertSame($password === null ? "authentication required" : "authenticated", $data);
+        }
+        $this->assertTrue($this->session->taskRegistry->isEmpty);
+        [$data, , $error] = $this->awaitDataTask(new URLRequest(new URL("http://" . self::$host . "/hello?after=authentication")));
+        $this->assertNull($error);
+        $this->assertSame("hello world", $data);
+    }
+
+    public static function passwords(): array
+    {
+        return [["secret"], ["wrong"], [null]];
+    }
+
+    /** @throws Throwable */
+    public function testDelegateCanCancelAnAuthenticationChallenge(): void
+    {
+        $configuration = new URLSessionConfiguration();
+        $configuration->urlCache = null;
+        $configuration->urlCredentialStorage = new URLCredentialStorage();
+        $delegate = $this->createMock(URLSessionTaskDelegate::class);
+        $delegate->method("urlSessionTaskNeedNewBodyStream")->willReturnCallback(fn($session, $task, $completion) => $completion(null));
+        $delegate->expects($this->once())->method("urlSessionTaskDidReceiveChallenge")->willReturnCallback(function ($session, $task, $challenge, $completion): void {
+            $this->assertSame("members", $challenge->protectionSpace->realm);
+            $completion(URLSessionAuthChallengeDisposition::cancelAuthenticationChallenge, null);
+        });
+        $this->session = new URLSession($configuration, $delegate);
+        [, , $error] = $this->awaitDataTask(new URLRequest(new URL("http://" . self::$host . "/private")));
+        $this->assertInstanceOf(Error::class, $error);
+        $this->assertTrue($this->session->taskRegistry->isEmpty);
+    }
+
+    /** @throws Throwable */
+    public function testAuthenticationPrefersTheDefaultCredential(): void
+    {
+        $configuration = new URLSessionConfiguration();
+        $configuration->urlCache = null;
+        $storage = new URLCredentialStorage();
+        $configuration->urlCredentialStorage = $storage;
+        $space = new URLProtectionSpace("127.0.0.1", self::$port, protocol: "http", realm: "members", authenticationMethod: URLAuthenticationMethodHTTPBasic);
+        $storage->set(new URLCredential("aaron", "wrong", URLCredentialPersistence::forSession), $space, null);
+        $storage->setDefaultCredential(new URLCredential("alice", "secret", URLCredentialPersistence::forSession), $space, null);
+        $this->session = new URLSession($configuration);
+        [$data, , $error] = $this->awaitDataTask(new URLRequest(new URL("http://" . self::$host . "/private")));
+        $this->assertNull($error);
+        $this->assertSame("authenticated", $data);
+        $this->assertTrue($this->session->taskRegistry->isEmpty);
+    }
+
+    /** @throws Throwable */
+    public function testDelegateCanReplaceARejectedCredential(): void
+    {
+        $configuration = new URLSessionConfiguration();
+        $configuration->urlCache = null;
+        $configuration->urlCredentialStorage = null;
+        $delegate = $this->createMock(URLSessionTaskDelegate::class);
+        $delegate->method("urlSessionTaskNeedNewBodyStream")->willReturnCallback(fn($session, $task, $completion) => $completion(null));
+        $calls = 0;
+        $delegate->expects($this->exactly(2))->method("urlSessionTaskDidReceiveChallenge")->willReturnCallback(function ($session, $task, $challenge, $completion) use (&$calls): void {
+            $this->assertSame($calls, $challenge->previousFailureCount);
+            $calls += 1;
+            $completion(URLSessionAuthChallengeDisposition::useCredential, new URLCredential("alice", $calls === 1 ? "wrong" : "secret"));
+        });
+        $this->session = new URLSession($configuration, $delegate);
+        [$data, , $error] = $this->awaitDataTask(new URLRequest(new URL("http://" . self::$host . "/private")));
+        $this->assertNull($error);
+        $this->assertSame("authenticated", $data);
+        $this->assertTrue($this->session->taskRegistry->isEmpty);
+    }
+
+    public function testDelegateCanAnswerTheAuthenticationChallengeLater(): void
+    {
+        $configuration = new URLSessionConfiguration();
+        $configuration->urlCache = null;
+        $configuration->urlCredentialStorage = null;
+        $delegate = $this->createMock(URLSessionTaskDelegate::class);
+        $delegate->method("urlSessionTaskNeedNewBodyStream")->willReturnCallback(fn($session, $task, $completion) => $completion(null));
+        /** @var Closure|null $answer */
+        $answer = null;
+        $delegate->expects($this->once())->method("urlSessionTaskDidReceiveChallenge")->willReturnCallback(function ($session, $task, $challenge, $completion) use (&$answer): void {
+            $answer = $completion;
+        });
+        $this->session = new URLSession($configuration, $delegate);
+        $calls = 0;
+        $task = $this->session->dataTaskWithURL(new URL("http://" . self::$host . "/private"), function ($data, $response, $error) use (&$calls): void {
+            $calls += 1;
+            $this->assertSame("authenticated", $data);
+            $this->assertNull($error);
+        });
+        $task->resume();
+        $this->assertSame(0, $calls);
+        $this->assertInstanceOf(Closure::class, $answer);
+        $answer(URLSessionAuthChallengeDisposition::useCredential, new URLCredential("alice", "secret"));
+        $this->assertSame(1, $calls);
+        $this->assertTrue($this->session->taskRegistry->isEmpty);
     }
 }

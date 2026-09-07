@@ -7,9 +7,8 @@ namespace Sabatier\Foundation\Networking;
 use Sabatier\Foundation\ArrayClass;
 use Sabatier\Foundation\CompareOptions;
 use Sabatier\Foundation\Dictionary;
+use Sabatier\Foundation\Scanner;
 use function Sabatier\Foundation\string_has_suffix;
-use function Sabatier\Foundation\substring_from_index;
-use function Sabatier\Foundation\substring_to_index;
 
 /** @internal */
 final class Challenge
@@ -51,26 +50,63 @@ final class Challenge
     {
         /** @var ArrayClass<Challenge> $challenges */
         $challenges = new ArrayClass();
-        while ($authenticateView !== "") {
-            if (!($index = strpos($authenticateView, " "))) {
+        $scanner = new Scanner($authenticateView);
+        while (!$scanner->isAtEnd) {
+            $scanner->scanCharacters(",");
+            $authScheme = "";
+            if (!$scanner->scanUpCharacters(" \t,=", $authScheme)) {
                 break;
             }
-            $authScheme = substring_to_index($authenticateView, $index);
-            $authDataView = substring_from_index($authenticateView, $index);
-            $authParameters = new ArrayClass(explode(",", $authDataView))->reduce(new Dictionary(), function (Dictionary $result, string $e): Dictionary {
-                $components = explode("=", $e, 2);
-                $result[trim($components[0])] = count($components) > 1 ? trim($components[1], " \"'") : "";
-                return $result;
-            });
+            /** @var Dictionary<string> $authParameters */
+            $authParameters = new Dictionary();
+            while (true) {
+                $location = $scanner->scanLocation;
+                $name = "";
+                if (!$scanner->scanUpCharacters(" \t,=", $name) || !$scanner->scanString("=")) {
+                    $scanner->scanLocation = $location;
+                    break;
+                }
+                if (($value = self::parameterValue($scanner)) === null) {
+                    return $challenges;
+                }
+                $authParameters[$name] = $value;
+                if (!$scanner->scanString(",")) {
+                    break;
+                }
+            }
             $challenge = new Challenge($authScheme, $authParameters);
             if ($challenge->parameter("realm") !== null) {
                 $challenges->append($challenge);
             }
-            if (!($commaIndex = strpos($authenticateView, ","))) {
-                break;
-            }
-            $authenticateView = trim(substring_from_index($authenticateView, $commaIndex));
         }
         return $challenges;
+    }
+
+    private static function parameterValue(Scanner $scanner): ?string
+    {
+        if (!$scanner->scanString("\"")) {
+            return $scanner->scanUpCharacters(" \t,", $value) ? $value : null;
+        }
+        $skipped = $scanner->charactersToBeSkipped;
+        $scanner->charactersToBeSkipped = "";
+        $value = "";
+        while (true) {
+            $part = "";
+            if ($scanner->scanUpCharacters("\\\"", $part)) {
+                /** @var string $part */
+                $value .= $part;
+            }
+            if ($scanner->scanString("\"")) {
+                $scanner->charactersToBeSkipped = $skipped;
+                return $value;
+            }
+            if (!$scanner->scanString("\\") || $scanner->isAtEnd) {
+                break;
+            }
+            $value .= mb_substr($scanner->string, $scanner->scanLocation, 1);
+            $scanner->scanLocation += 1;
+        }
+        $scanner->charactersToBeSkipped = $skipped;
+        return null;
     }
 }

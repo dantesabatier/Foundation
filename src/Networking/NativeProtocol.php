@@ -114,6 +114,8 @@ abstract class NativeProtocol extends URLProtocol implements EasyHandleDelegate
     {
         $task = $this->task;
         $task->currentRequest = $request;
+        $task->response = null;
+        self::setProperty("", "responseData", $this->request);
         $url = $request->url;
         $task->getBody(function (TaskBody $body) use ($task, $request, $url): void {
             $this->internalState = InternalState::transferReady($this->createTransferState($url, $body));
@@ -355,13 +357,12 @@ abstract class NativeProtocol extends URLProtocol implements EasyHandleDelegate
             }
             self::setProperty($fileURL, "temporaryFileURL", $this->request);
         }
-        if (!$task->previousFailureCount) {
-            $this->internalState = InternalState::initial();
-            $task->session->remove($this->easyHandle);
-        }
-        $this->client?->urlProtocolDidFinishLoading($this);
-        $this->internalState = InternalState::taskCompleted();
+        $this->internalState = InternalState::initial();
         $task->session->remove($this->easyHandle);
+        $this->client?->urlProtocolDidFinishLoading($this);
+        if ($task->state === URLSessionTaskState::completed) {
+            $this->internalState = InternalState::taskCompleted();
+        }
     }
 
     public function completionAction(URLRequest $request, URLResponse $response): CompletionAction

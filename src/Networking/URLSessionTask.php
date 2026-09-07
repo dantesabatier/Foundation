@@ -127,7 +127,13 @@ abstract class URLSessionTask extends ObjectClass
         }
     }
 
-    /** @internal */
+    /**
+     * @internal
+     * @param URLSession $session
+     * @param URLRequest $request
+     * @param int $taskIdentifier
+     * @param TaskBody|null $body
+     */
     public function __construct(URLSession $session, URLRequest $request, int $taskIdentifier, ?TaskBody $body = null)
     {
         $this->session = $session;
@@ -320,7 +326,10 @@ abstract class URLSessionTask extends ObjectClass
                 $task->cancel();
                 return;
             }
-            $task->authRequest = $request;
+            $task->authRequest = clone $request;
+            if ($headers = $request->allHTTPHeaderFields) {
+                $task->authRequest->allHTTPHeaderFields = clone $headers;
+            }
             $task->authRequest->setValueForHttpHeaderField("$challenge->authScheme $authorization", "Authorization");
         };
     }

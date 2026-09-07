@@ -108,7 +108,7 @@ final class ProtocolClient implements URLProtocolClient
             }
             $task->resume();
         };
-        $attemptProceedingWithDefaultCredential = function () use ($authenticationChallenge, $task, $proceed): void {
+        $attemptProceedingWithDefaultCredential = function () use ($authenticationChallenge, $task, $proceed, $protocol): void {
             if ($credential = $authenticationChallenge->proposedCredential) {
                 $last = $task->lastCredentialUsedFromStorageDuringAuthentication;
                 if ($last?->credential !== $credential) {
@@ -116,6 +116,10 @@ final class ProtocolClient implements URLProtocolClient
                 } else {
                     $task->cancel();
                 }
+            } elseif ($authenticationChallenge->previousFailureCount > 0) {
+                $task->cancel();
+            } else {
+                $this->completeTask($protocol);
             }
         };
         $delegate = $session->delegate;
@@ -254,13 +258,16 @@ final class ProtocolClient implements URLProtocolClient
                 $this->urlProtocolDidReceive($protocol, $authenticationChallenge);
             };
             if ($storage = $session->configuration->urlCredentialStorage) {
-                $storage->getCredentials($protectionSpace, $task, function (?Dictionary $credentials) use ($task, $storage, $protectionSpace, $proceed): void {
-                    if (($firstKeyLexicographically = $credentials?->keys?->sort()->first())) {
-                        /** @psalm-suppress PossiblyNullArrayAccess, PossiblyNullReference */
-                        $proceed($credentials[$firstKeyLexicographically]);
+                $storage->getDefaultCredential($protectionSpace, $task, function (?URLCredential $credential) use ($task, $storage, $protectionSpace, $proceed): void {
+                    if ($credential) {
+                        $proceed($credential);
                     } else {
-                        $storage->getDefaultCredential($protectionSpace, $task, function (?URLCredential $credential) use ($proceed): void {
-                            $proceed($credential);
+                        $storage->getCredentials($protectionSpace, $task, function (?Dictionary $credentials) use ($proceed): void {
+                            if ($credentials && ($firstUser = $credentials->keys->sort()->first) !== null) {
+                                $proceed($credentials[$firstUser]);
+                            } else {
+                                $proceed(null);
+                            }
                         });
                     }
                 });
@@ -269,6 +276,17 @@ final class ProtocolClient implements URLProtocolClient
             }
             return;
         }
+        $this->completeTask($protocol);
+    }
+
+    private function completeTask(URLProtocol $protocol): void
+    {
+        $task = $protocol->task;
+        if ($task->state === URLSessionTaskState::completed) {
+            return;
+        }
+        $session = $task->session;
+        $response = $task->response;
         if (($storage = $session->configuration->urlCredentialStorage) &&
             ($last = $task->lastCredentialUsedFromStorageDuringAuthentication)) {
             $storage->set($last->credential, $last->protectionSpace, $task);
