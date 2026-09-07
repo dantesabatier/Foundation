@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Sabatier\Foundation;
 
+/** @internal */
 function components_from_key_path(string $keyPath): KeyPathComponents
 {
     $parts = explode(".", $keyPath, 2);
@@ -12,6 +13,7 @@ function components_from_key_path(string $keyPath): KeyPathComponents
     return new KeyPathComponents($key, $remainder);
 }
 
+/** @internal */
 function kvc_operator_from_key(string $key): ?string
 {
     if ($key === "" || $key[0] !== "@") {
@@ -25,18 +27,17 @@ function kvc_operator_from_key(string $key): ?string
 }
 
 /**
- * @param string $keyPath
+ * @internal
  * @return array{string, string, string}
  */
 function kvc_components(string $keyPath): array
 {
-    $idx = strpos($keyPath, "@");
-    if ($idx !== false) {
-        $pathPart = substring_to_index($keyPath, $idx);
-        $operatorPart = substring_from_index($keyPath, $idx + 1);
-    } else {
-        $pathPart = $keyPath;
-        $operatorPart = "";
+    $pathPart = $keyPath;
+    $operatorPart = "";
+    $index = strpos($keyPath, "@");
+    if ($index !== false) {
+        $pathPart = substring_to_index($keyPath, $index);
+        $operatorPart = substring_from_index($keyPath, $index + 1);
     }
     $collection = "";
     $keyPathToProperty = "";

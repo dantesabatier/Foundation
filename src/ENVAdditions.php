@@ -20,7 +20,7 @@ use SplFileObject;
  */
 function parse_env_file(string $path): array
 {
-    /** @var array<string,string> $environment */
+    /** @var array<string, string> $environment */
     $environment = [];
     if (!is_file($path) || !is_readable($path)) {
         return $environment;
@@ -45,15 +45,16 @@ function parse_env_file(string $path): array
         if (!str_contains($line, "=")) {
             continue;
         }
+        /** @var array{string, string} $parts */
         $parts = explode("=", $line, 2);
-        if (count($parts) !== 2) {
-            continue;
-        }
         [$key, $value] = $parts;
         $key = trim($key);
+        if (empty($key)) {
+            continue;
+        }
         $value = trim($value);
-        $len = strlen($value);
-        if ($len >= 2 && ($value[0] === "\"" && $value[$len - 1] === "\"" || $value[0] === "'" && $value[$len - 1] === "'")) {
+        $length = strlen($value);
+        if ($length >= 2 && ($value[0] === "\"" && $value[$length - 1] === "\"" || $value[0] === "'" && $value[$length - 1] === "'")) {
             $value = substr($value, 1, -1);
         }
         $environment[$key] = $value;

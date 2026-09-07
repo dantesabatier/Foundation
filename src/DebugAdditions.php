@@ -45,7 +45,8 @@ function cli_log(string $string): void
  */
 function escape_sequence(string $string, EscapeSequenceTextAttribute $textAttribute = EscapeSequenceTextAttribute::normal, EscapeSequenceColor $foregroundColor = EscapeSequenceColor::white, EscapeSequenceColor $backgroundColor = EscapeSequenceColor::none): string
 {
-    return sprintf("\e[%s;%s;%sm%s\e[0m", $textAttribute->value, $foregroundColor->value, $backgroundColor->value + EscapeSequenceBackgroundColorAddition, $string);
+    $backgroundCode = $backgroundColor === EscapeSequenceColor::none ? "" : ";" . ($backgroundColor->value + EscapeSequenceBackgroundColorAddition);
+    return sprintf("\e[%s;%s%sm%s\e[0m", $textAttribute->value, $foregroundColor->value, $backgroundCode, $string);
 }
 
 /**
@@ -118,38 +119,20 @@ function human_readable_value(mixed $value, int $depth = 0, int $maxDepth = 10):
     }
     return typeof($value);
 }
-
-
 /**
- * Converts an array to a human-readable string representation.
- *
- * This is a helper function for human_readable_value() that handles array
- * formatting specifically. It recursively processes nested arrays up to
- * the specified maximum depth.
- *
- * @param array $value The array to convert
- * @param int $depth Current recursion depth
- * @param int $maxDepth Maximum recursion depth allowed
- *
- * @return string Formatted `array` as "[key1: value1, key2: value2, ...]"
- *
- * Special cases:
- * - Empty arrays: Returns "[]"
- * - Max depth reached: Returns "[max depth]"
- * - Nested arrays: Recursively formats with incremented depth
- * Examples:
- * <code>
- *  human_readable_array([]); // "[]"
- *  human_readable_array([1, 2]); // "[0: 1, 1: 2]"
- *  human_readable_array(["x" => ["y" => 1]]); // "[x: [y: 1]]"
- * </code>
- *
- * @internal This function is primarily used by human_readable_value()
+ * @internal
+ * @param array<array-key, mixed> $value
+ * @param int $depth
+ * @param int $maxDepth
+ * @return string
  */
 function human_readable_array(array $value, int $depth, int $maxDepth): string
 {
     if ($value === []) {
         return "[]";
+    }
+    if ($depth >= $maxDepth) {
+        return "[max depth]";
     }
     return "[" . implode(", ", array_map(fn(mixed $key, mixed $element): string => sprintf("%s: %s", is_string($key) ? $key : (string)$key, human_readable_value($element, $depth + 1, $maxDepth)), array_keys($value), array_values($value))) . "]";
 }
@@ -164,31 +147,27 @@ function human_readable_array(array $value, int $depth, int $maxDepth): string
  * - Year: 365 days (31,536,000 seconds)
  * - Month: 30 days (2,592,000 seconds)
  *
- * Note: The primary units (year, month, etc.) are formatted in English (appending 's' for plural),
- * while the millisecond fallback is currently hardcoded in Spanish ("milisegundos").
- *
  * @param float $seconds The time duration in seconds.
  * @param string $locale The locale used for number formatting within the plural rules (default: "en_US").
  *
  * @return string A comma-separated string of time components (e.g., "1 hour, 30 minutes").
  * @throws Exception
  */
-
 function human_readable_time(float $seconds, string $locale = "en_US"): string
 {
     $units = ["year" => 31_536_000, "month" => 2_592_000, "day" => 86400, "hour" => 3600, "minute" => 60, "second" => 1];
     $parts = [];
     $remainder = $seconds;
-    foreach ($units as $unit => $value) {
-        if ($remainder >= $value) {
-            $amount = (int)floor($remainder / $value);
-            $remainder -= $amount * $value;
+    foreach ($units as $unit => $secondsPerUnit) {
+        if ($remainder >= $secondsPerUnit) {
+            $amount = (int)floor($remainder / $secondsPerUnit);
+            $remainder -= $amount * $secondsPerUnit;
             $parts[] = new MessageFormatter($locale, "{n, plural, =1 {1 $unit} other {# {$unit}s}}")->format(["n" => $amount]);
         }
     }
     if ($remainder > 0 || $parts === []) {
-        $ms = round($remainder * 1000);
-        $parts[] = new MessageFormatter($locale, "{n, plural, =1 {1 millisecond} other {# milliseconds}}")->format(["n" => $ms]);
+        $milliseconds = round($remainder * 1000);
+        $parts[] = new MessageFormatter($locale, "{n, plural, =1 {1 millisecond} other {# milliseconds}}")->format(["n" => $milliseconds]);
     }
     return implode(", ", $parts);
 }
@@ -212,15 +191,22 @@ function human_readable_time(float $seconds, string $locale = "en_US"): string
 function human_readable_bytes(float $bytes, string $locale = "en_US"): string
 {
     $units = ["B", "KB", "MB", "GB", "TB", "PB"];
-    $i = $bytes > 0 ? (int)floor(log($bytes, 1024)) : 0;
-    $i = max(min($i, count($units) - 1), 0);
-    $value = $bytes / 1024 ** $i;
+    $unitIndex = $bytes > 0 ? (int)floor(log($bytes, 1024)) : 0;
+    $unitIndex = max(min($unitIndex, count($units) - 1), 0);
+    $value = $bytes / 1024 ** $unitIndex;
     $formatter = new NumberFormatter($locale, NumberFormatter::DECIMAL);
-    $formatter->setAttribute(NumberFormatter::MAX_FRACTION_DIGITS, $i === 0 ? 0 : 2);
-    $formatter->setAttribute(NumberFormatter::MIN_FRACTION_DIGITS, $i === 0 ? 0 : 2);
-    return $formatter->format($value) . " " . $units[$i];
+    $formatter->setAttribute(NumberFormatter::MAX_FRACTION_DIGITS, $unitIndex === 0 ? 0 : 2);
+    $formatter->setAttribute(NumberFormatter::MIN_FRACTION_DIGITS, $unitIndex === 0 ? 0 : 2);
+    return $formatter->format($value) . " " . $units[$unitIndex];
 }
 
+/**
+ * Appends "s" to an entity when the number is zero or greater than one.
+ *
+ * @param string $string The entity to pluralize.
+ * @param int|float $number The number that determines whether to append the suffix.
+ * @return string The singular or plural entity.
+ */
 #[Deprecated("since Foundation 0.1, use pluralize() instead", "pluralize(%parametersList%)")]
 function human_readable_plural(string $string, int|float $number): string
 {
@@ -246,6 +232,8 @@ function pluralize(string $entity, int|float $count, string $locale = "en_US"): 
 }
 
 /**
+ * Throws an internal inconsistency exception with fatal-error severity.
+ *
  * @param string $message The string to print. The default is an empty string.
  * @param string $file The file name to print with the message. The default is the file where fatal_error() is called.
  * @param int $line The line number to print along with the message. The default is the file where fatal_error() is called.
@@ -308,10 +296,11 @@ function invalid_mutation(): never
 
 /**
  * @template Result
- * Executes a given closure with a custom error handler to ensure more controlled error handling.
+ * Executes a closure while converting every PHP diagnostic handled by set_error_handler() into an exception.
  *
  * @param Closure(): Result $block The closure to be executed within the custom error handler context.
  * @return Result The value returned by the executed closure.
+ * @throws InternalInconsistencyException
  */
 function unsafe_value(Closure $block)
 {
@@ -326,18 +315,19 @@ function unsafe_value(Closure $block)
 /**
  * Extracts the class name from the fully qualified class name, optionally providing its namespace.
  *
- * @param string $class The fully qualified class name to process.
+ * @param class-string $class The fully qualified class name to process.
  * @param string|null &$namespace A variable passed by reference to hold the extracted namespace, if applicable.
  * @return string The class name extracted from the fully qualified class name.
  */
 function class_name(string $class, ?string &$namespace = null): string
 {
     if (str_contains($class, "\\")) {
-        $lastPos = strrpos($class, "\\");
+        $separatorIndex = strrpos($class, "\\");
+        assert($separatorIndex !== false);
         if (func_num_args() > 1) {
-            $namespace = substr($class, 0, $lastPos);
+            $namespace = substr($class, 0, $separatorIndex);
         }
-        return substr($class, (int)$lastPos + 1);
+        return substr($class, $separatorIndex + 1);
     }
     return $class;
 }
@@ -345,16 +335,16 @@ function class_name(string $class, ?string &$namespace = null): string
 /**
  * Determines the name of the class from which the current method was called, navigating through the backtrace to identify the first differing object.
  *
- * @return string|null The fully qualified name of the calling class, or null if not applicable.
+ * @return class-string|null The fully qualified name of the calling class, or null if not applicable.
  */
 function get_calling_class(): ?string
 {
     $backtrace = debug_backtrace();
     $object = $backtrace[1]["object"] ?? null;
     $backtraceCount = count($backtrace);
-    for ($i = 1; $i < $backtraceCount; $i++) {
-        if (isset($backtrace[$i])) {
-            $current = $backtrace[$i]["object"] ?? null;
+    for ($index = 1; $index < $backtraceCount; $index++) {
+        if (isset($backtrace[$index])) {
+            $current = $backtrace[$index]["object"] ?? null;
             if ($object !== $current) {
                 if (is_object($current)) {
                     return $current::class;

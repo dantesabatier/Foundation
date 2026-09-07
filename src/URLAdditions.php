@@ -75,11 +75,17 @@ function url_encode(string $url, string $endpoint, array $parameters = []): stri
  */
 function request_url(): string
 {
-    $elements = explode("?", $_SERVER["REQUEST_URI"] ?? "");
+    $requestURI = $_SERVER["REQUEST_URI"] ?? null;
+    $host = $_SERVER["HTTP_HOST"] ?? null;
+    if (empty($requestURI) || empty($host)) {
+        return "";
+    }
+    $elements = explode("?", $requestURI, 2);
     $components = new URLComponents();
-    $components->scheme = isset($_SERVER["HTTPS"]) ? "https" : "http";
-    $components->host = $_SERVER["HTTP_HOST"] ?? null;
-    $components->path = $elements[0] ?? null;
+    $https = $_SERVER["HTTPS"] ?? null;
+    $components->scheme = !empty($https) && !string_is_equal($https, "off", CompareOptions::caseInsensitive) ? "https" : "http";
+    $components->host = $host;
+    $components->path = $elements[0];
     $components->query = $elements[1] ?? null;
     return $components->string ?? "";
 }
@@ -94,7 +100,7 @@ function request_url(): string
 function getallheaders(): array
 {
     $headers = [];
-    $copy_server = [
+    $copyServer = [
         "CONTENT_TYPE" => "Content-Type",
         "CONTENT_LENGTH" => "Content-Length",
         "CONTENT_MD5" => "Content-Md5",
@@ -102,7 +108,7 @@ function getallheaders(): array
     foreach ($_SERVER as $key => $value) {
         if (str_starts_with($key, "HTTP_")) {
             $key = substring_from_index($key, 5);
-            if (!isset($copy_server[$key]) || !isset($_SERVER[$key])) {
+            if (!isset($copyServer[$key]) || !isset($_SERVER[$key])) {
                 $key = str_replace("_", " ", $key)
                         |> strtolower(...)
                         |> ucwords(...)
@@ -110,9 +116,9 @@ function getallheaders(): array
                 assert(is_string($value), sprintf("Invalid argument: expecting string, \"%s\" given", typeof($value)));
                 $headers[$key] = $value;
             }
-        } elseif (isset($copy_server[$key])) {
+        } elseif (isset($copyServer[$key])) {
             assert(is_string($value), sprintf("Invalid argument: expecting string, \"%s\" given", typeof($value)));
-            $headers[$copy_server[$key]] = $value;
+            $headers[$copyServer[$key]] = $value;
         }
     }
     if (!isset($headers["Authorization"])) {
