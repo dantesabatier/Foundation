@@ -12,7 +12,7 @@ interface RandomNumberGenerator
     /**
      * Returns a value from a uniform, independent distribution of binary data.
      * @param int $upperBound The upper bound for the randomly generated value.
-     * @return int A random value of T in the range 0..<upperBound. Every value in the range 0..<upperBound is equally likely to be returned.
+     * @return int A random value in the range from zero through `$upperBound`, inclusive. Every value in the range is equally likely to be returned.
      */
     public function next(int $upperBound = 0): int;
 }

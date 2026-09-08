@@ -30,7 +30,7 @@ trait BidirectionalCollectionAlgorithms
         $i = $this->endIndex;
         while ($i !== $start) {
             $this->formIndexBefore($i);
-            if ($where($this[$i])) {
+            if ($where($this[$i], $i)) {
                 return $i;
             }
         }
