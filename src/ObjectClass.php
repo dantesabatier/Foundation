@@ -29,6 +29,8 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
     private array $observances = [];
     /** @var array<string, mixed> $valuesBeingChanged The value each key held when willChangeValueForKey() announced the change, so didChangeValueForKey() can report the one that was replaced rather than the one replacing it. */
     private array $valuesBeingChanged = [];
+    /** @var array<string, true> $keysBeingAnnounced The keys whose dependents are currently being notified, used as a re-entry guard: a model that declares a dependency cycle would otherwise recurse until the stack overflows. */
+    private array $keysBeingAnnounced = [];
     /** @var array<string, mixed> */
     public static array $staticAssociatedValues = [];
     /** @var array<string, mixed> */
@@ -66,11 +68,10 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
         return is_a($this, $class, true);
     }
 
-    #[Pure]
     #[Override]
     final public function isMember(string $class): bool
     {
-        return $this->isKind($class);
+        return $this::class === $class;
     }
 
     #[Pure]
@@ -243,6 +244,7 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
                 }
             }
         }
+        $this->announceToDependents($key, fn(string $dependentKey) => $this->willChangeValueForKey($dependentKey));
     }
 
     #[Override]
@@ -258,7 +260,7 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
                     $change->newValue = $this->valueForKey($key);
                 }
                 if ($options & KeyValueObservingOptions::old) {
-                    // The value willChangeValueForKey() recorded, not $changedValue: callers pass the value being written, which is the new one, so reporting that here labelled the replacement as the replaced. A collection mutation is the exception — it has no scalar property to read back and passes the inserted or removed members as $changedValue, which is what "old" means for it.
+                    // The value willChangeValueForKey() recorded, not $changedValue: callers pass the value being written, which is the new one, so reporting that here labeled the replacement as the replaced. A collection mutation is the exception — it has no scalar property to read back and passes the inserted or removed members as $changedValue, which is what "old" means for it.
                     $change->oldValue = match (true) {
                         array_key_exists($key, $this->valuesBeingChanged) => $this->valuesBeingChanged[$key],
                         $changeKind === KeyValueChange::insertion, $changeKind === KeyValueChange::removal => $changedValue,
@@ -279,12 +281,43 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
             }
         }
         unset($this->valuesBeingChanged[$key]);
+        $this->announceToDependents($key, fn(string $dependentKey) => $this->didChangeValueForKey($dependentKey));
+    }
+
+    /**
+     * Repeats a change announcement for every observed key whose value is derived from `$key`.
+     *
+     * This inverts {@see keyPathsForValuesAffectingValueForKey()}, which maps a derived key to its ingredients: the notification machinery needs the opposite direction, and only the keys actually being observed are worth asking about. A key already being announced is skipped, so a model that declares a dependency cycle settles instead of recursing until the stack overflows.
+     * @param string $key The key that just changed.
+     * @param Closure(string): void $announce Repeats the announcement for one dependent key.
+     */
+    private function announceToDependents(string $key, Closure $announce): void
+    {
+        if (isset($this->keysBeingAnnounced[$key])) {
+            return;
+        }
+        $this->keysBeingAnnounced[$key] = true;
+        try {
+            $announced = [];
+            foreach ($this->observances as $observance) {
+                $candidate = $observance->keyPath;
+                if ($candidate === $key || isset($announced[$candidate]) || isset($this->keysBeingAnnounced[$candidate])) {
+                    continue;
+                }
+                if (static::keyPathsForValuesAffectingValueForKey($candidate)->containsElement($key)) {
+                    $announced[$candidate] = true;
+                    $announce($candidate);
+                }
+            }
+        } finally {
+            unset($this->keysBeingAnnounced[$key]);
+        }
     }
 
     #[Override]
     public static function keyPathsForValuesAffectingValueForKey(string $key): Set
     {
-        $selector = "keyPathsForValuesAffectingValueFor" . ucfirst($key);
+        $selector = "keyPathsForValuesAffecting" . ucfirst($key);
         if (static::instancesRespond($selector)) {
             return static::$selector();
         }
@@ -294,7 +327,7 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
     #[Override]
     public static function automaticallyNotifiesObserversForKey(string $key): bool
     {
-        $selector = "automaticallyNotifiesObserversFor" . ucfirst($key);
+        $selector = "automaticallyNotifiesObserversOf" . ucfirst($key);
         if (static::instancesRespond($selector)) {
             return static::$selector();
         }

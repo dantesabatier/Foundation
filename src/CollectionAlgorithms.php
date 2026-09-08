@@ -49,7 +49,7 @@ trait CollectionAlgorithms
 
     public function sort(?Closure $by = null): self
     {
-        $by ??= fn(mixed $e0, mixed $e1): int => compare($e0, $e1);
+        $by ??= compare(...);
         usort($this->reserved, $by);
         return $this;
     }

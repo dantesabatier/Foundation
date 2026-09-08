@@ -31,7 +31,7 @@ final class Range extends ObjectClass implements ExpressibleByArrayLiteral, Iter
     }
     /** @var list<int> */
     private(set) array $array {
-        get => $this->array ??= range($this->lowerBound, $this->upperBound - 1);
+        get => $this->array ??= $this->isEmpty ? [] : range($this->lowerBound, $this->upperBound - 1);
     }
 
     /**
@@ -52,7 +52,7 @@ final class Range extends ObjectClass implements ExpressibleByArrayLiteral, Iter
     /**
      * Returns a Boolean value indicating whether the given element is contained within the range.
      *
-     * Because Range represents a half-open range, a Range instance does not contain its upper bound $element is contained in the range if it is greater than or equal to the lower bound and less than the upper bound.
+     * A half-open range includes its lower bound and excludes its upper bound.
      * @param int $element The element to check for containment.
      * @return bool true if $element is contained in the range; otherwise, false.
      */

@@ -64,7 +64,7 @@ final class CompactMapReturnTypeProvider implements MethodReturnTypeProviderInte
                 $filtered[] = $atomic;
             }
         }
-        if (!$filtered) {
+        if ($filtered === []) {
             return Type::getNever();
         }
         $cleanResult = new Union($filtered);

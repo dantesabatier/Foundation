@@ -12,10 +12,10 @@ use Sabatier\Foundation\Predicates\Predicate;
 use Traversable;
 
 /**
- * A sequence consisting of all the elements contained in each segment contained in some Base sequence.
+ * A lazy view that recursively concatenates arrays and Traversable segments from a base sequence.
  *
- * The elements of this view are a concatenation of the elements of each sequence in the base.
- * The joined method is always lazy but does not implicitly confer laziness on algorithms applied to its result.
+ * Dictionary instances remain elements because their keyed entries are not positional segments.
+ * Iteration is lazy, although algorithms applied to the view may materialize their results.
  * @template Element
  * @implements Sequence<int, Element>
  * @implements IteratorAggregate<int, Element>
@@ -24,6 +24,7 @@ final class FlattenSequence extends ObjectClass implements Sequence, IteratorAgg
 {
     use SequenceAlgorithms {
         reduce as private sequenceReduce;
+        filtered as private sequenceFiltered;
     }
 
     #[Override]
@@ -51,12 +52,23 @@ final class FlattenSequence extends ObjectClass implements Sequence, IteratorAgg
     }
 
     /**
-     * Creates a view into the given collection that allows access to elements within the specified range.
-     *
-     * @param Sequence<int, Element> $base The collection to create a view into.
+     * Creates a lazy view that recursively concatenates the base sequence's segments.
+     * @param Sequence<int, mixed> $base The sequence whose nested elements are flattened.
      */
     public function __construct(public readonly Sequence $base)
     {
+    }
+
+    /** @return array{base: Sequence<int, mixed>} */
+    public function __serialize(): array
+    {
+        return ["base" => $this->base];
+    }
+
+    /** @param array{base: Sequence<int, mixed>} $data */
+    public function __unserialize(array $data): void
+    {
+        $this->base = $data["base"];
     }
 
     /**
@@ -76,39 +88,39 @@ final class FlattenSequence extends ObjectClass implements Sequence, IteratorAgg
 
     /**
      * @template Result
-     * Returns a Collection containing the results of mapping the given closure over the collection's elements.
+     * Returns an ArrayClass containing the results of mapping the given closure over the flattened elements.
      * @param Closure(mixed, int=): Result $transform
-     * @return Sequence<int, Result>
+     * @return ArrayClass<Result>
      */
     #[Override]
-    public function map(Closure $transform): Sequence
+    public function map(Closure $transform): ArrayClass
     {
-        return new ($this->base::class)($this)->map($transform);
+        return new ArrayClass($this)->map($transform);
     }
 
     /**
      * @template Result
-     * Returns a Collection containing the non-null results of calling the given transformation with each element of this collection.
+     * Returns an ArrayClass containing the non-null results of transforming the flattened elements.
      *
      * @param Closure(mixed, int=): ?Result $transform
-     * @return Sequence<int, Result>
+     * @return ArrayClass<Result>
      */
     #[Override]
-    public function compactMap(Closure $transform): Sequence
+    public function compactMap(Closure $transform): ArrayClass
     {
-        return new ($this->base::class)($this)->compactMap($transform);
+        return new ArrayClass($this)->compactMap($transform);
     }
 
     /**
      * @template Result
-     * Returns a Collection containing the concatenated results of calling the given transformation with each element of this collection.
+     * Returns an ArrayClass containing the concatenated results of transforming the flattened elements.
      * @param Closure(mixed, int=): iterable<Result> $transform
-     * @return Sequence<int, Result>
+     * @return ArrayClass<Result>
      */
     #[Override]
-    public function flatMap(Closure $transform): Sequence
+    public function flatMap(Closure $transform): ArrayClass
     {
-        return new ($this->base::class)($this)->flatMap($transform);
+        return new ArrayClass($this)->flatMap($transform);
     }
 
     /**
@@ -134,36 +146,38 @@ final class FlattenSequence extends ObjectClass implements Sequence, IteratorAgg
     #[Override]
     public function forEach(Closure $body): void
     {
+        /**
+         * @var Element $e
+         * @var int $i
+         */
         foreach (clone $this as $i => $e) {
             $body($e, $i);
         }
     }
 
     /**
-     * Returns a Sequence containing, in order, the elements of the sequence that satisfy the given predicate.
+     * Returns an ArrayClass containing the flattened elements that satisfy the given predicate.
      *
      * Complexity: O(n), where n is the length of the sequence.
      * @param Closure(Element, int=, bool=): bool $isIncluded
-     * @return Sequence<int, Element>
+     * @return ArrayClass<Element>
      */
     #[Override]
-    public function filter(Closure $isIncluded): Sequence
+    public function filter(Closure $isIncluded): ArrayClass
     {
-        return new ($this->base::class)($this)->filter($isIncluded);
+        return new ArrayClass($this)->filter($isIncluded);
     }
 
     /**
-     * Evaluates a given predicate against each object in the receiving and returns a new sequence containing the objects for which the predicate returns true.
-     *
-     * Complexity: O(n), where n is the length of the sequence.
-     * @param Predicate $predicate The predicate against which to evaluate the receiving sequence's elements.
-     * @return Sequence<int, Element> A new sequence containing the objects in the receiving array for which predicate returns true.
-     * Objects in the resulting array appear in the same order as they do in the receiver.
+     * Returns a Collection containing, in order, the elements of the collection that satisfy the given predicate.
+     * @param Predicate $predicate
+     * @return ArrayClass<Element>
      */
     #[Override]
-    public function filtered(Predicate $predicate): Sequence
+    public function filtered(Predicate $predicate): ArrayClass
     {
-        return new ($this->base::class)($this)->filtered($predicate);
+        /** @var ArrayClass<Element> */
+        return $this->sequenceFiltered($predicate);
     }
 
     #[Override]

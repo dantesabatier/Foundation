@@ -9,13 +9,13 @@ use JetBrains\PhpStorm\Pure;
 use Override;
 
 /**
- * A simple container for a single data item.
+ * Wraps a PHP value with Foundation comparison, serialization, and display behavior.
  */
 class Value extends ObjectClass
 {
-    /** @var mixed|null The value of the object. */
+    /** @var mixed|null The wrapped value after recognized string literals are normalized. */
     public readonly mixed $value;
-    /** @var string The type of the value */
+    /** @var string The debug type of the normalized value. */
     public readonly string $type;
     #[Override]
     public string $description {
@@ -27,8 +27,8 @@ class Value extends ObjectClass
     }
 
     /**
-     * Initializes a value object to contain the specified value.
-     * @param mixed $value The value of the object.
+     * Wraps a value, converting recognized null, Boolean, and numeric strings to their scalar forms.
+     * @param mixed $value The value or scalar literal to wrap.
      */
     public function __construct(mixed $value)
     {
@@ -38,7 +38,7 @@ class Value extends ObjectClass
             } elseif (string_is_equal($value, "TRUE", CompareOptions::caseInsensitive) || string_is_equal($value, "FALSE", CompareOptions::caseInsensitive) || string_is_equal($value, "YES", CompareOptions::caseInsensitive) || string_is_equal($value, "NO", CompareOptions::caseInsensitive)) {
                 $value = filter_var($value, FILTER_VALIDATE_BOOLEAN);
             } elseif (is_numeric($value)) {
-                $value = str_contains($value, ".") ? filter_var($value, FILTER_VALIDATE_FLOAT) : filter_var($value, FILTER_VALIDATE_INT);
+                $value = str_contains($value, ".") || string_contains($value, "e", CompareOptions::caseInsensitive) ? (float)$value : (int)$value;
             }
         } elseif ($value instanceof Value) {
             $value = $value->value;
@@ -47,6 +47,7 @@ class Value extends ObjectClass
         $this->type = typeof($this->value);
     }
 
+    /** @return array{value: mixed} */
     #[Pure]
     #[ArrayShape(["value" => "mixed"])]
     public function __serialize(): array
@@ -54,9 +55,11 @@ class Value extends ObjectClass
         return ["value" => $this->value];
     }
 
+    /** @param array{value: mixed} $data */
     public function __unserialize(array $data): void
     {
         $this->value = $data["value"];
+        $this->type = typeof($this->value);
     }
 
     #[Override]

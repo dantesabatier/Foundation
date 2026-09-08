@@ -108,13 +108,10 @@ final class IndexPath extends ObjectClass implements MutableCollection, ArrayAcc
         get => $this->item;
     }
 
-    /**
-     * Initialized IndexPath object with indexes up to length.
-     * @param int[] $indexes Array of indexes to make up the index path.
-     */
-    public function __construct(array $indexes)
+    /** @param array<int, int> $indexes The ordered indexes forming the path. */
+    public function __construct(array $indexes = [])
     {
-        $this->reserved = $indexes;
+        $this->reserved = array_values($indexes);
     }
 
     /**
@@ -335,6 +332,7 @@ final class IndexPath extends ObjectClass implements MutableCollection, ArrayAcc
     #[Override]
     public function filtered(Predicate $predicate): IndexPath
     {
+        /** @var IndexPath */
         return $this->sequenceFiltered($predicate);
     }
 
@@ -548,14 +546,15 @@ final class IndexPath extends ObjectClass implements MutableCollection, ArrayAcc
     }
 
     /**
-     * Copies the indexes stored in the index path from the positions specified by the position range into the specified indexes.
-     * @param int[]|null $indexes Array of at least as many ints as specified by the length of $range. On return, the array holds the index path's indexes.
-     * @param Range $range A range of valid positions within the index path.
+     * Copies the indexes at the positions in the given half-open range.
+     * @param list<int>|null $indexes Receives the selected indexes in position order.
+     * @param-out list<int> $indexes
+     * @param Range $range A half-open range of valid positions within the index path.
      * @return void
      */
     public function getIndexes(?array &$indexes, Range $range): void
     {
-        $indexes = $this->filter($range->contains(...))->array;
+        $indexes = array_slice($this->array, $range->lowerBound, $range->count);
     }
 
     /**

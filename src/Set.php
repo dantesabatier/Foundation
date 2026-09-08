@@ -140,6 +140,15 @@ class Set extends ObjectClass implements SetAlgebra, ArrayAccess, Iterator
         }
     }
 
+    /** Returns whether another set contains the same elements, regardless of iteration order. */
+    #[Override]
+    public function isEqual(mixed $other): bool
+    {
+        return $other instanceof Set
+            && $this->count === $other->count
+            && $this->allSatisfy(fn(mixed $element): bool => $other->containsElement($element));
+    }
+
     /**
      * Returns a Boolean value indicating whether the sequence contains an element that satisfies the given predicate.
      * @param Closure(Element, int): bool $predicate A closure that takes an element of the sequence as its argument and returns a Boolean value that indicates whether the passed element represents a match.
@@ -351,6 +360,7 @@ class Set extends ObjectClass implements SetAlgebra, ArrayAccess, Iterator
     #[Override]
     public function filtered(Predicate $predicate): Set
     {
+        /** @var Set<Element> */
         return $this->sequenceFiltered($predicate);
     }
 

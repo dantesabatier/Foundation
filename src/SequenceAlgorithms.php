@@ -71,7 +71,7 @@ trait SequenceAlgorithms
         return $instance;
     }
 
-    public function filtered(Predicate $predicate): self
+    public function filtered(Predicate $predicate): Sequence
     {
         return $this->filter(fn(mixed $e): bool => $predicate->evaluate($e));
     }
@@ -102,7 +102,15 @@ trait SequenceAlgorithms
             return false;
         }
         $areEquivalent ??= is_equal(...);
-        return $this->allSatisfy(fn(mixed $e, string|int $i) => $areEquivalent($e, $sequence->first(fn(mixed $v, string|int $k): bool => $k === $i)));
+        $position = 0;
+        return $this->allSatisfy(function (mixed $element) use ($sequence, $areEquivalent, &$position): bool {
+            $otherPosition = 0;
+            $other = $sequence->first(function () use (&$otherPosition, $position): bool {
+                return $otherPosition++ === $position;
+            });
+            $position += 1;
+            return $areEquivalent($element, $other);
+        });
     }
 
     public function first(?Closure $where = null): mixed

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Sabatier\Foundation;
 
-use ArrayAccess;
 use Closure;
 use Generator;
 use IteratorAggregate;
@@ -55,8 +54,8 @@ final class Slice extends ObjectClass implements Collection, IteratorAggregate
     }
     /** @var list<Element> */
     #[Override]
-    private(set) array $array {
-        get => $this->array ??= array_slice($this->base->array, $this->startIndex, $this->endIndex - $this->startIndex);
+    public array $array {
+        get => array_slice($this->base->array, $this->startIndex - $this->base->startIndex, $this->count);
     }
     #[Override]
     public string $description {
@@ -70,6 +69,21 @@ final class Slice extends ObjectClass implements Collection, IteratorAggregate
      */
     public function __construct(public readonly Collection $base, public readonly Range $bounds)
     {
+        $this->validateBounds();
+    }
+
+    /** @return array{base: Collection<int, Element>, bounds: Range} */
+    public function __serialize(): array
+    {
+        return ["base" => $this->base, "bounds" => $this->bounds];
+    }
+
+    /** @param array{base: Collection<int, Element>, bounds: Range} $data */
+    public function __unserialize(array $data): void
+    {
+        $this->base = $data["base"];
+        $this->bounds = $data["bounds"];
+        $this->validateBounds();
     }
 
     #[Override]
@@ -95,42 +109,39 @@ final class Slice extends ObjectClass implements Collection, IteratorAggregate
 
     /**
      * @template Result
-     * Returns a Collection containing the results of mapping the given closure over the collection's elements.
+     * Returns an ArrayClass containing the results of mapping the given closure over the slice's elements.
      * @param Closure(mixed, int=): Result $transform
-     * @return Collection<int, Result>
-     * @psalm-suppress LessSpecificReturnStatement, MoreSpecificReturnType
+     * @return ArrayClass<Result>
      */
     #[Override]
-    public function map(Closure $transform): Collection
+    public function map(Closure $transform): ArrayClass
     {
-        return new ($this->base::class)($this)->map($transform);
+        return new ArrayClass($this)->map($transform);
     }
 
     /**
      * @template Result
-     * Returns a Collection containing the non-null results of calling the given transformation with each element of this collection.
+     * Returns an ArrayClass containing the non-null results of transforming the slice's elements.
      *
      * @param Closure(mixed, int=): ?Result $transform
-     * @return Collection<int, Result>
-     * @psalm-suppress LessSpecificReturnStatement, MoreSpecificReturnType
+     * @return ArrayClass<Result>
      */
     #[Override]
-    public function compactMap(Closure $transform): Collection
+    public function compactMap(Closure $transform): ArrayClass
     {
-        return new ($this->base::class)($this)->compactMap($transform);
+        return new ArrayClass($this)->compactMap($transform);
     }
 
     /**
      * @template Result
-     * Returns a Collection containing the concatenated results of calling the given transformation with each element of this collection.
+     * Returns an ArrayClass containing the concatenated results of transforming the slice's elements.
      * @param Closure(mixed, int=): iterable<Result> $transform
-     * @return Collection<int, Result>
-     * @psalm-suppress LessSpecificReturnStatement, MoreSpecificReturnType
+     * @return ArrayClass<Result>
      */
     #[Override]
-    public function flatMap(Closure $transform): Collection
+    public function flatMap(Closure $transform): ArrayClass
     {
-        return new ($this->base::class)($this)->flatMap($transform);
+        return new ArrayClass($this)->flatMap($transform);
     }
 
     /**
@@ -215,7 +226,7 @@ final class Slice extends ObjectClass implements Collection, IteratorAggregate
     #[Override]
     public function joined(): FlattenSequence
     {
-        return new FlattenSequence($this->base);
+        return new FlattenSequence($this);
     }
 
     /**
@@ -250,9 +261,8 @@ final class Slice extends ObjectClass implements Collection, IteratorAggregate
     public function getIterator(): Traversable
     {
         return (function (): Generator {
-            assert($this->base instanceof ArrayAccess);
-            foreach ($this->bounds as $e) {
-                yield $e => $this->base[$e];
+            foreach ($this->array as $offset => $element) {
+                yield $this->startIndex + $offset => $element;
             }
         })();
     }
@@ -261,5 +271,12 @@ final class Slice extends ObjectClass implements Collection, IteratorAggregate
     public function jsonSerialize(): array
     {
         return $this->array;
+    }
+
+    private function validateBounds(): void
+    {
+        if ($this->bounds->lowerBound < $this->base->startIndex || $this->bounds->upperBound > $this->base->endIndex) {
+            fatal_error(sprintf("Invalid argument: slice bounds %s are outside collection indices %s", $this->bounds->description, $this->base->indices->description));
+        }
     }
 }

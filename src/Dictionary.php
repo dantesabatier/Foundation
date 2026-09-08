@@ -433,6 +433,7 @@ final class Dictionary extends ObjectClass implements Collection, ArrayAccess, I
     #[Override]
     public function filtered(Predicate $predicate): Dictionary
     {
+        /** @var Dictionary<Element> */
         return $this->sequenceFiltered($predicate);
     }
 
@@ -444,7 +445,7 @@ final class Dictionary extends ObjectClass implements Collection, ArrayAccess, I
     #[Override]
     public function sort(?Closure $by = null): Dictionary
     {
-        $by ??= fn(mixed $e0, mixed $e1): int => compare($e0, $e1);
+        $by ??= compare(...);
         uasort($this->reserved, $by);
         return $this;
     }

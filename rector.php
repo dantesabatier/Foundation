@@ -8,6 +8,7 @@ use Rector\CodeQuality\Rector\ClassMethod\ExplicitReturnNullRector;
 use Rector\CodeQuality\Rector\ClassMethod\LocallyCalledStaticMethodToNonStaticRector;
 use Rector\CodeQuality\Rector\Equal\UseIdenticalOverEqualWithSameTypeRector;
 use Rector\CodeQuality\Rector\Identical\FlipTypeControlToUseExclusiveTypeRector;
+use Rector\CodeQuality\Rector\If_\ObjectExplicitBoolCompareRector;
 use Rector\Config\RectorConfig;
 use Rector\DeadCode\Rector\Cast\RecastingRemovalRector;
 use Rector\DeadCode\Rector\ClassMethod\RemoveEmptyClassMethodRector;
@@ -77,6 +78,7 @@ try {
             RecastingRemovalRector::class => [
                 __DIR__ . "/src/Predicates/PredicateUtilities.php"
             ],
+            ObjectExplicitBoolCompareRector::class
         ])->withPreparedSets(deadCode: true, codeQuality: true, earlyReturn: true);
 } catch (InvalidConfigurationException $e) {
     error_log($e->getMessage());

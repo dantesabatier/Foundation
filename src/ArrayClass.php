@@ -376,6 +376,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Arra
     #[Override]
     public function filtered(Predicate $predicate): ArrayClass
     {
+        /** @var ArrayClass<Element> */
         return $this->sequenceFiltered($predicate);
     }
 
@@ -798,7 +799,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Arra
      */
     public function starts(Sequence $possiblePrefix, ?Closure $areEquivalent = null): bool
     {
-        $areEquivalent ??= fn(mixed $e0, mixed $e1): bool => is_equal($e0, $e1);
+        $areEquivalent ??= is_equal(...);
         foreach ($this as $e0) {
             if ($possiblePrefix->valid()) {
                 if (!$areEquivalent($e0, $possiblePrefix->current())) {
@@ -809,7 +810,7 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Arra
             }
             $possiblePrefix->next();
         }
-        return $possiblePrefix->valid();
+        return !$possiblePrefix->valid();
     }
 
     /**
