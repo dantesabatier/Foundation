@@ -37,6 +37,8 @@ trait MutableCollectionAlgorithms
 
     public function removeFirst(int $k): void
     {
+        assert($k >= 0, "Number of elements to remove should be non-negative");
+        assert($k <= $this->count, "Can't remove more items from a collection than it contains");
         $this->removeAll(fn(mixed $e, int $i): bool => $i < $k);
     }
 

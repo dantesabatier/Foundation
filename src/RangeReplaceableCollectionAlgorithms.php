@@ -19,11 +19,15 @@ trait RangeReplaceableCollectionAlgorithms
     
     public function replaceSubrange(Range $subrange, Collection $newElements): void
     {
-        assert($subrange->count() <= $this->count() && $subrange->count() === $newElements->count(), "Invalid argument: the range's upper bound must be less or equal to the count of the receiver and, range and collection must have the same number of elements");
-        foreach ($subrange as $idx => $bound) {
-            $this->removeAt($bound);
-            $this->insertAt($newElements[$idx], $bound);
-        }
+        assert($subrange->lowerBound >= $this->startIndex && $subrange->upperBound <= $this->endIndex, "Invalid argument: subrange bounds must be valid collection indices");
+        // The replacement may be a view into this collection, so preserve its elements before mutation invalidates the view.
+        $replacement = $newElements->map(fn(mixed $element): mixed => $element);
+        $this->removeSubrange($subrange);
+        $insertionIndex = $subrange->lowerBound;
+        $replacement->forEach(function (mixed $element) use (&$insertionIndex): void {
+            $this->insertAt($element, $insertionIndex);
+            $this->formIndexAfter($insertionIndex);
+        });
     }
 
     public function removeSubrange(Range $subrange): void

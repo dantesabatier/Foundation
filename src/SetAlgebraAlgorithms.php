@@ -102,7 +102,7 @@ trait SetAlgebraAlgorithms
 
     public function isSubset(SetAlgebra $other): bool
     {
-        if ($this->compare($other) != ComparisonResult::orderedAscending) {
+        if ($this->compare($other) === ComparisonResult::orderedDescending) {
             return false;
         }
         return $this->allSatisfy($other->containsElement(...));
@@ -110,10 +110,10 @@ trait SetAlgebraAlgorithms
 
     public function isSuperset(SetAlgebra $other): bool
     {
-        if ($this->compare($other) != ComparisonResult::orderedDescending) {
+        if ($this->compare($other) === ComparisonResult::orderedAscending) {
             return false;
         }
-        return $this->allSatisfy($other->containsElement(...));
+        return $other->allSatisfy($this->containsElement(...));
     }
 
     public function isDisjoint(SetAlgebra $other): bool
