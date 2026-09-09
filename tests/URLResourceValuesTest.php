@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace Sabatier\Foundation\Tests;
 
+use Override;
 use PHPUnit\Framework\TestCase;
+use Sabatier\Foundation\Dictionary;
 use Sabatier\Foundation\FileManager;
 use Sabatier\Foundation\Set;
 use Sabatier\Foundation\URL;
 use Sabatier\Foundation\URLResourceKey;
+use Sabatier\Foundation\URLResourceValues;
 use Throwable;
 
 /**
@@ -23,12 +26,14 @@ final class URLResourceValuesTest extends TestCase
 {
     private string $directory;
 
+    #[Override]
     protected function setUp(): void
     {
         $this->directory = sys_get_temp_dir() . "/" . uniqid("resourcevalues", true);
         mkdir($this->directory, 0777, true);
     }
 
+    #[Override]
     protected function tearDown(): void
     {
         try {
@@ -79,10 +84,78 @@ final class URLResourceValuesTest extends TestCase
     public function testIsPackageIsReportedAlongsideTheOtherKeys(): void
     {
         $url = $this->makeDirectory("Model.momd");
-        $values = $url->resourceValues(new Set([URLResourceKey::isPackageKey, URLResourceKey::isDirectoryKey, URLResourceKey::isRegularFileKey]));
+        $values = $url->resourceValues(new Set([URLResourceKey::isPackageKey, URLResourceKey::isDirectoryKey, URLResourceKey::isRegularFileKey, URLResourceKey::fileResourceTypeKey]));
 
-        $this->assertTrue($values->allValues[URLResourceKey::isPackageKey]);
-        $this->assertTrue($values->allValues[URLResourceKey::isDirectoryKey]);
-        $this->assertFalse($values->allValues[URLResourceKey::isRegularFileKey]);
+        $this->assertTrue($values->contains(URLResourceKey::isPackageKey));
+        $this->assertTrue($values->isDirectory);
+        $this->assertFalse($values->isRegularFile);
+        $this->assertSame("dir", $values->fileResourceType);
+    }
+
+    public function testRegularFileValuesAreExposedThroughTheirProperties(): void
+    {
+        $url = $this->makeFile("payload.txt");
+        $values = $url->resourceValues(new Set([
+            URLResourceKey::nameKey,
+            URLResourceKey::pathKey,
+            URLResourceKey::parentDirectoryURLKey,
+            URLResourceKey::fileSizeKey,
+            URLResourceKey::isDirectoryKey,
+            URLResourceKey::isRegularFileKey,
+            URLResourceKey::fileResourceTypeKey,
+        ]));
+
+        $this->assertSame("payload.txt", $values->name);
+        $this->assertSame($url->path, $values->path);
+        $parentDirectory = $values->parentDirectory;
+        $this->assertNotNull($parentDirectory);
+        $this->assertTrue($parentDirectory->isEqual(URL::fileURL($this->directory)));
+        $this->assertSame(8, $values->fileSize);
+        $this->assertFalse($values->isDirectory);
+        $this->assertTrue($values->isRegularFile);
+        $this->assertSame("file", $values->fileResourceType);
+        $this->assertFalse($values->contains(URLResourceKey::creationDateKey));
+        $this->assertNull($values->creationDate);
+    }
+
+    public function testTemporaryValueIsUsedUntilItIsRemovedFromTheCache(): void
+    {
+        $url = $this->makeFile("temporary.txt");
+        $url->setTemporaryResourceValue(99, URLResourceKey::fileSizeKey);
+
+        $this->assertSame(99, $url->resourceValues(new Set([URLResourceKey::fileSizeKey]))->fileSize);
+
+        $url->removeCachedResourceValue(URLResourceKey::fileSizeKey);
+
+        $this->assertSame(8, $url->resourceValues(new Set([URLResourceKey::fileSizeKey]))->fileSize);
+    }
+
+    public function testFileValueIsReadAgainAfterCacheInvalidation(): void
+    {
+        $url = $this->makeFile("cached.txt");
+
+        $this->assertSame(8, $url->resourceValues(new Set([URLResourceKey::fileSizeKey]))->fileSize);
+
+        file_put_contents($url->path, str_repeat("x", 12));
+        clearstatcache(true, $url->path);
+        $this->assertSame(8, $url->resourceValues(new Set([URLResourceKey::fileSizeKey]))->fileSize);
+
+        $url->removeCachedResourceValue(URLResourceKey::fileSizeKey);
+
+        $this->assertSame(12, $url->resourceValues(new Set([URLResourceKey::fileSizeKey]))->fileSize);
+    }
+
+    public function testSettingTheNameMovesTheFile(): void
+    {
+        $url = $this->makeFile("original.txt");
+        $values = new URLResourceValues(
+            new Set([URLResourceKey::nameKey]),
+            new Dictionary([URLResourceKey::nameKey => "renamed.txt"]),
+        );
+
+        $url->setResourceValues($values);
+
+        $this->assertFileDoesNotExist($this->directory . "/original.txt");
+        $this->assertFileExists($this->directory . "/renamed.txt");
     }
 }
