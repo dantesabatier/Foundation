@@ -328,6 +328,7 @@ final class ProtocolClient implements URLProtocolClient
                 $task->state = URLSessionTaskState::completed;
                 $delegate = $behaviour->taskDelegate;
                 if ($delegate instanceof URLSessionTaskDelegate) {
+                    /** @noinspection PhpConditionAlreadyCheckedInspection */
                     if ($delegate instanceof URLSessionDownloadDelegate && $task instanceof URLSessionDownloadTask) {
                         /** @var URL|null $location */
                         $location = $protocol::property("temporaryFileURL", $request);
