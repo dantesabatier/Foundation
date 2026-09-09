@@ -8,8 +8,12 @@ use Override;
 use PHPUnit\Framework\TestCase;
 use Sabatier\Foundation\ArrayClass;
 use Sabatier\Foundation\Dictionary;
+use Sabatier\Foundation\NotificationCenter;
 use Sabatier\Foundation\URL;
 use Sabatier\Foundation\UserDefaults;
+
+use const Sabatier\Foundation\BytesPerKilobyte;
+use const Sabatier\Foundation\USER_DEFAULTS_SIZE_LIMIT;
 
 /**
  * Tests for src/UserDefaults.php.
@@ -120,14 +124,41 @@ final class UserDefaultsTest extends TestCase
         $existing = $this->write("existing");
         $fallback = $this->write("fallback");
         $this->defaults->setObject("stored", $existing);
+        $registered = new Dictionary([$existing => "registered", $fallback => "default"]);
 
-        $this->defaults->register(new Dictionary([
-            $existing => "registered",
-            $fallback => "default",
-        ]));
+        $this->defaults->register($registered);
+        $representation = $this->defaults->dictionaryRepresentation();
 
         $this->assertSame("stored", $this->defaults->string($existing));
         $this->assertSame("default", $this->defaults->string($fallback));
+        $this->assertSame("stored", $representation[$existing]);
+        $this->assertSame("default", $representation[$fallback]);
+    }
+
+    public function testPersistentValueOverridesARegisteredDefaultUntilItIsRemoved(): void
+    {
+        $key = $this->write("appearance");
+        $this->defaults->register(new Dictionary([$key => "light"]));
+        $this->defaults->setObject("dark", $key);
+
+        $this->assertSame("dark", $this->defaults->string($key));
+
+        $this->defaults->removeObject($key);
+
+        $this->assertSame("light", $this->defaults->string($key));
+    }
+
+    public function testRegisteredDefaultsAreNotLoadedByAFreshInstance(): void
+    {
+        $registeredKey = $this->write("registered-only");
+        $persistentKey = $this->write("persistent");
+        $this->defaults->register(new Dictionary([$registeredKey => "transient"]));
+        $this->defaults->setObject("stored", $persistentKey);
+
+        $fresh = new UserDefaults($this->suiteName);
+
+        $this->assertNull($fresh->string($registeredKey));
+        $this->assertSame("stored", $fresh->string($persistentKey));
     }
 
     public function testPersistentDomainCanBeSetAndRemoved(): void
@@ -141,9 +172,64 @@ final class UserDefaultsTest extends TestCase
         $this->assertSame(0, $this->defaults->persistentDomain($this->suiteName)->count);
     }
 
+    public function testSettingPersistentDomainReplacesItsPreviousContents(): void
+    {
+        $this->defaults->setPersistentDomain(new Dictionary(["stale" => "old"]), $this->suiteName);
+        $this->defaults->setPersistentDomain(new Dictionary(["current" => "new"]), $this->suiteName);
+
+        $domain = $this->defaults->persistentDomain($this->suiteName);
+
+        $this->assertNull($domain["stale"]);
+        $this->assertSame("new", $domain["current"]);
+
+        $this->defaults->removePersistentDomain($this->suiteName);
+    }
+
+    public function testSizeLimitNotificationUsesKilobytes(): void
+    {
+        /** @var ArrayClass<bool> $notifications */
+        $notifications = new ArrayClass();
+        $center = NotificationCenter::default();
+        $receiveNotification = function () use ($notifications): void {
+            $notifications->append(true);
+        };
+        $observer = $center->addObserverForName(UserDefaults::sizeLimitExceededNotification, $this->defaults, $receiveNotification);
+
+        try {
+            $this->defaults->setObject("small", $this->write("small"));
+            $this->assertCount(0, $notifications);
+
+            $this->defaults->setObject(str_repeat("x", (USER_DEFAULTS_SIZE_LIMIT + 1) * BytesPerKilobyte), $this->write("large"));
+            $this->assertCount(1, $notifications);
+        } finally {
+            $center->removeObserver($observer);
+        }
+    }
+
     public function testStandardReturnsTheSharedDefaultsInstance(): void
     {
         $this->assertSame(UserDefaults::standard(), UserDefaults::standard());
+    }
+
+    public function testInstancesOfTheSameSuiteSharePersistentValues(): void
+    {
+        $key = $this->write("shared");
+        $other = new UserDefaults($this->suiteName);
+
+        $this->defaults->setObject("value", $key);
+
+        $this->assertSame("value", $other->string($key));
+    }
+
+    public function testRemovingAndReaddingASuiteKeepsItsPersistentValues(): void
+    {
+        $key = $this->write("retained");
+        $this->defaults->setObject("value", $key);
+
+        $this->defaults->removeSuite($this->suiteName);
+        $this->defaults->addSuite($this->suiteName);
+
+        $this->assertSame("value", $this->defaults->string($key));
     }
 
     public function testAMissingKeyReturnsTheDocumentedDefault(): void

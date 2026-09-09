@@ -18,6 +18,12 @@ final class UserDefaults
     public const string didChangeNotification = UserDefaultsDidChangeNotification;
     public const string sizeLimitExceededNotification = UserDefaultsSizeLimitExceededNotification;
     private readonly string $suiteName;
+    /** @var Dictionary<mixed> */
+    private readonly Dictionary $registeredDefaults;
+    /** @internal */
+    public ApplicationPreferences $applicationPreferences {
+        get => self::standardUserPreferences()->valueForKey($this->suiteName) ?? fatal_error("Suite \"$this->suiteName\" not found");
+    }
 
     /**
      * Creates a user defaults object initialized with the defaults for the specified database name.
@@ -29,6 +35,7 @@ final class UserDefaults
     {
         $suiteName ??= Bundle::main()->bundleIdentifier ?? fatal_error("Unable to infer a valid suite");
         $this->suiteName = $suiteName;
+        $this->registeredDefaults = new Dictionary();
         $this->addSuite($this->suiteName);
     }
 
@@ -209,7 +216,15 @@ final class UserDefaults
      */
     public function dictionaryRepresentation(): Dictionary
     {
-        return self::standardUserPreferences()->valueForKey($this->suiteName)?->dictionaryRepresentation ?? fatal_error("Suite \"$this->suiteName\" not found");
+        $representation = clone $this->registeredDefaults;
+        $representation->merge($this->persistentDictionaryRepresentation());
+        return $representation;
+    }
+
+    /** @return Dictionary<mixed> */
+    private function persistentDictionaryRepresentation(): Dictionary
+    {
+        return $this->applicationPreferences->dictionaryRepresentation;
     }
 
     /**
@@ -221,7 +236,7 @@ final class UserDefaults
      */
     public function setObject(mixed $value, string $key): void
     {
-        $this->dictionaryRepresentation()->updateValue($value, $key);
+        $this->persistentDictionaryRepresentation()->updateValue($value, $key);
         NotificationCenter::default()->postNotificationName(self::didChangeNotification, $this);
     }
 
@@ -291,7 +306,7 @@ final class UserDefaults
      */
     public function removeObject(string $key): void
     {
-        $this->dictionaryRepresentation()->removeValueForKey($key);
+        $this->persistentDictionaryRepresentation()->removeValueForKey($key);
         NotificationCenter::default()->postNotificationName(self::didChangeNotification, $this);
     }
 
@@ -304,7 +319,7 @@ final class UserDefaults
      */
     public function register(Dictionary $defaults): void
     {
-        $this->dictionaryRepresentation()->merge($defaults, fn(mixed $old, mixed $new): mixed => $old ?? $new);
+        $this->registeredDefaults->merge($defaults);
     }
 
     /**
@@ -315,7 +330,10 @@ final class UserDefaults
      */
     public function addSuite(string $named): void
     {
-        self::standardUserPreferences()[$named] = new ApplicationPreferences($named);
+        $preferences = self::standardUserPreferences();
+        if (!$preferences->offsetExists($named)) {
+            $preferences[$named] = new ApplicationPreferences($named);
+        }
     }
 
     /**
@@ -324,7 +342,12 @@ final class UserDefaults
      */
     public function removeSuite(string $named): void
     {
-        self::standardUserPreferences()->removeValueForKey($named);
+        $preferences = self::standardUserPreferences();
+        $applicationPreferences = $preferences->valueForKey($named);
+        if ($applicationPreferences instanceof ApplicationPreferences) {
+            $applicationPreferences->invalidate();
+        }
+        $preferences->removeValueForKey($named);
     }
 
     /**
@@ -350,7 +373,9 @@ final class UserDefaults
     public function setPersistentDomain(Dictionary $domain, string $domainName): void
     {
         $defaults = new UserDefaults($domainName);
-        $defaults->dictionaryRepresentation()->merge($domain);
+        $dictionary = $defaults->persistentDictionaryRepresentation();
+        $dictionary->removeAll();
+        $dictionary->merge($domain);
         NotificationCenter::default()->postNotificationName(self::didChangeNotification, $defaults);
     }
 
@@ -363,7 +388,7 @@ final class UserDefaults
     public function removePersistentDomain(string $domainName): void
     {
         $defaults = new UserDefaults($domainName);
-        $defaults->dictionaryRepresentation()->removeAll();
+        $defaults->persistentDictionaryRepresentation()->removeAll();
         NotificationCenter::default()->postNotificationName(self::didChangeNotification, $defaults);
     }
 
