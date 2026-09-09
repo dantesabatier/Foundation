@@ -388,13 +388,11 @@ final class EasyHandle
             // Reads the socket directly rather than through the delegate's fill(), whose granularity belongs to whatever the delegate needs for its uploads: it answered with a whole block once FTP support switched it from fgets() to fread(), and a block is the one shape the header parser below cannot consume.
             $data = fread($rawHandle, CURL_MAX_WRITE_SIZE);
             if ($data === false || $data === "") {
-                stream_get_meta_data($rawHandle)["timed_out"]
-                    ? fatal_error("Connection timeout while reading the WebSocket handshake")
-                    : fatal_error("The connection closed before the WebSocket handshake completed");
+                stream_get_meta_data($rawHandle)["timed_out"] ? fatal_error("Connection timeout while reading the WebSocket handshake") : fatal_error("The connection closed before the WebSocket handshake completed");
             }
             $buffer .= $data;
         } while (substr_count($buffer, "\r\n\r\n") === 0);
-        // Delivered one line at a time, the way CURLOPT_HEADERFUNCTION feeds the HTTP path: the parser recognises the end of the header by receiving the blank line on its own, so handing it the whole block at once leaves the header forever incomplete.
+        // Delivered one line at a time, the way CURLOPT_HEADERFUNCTION feeds the HTTP path: the parser recognizes the end of the header by receiving the blank line on its own, so handing it the whole block at once leaves the header forever incomplete.
         $headerLines = explode("\r\n", substr($buffer, 0, (int)strpos($buffer, "\r\n\r\n")));
         $headerLines[] = "";
         foreach ($headerLines as $line) {
