@@ -17,9 +17,9 @@ use Sabatier\Foundation\UndefinedKeyException;
  * mutating, reading a range of positions — and leaves the container itself untested.
  *
  * Regression guards:
- *  - sort() mutates the receiver and answers it, while sorted() and reversed() copy.
- *    The two halves of that pair are easy to conflate, and CollectionDifference makes
- *    the opposite choice for sort(), so the asymmetry is worth pinning;
+ *  - sort() is an in-place sort, as in Swift: it reorders the receiver and answers it so
+ *    the call can be chained. sorted() and reversed() are the copying halves of that
+ *    pair, and conflating the two is the usual mistake;
  *  - the mutators operate on the positions themselves: remove, removeAll with a
  *    predicate, removeFirst/Last and popFirst/Last;
  *  - valueForKey() reads the declared properties rather than a position, so a key that
@@ -90,14 +90,14 @@ final class IndexPathCollectionTest extends TestCase
         $this->assertTrue($path->containsElement($path->randomElement()));
     }
 
-    public function testSortRewritesTheReceiverWhileSortedCopies(): void
+    public function testSortIsInPlaceWhileSortedCopies(): void
     {
         $sortedInPlace = new IndexPath([3, 1, 2]);
 
         $answer = $sortedInPlace->sort(fn(int $lhs, int $rhs): int => $lhs <=> $rhs);
 
-        $this->assertSame([1, 2, 3], $sortedInPlace->array, "sort() rewrites the receiver");
-        $this->assertSame($sortedInPlace, $answer, "and answers it rather than a copy");
+        $this->assertSame([1, 2, 3], $sortedInPlace->array, "sort() reorders the receiver in place");
+        $this->assertSame($sortedInPlace, $answer, "and answers it so the call can be chained");
 
         $copied = new IndexPath([3, 1, 2]);
 
