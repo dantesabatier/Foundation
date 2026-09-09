@@ -64,7 +64,8 @@ trait MutableCollectionAlgorithms
             $this->reserved = [];
             return;
         }
-        $this->reserved = $this->filter(fn(mixed $e, int $i): bool => !$where($e, $i))->reserved;
+        // Reads the survivors through the public array rather than the filtered collection's own storage: filter() is free to answer with a different class — CollectionDifference returns an ArrayClass — and protected access is per class, not per hierarchy.
+        $this->reserved = $this->filter(fn(mixed $e, int $i): bool => !$where($e, $i))->array;
     }
 
     public function popFirst()
