@@ -39,7 +39,7 @@ final readonly class LocalizationExtractor
         /** @var ArrayClass<string> $filenames */
         $filenames = new ArrayClass();
         foreach ($enumerator as $url) {
-            if (!str_ends_with($url->lastPathComponent, "php")) {
+            if ($url->pathExtension !== "php") {
                 continue;
             }
             if ($this->excludedFilenames->containsElement($fileManager->displayName($url->path))) {
@@ -60,10 +60,10 @@ final readonly class LocalizationExtractor
             if (!$fileManager->fileExists($pot)) {
                 $fileManager->createFile($pot, "");
             }
-            exec("xgettext --keyword=localized_string -d Localizable --from-code=UTF-8 --no-location --no-wrap -j --files-from=$listFile -o $pot", $potOutput, $potStatus);
+            exec(sprintf("xgettext --keyword=localized_string -d Localizable --from-code=UTF-8 --no-location --no-wrap -j --files-from=%s -o %s", escapeshellarg($listFile), escapeshellarg($pot)), $potOutput, $potStatus);
             $potStatus === 0 ?: fatal_error("xgettext failed with status $potStatus");
             $mo = $messages->appendingPathExtension("mo")->path;
-            exec("msgfmt $pot -o $mo", $moOutput, $moStatus);
+            exec(sprintf("msgfmt %s -o %s", escapeshellarg($pot), escapeshellarg($mo)), $moOutput, $moStatus);
             $moStatus === 0 ?: fatal_error("msgfmt failed with status $moStatus");
         }
     }
