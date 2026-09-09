@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Sabatier\Foundation\Tests;
 
+use Override;
 use PHPUnit\Framework\TestCase;
 use Sabatier\Foundation\ArrayClass;
 use Sabatier\Foundation\Dictionary;
@@ -25,21 +26,25 @@ use Sabatier\Foundation\UserDefaults;
 final class UserDefaultsTest extends TestCase
 {
     private UserDefaults $defaults;
+    private string $suiteName;
     /** @var list<string> $written The keys to clear in tearDown. */
     private array $written = [];
 
+    #[Override]
     protected function setUp(): void
     {
-        $this->defaults = new UserDefaults(sprintf("foundation-tests-%d", getmypid()));
+        $this->suiteName = sprintf("foundation-tests-%d", getmypid());
+        $this->defaults = new UserDefaults($this->suiteName);
         $this->written = [];
     }
 
+    #[Override]
     protected function tearDown(): void
     {
         foreach ($this->written as $key) {
             $this->defaults->removeObject($key);
         }
-        $this->defaults->synchronize();
+        $this->assertTrue($this->defaults->synchronize());
     }
 
     private function write(string $key): string
@@ -57,7 +62,6 @@ final class UserDefaultsTest extends TestCase
 
     public function testDoubleCoercesTheValuesItsContractNames(): void
     {
-        // The docblock promises each of these conversions.
         $this->defaults->setBool(true, $this->write("flag"));
         $this->defaults->setInteger(2, $this->write("count"));
         $this->defaults->setObject("123.4", $this->write("text"));
@@ -101,6 +105,47 @@ final class UserDefaultsTest extends TestCase
         $this->assertSame("v", $this->defaults->dictionary("map")?->offsetGet("k"));
     }
 
+    public function testStringArrayRequiresEveryElementToBeAString(): void
+    {
+        $this->defaults->setObject(new ArrayClass(["one", "two"]), $this->write("strings"));
+        $this->defaults->setObject(new ArrayClass(["one", 2]), $this->write("mixed"));
+
+        $this->assertSame(["one", "two"], $this->defaults->stringArray("strings")?->array);
+        $this->assertNull($this->defaults->stringArray("mixed"));
+        $this->assertNull($this->defaults->stringArray("absent"));
+    }
+
+    public function testRegisterSuppliesMissingValuesWithoutReplacingStoredValues(): void
+    {
+        $existing = $this->write("existing");
+        $fallback = $this->write("fallback");
+        $this->defaults->setObject("stored", $existing);
+
+        $this->defaults->register(new Dictionary([
+            $existing => "registered",
+            $fallback => "default",
+        ]));
+
+        $this->assertSame("stored", $this->defaults->string($existing));
+        $this->assertSame("default", $this->defaults->string($fallback));
+    }
+
+    public function testPersistentDomainCanBeSetAndRemoved(): void
+    {
+        $this->defaults->setPersistentDomain(new Dictionary(["theme" => "dark"]), $this->suiteName);
+
+        $this->assertSame("dark", $this->defaults->persistentDomain($this->suiteName)["theme"]);
+
+        $this->defaults->removePersistentDomain($this->suiteName);
+
+        $this->assertSame(0, $this->defaults->persistentDomain($this->suiteName)->count);
+    }
+
+    public function testStandardReturnsTheSharedDefaultsInstance(): void
+    {
+        $this->assertSame(UserDefaults::standard(), UserDefaults::standard());
+    }
+
     public function testAMissingKeyReturnsTheDocumentedDefault(): void
     {
         $this->assertNull($this->defaults->string("absent"));
@@ -129,7 +174,7 @@ final class UserDefaultsTest extends TestCase
         $writer = new UserDefaults($suite);
         $writer->setObject("Ventas & Marketing", "area");
         $writer->setDouble(2.5, "amount");
-        $writer->synchronize();
+        $this->assertTrue($writer->synchronize());
 
         $reader = new UserDefaults($suite);
 
@@ -138,7 +183,7 @@ final class UserDefaultsTest extends TestCase
 
         $reader->removeObject("area");
         $reader->removeObject("amount");
-        $reader->synchronize();
+        $this->assertTrue($reader->synchronize());
     }
 
     public function testDictionaryRepresentationCarriesEveryValue(): void
