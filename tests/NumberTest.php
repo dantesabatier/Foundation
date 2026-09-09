@@ -26,10 +26,12 @@ use Sabatier\Foundation\Set;
  *  - the collections rely on that: Set deduplicates, ArrayClass searches and sort()
  *    orders through isEqual()/compare() rather than through hashes, so breaking Number's
  *    equality changes how every collection holding one behaves;
- *  - compare() converts the receiver to the type of the operand rather than the other
- *    way round, which is why comparing against a string is a string comparison — "42"
- *    sorts before "9" — and comparing against a bool asks only whether the number is
- *    non-zero;
+ *  - compare() stays a numeric comparison whatever the operand is spelled as. It used to
+ *    compare against a string as text, so "9" sorted after 42 and a mixed collection
+ *    ordered by spelling rather than by value — a Number that stops answering as a
+ *    number for one operand type contradicts the only thing the class is for;
+ *  - comparing against a bool still asks only whether the number is non-zero, and a
+ *    string that is not numeric falls through to the parent;
  *  - an operand it cannot compare falls through to the parent, which answers a stable
  *    order rather than raising.
  */
@@ -85,11 +87,22 @@ final class NumberTest extends TestCase
         $this->assertSame($expected, new Number(42)->compare($other));
     }
 
-    public function testComparingAgainstAStringIsAStringComparison(): void
+    public function testANumericStringIsComparedAsANumber(): void
     {
-        // The receiver is rendered as a string to meet the operand, so the ordering is lexicographic: "42" sorts before "9" even though 42 is the larger number.
-        $this->assertSame(ComparisonResult::orderedAscending, new Number(42)->compare("9"));
-        $this->assertSame(ComparisonResult::orderedSame, new Number(42)->compare("42"));
+        $number = new Number(42);
+
+        $this->assertSame(ComparisonResult::orderedDescending, $number->compare("9"), "42 is greater than 9, however the operand is spelled");
+        $this->assertSame(ComparisonResult::orderedSame, $number->compare("42"));
+        $this->assertSame(ComparisonResult::orderedAscending, $number->compare("100"));
+        $this->assertSame(ComparisonResult::orderedSame, new Number(1.5)->compare("1.50"), "the value is what counts, not its spelling");
+    }
+
+    public function testAStringThatIsNotANumberFallsThroughToTheParent(): void
+    {
+        $number = new Number(42);
+
+        $this->assertNotSame(ComparisonResult::orderedSame, $number->compare("abc"), "there is no ordering to answer, only a stable one");
+        $this->assertFalse($number->isEqual("abc"));
     }
 
     public function testComparingAgainstABooleanAsksOnlyWhetherTheNumberIsSet(): void

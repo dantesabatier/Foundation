@@ -67,8 +67,8 @@ final class Number extends Value
         if (is_bool($other)) {
             return ComparisonResult::from($this->boolValue <=> $other);
         }
-        if (is_string($other)) {
-            return ComparisonResult::from(string_compare($this->stringValue, $other));
+        if (is_numeric($other)) {
+            return ComparisonResult::from($this->floatValue <=> (float)$other);
         }
         if ($other instanceof Number) {
             return $this->compare($other->value);
