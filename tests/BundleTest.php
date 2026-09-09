@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Sabatier\Foundation\Tests;
 
 use GdImage;
+use Override;
 use PHPUnit\Framework\TestCase;
 use Sabatier\Foundation\ArrayClass;
 use Sabatier\Foundation\Bundle;
@@ -34,11 +35,12 @@ final class BundleTest extends TestCase
     private Bundle $bundle;
     private Bundle $bare;
 
+    #[Override]
     protected function setUp(): void
     {
         // Fixture: a bundle directory with an Info.plist and a Resources tree, plus a
         // bare directory with neither.
-        $this->root = sys_get_temp_dir() . DIRECTORY_SEPARATOR . "sabatier-bundle-test-" . getmypid();
+        $this->root = sys_get_temp_dir() . DIRECTORY_SEPARATOR . "sabatier-bundle-test-" . (int)getmypid();
         $this->bundleRoot = $this->root . DIRECTORY_SEPARATOR . "TestBundle";
         $this->bareRoot = $this->root . DIRECTORY_SEPARATOR . "BareBundle";
         $this->resources = $this->bundleRoot . DIRECTORY_SEPARATOR . "Resources";
@@ -52,27 +54,28 @@ final class BundleTest extends TestCase
             mkdir($this->bareRoot, 0777, true);
         }
 
-        file_put_contents($this->bundleRoot . DIRECTORY_SEPARATOR . "Info.plist", <<<PLIST
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist>
-<dict>
-	<key>CFBundleDevelopmentRegion</key>
-	<string>en</string>
-	<key>CFBundleIdentifier</key>
-	<string>com.example.bundle-tests</string>
-	<key>CFBundleName</key>
-	<string>TestBundle</string>
-	<key>CFBundlePackageType</key>
-	<string>APPL</string>
-	<key>CFBundleLocalizations</key>
-	<array>
-		<string>en</string>
-		<string>es</string>
-	</array>
-</dict>
-</plist>
-PLIST);
+        $info = [
+            '<?xml version="1.0" encoding="UTF-8"?>',
+            '<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "https://www.apple.com/DTDs/PropertyList-1.0.dtd">',
+            "<plist>",
+            "<dict>",
+            "\t<key>CFBundleDevelopmentRegion</key>",
+            "\t<string>en</string>",
+            "\t<key>CFBundleIdentifier</key>",
+            "\t<string>com.example.bundle-tests</string>",
+            "\t<key>CFBundleName</key>",
+            "\t<string>TestBundle</string>",
+            "\t<key>CFBundlePackageType</key>",
+            "\t<string>APPL</string>",
+            "\t<key>CFBundleLocalizations</key>",
+            "\t<array>",
+            "\t\t<string>en</string>",
+            "\t\t<string>es</string>",
+            "\t</array>",
+            "</dict>",
+            "</plist>",
+        ];
+        file_put_contents($this->bundleRoot . DIRECTORY_SEPARATOR . "Info.plist", implode(PHP_EOL, $info));
 
         file_put_contents($this->resources . DIRECTORY_SEPARATOR . "data.json", "{\"a\":1}");
         file_put_contents($this->resources . DIRECTORY_SEPARATOR . "other.json", "{\"b\":2}");
@@ -89,6 +92,7 @@ PLIST);
         $this->bare = Bundle::bundleWithPath($this->bareRoot);
     }
 
+    #[Override]
     protected function tearDown(): void
     {
         $paths = [
@@ -161,9 +165,10 @@ PLIST);
     public function testResourceEnumeration(): void
     {
         $jsonURLs = $this->bundle->urls("json");
-        $this->assertTrue($jsonURLs instanceof ArrayClass && $jsonURLs->count === 2, "urls() returns every resource with the given extension");
-        $jsonNames = $jsonURLs?->map(fn(URL $url): string => $url->lastPathComponent);
-        $this->assertTrue($jsonNames !== null && $jsonNames->containsElement("data.json") && $jsonNames->containsElement("other.json"), "urls() returns the expected files");
+        $this->assertInstanceOf(ArrayClass::class, $jsonURLs, "urls() returns a collection when resources match");
+        $this->assertSame(2, $jsonURLs->count, "urls() returns every resource with the given extension");
+        $jsonNames = $jsonURLs->map(fn(URL $url): string => $url->lastPathComponent);
+        $this->assertTrue($jsonNames->containsElement("data.json") && $jsonNames->containsElement("other.json"), "urls() returns the expected files");
         $allNames = $this->bundle->urls()?->map(fn(URL $url): string => $url->lastPathComponent);
         $this->assertTrue($allNames !== null && $allNames->containsElement("notes.txt") && $allNames->containsElement("data.json"), "urls() without an extension returns everything in Resources");
         $this->assertNull($this->bundle->urls("json", "Extras"), "urls() returns null when nothing matches");
@@ -204,6 +209,41 @@ PLIST);
         $this->assertTrue($this->bare->localizations->isEmpty, "localizations is empty without an Info.plist");
     }
 
+    public function testLocalizedStringUsesTheDocumentedFallbacks(): void
+    {
+        $key = "Missing bundle test localization";
+
+        $this->assertSame($key, $this->bundle->localizedString($key));
+        $this->assertSame("Fallback", $this->bundle->localizedString($key, "Fallback"));
+        $this->assertSame("", $this->bundle->localizedString($key, ""));
+        $this->assertSame("Fallback", $this->bare->localizedString($key, "Fallback"));
+        $this->bundle->localizedString($key, null, "");
+        $this->assertSame(realpath($this->resources), realpath($this->boundDirectory("Localizable")));
+    }
+
+    public function testLocalizedStringRebindsATableWhenSwitchingBundles(): void
+    {
+        $alternateRoot = $this->root . DIRECTORY_SEPARATOR . "AlternateBundle";
+        $alternateResources = $alternateRoot . DIRECTORY_SEPARATOR . "Resources";
+        mkdir($alternateResources, 0777, true);
+        $alternate = Bundle::bundleWithPath($alternateRoot);
+        $table = "BundleTest" . (int)getmypid();
+
+        try {
+            $this->bundle->localizedString("Missing", null, $table);
+            $this->assertSame(realpath($this->resources), realpath($this->boundDirectory($table)));
+
+            $alternate->localizedString("Missing", null, $table);
+            $this->assertSame(realpath($alternateResources), realpath($this->boundDirectory($table)));
+
+            $this->bundle->localizedString("Missing", null, $table);
+            $this->assertSame(realpath($this->resources), realpath($this->boundDirectory($table)));
+        } finally {
+            rmdir($alternateResources);
+            rmdir($alternateRoot);
+        }
+    }
+
     public function testClassLoadingAndBundleForClass(): void
     {
         $this->assertSame(URL::class, $this->bundle->classNamed(URL::class), "classNamed resolves an already-loaded class");
@@ -225,5 +265,14 @@ PLIST);
         $this->assertFalse(Bundle::allFrameworks()->containsElement($this->bundle), "allFrameworks excludes applications");
         $this->assertSame($this->bundle, Bundle::bundleWithIdentifier("COM.EXAMPLE.BUNDLE-TESTS"), "bundleWithIdentifier matches case-insensitively");
         $this->assertNull(Bundle::bundleWithIdentifier("com.example.nope"), "bundleWithIdentifier returns null for unknown identifiers");
+    }
+
+    /**
+     * Psalm requires the optional directory argument when querying an existing gettext binding.
+     * @noinspection PhpSameParameterValueInspection
+     */
+    private function boundDirectory(string $table, ?string $directory = null): string
+    {
+        return bindtextdomain($table, $directory);
     }
 }

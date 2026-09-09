@@ -436,9 +436,9 @@ function is_ascii(string $string): bool
  */
 function localized_string(string $string, string $domain = "Localizable", string $directory = "", string $comment = ""): string
 {
-    static $cache = [];
+    static $bindings = [];
     $fileManager = FileManager::default();
-    if ($directory !== "" && $fileManager->fileExists($directory, $isDirectory) && $isDirectory) {
+    if (!empty($directory) && $fileManager->fileExists($directory, $isDirectory) && $isDirectory) {
         $directoryURL = URL::fileURL($directory);
         $bundleURL = $directoryURL->deletingLastPathComponent();
         $resourcesURL = $bundleURL->appendingPathComponent("Resources");
@@ -466,9 +466,8 @@ function localized_string(string $string, string $domain = "Localizable", string
         }
         $resourcesURL ??= Bundle::main()->bundleURL->appendingPathComponent("Resources");
     }
-    $key = "$domain|$resourcesURL->path";
-    if (!isset($cache[$key])) {
-        $cache[$key] = true;
+    if (($bindings[$domain] ?? null) !== $resourcesURL->path) {
+        $bindings[$domain] = $resourcesURL->path;
         bindtextdomain($domain, $resourcesURL->path);
         bind_textdomain_codeset($domain, "UTF-8");
     }
