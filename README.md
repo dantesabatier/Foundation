@@ -252,9 +252,9 @@ Nothing depends on the rule, because nothing in the framework looks up by hash. 
 
 ## Static analysis
 
-The collections are annotated with `@template` tags, and a bundled Psalm plugin extends return-type inference for `compactMap()` so a mapped collection keeps its element type. Correctness is enforced through Psalm at level 4 and the PHPUnit suite in [tests/](tests).
+The collections are annotated with `@template` tags, and a bundled Psalm plugin extends return-type inference for `compactMap()` so a mapped collection keeps its element type. Correctness is enforced through Psalm at level 4 and the PHPUnit suite in [tests/](tests), which covers 80% of the framework's lines across 96 files.
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for how to run both.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for how to run both, and [CONVENTIONS.md](CONVENTIONS.md) for the conventions a change is expected to follow — each with the search that finds a violation, since the analysers catch almost none of them.
 
 ## License
 
