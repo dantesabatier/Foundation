@@ -139,7 +139,6 @@ final class WebSocketURLProtocolTest extends TestCase
     {
         [$task, $protocol] = $this->pair();
 
-        // A close payload is a big-endian status code followed by the reason text.
         $this->deliver($protocol, pack("n", URLSessionWebSocketTaskCloseCode::normalClosure->value) . "goodbye", URLSessionWebSocketOperation::close);
 
         $this->assertSame(URLSessionWebSocketTaskCloseCode::normalClosure, $task->closeCode);
@@ -177,8 +176,7 @@ final class WebSocketURLProtocolTest extends TestCase
     {
         [, $protocol] = $this->pair();
 
-        // The protocol reports the violation through trigger_error before failing, and
-        // the suite runs with failOnNotice, so the notice is expected here.
+        // The protocol reports the violation through trigger_error before failing, and the suite runs with failOnNotice, so the notice is expected here.
         @$this->deliver($protocol, "x", $operation);
 
         $state = new ReflectionProperty(WebSocketURLProtocol::class, "internalState")->getValue($protocol);

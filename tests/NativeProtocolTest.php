@@ -164,7 +164,6 @@ final class NativeProtocolTest extends TestCase
             totalBytesExpectedToReceive: 200,
         ));
 
-        // Progress counts are floats, so the sums come back as 300.0 and 30.0.
         $this->assertSame(300.0, $task->progress->totalUnitCount, "the expected totals of both directions are added");
         $this->assertSame(30.0, $task->progress->completedUnitCount, "so are the transferred counts");
     }

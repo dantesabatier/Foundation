@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Sabatier\Foundation\Tests;
 
+use CurlHandle;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use ReflectionProperty;
@@ -82,8 +83,7 @@ final class EasyHandleTest extends TestCase
 
     private function isPaused(EasyHandle $handle, int $option): bool
     {
-        // The pause state is private and has no accessor: it is observable only through
-        // the CURL handle it drives, so the test reads it directly.
+        // The pause state is private and has no accessor: it is observable only through the CURL handle it drives, so the test reads it directly.
         return new ReflectionProperty(EasyHandle::class, "pauseState")->getValue($handle)->contains($option);
     }
 
@@ -91,7 +91,7 @@ final class EasyHandleTest extends TestCase
     {
         $handle = $this->handle();
 
-        $this->assertInstanceOf(\CurlHandle::class, $handle->rawHandle);
+        $this->assertInstanceOf(CurlHandle::class, $handle->rawHandle);
         $this->assertSame(URLSessionWebSocketOperation::cont, $handle->webSocketFlags, "no websocket operation is pending");
     }
 
@@ -191,8 +191,7 @@ final class EasyHandleTest extends TestCase
         $handle = $this->handle();
         $handle->setURL(new URL("http://127.0.0.1:9/resource"));
 
-        // Each of these writes a CURL option; none is readable back through curl_getinfo,
-        // so the assertion is that configuring a handle end to end raises nothing.
+        // Each of these writes a CURL option; none is readable back through curl_getinfo, so the assertion is that configuring a handle end to end raises nothing.
         $handle->setVerboseModeOn(false);
         $handle->setPassHeadersToDataStream(false);
         $handle->setFollowLocation(true);
@@ -220,7 +219,7 @@ final class EasyHandleTest extends TestCase
         $handle->setAllowedProtocolsToFTP();
         $handle->setAllowedProtocolsToAll();
 
-        $this->assertInstanceOf(\CurlHandle::class, $handle->rawHandle, "the handle survives every protocol restriction");
+        $this->assertInstanceOf(CurlHandle::class, $handle->rawHandle, "the handle survives every protocol restriction");
     }
 
     public function testDisconnectingIsSafeToRepeat(): void

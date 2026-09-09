@@ -215,9 +215,7 @@ ROUTER);
         $this->assertNull($error);
         $this->assertSame("cacheable body", $data);
 
-        // canCache() would accept this response — 200, max-age=300, no Vary, no auth
-        // headers — but the storage path is never reached with an allowed policy, so
-        // nothing is written. See the class docblock.
+        // canCache() would accept this response — 200, max-age=300, no Vary, no auth headers — but the storage path is never reached with an allowed policy, so nothing is written. See the class docblock.
         $this->assertNull($cache->cachedResponse($request), "no entry is stored");
         $this->assertSame(0, $cache->currentMemoryUsage);
     }
@@ -232,7 +230,6 @@ ROUTER);
 
         [$data, $response, $error] = $this->await($session, $request);
 
-        // With nothing in the cache the "else load" half of the policy is what answers.
         $this->assertNull($error);
         $this->assertSame("cacheable body", $data);
         $this->assertInstanceOf(HTTPURLResponse::class, $response);

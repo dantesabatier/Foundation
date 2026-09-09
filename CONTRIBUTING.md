@@ -87,6 +87,8 @@ The architectural conventions are documented in [CLAUDE.md](CLAUDE.md) — it is
 
 Beyond that: match the surrounding code. Algorithms live in traits rather than in the concrete collection classes, computed properties use property hooks rather than explicit getters, and string literals in this codebase use double quotes.
 
+[CONVENTIONS.md](CONVENTIONS.md) is the checklist version — every mechanical convention with the search that finds a violation, covering file layout, class and property rules, the collection idioms, when a comment earns its place, and what public API has to document. Worth a pass before opening a pull request; the static analysers do not catch most of it.
+
 ## Reporting a bug
 
 Please include the PHP version, the failing code as a runnable snippet, and what you expected instead. A predicate bug is much easier to act on with the format string and the data it was evaluated against; `Predicate::$debugDefault` turns on an evaluation trace, documented in [PREDICATES.md](PREDICATES.md#tracing-an-evaluation).
