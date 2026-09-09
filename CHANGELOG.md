@@ -16,6 +16,8 @@ First public release. The framework itself has been in use in private projects s
 - `KeyValueObservingOptions::initial`, which previously did nothing — registering an observer with it sent no notification, so an observer could not prime itself through the same path that handles later changes.
 - An in-memory `FileHandle`, and `is_directory_junction()` for Windows junction points.
 - Test coverage for the predicate engine, key-value observing, property list serialization, `NotificationCenter`, `UndoManager`, `Scanner` and `UserDefaults`, taking the suite from 17 files to 34 and to 700 tests. The predicate comparison operators are additionally pinned against MariaDB, since the same predicate has to answer identically whether it is evaluated in memory or lowered to SQL by a store.
+- Coverage for the rest of the framework, taking the suite to 94 files and 1486 tests, and the measured line coverage from 69% to 80%. Most of it is the surface the earlier suites skipped: the collection stack the concrete types inherit rather than declare (`Set`, `IndexPath`, `Dictionary` and `CollectionDifference` each cover their algebra or their semantics but not the container underneath), the predicate expression nodes and the selector-to-operator mapping, `ObjectClass`'s introspection and key-value machinery, and the networking types that carry no transport of their own. `HTTPURLProtocolServerTest` drives a real PHP development server for the redirect chain and the upload path, on a port derived from the process id so it never collides with `URLSessionTest`.
+- `CONVENTIONS.md`, a checklist of the mechanical conventions with the search that finds each violation — file layout, class and property rules, the collection idioms, when a comment earns its place, and what public API has to document. `CONTRIBUTING.md` links to it. The rest of the stack points at the same document rather than copying it.
 
 ### Fixed
 
@@ -43,8 +45,18 @@ First public release. The framework itself has been in use in private projects s
 - Announcing a change on a declared but uninitialised typed property no longer raises.
 - A plain assignment reports `KeyValueChange::setting`, not `replacement`.
 
+**Networking**
+
+- The WebSocket handshake completes. `EasyHandle::connect()` read the response through the delegate's `fill()`, whose granularity belongs to whatever the delegate needs for its own uploads: FTP support switched it from `fgets()` to `fread()`, so it began answering with a whole block. The header parser recognizes the end of a header by receiving the blank line on its own, and a block is the one shape it cannot consume, so the header never completed and the task was cancelled before opening. `connect()` now reads the socket itself and feeds the parser one line at a time, the way `CURLOPT_HEADERFUNCTION` feeds the HTTP path.
+- A pathless WebSocket URL such as `wss://host` built the request line `GET  HTTP/1.1`, which is malformed. The target falls back to `/`.
+- `EasyHandle::supportsWebSockets()` tested for a transport named `tpc`. The typo was latent because the `ssl` branch answered true anyway, but a build without OpenSSL would have refused WebSockets while holding a usable TCP transport.
+
 **Other**
 
+- `isKind()` and `isMember()` answer different questions again, as in Cocoa: the first accepts any class in the ancestry, the second only the exact class. `isMember()` delegated to `isKind()`, which collapsed the distinction that is the only reason both exist and contradicted `ObjectProtocol`, whose docblock for it deliberately omits the inheritance clause the other one carries.
+- The key-value observing customization hooks are found. Both dispatched to a selector no method could match — `keyPathsForValuesAffectingValueFor<Key>` and `automaticallyNotifiesObserversFor<Key>`, where `KeyValueObserving` documents `keyPathsForValuesAffecting<Key>` and `automaticallyNotifiesObserversOf<Key>` — so a method written against the documentation was never called and the whole feature was inert.
+- A dependent key is notified when one of its ingredients changes. Nothing consulted `keyPathsForValuesAffectingValueForKey()`, so declaring `full` as derived from `first` and `last` bought nothing: observing `full` reported no change when either moved. A declared dependency cycle settles instead of recursing until the stack overflows.
+- `removeAll()` with a predicate no longer raises `Cannot access protected property`. The algorithm read the filtered collection's own storage, which holds only while `filter()` answers with the same class — `CollectionDifference::filter()` returns an `ArrayClass`, and protected access is per class, not per hierarchy. It reads through the public array now, which works for any collection whose `filter()` changes type.
 - Property list values are escaped as text rather than parsed as markup, so a value containing `<` or `&` no longer corrupts the document or silently disappears.
 - `NotificationCenter::removeObserver()` unregisters an observer wholesale, matching on the observer, the notification name and the observed object, and accepting either a registered object or an opaque block token.
 - `UndoManager` tracks its grouping level, marks itself as undoing while it undoes a nested group, and treats `levelsOfUndo = 0` as unlimited. Its menu titles were crossed.
