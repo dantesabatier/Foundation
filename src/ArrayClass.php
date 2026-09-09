@@ -503,9 +503,12 @@ class ArrayClass extends ObjectClass implements RangeReplaceableCollection, Arra
      */
     public function insertContentsOf(iterable $newElements, int $at = NotFound): void
     {
-        foreach ($newElements as $idx => $element) {
+        // Self-insertion needs a snapshot because every insertion extends the sequence being iterated.
+        $newElements = $newElements === $this ? clone $this : $newElements;
+        foreach ($newElements as $element) {
             if ($at !== NotFound) {
-                $this->insertAt($element, $at + $idx);
+                $this->insertAt($element, $at);
+                $at += 1;
             } else {
                 $this->append($element);
             }
