@@ -12,7 +12,7 @@ use Sabatier\Foundation\LocalizationExtractor;
 try {
     $bundle = Bundle::bundleForClass(FileManager::class);
     $excludedFilenames = new ArrayClass(["ArrayClass", "IndexPath", "Set", "AggregateExpression", "ExpressionOperator", "CollectionDifference"]);
-    $extractor = new LocalizationExtractor($bundle, new ArrayClass(["en", "es"]), $excludedFilenames);
+    $extractor = new LocalizationExtractor($bundle, $bundle->localizations, $excludedFilenames);
     $extractor->extract();
 } catch (Exception $exception) {
     error_log("Exception raised $exception");
