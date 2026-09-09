@@ -601,7 +601,7 @@ function is_hidden(string $filename): bool
             return $attributes[3] === "h" || $attributes[4] === "s";
         }
     }
-    return str_starts_with($filename, ".");
+    return str_starts_with(basename($filename), ".");
 }
 
 /**
