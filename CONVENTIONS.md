@@ -1,6 +1,6 @@
 # Conventions
 
-A checklist of the mechanical conventions this codebase follows, with the search that finds each violation. [CLAUDE.md](CLAUDE.md) describes the architecture and the reasoning behind the design; this file is the narrower thing: what to check before opening a pull request, and how.
+A checklist of the mechanical conventions this codebase follows, with the search that finds each violation. The [README](README.md) describes the architecture and the reasoning behind the design; this file is the narrower thing: what to check before opening a pull request, and how.
 
 Most entries carry a reason. Where the convention is a preference rather than a rule, that is said explicitly — a few of these have legitimate exceptions, and applying them blindly makes the code worse.
 

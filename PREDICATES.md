@@ -9,6 +9,7 @@ $predicate = Predicate::format("name BEGINSWITH[cd] %s AND ANY orders.total > %f
 
 $matches = $sequence->filtered($predicate);   // in memory
 $request->predicate = $predicate;             // or through a store
+$predicate->evaluate($object);                // or against a single object
 ```
 
 What a store does with it is the store's concern. One backed by an in-memory collection
@@ -94,7 +95,11 @@ symbols. Their operands are rounded to integers.
   `NULL`/`NIL`.
 - **`SELF`** — the object being evaluated.
 - **Substitution variables** — `$NAME`, resolved at evaluation time through
-  `withSubstitutionVariables(…)`. Use these in saved fetch request templates.
+  `withSubstitutionVariables(…)`, or by passing the dictionary as the second argument to
+  `evaluate(…)`. Use these in saved fetch request templates. **The dictionary key keeps
+  the `$`** — `["$NAME" => …]`, not `["NAME" => …]`, which is where this departs from
+  `NSPredicate`. A key written without it leaves the token unresolved, and the predicate
+  answers `false` instead of raising.
 - **Format placeholders** — `%K` (key path), `%@` (object value), and the printf-style
   `%d`, `%f`, `%s`. These are filled positionally from the arguments passed when the
   predicate is built, so a template parsed without arguments must use `$VARIABLE`

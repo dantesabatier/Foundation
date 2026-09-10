@@ -1,4 +1,6 @@
-# Foundation for PHP
+# Sabatier Foundation
+
+**Foundation** is the base layer of the PHP 8.5+ **Sabatier SDK**. The SDK is formed by three sibling frameworks — Foundation, [CoreData](https://github.com/dantesabatier/CoreData) and [Service](https://github.com/dantesabatier/Service) — combining system primitives, managed persistence and application infrastructure for server-side PHP development. Foundation supplies the primitives the other two build on, and stands on its own: it has no dependency on either.
 
 A port of Apple's **Foundation** framework to PHP — faithful to its design, not to its syntax.
 
@@ -107,6 +109,23 @@ $engineers = $employees->filtered($predicate);
 ```
 
 Note `filtered(Predicate)` alongside `filter(Closure)` — the predicate form is what a store can lower to SQL, which the closure form cannot be.
+
+To test a single object rather than filter a collection, call `evaluate()`:
+
+```php
+$predicate->evaluate($employee); // true
+```
+
+A predicate written as a template resolves its `$VARIABLE` tokens at evaluation time, either through `withSubstitutionVariables()` or by passing the dictionary to `evaluate()` directly:
+
+```php
+$template = Predicate::format("dept == \$DEPT");
+
+$template->evaluate($employee, new Dictionary(["\$DEPT" => "eng"]));
+$template->withSubstitutionVariables(new Dictionary(["\$DEPT" => "eng"]))->evaluate($employee);
+```
+
+**The dictionary keys keep the `$`.** This differs from `NSPredicate`, where the key is the bare name. A key written without it does not match the token, which leaves the variable unresolved — the predicate reads back as `dept = null` and answers `false` rather than raising.
 
 Options survive the round trip, so a predicate reads back the way it was written:
 
@@ -218,6 +237,25 @@ $restored = PropertyListSerialization::propertyList($xml);
 ```
 
 `PropertyListSerialization::writePropertyList()` and `propertyListWithURL()` work against a `URL` directly. Every collection type also implements `JsonSerializable`.
+
+An object graph archives through `KeyedArchiver`, which goes through PHP's own `serialize()`:
+
+```php
+use Sabatier\Foundation\ArrayClass;
+use Sabatier\Foundation\KeyedArchiver;
+use Sabatier\Foundation\KeyedUnarchiver;
+
+$data = KeyedArchiver::archivedData($graph);
+$restored = KeyedUnarchiver::unarchiveTopLevelObjectWithData($data);
+```
+
+**Decoding instantiates whatever classes the archive names**, which is a way to construct arbitrary objects and run their destructors. For anything this process did not write, name the classes it is allowed to build:
+
+```php
+KeyedUnarchiver::unarchiveTopLevelObjectWithData($data, new ArrayClass([Dictionary::class, Date::class]));
+```
+
+Anything outside the list decodes to `__PHP_Incomplete_Class` instead of being constructed. This is what secure coding is here: PHP applies the restriction in the engine, before anything is built, so there is no marker protocol to conform to.
 
 ## Two conventions that will surprise you
 
