@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Sabatier\Foundation\Tests;
 
+use Override;
 use PHPUnit\Framework\TestCase;
 use Sabatier\Foundation\KeyValueChange;
 use Sabatier\Foundation\KeyValueObservedChange;
@@ -30,6 +31,7 @@ final class RecordingObserver extends ObjectClass
     /** @var list<array{keyPath: string, new: mixed, old: mixed, prior: bool, kind: KeyValueChange, context: mixed}> $notifications */
     public array $notifications = [];
 
+    #[Override]
     public function observeValue(string $keyPath, mixed $object, KeyValueObservedChange $change, mixed $context = null): void
     {
         $this->notifications[] = [

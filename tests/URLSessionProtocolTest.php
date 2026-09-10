@@ -7,6 +7,7 @@ namespace Sabatier\Foundation\Tests;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Sabatier\Foundation\ArrayClass;
+use Override;
 use Sabatier\Foundation\Error;
 use Sabatier\Foundation\Networking\HTTPURLResponse;
 use Sabatier\Foundation\Networking\URLProtocol;
@@ -31,6 +32,7 @@ final class URLSessionProtocolTest extends TestCase
 {
     private URLSession $session;
 
+    #[Override]
     protected function setUp(): void
     {
         $configuration = new URLSessionConfiguration();

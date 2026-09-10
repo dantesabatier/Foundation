@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Sabatier\Foundation\Tests;
 
 use Closure;
+use Override;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use ReflectionMethod;
@@ -34,10 +35,12 @@ use Sabatier\Foundation\URL;
  */
 final class WebSocketURLProtocolTestDelegate implements URLSessionDelegate
 {
+    #[Override]
     public function urlSessionDidBecomeInvalidWithError(URLSession $session, ?Error $error = null): void
     {
     }
 
+    #[Override]
     public function urlSessionDidReceiveChallenge(URLSession $session, URLAuthenticationChallenge $challenge, Closure $completionHandler): void
     {
     }

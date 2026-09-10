@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Sabatier\Foundation\Tests;
 
 use DivisionByZeroError;
+use Override;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Sabatier\Foundation\ArrayClass;
@@ -34,6 +35,7 @@ use Sabatier\Foundation\Predicates\PredicateUtilities;
  */
 final class PredicateUtilitiesTest extends TestCase
 {
+    #[Override]
     protected function setUp(): void
     {
         // The date helpers round-trip through DateTime in the process time zone.

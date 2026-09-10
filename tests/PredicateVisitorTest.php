@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Sabatier\Foundation\Tests;
 
+use Override;
 use PHPUnit\Framework\TestCase;
 use Sabatier\Foundation\Predicates\Expression;
 use Sabatier\Foundation\Predicates\Predicate;
@@ -40,15 +41,18 @@ final class PredicateVisitorTest extends TestCase
             {
             }
 
+            #[Override]
             public function visitPredicate(Predicate $predicate): void
             {
             }
 
+            #[Override]
             public function visitPredicateExpression(Expression $expression): void
             {
                 $this->events[] = "expression";
             }
 
+            #[Override]
             public function visitPredicateOperator(PredicateOperator $operator): void
             {
                 $this->events[] = "operator";

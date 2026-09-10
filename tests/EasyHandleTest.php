@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Sabatier\Foundation\Tests;
 
 use CurlHandle;
+use Override;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use ReflectionProperty;
@@ -36,25 +37,30 @@ use const Sabatier\Foundation\URLErrorUnsupportedURL;
  */
 final class EasyHandleTestDelegate implements EasyHandleDelegate
 {
+    #[Override]
     public function didReceiveData(string $data): EasyHandleAction
     {
         return EasyHandleAction::proceed;
     }
 
+    #[Override]
     public function didReceiveHeaderData(string $data, int $contentLength): EasyHandleAction
     {
         return EasyHandleAction::proceed;
     }
 
+    #[Override]
     public function fill(mixed $buffer, int $length): EasyHandleWriteBufferResult
     {
         return EasyHandleWriteBufferResult::abort();
     }
 
+    #[Override]
     public function transferCompleted(?Error $error): void
     {
     }
 
+    #[Override]
     public function updateProgressMeter(EasyHandleProgress $progress): void
     {
     }

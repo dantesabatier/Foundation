@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Sabatier\Foundation\Tests;
 
+use Override;
 use PHPUnit\Framework\TestCase;
 use Sabatier\Foundation\ArrayClass;
 use Sabatier\Foundation\Error;
@@ -43,6 +44,7 @@ final class ProtocolClientTest extends TestCase
 {
     private URLSession $session;
 
+    #[Override]
     protected function setUp(): void
     {
         $configuration = new URLSessionConfiguration();

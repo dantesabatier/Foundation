@@ -21,6 +21,7 @@ use Rector\DeadCode\Rector\ClassMethod\RemoveUselessParamTagRector;
 use Rector\DeadCode\Rector\ClassMethod\RemoveUselessReturnTagRector;
 use Rector\DeadCode\Rector\ClassMethod\RemoveUselessUnionReturnDocblockRector;
 use Rector\DeadCode\Rector\If_\RemoveAlwaysTrueIfConditionRector;
+use Rector\DeadCode\Rector\MethodCall\RemoveNullArgOnNullDefaultParamRector;
 use Rector\DeadCode\Rector\Property\RemoveDefaultValueFromAssignedPropertyRector;
 use Rector\DeadCode\Rector\Property\RemoveUnusedPrivatePropertyRector;
 use Rector\DeadCode\Rector\StmtsAwareInterface\RemoveDeadInstanceOfAssertRector;
@@ -36,6 +37,7 @@ try {
     return RectorConfig::configure()
         ->withPaths([
             __DIR__ . "/src",
+            __DIR__ . "/tests",
         ])->withPhpSets()->withSkip([
             SensitiveConstantNameRector::class,
             ClassPropertyAssignToConstructorPromotionRector::class,
@@ -77,6 +79,11 @@ try {
             ],
             RecastingRemovalRector::class => [
                 __DIR__ . "/src/Predicates/PredicateUtilities.php"
+            ],
+            // These two pass the default explicitly because passing it is what the test asserts: that the parameter accepts null and behaves as documented, not that it can be left out. Dropping the argument collapses the case into the one on the line above it, and the suite still passes while covering half of what it says it covers.
+            RemoveNullArgOnNullDefaultParamRector::class => [
+                __DIR__ . "/tests/ConditionalAndBlockExpressionTest.php",
+                __DIR__ . "/tests/NotificationCenterTest.php"
             ],
             ObjectExplicitBoolCompareRector::class
         ])->withPreparedSets(deadCode: true, codeQuality: true, earlyReturn: true);

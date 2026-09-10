@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Sabatier\Foundation\Tests;
 
+use Override;
 use PHPUnit\Framework\TestCase;
 use Sabatier\Foundation\FileHandle;
 use Sabatier\Foundation\URL;
@@ -25,6 +26,7 @@ final class FileHandleTest extends TestCase
     private string $directory;
     private string $existing;
 
+    #[Override]
     protected function setUp(): void
     {
         $this->directory = sys_get_temp_dir() . DIRECTORY_SEPARATOR . "sabatier-filehandle-test-" . getmypid();
@@ -35,6 +37,7 @@ final class FileHandleTest extends TestCase
         file_put_contents($this->existing, "hello world");
     }
 
+    #[Override]
     protected function tearDown(): void
     {
         @unlink($this->existing);

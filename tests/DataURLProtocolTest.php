@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Sabatier\Foundation\Tests;
 
+use Override;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Sabatier\Foundation\Error;
@@ -25,6 +26,7 @@ final class DataURLProtocolTest extends TestCase
 {
     private URLSession $session;
 
+    #[Override]
     protected function setUp(): void
     {
         $configuration = URLSessionConfiguration::ephemeral();

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Sabatier\Foundation\Tests;
 
+use Override;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Sabatier\Foundation\ArrayClass;
@@ -32,6 +33,7 @@ use Sabatier\Foundation\UUID;
  */
 final class PropertyListSerializationTest extends TestCase
 {
+    #[Override]
     protected function setUp(): void
     {
         // A Date round-trip renders and re-reads in the process time zone.

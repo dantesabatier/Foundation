@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Sabatier\Foundation\Tests;
 
+use Override;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Sabatier\Foundation\Date;
@@ -29,6 +30,7 @@ final class PredicateUtilitiesFunctionTest extends TestCase
 {
     private string $timeZone;
 
+    #[Override]
     protected function setUp(): void
     {
         // The date helpers render through the process time zone, so the formatted output is only predictable once it is pinned.
@@ -36,6 +38,7 @@ final class PredicateUtilitiesFunctionTest extends TestCase
         date_default_timezone_set("UTC");
     }
 
+    #[Override]
     protected function tearDown(): void
     {
         date_default_timezone_set($this->timeZone);

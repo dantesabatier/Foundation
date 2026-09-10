@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Sabatier\Foundation\Tests;
 
+use Override;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Sabatier\Foundation\ArrayClass;
@@ -18,6 +19,7 @@ final class HTTPCookieStorageTest extends TestCase
 {
     private HTTPCookieStorage $storage;
 
+    #[Override]
     protected function setUp(): void
     {
         $this->storage = HTTPCookieStorage::ephemeralStorage();

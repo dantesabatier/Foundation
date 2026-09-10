@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Sabatier\Foundation\Tests;
 
 use InvalidArgumentException;
+use Override;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use ReflectionMethod;
@@ -30,6 +31,7 @@ use Sabatier\Foundation\Predicates\PredicateUtilities;
  */
 final class ExpressionOperatorTest extends TestCase
 {
+    #[Override]
     protected function setUp(): void
     {
         // The date helpers round-trip through DateTime/Date in the process time zone; pin it so the expectations are stable.

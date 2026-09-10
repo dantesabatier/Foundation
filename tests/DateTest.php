@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Sabatier\Foundation\Tests;
 
+use Override;
 use PHPUnit\Framework\TestCase;
 use Sabatier\Foundation\ComparisonResult;
 use Sabatier\Foundation\Date;
@@ -25,6 +26,7 @@ use Sabatier\Foundation\InternalInconsistencyException;
  */
 final class DateTest extends TestCase
 {
+    #[Override]
     protected function setUp(): void
     {
         // format() renders in the process time zone; pin it so the expectations are stable.

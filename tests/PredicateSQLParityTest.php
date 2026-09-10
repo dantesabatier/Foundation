@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Sabatier\Foundation\Tests;
 
+use Override;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Sabatier\Foundation\ArrayClass;
@@ -38,6 +39,7 @@ use Sabatier\Foundation\Predicates\PredicateUtilities;
  */
 final class PredicateSQLParityTest extends TestCase
 {
+    #[Override]
     protected function setUp(): void
     {
         // The SQL side ran under time_zone = "+00:00".

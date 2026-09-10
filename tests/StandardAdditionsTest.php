@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Sabatier\Foundation\Tests;
 
+use Override;
 use PHPUnit\Framework\TestCase;
 use Sabatier\Foundation\Comparable;
 use Sabatier\Foundation\CompareOptions;
@@ -41,12 +42,14 @@ final class ComparableInt implements Comparable
     {
     }
 
+    #[Override]
     public function compare(mixed $other): ComparisonResult
     {
         $value = $other instanceof self ? $other->value : $other;
         return ComparisonResult::from($this->value <=> $value);
     }
 
+    #[Override]
     public function isEqual(mixed $other): bool
     {
         return $this->compare($other) === ComparisonResult::orderedSame;

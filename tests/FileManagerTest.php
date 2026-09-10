@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Sabatier\Foundation\Tests;
 
+use Override;
 use PHPUnit\Framework\TestCase;
 use Sabatier\Foundation\FileAttributeKey;
 use Sabatier\Foundation\FileManager;
@@ -36,6 +37,7 @@ final class FileManagerTest extends TestCase
     private ?string $originalPWD = null;
     private bool $hadPWD = false;
 
+    #[Override]
     protected function setUp(): void
     {
         $this->manager = FileManager::default();
@@ -48,6 +50,7 @@ final class FileManagerTest extends TestCase
         $this->originalPWD = $_SERVER["PWD"] ?? null;
     }
 
+    #[Override]
     protected function tearDown(): void
     {
         if (!$this->hadPWD) {

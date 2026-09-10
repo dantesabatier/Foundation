@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Sabatier\Foundation\Tests;
 
+use Override;
 use PHPUnit\Framework\TestCase;
 use Sabatier\Foundation\ArrayClass;
 use Sabatier\Foundation\Dictionary;
@@ -41,6 +42,7 @@ final class PredicateDebugTest extends TestCase
     /** @var list<string> $lines The trace collected during one test. */
     private array $lines = [];
 
+    #[Override]
     protected function setUp(): void
     {
         $this->lines = [];
@@ -50,6 +52,7 @@ final class PredicateDebugTest extends TestCase
         Predicate::$debugDefault = true;
     }
 
+    #[Override]
     protected function tearDown(): void
     {
         // Leaving either of these set would trace every later test in the run.

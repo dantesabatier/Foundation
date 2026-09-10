@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Sabatier\Foundation\Tests;
 
+use Override;
 use PHPUnit\Framework\TestCase;
 use Sabatier\Foundation\Networking\HTTPStatusCode;
 use Sabatier\Foundation\Networking\HTTPURLResponse;
@@ -44,6 +45,7 @@ final class HTTPURLProtocolServerTest extends TestCase
     private static string $host;
     private static string $router;
 
+    #[Override]
     public static function setUpBeforeClass(): void
     {
         // A different range from URLSessionTest's 8900-8999, so the two suites can run at once.
@@ -116,6 +118,7 @@ ROUTER);
         self::markTestSkipped("the test server never became reachable on " . self::$host);
     }
 
+    #[Override]
     public static function tearDownAfterClass(): void
     {
         if (is_resource(self::$server)) {

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Sabatier\Foundation\Tests;
 
+use Override;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Sabatier\Foundation\InternalInconsistencyException;
@@ -29,6 +30,7 @@ final class URLTest extends TestCase
 
     private ?string $temporaryDirectory = null;
 
+    #[Override]
     protected function tearDown(): void
     {
         if ($this->temporaryDirectory !== null) {

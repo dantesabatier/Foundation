@@ -6,6 +6,7 @@ declare(strict_types=1);
 namespace Sabatier\Foundation\Tests;
 
 use Closure;
+use Override;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Sabatier\Foundation\Error;
@@ -53,6 +54,7 @@ final class URLSessionTest extends TestCase
     private static string $unique;
     private URLSession $session;
 
+    #[Override]
     public static function setUpBeforeClass(): void
     {
         self::$unique = uniqid("", true);
@@ -149,6 +151,7 @@ ROUTER);
         }
     }
 
+    #[Override]
     public static function tearDownAfterClass(): void
     {
         if (is_resource(self::$server)) {
@@ -159,6 +162,7 @@ ROUTER);
         @unlink(self::$router);
     }
 
+    #[Override]
     protected function setUp(): void
     {
         $configuration = new URLSessionConfiguration();

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Sabatier\Foundation\Tests;
 
 use Closure;
+use Override;
 use PHPUnit\Framework\TestCase;
 use ReflectionMethod;
 use Sabatier\Foundation\ArrayClass;
@@ -34,41 +35,50 @@ final class ProtocolClientCompletionDelegate implements URLSessionDelegate, URLS
     public array $events = [];
     public ?URL $downloadLocation = null;
 
+    #[Override]
     public function urlSessionDidBecomeInvalidWithError(URLSession $session, ?Error $error = null): void
     {
     }
 
+    #[Override]
     public function urlSessionDidReceiveChallenge(URLSession $session, URLAuthenticationChallenge $challenge, Closure $completionHandler): void
     {
     }
 
+    #[Override]
     public function urlSessionTaskDidComplete(URLSession $session, URLSessionTask $task, ?Error $error = null): void
     {
         $this->events[] = "didComplete";
     }
 
+    #[Override]
     public function urlSessionTaskWillPerformHTTPRedirection(URLSession $session, URLSessionTask $task, HTTPURLResponse $response, URLRequest $request, Closure $completionHandler): void
     {
     }
 
+    #[Override]
     public function urlSessionTaskDidSendBodyData(URLSession $session, URLSessionTask $task, float $bytesSent, float $totalBytesSent, float $totalBytesExpectedToSend): void
     {
     }
 
+    #[Override]
     public function urlSessionTaskNeedNewBodyStream(URLSession $session, URLSessionTask $task, Closure $completionHandler): void
     {
     }
 
+    #[Override]
     public function urlSessionTaskDidReceiveChallenge(URLSession $session, URLSessionTask $task, URLAuthenticationChallenge $challenge, Closure $completionHandler): void
     {
     }
 
+    #[Override]
     public function urlSessionDownloadTaskDidFinishDownloadingToURL(URLSession $session, URLSessionDownloadTask $downloadTask, ?URL $location): void
     {
         $this->events[] = "didFinishDownloading";
         $this->downloadLocation = $location;
     }
 
+    #[Override]
     public function urlSessionDownloadTaskDidWriteData(URLSession $session, URLSessionDownloadTask $downloadTask, int $bytesWritten, float $totalBytesWritten, float $totalBytesExpectedToWrite): void
     {
     }

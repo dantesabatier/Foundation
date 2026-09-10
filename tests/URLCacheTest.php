@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Sabatier\Foundation\Tests;
 
 use Exception;
+use Override;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Sabatier\Foundation\Date;
@@ -26,6 +27,7 @@ final class URLCacheTest extends TestCase
     private URLRequest $request;
 
     /** @throws Exception */
+    #[Override]
     protected function setUp(): void
     {
         $this->directory = URL::fileURL(sys_get_temp_dir() . DIRECTORY_SEPARATOR . "sabatier-urlcache-" . bin2hex(random_bytes(8)));
@@ -34,6 +36,7 @@ final class URLCacheTest extends TestCase
     }
 
     /** @throws Exception */
+    #[Override]
     protected function tearDown(): void
     {
         FileManager::default()->removeItem($this->directory);
