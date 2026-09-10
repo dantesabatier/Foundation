@@ -37,7 +37,6 @@ try {
     return RectorConfig::configure()
         ->withPaths([
             __DIR__ . "/src",
-            __DIR__ . "/tests",
         ])->withPhpSets()->withSkip([
             SensitiveConstantNameRector::class,
             ClassPropertyAssignToConstructorPromotionRector::class,
@@ -80,7 +79,7 @@ try {
             RecastingRemovalRector::class => [
                 __DIR__ . "/src/Predicates/PredicateUtilities.php"
             ],
-            // These two pass the default explicitly because passing it is what the test asserts: that the parameter accepts null and behaves as documented, not that it can be left out. Dropping the argument collapses the case into the one on the line above it, and the suite still passes while covering half of what it says it covers.
+            // tests/ is not in withPaths(), but running Rector over it by hand is worth doing, and this rule is a trap when you do. Both files pass the default explicitly because passing it is what the test asserts: testAnObserverWithoutAnObjectAcceptsAnySender posts once with a sender and once with an explicit null. Dropping the argument collapses the two cases into one, and the suite still passes while covering half of what it claims.
             RemoveNullArgOnNullDefaultParamRector::class => [
                 __DIR__ . "/tests/ConditionalAndBlockExpressionTest.php",
                 __DIR__ . "/tests/NotificationCenterTest.php"
