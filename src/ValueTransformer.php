@@ -18,6 +18,7 @@ abstract class ValueTransformer extends ObjectClass
      */
     private static function valueTransformers(): Dictionary
     {
+        // SecureUnarchiveFromData resolves to the same transformer as UnarchiveFromData. Secure coding in PHP is unserialize()'s allowed_classes, which the caller supplies at the point of decoding; a transformable attribute names its class in the model, which the transformer never receives, so there is no list for it to restrict to. Both names are registered because callers ask for both. To decode a stored value against a known class, unarchive it directly with that list — see KeyedUnarchiver::unarchiveTopLevelObjectWithData().
         return static::$valueTransformers ??= new Dictionary([
             NegateBooleanTransformerName => new NegateBooleanTransformer(),
             UnarchiveFromDataTransformerName => new UnarchiveFromDataTransformer(),

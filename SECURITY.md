@@ -42,7 +42,18 @@ scope:
   responses trusted past what the transport verified, and TLS verification
   that can be silently disabled.
 - **Serialization** — object instantiation or method invocation driven by
-  untrusted archived data.
+  untrusted archived data. Decoding an archive is decoding a serialized PHP
+  object graph, so it instantiates the classes the archive names. Restricting
+  that is the caller's to ask for: pass `$allowedClasses` to
+  `KeyedUnarchiver::unarchiveTopLevelObjectWithData()` for anything this
+  process did not write. Two places do not restrict and are known limits
+  rather than reports — `URLCache`, whose stored `userInfo` holds whatever the
+  application put there, and the `SecureUnarchiveFromData` value transformer,
+  which resolves to the same transformer as `UnarchiveFromData` because a
+  transformable attribute names its class in the model and the transformer
+  never receives it. A report that an archive the framework itself wrote can
+  be decoded into arbitrary objects is in scope; one that requires writing to
+  the cache directory first is the local filesystem, not this.
 - **Filesystem and bundles** — path traversal through `FileManager` or bundle
   resource lookup escaping the bundle.
 - **Localization** — a format string reaching a formatter from untrusted input.

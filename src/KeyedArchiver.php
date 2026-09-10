@@ -7,9 +7,12 @@ namespace Sabatier\Foundation;
 final class KeyedArchiver
 {
     /**
-     * Encodes an object graph with the given root object into a data representation, optionally requiring secure coding.
+     * Encodes an object graph with the given root object into a data representation.
+     *
+     * Encoding goes through PHP's own {@see serialize()}, which places no requirement on the classes in the graph.
      * @param mixed $object The root of the object graph to archive.
-     * @param bool $requiresSecureCoding A Boolean value indicating whether all encoded objects must conform to SecureCoding.
+     * @param bool $requiresSecureCoding Ignored. The parameter is kept for signature compatibility with the framework this ports; there is no SecureCoding protocol here, and no value of it changes what is written.
+     * Security belongs to the decoding side: pass $allowedClasses to {@see KeyedUnarchiver::unarchiveTopLevelObjectWithData()} when reading an archive this process did not write.
      */
     public static function archivedData(/** @noinspection PhpUnusedParameterInspection */ mixed $object, bool $requiresSecureCoding = true): string
     {

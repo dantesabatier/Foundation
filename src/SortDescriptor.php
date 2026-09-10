@@ -60,7 +60,7 @@ final class SortDescriptor extends ObjectClass
     }
 
     /**
-     * Forces a securely decoded sort descriptor to allow evaluation.
+     * Does nothing. The method is kept for signature compatibility with the framework this ports; a decoded sort descriptor here is never in a disabled state for this to lift.
      */
     public function allowEvaluation(): void
     {

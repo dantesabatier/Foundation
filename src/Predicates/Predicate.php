@@ -139,11 +139,10 @@ class Predicate extends ObjectClass
     }
 
     /**
-     * Forces a predicate securely decoded to allow evaluation.
+     * Does nothing. The method is kept for signature compatibility with the framework this ports, where a securely decoded predicate arrives with evaluation disabled and this re-enables it once the caller has vetted it.
      *
-     * When securely decoding Predicate objects that are encoded using SecureCoding, evaluation is disabled because it is potentially unsafe to evaluate predicates you get out of an archive.
-     * Before you enable evaluation, you should validate key paths, selectors, and other details to ensure no erroneous or malicious code will be executed.
-     * Once you've verified the predicate, you can enable the receiver for evaluation by calling allowEvaluation().
+     * There is no such disabled state here: a decoded predicate evaluates like any other, so calling this changes nothing and skipping it withholds nothing.
+     * Evaluating a predicate that came out of an archive runs the key paths and selectors the archive named, so validate those before evaluating, and decode the archive with an explicit class list — see {@see \Sabatier\Foundation\KeyedUnarchiver::unarchiveTopLevelObjectWithData()}.
      */
     public function allowEvaluation(): void
     {
