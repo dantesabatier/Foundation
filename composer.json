@@ -10,7 +10,7 @@
     "kvc",
     "kvo"
   ],
-  "homepage": "https://github.com/dantesabatier/foundation",
+  "homepage": "https://github.com/dantesabatier/Foundation",
   "license": "MIT",
   "authors": [
     {
@@ -18,20 +18,26 @@
       "email": "dantesabatier@me.com"
     }
   ],
+  "support": {
+    "issues": "https://github.com/dantesabatier/Foundation/issues",
+    "source": "https://github.com/dantesabatier/Foundation",
+    "security": "https://github.com/dantesabatier/Foundation/security/policy"
+  },
   "require": {
     "php": "^8.5",
-    "ext-gd": "*",
     "ext-mbstring": "*",
     "ext-curl": "*",
     "ext-intl": "*",
     "ext-gettext": "*",
     "ext-dom": "*",
-    "ext-ctype": "*",
-    "ext-simplexml": "*"
+    "ext-ctype": "*"
+  },
+  "suggest": {
+    "ext-gd": "To decode image resources through Bundle::image(). Nothing else in the framework needs it.",
+    "ext-simplexml": "To run the bundled Psalm plugin, which Psalm hands a SimpleXMLElement. Not used at runtime; property lists go through ext-dom."
   },
   "config": {
     "platform": {
-      "ext-pcntl": "8.5",
       "ext-posix": "8.5"
     }
   },

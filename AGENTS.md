@@ -14,8 +14,9 @@ All tools installed globally and available in PATH. There is no formatter — ma
 
 ## PHP Requirements
 
-- **PHP ^8.5** with extensions: gd, mbstring, curl, intl, gettext, dom, ctype, simplexml
-- Platform config fakes `ext-pcntl` and `ext-posix` (not actually required at runtime)
+- **PHP ^8.5** with extensions: mbstring, curl, intl, gettext, dom, ctype
+- Suggested, not required: gd (only `Bundle::image()`) and simplexml (only the bundled Psalm plugin). Property lists use ext-dom, not simplexml.
+- Platform config fakes `ext-posix`, which Windows does not have. It is used — user lookups, `posix_strerror()`, TTY detection — but every call sits behind `function_exists()`, so it is optional at runtime and stays out of `require`.
 
 ## Architecture
 

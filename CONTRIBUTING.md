@@ -5,7 +5,8 @@ Thanks for your interest in Foundation for PHP. This document covers how to get 
 ## Requirements
 
 - **PHP 8.5 or newer.** The codebase uses property hooks, asymmetric visibility, the pipe operator and `#[Override]`; earlier versions will not parse it.
-- The extensions listed in `composer.json`: `gd`, `mbstring`, `curl`, `intl`, `gettext`, `dom`, `ctype`, `simplexml`.
+- The extensions `composer.json` requires: `mbstring`, `curl`, `intl`, `gettext`, `dom`, `ctype`.
+- Two more are suggested rather than required, and you want both to work on the framework: `gd`, which only `Bundle::image()` uses — its test skips itself without it — and `simplexml`, which Psalm hands to the bundled plugin. `posix` is used where it exists, always behind `function_exists()`, so Windows needs nothing for it.
 
 There are no runtime dependencies. `composer install` only generates the autoloader.
 
@@ -80,7 +81,7 @@ Compare the covered and executable line counts for each area before and after a 
 
 ## Conventions
 
-The architectural conventions are documented in [CLAUDE.md](CLAUDE.md) — it is written as guidance for an AI assistant, but it is the most complete description of the framework's internal design and is worth reading before a substantial change. Two are worth repeating because they are the ones most often "corrected" by mistake:
+The README describes the design a change has to fit — the collection stack, the protocol hierarchy, and the two conventions below. It is worth reading before a substantial change. Those two are repeated here because they are the ones most often "corrected" by mistake:
 
 - **`$hash` is instance identity**, never a value hash, and no subclass overrides it. Conceptual equality lives only in `isEqual(mixed)` / `compare(mixed)`. See the README section on this.
 - **`Date` uses the 2001 epoch.** `new Date()` takes no arguments. A Unix timestamp goes through `Date::dateWithTimeIntervalSince1970()` and nowhere else.
