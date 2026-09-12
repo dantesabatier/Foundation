@@ -11,6 +11,7 @@ final class UndoGroup
     private(set) ArrayClass $actions;
     public string $actionName = "";
 
+    /** @param UndoGroup|null $parent The enclosing group, or null for a top-level group. */
     public function __construct(public ?UndoGroup $parent = null)
     {
         $this->actions = new ArrayClass();
@@ -23,7 +24,7 @@ final class UndoGroup
 
     public function perform(): void
     {
-        $this->actions->forEach(fn(Invocation $action) => $action->invoke());
+        $this->actions->reversed()->forEach(fn(Invocation $action) => $action->invoke());
     }
 
     public function removeActions(?object $target): bool

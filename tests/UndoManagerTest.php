@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Sabatier\Foundation\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Sabatier\Foundation\ArrayClass;
 use Sabatier\Foundation\ObjectClass;
 use Sabatier\Foundation\UndoManager;
 
@@ -17,13 +18,15 @@ final class UndoableDocument extends ObjectClass
 {
     public string $text = "v0";
     public ?UndoManager $undoManager = null;
-    /** @var list<string> $applied Every value the setter was asked to apply, in order. */
-    public array $applied = [];
+    /** @var ArrayClass<string> Every value the setter was asked to apply, in order. */
+    public ArrayClass $applied {
+        get => $this->applied ??= new ArrayClass();
+    }
 
     public function setText(mixed $value): void
     {
         $this->undoManager?->registerUndo($this, "setText", $this->text);
-        $this->applied[] = (string)$value;
+        $this->applied->append((string)$value);
         $this->text = (string)$value;
     }
 }
@@ -47,6 +50,10 @@ final class UndoableDocument extends ObjectClass
  *    raised. The setter had the same defect, so lifting the cap emptied both stacks;
  *  - undoMenuTitle() returned the localized "Redo" and redoMenuTitle() returned "Undo" —
  *    the two were crossed.
+ *  - grouped actions replayed in registration order, which left a property at an intermediate
+ *    value instead of restoring its original value. Undo groups now replay in reverse order;
+ *  - removeAllActions() closed open groups and reset registration state. It now removes matching
+ *    actions without changing group nesting or nested registration disabling.
  */
 final class UndoManagerTest extends TestCase
 {
@@ -137,7 +144,7 @@ final class UndoManagerTest extends TestCase
         $manager->registerUndo($document, "setText", "a");
         $manager->registerUndo($document, "setText", "b");
         $manager->endUndoGrouping();
-        $document->applied = [];
+        $document->applied->removeAll();
 
         $manager->undo();
 
@@ -211,7 +218,9 @@ final class UndoManagerTest extends TestCase
 
         $manager->undo();
 
-        $this->assertSame("v4", $document->text, "the group's actions replay in order, ending on the most recent");
+        $this->assertSame("v0", $document->text);
+        $manager->redo();
+        $this->assertSame("v5", $document->text);
     }
 
     public function testClosedGroupsNestIntoTheOpenEventGroup(): void
@@ -229,7 +238,7 @@ final class UndoManagerTest extends TestCase
 
         $manager->undo();
 
-        $this->assertSame("v2", $document->text);
+        $this->assertSame("v0", $document->text);
         $this->assertFalse($manager->canUndo, "the run collapsed into a single step");
     }
 
@@ -239,11 +248,11 @@ final class UndoManagerTest extends TestCase
         $manager = new UndoManager();
         $document = $this->document($manager);
         $document->setText("v1");
-        $document->applied = [];
+        $document->applied->removeAll();
 
         $manager->undo();
 
-        $this->assertSame(["v0"], $document->applied);
+        $this->assertSame(["v0"], $document->applied->array);
         $this->assertTrue($manager->canRedo);
     }
 
@@ -257,4 +266,26 @@ final class UndoManagerTest extends TestCase
 
         $this->assertSame("Escribir", $manager->undoActionName);
     }
+
+    public function testRemovingOneTargetPreservesNestedGroupsAndDisabledRegistration(): void
+    {
+        $manager = new UndoManager();
+        $first = $this->document($manager);
+        $second = $this->document($manager);
+        $first->setText("first");
+        $manager->beginUndoGrouping();
+        $second->setText("second");
+        $manager->disableUndoRegistration();
+        $manager->disableUndoRegistration();
+        $manager->removeAllActions($first);
+        self::assertSame(2, $manager->groupingLevel);
+        $manager->enableUndoRegistration();
+        self::assertFalse($manager->isUndoRegistrationEnabled);
+        $manager->enableUndoRegistration();
+        $manager->endUndoGrouping();
+        $manager->undo();
+        self::assertSame("first", $first->text);
+        self::assertSame("v0", $second->text);
+    }
+
 }

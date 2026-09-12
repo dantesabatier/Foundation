@@ -47,6 +47,7 @@ final class UndoManager extends ObjectClass
     private ArrayClass $redoStack;
     private ?object $nextTarget = null;
     private ?UndoGroup $group = null;
+    private int $registrationDisableCount = 0;
     /** @var bool A Boolean value that indicates whether the receiver has any actions to undo. */
     public bool $canUndo {
         get => !$this->undoStack->isEmpty || $this->group?->actions->isEmpty === false;
@@ -303,6 +304,7 @@ final class UndoManager extends ObjectClass
      */
     public function disableUndoRegistration(): void
     {
+        $this->registrationDisableCount++;
         $this->isUndoRegistrationEnabled = false;
     }
 
@@ -313,8 +315,8 @@ final class UndoManager extends ObjectClass
      */
     public function enableUndoRegistration(): void
     {
-        !$this->isUndoRegistrationEnabled ?: fatal_error();
-        $this->isUndoRegistrationEnabled = true;
+        $this->registrationDisableCount > 0 ?: fatal_error();
+        $this->isUndoRegistrationEnabled = --$this->registrationDisableCount === 0;
     }
 
     /**
@@ -328,11 +330,15 @@ final class UndoManager extends ObjectClass
         $redoStack = $this->redoStack;
         $undoStack = $this->undoStack;
         if ($target === null) {
-            if ($this->group !== null) {
-                $this->endUndoGrouping();
-            }
             $redoStack->removeAll();
             $undoStack->removeAll();
+        }
+        for ($openGroup = $this->group; $openGroup !== null; $openGroup = $openGroup->parent) {
+            if ($target === null) {
+                $openGroup->actions->removeAll();
+            } else {
+                $openGroup->removeActions($target);
+            }
         }
         $i = $redoStack->endIndex;
         while ($i-- > 0) {
@@ -348,9 +354,6 @@ final class UndoManager extends ObjectClass
                 $undoStack->removeAt($i);
             }
         }
-        $this->isUndoing = false;
-        $this->isRedoing = false;
-        $this->isUndoRegistrationEnabled = true;
     }
 
     /**
