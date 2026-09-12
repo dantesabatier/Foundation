@@ -27,8 +27,7 @@ final  class AssociativeArrayStrategy implements ArrayConversionStrategy
         $dictionary = new Dictionary();
         foreach ($value instanceof stdClass ? get_object_vars($value) : $value as $key => $element) {
             if (is_array($element) || $element instanceof stdClass) {
-                // A stdClass becomes a Dictionary even when empty: that is what separates it from a
-                // list, and is_sequential() answers true for every empty array.
+                // A stdClass becomes a Dictionary even when empty: that is what separates it from a list, and is_sequential() answers true for every empty array.
                 $dictionary[$key] = $element instanceof stdClass || !is_sequential($element) ? $this->convert($element, $preserveNull) : $this->nestedConversionStrategy->convert($element, $preserveNull);
             } else {
                 if ($element === null && $preserveNull) {

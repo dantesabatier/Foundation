@@ -83,8 +83,7 @@ final class URLTest extends TestCase
 
     public function testPercentEncoding(): void
     {
-        // The raw string must be parsed before decoding; an encoded "#" in the query used to
-        // truncate the query and spill the rest into the fragment.
+        // The raw string must be parsed before decoding; an encoded "#" in the query used to truncate the query and spill the rest into the fragment.
         $encoded = new URL("https://example.com/search?q=a%23b");
         $this->assertSame("q=a%23b", $encoded->query, "encoded # in query keeps the query intact and raw");
         $this->assertNull($encoded->fragment, "encoded # in query does not create a fragment");
@@ -145,8 +144,7 @@ final class URLTest extends TestCase
         $this->assertSame("https://example.com/file", new URL("https://example.com/file.txt")->deletingPathExtension()->absoluteString, "deletingPathExtension removes extension and dot");
         $this->assertSame("https://example.com/archive.tar", new URL("https://example.com/archive.tar.gz")->deletingPathExtension()->absoluteString, "only the last extension is removed");
         $this->assertSame("https://example.com/dir/", new URL("https://example.com/dir/")->deletingPathExtension()->absoluteString, "no extension means no change");
-        // The extension used to be str_replace()d out of the whole string, mangling a host that
-        // contains the same substring.
+        // The extension used to be str_replace()d out of the whole string, mangling a host that contains the same substring.
         $this->assertSame("https://txt.example.com/file", new URL("https://txt.example.com/file.txt")->deletingPathExtension()->absoluteString, "host containing the extension substring is untouched");
         $this->assertSame("/a/", new URL("https://example.com/a.txt/")->deletingPathExtension()->path, "trailing slash survives deletingPathExtension");
     }
@@ -287,8 +285,7 @@ final class URLTest extends TestCase
         $missing = $directoryURL->appendingPathComponent("missing.bin");
         $this->assertStringEndsWith("missing.bin", $missing->fileSystemRepresentation, "fileSystemRepresentation of a missing file falls back to the native path");
 
-        // resolveSymlinksInPath used readlink(), which warns and returns false on any regular file,
-        // reducing the URL to "file:///".
+        // resolveSymlinksInPath used readlink(), which warns and returns false on any regular file, reducing the URL to "file:///".
         $resolved = $fileURL->resolvingSymlinksInPath();
         $this->assertSame("file.txt", $resolved->lastPathComponent, "resolvingSymlinksInPath keeps a regular file intact");
         $this->assertTrue($resolved->isFileURL, "resolvingSymlinksInPath keeps the file scheme");

@@ -133,8 +133,7 @@ class Set extends ObjectClass implements SetAlgebra, ArrayAccess, Iterator
             $this->reserved = $elements->array;
             return;
         }
-        // Inserts directly instead of calling formUnion(): an override of it would observe a mutation
-        // on an instance that is still initializing.
+        // Inserts directly instead of calling formUnion(): an override of it would observe a mutation on an instance that is still initializing.
         foreach ($elements as $element) {
             $this->setAlgebraInsert($element);
         }

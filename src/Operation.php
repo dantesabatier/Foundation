@@ -87,8 +87,7 @@ abstract class Operation extends ObjectClass
             return;
         }
         $this->fiber = new Fiber(function (): void {
-            // Restore the previous current queue, not null: an operation may itself drive
-            // another queue, and that nesting must unwind to the right caller.
+            // Restore the previous current queue, not null: an operation may itself drive another queue, and that nesting must unwind to the right caller.
             $previous = OperationQueue::$current;
             OperationQueue::$current = $this->queue;
             try {

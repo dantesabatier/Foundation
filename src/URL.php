@@ -280,8 +280,7 @@ final class URL extends ObjectClass
             $string .= ":" . $components["port"];
         }
         $path = $components["path"] ?? "";
-        // On Windows, parse_url() strips the slash before a drive letter ("file:///C:/x" parses
-        // to path "C:/x"); reinsert it so the authority and path stay separated.
+        // On Windows, parse_url() strips the slash before a drive letter ("file:///C:/x" parses to path "C:/x"); reinsert it so the authority and path stay separated.
         if ($path !== "" && !str_starts_with($path, "/")) {
             $path = "/" . $path;
         }

@@ -86,8 +86,7 @@ final class OperationQueue extends ObjectClass
                 $this->operations->remove($operation);
             }
         });
-        // A canceled operation never reports isFinished, so without this it would linger forever
-        // and hang waitUntilAllOperationsAreFinished. Only drop it if it has not started running.
+        // A canceled operation never reports isFinished, so without this it would linger forever and hang waitUntilAllOperationsAreFinished. Only drop it if it has not started running.
         $operation->observe("isCancelled", KeyValueObservingOptions::new, function (Operation $operation, KeyValueObservedChange $change): void {
             if ($change->newValue && !$operation->isExecuting) {
                 $this->operations->remove($operation);
@@ -95,15 +94,12 @@ final class OperationQueue extends ObjectClass
         });
         $operation->queue = $this;
         if ($operation->isCancelled) {
-            // Already canceled before being added: the isCancelled observer never fires (no
-            // change), so drop it here instead.
+            // Already canceled before being added: the isCancelled observer never fires (no change), so drop it here instead.
             $this->operations->remove($operation);
             return;
         }
         if (!$operation->isReady) {
-            // Reschedule once its dependencies finish. The dependencies are not pulled into this
-            // queue — like NSOperationQueue, an operation only waits on them via readiness; the
-            // caller is responsible for running them (here or in another queue).
+            // Reschedule once its dependencies finish. The dependencies are not pulled into this queue — like NSOperationQueue, an operation only waits on them via readiness; the caller is responsible for running them (here or in another queue).
             $operation->observe("isReady", KeyValueObservingOptions::new, function (Operation $operation, KeyValueObservedChange $change): void {
                 if ($change->newValue) {
                     $this->schedule();
@@ -119,8 +115,7 @@ final class OperationQueue extends ObjectClass
     {
         $executing = $this->operations->filter(fn(Operation $op): bool => $op->isExecuting)->count;
         if ($executing < $this->maxConcurrentOperationCount) {
-            // Snapshot the backing array: start() below can finish an operation synchronously,
-            // whose isFinished observer removes it from $operations mid-iteration.
+            // Snapshot the backing array: start() below can finish an operation synchronously, whose isFinished observer removes it from $operations mid-iteration.
             foreach ($this->operations->array as $operation) {
                 if ($operation->isReady && !$operation->isExecuting && !$operation->isFinished && !$operation->isCancelled) {
                     $operation->start();
@@ -131,9 +126,7 @@ final class OperationQueue extends ObjectClass
                 }
             }
         }
-        // One resume per suspended fiber, then return: looping until none are suspended would
-        // spin at 100% CPU on a fiber that parks on an event that never arrives. Snapshot via
-        // ->array because a resumed fiber can finish and its observer then mutates $operations.
+        // One resume per suspended fiber, then return: looping until none are suspended would spin at 100% CPU on a fiber that parks on an event that never arrives. Snapshot via ->array because a resumed fiber can finish and its observer then mutates $operations.
         foreach ($this->operations->array as $operation) {
             if ($operation->isExecuting && $operation->fiber?->isSuspended()) {
                 $operation->fiber->resume();
@@ -194,8 +187,7 @@ final class OperationQueue extends ObjectClass
             if ($this->operations->isEmpty) {
                 break;
             }
-            // Yield the core between passes: schedule() may be waiting on operations whose
-            // fibers are parked on external I/O, and spinning here would peg one core at 100%.
+            // Yield the core between passes: schedule() may be waiting on operations whose fibers are parked on external I/O, and spinning here would peg one core at 100%.
             usleep(1000);
         }
     }

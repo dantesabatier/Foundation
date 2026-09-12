@@ -162,8 +162,7 @@ final class UUIDTest extends TestCase
 
     public function testReadTimeTracksTheWallClock(): void
     {
-        // read_time()/nanotime() used to mix unscaled seconds and nanoseconds, so the v1
-        // timestamp bore no relation to the clock. Decode it and compare against wall time.
+        // read_time()/nanotime() used to mix unscaled seconds and nanoseconds, so the v1 timestamp bore no relation to the clock. Decode it and compare against wall time.
         $gregorianOffset = 0x01B21DD213814000;
         $time = read_time();
         $delta = ($time - $gregorianOffset) / 10_000_000 - microtime(true);

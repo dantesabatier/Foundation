@@ -38,8 +38,7 @@ final class BundleTest extends TestCase
     #[Override]
     protected function setUp(): void
     {
-        // Fixture: a bundle directory with an Info.plist and a Resources tree, plus a
-        // bare directory with neither.
+        // Fixture: a bundle directory with an Info.plist and a Resources tree, plus a bare directory with neither.
         $this->root = sys_get_temp_dir() . DIRECTORY_SEPARATOR . "sabatier-bundle-test-" . (int)getmypid();
         $this->bundleRoot = $this->root . DIRECTORY_SEPARATOR . "TestBundle";
         $this->bareRoot = $this->root . DIRECTORY_SEPARATOR . "BareBundle";
@@ -251,8 +250,7 @@ final class BundleTest extends TestCase
 
         $foundation = Bundle::bundleForClass(Bundle::class);
         $this->assertSame("com.sabatiersoftware.foundation", $foundation->bundleIdentifier, "bundleForClass walks up to the framework root through src");
-        // This test file lives in tests/, not under src, so the walk runs to the
-        // filesystem root; before the drive-root guard this looped forever on Windows.
+        // This test file lives in tests/, not under src, so the walk runs to the filesystem root; before the drive-root guard this looped forever on Windows.
         $this->assertInstanceOf(Bundle::class, Bundle::bundleForClass(self::class), "bundleForClass terminates for classes outside a src tree");
     }
 

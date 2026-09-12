@@ -58,9 +58,7 @@ final class DateTest extends TestCase
 
     public function testConstructorArgumentsFailLoudly(): void
     {
-        // PHP silently ignores extra arguments to non-variadic functions, so the constructor
-        // promotes them to a hard error instead of silently meaning "now" — the old
-        // `new Date($timestamp)` habit fails loudly.
+        // PHP silently ignores extra arguments to non-variadic functions, so the constructor promotes them to a hard error instead of silently meaning "now" — the old `new Date($timestamp)` habit fails loudly.
         $this->expectException(InternalInconsistencyException::class);
         new Date(529_887_685.0);
     }
@@ -73,8 +71,7 @@ final class DateTest extends TestCase
 
     public function testCookieStyleExpirationSitsInTheNearFuture(): void
     {
-        // A cookie-style numeric expiration built from Unix time must sit in the near future,
-        // not 31 years away.
+        // A cookie-style numeric expiration built from Unix time must sit in the near future, not 31 years away.
         $expiry = Date::dateWithTimeIntervalSince1970((float)time() + 3600.0);
         $this->assertGreaterThan(3590.0, $expiry->timeIntervalSinceNow, "a Unix-based expiration one hour out reads as one hour out");
         $this->assertLessThan(3610.0, $expiry->timeIntervalSinceNow, "a Unix-based expiration one hour out is not in the far future");

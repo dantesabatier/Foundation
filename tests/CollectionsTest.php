@@ -110,8 +110,7 @@ final class CollectionsTest extends TestCase
         $sequence = new ArrayClass([1, 0, 2, 3, 0, 0, 4]);
         $slices = $sequence->split(fn(int $e): bool => $e === 0);
         $this->assertSame(3, $slices->count, "split produces one slice per non-empty subsequence");
-        // A middle slice used to leak elements past its upper bound because Slice::$array
-        // passed the end index as array_slice()'s length.
+        // A middle slice used to leak elements past its upper bound because Slice::$array passed the end index as array_slice()'s length.
         $this->assertSame([[1], [2, 3], [4]], $slices->map(fn(Slice $s): array => $s->array)->array, "split slices contain exactly their subsequence");
         $this->assertSame(4, $sequence->split(fn(int $e): bool => $e === 0, omittingEmptySubsequences: false)->count, "split keeps empty subsequences on demand");
         $this->assertSame(2, $sequence->split(fn(int $e): bool => $e === 0, 1)->count, "split honors maxSplits");
@@ -142,9 +141,7 @@ final class CollectionsTest extends TestCase
         $this->assertSame(["a", "b", "c"], $letters->dropLast(1)->array, "dropLast");
         $this->assertSame(["c", "d"], $letters->drop(fn(string $e): bool => $e < "c")->array, "drop while");
 
-        // dropFirst/dropLast must clamp the drop count to the element count instead of
-        // building an inverted Range: k greater than or equal to the count yields an empty
-        // subsequence, and k of zero drops nothing.
+        // dropFirst/dropLast must clamp the drop count to the element count instead of building an inverted Range: k greater than or equal to the count yields an empty subsequence, and k of zero drops nothing.
         $this->assertSame(["a", "b", "c", "d"], $letters->dropFirst(0)->array, "dropFirst(0) drops nothing");
         $this->assertSame([], $letters->dropFirst($letters->count)->array, "dropFirst(count) is empty");
         $this->assertSame([], $letters->dropFirst($letters->count + 1)->array, "dropFirst beyond count is empty");
