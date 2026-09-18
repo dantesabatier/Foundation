@@ -32,6 +32,11 @@
     "ext-dom": "*",
     "ext-ctype": "*"
   },
+  "require-dev": {
+    "phpunit/phpunit": "^13.3",
+    "vimeo/psalm": "^6.17",
+    "rector/rector": "^2.6"
+  },
   "suggest": {
     "ext-gd": "To decode image resources through Bundle::image(). Nothing else in the framework needs it.",
     "ext-simplexml": "To run the bundled Psalm plugin, which Psalm hands a SimpleXMLElement. Not used at runtime; property lists go through ext-dom."

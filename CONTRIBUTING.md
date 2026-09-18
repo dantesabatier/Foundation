@@ -18,30 +18,32 @@ composer install
 
 ## Development tools
 
-Psalm, PHPUnit and Rector are **not** declared as dev dependencies, so `composer install` does not provide them. Install them globally and invoke the global binaries:
+PHPUnit, Psalm and Rector are declared in `require-dev`, so `composer install` provides them under `vendor/bin`:
 
 ```bash
-composer global require vimeo/psalm phpunit/phpunit rector/rector
+vendor/bin/phpunit
+vendor/bin/psalm
+vendor/bin/rector process src --dry-run
 ```
 
-Make sure your global Composer `vendor/bin` is on `PATH` (`%APPDATA%\Composer\vendor\bin` on Windows, `~/.composer/vendor/bin` or `~/.config/composer/vendor/bin` elsewhere).
+Installing them globally works too, and lets you invoke them by bare name from any of the stack's repositories.
 
 ## Running the checks
 
 Both must pass before a change is proposed.
 
 ```bash
-phpunit
+vendor/bin/phpunit
 ```
 
 ```bash
-psalm
+vendor/bin/psalm
 ```
 
 A single suite:
 
 ```bash
-phpunit tests/DateTest.php
+vendor/bin/phpunit tests/DateTest.php
 ```
 
 Psalm is configured by `psalm.xml` at **level 4**, and PHPUnit by `phpunit.xml` with `failOnWarning` and `failOnNotice` enabled — a raised warning fails the suite, which is deliberate: several past bugs surfaced only as a `preg_match()` compilation warning.
@@ -107,3 +109,9 @@ Beyond that: match the surrounding code. Algorithms live in traits rather than i
 Please include the PHP version, the failing code as a runnable snippet, and what you expected instead. A predicate bug is much easier to act on with the format string and the data it was evaluated against; `Predicate::$debugDefault` turns on an evaluation trace, documented in [PREDICATES.md](PREDICATES.md#tracing-an-evaluation).
 
 For anything with a security impact, see [SECURITY.md](SECURITY.md) rather than opening a public issue.
+
+## Code of conduct
+
+This project follows the [Contributor Covenant](CODE_OF_CONDUCT.md). By
+participating, you are expected to uphold it. Report unacceptable behavior to
+`dantesabatier@me.com`.
