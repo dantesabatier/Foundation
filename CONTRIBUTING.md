@@ -110,6 +110,13 @@ Please include the PHP version, the failing code as a runnable snippet, and what
 
 For anything with a security impact, see [SECURITY.md](SECURITY.md) rather than opening a public issue.
 
+## Versioning
+
+This package follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+What counts as the public API, what a major release is for, and the checks that
+run before a tag are in [VERSIONING.md](VERSIONING.md), which covers all three
+packages in the stack.
+
 ## Code of conduct
 
 This project follows the [Contributor Covenant](CODE_OF_CONDUCT.md). By
