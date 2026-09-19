@@ -45,10 +45,10 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
         get => get_parent_class($this);
     }
     public string $description {
-        get => sprintf("<%s %s>", $this->class, $this->hash);
+        get => "<$this->class $this->hash>";
     }
     public string $debugDescription {
-        get => sprintf("<%s %s>", $this->class, $this->hash);
+        get => "<$this->class $this->hash>";
     }
     public string $canonicalDescription {
         get => $this->class;
@@ -124,7 +124,7 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
      */
     public function doesNotRecognizeSelector(string $selector): never
     {
-        throw new InvalidArgumentException(sprintf("%s %s() unrecognized selector sent to instance", $this->debugDescription, $selector));
+        throw new InvalidArgumentException("$this->debugDescription $selector() unrecognized selector sent to instance");
     }
 
     /**
@@ -219,12 +219,12 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
         }
         foreach ($this->observances as $observance) {
             $keyPath = $observance->keyPath;
-            // Only an observer that asked for the pre-change notification gets one. Notifying every observance here sent two notifications for a single change to observers that never requested the pair, and the second one — the real, post-change notification — arrived indistinguishable from the first except for isPrior, which those observers have no reason to read.
+            // Only an observer that asked for the pre-change notification gets one. Notifying every observance here sent two notifications for a single change to observers that never requested the pair. The second one — the real, post-change notification — arrived indistinguishable from the first except for isPrior, which those observers have no reason to read.
             if ($keyPath === $key && ($observance->options & KeyValueObservingOptions::prior)) {
                 $change = new KeyValueObservedChange();
                 $change->kind = $changeKind;
                 if ($observance->options & KeyValueObservingOptions::new) {
-                    // A collection mutation reports the members being inserted or removed, and this is the only notification that can: after the change they are no longer readable from the collection, so didChangeValueForKey() — which reports what the key now holds — would answer with the survivors. A plain setting reports nothing here, matching the change dictionary the prior option documents, which "never contains an newKey entry".
+                    // A collection mutation reports the members being inserted or removed, and this is the only notification that can: after the change they are no longer readable from the collection, so didChangeValueForKey() — which reports what the key now holds — would answer with the survivors. A plain setting reports nothing here, matching the change dictionary the prior option documents, which "never contains a newKey entry".
                     $change->newValue = match ($changeKind) {
                         KeyValueChange::insertion, KeyValueChange::removal => $changedValue,
                         default => null
@@ -369,13 +369,13 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
     #[Override]
     public function valueForUndefinedKey(string $key): mixed
     {
-        throw new UndefinedKeyException(sprintf("%s is not key value coding compliant for the key \"%s\"", $this->debugDescription, $key));
+        throw new UndefinedKeyException("$this->debugDescription is not key value coding compliant for the key \"$key\"");
     }
 
     #[Override]
     public function setValueForUndefinedKey(mixed $value, string $key): void
     {
-        throw new UndefinedKeyException(sprintf("%s is not key value coding compliant for the key \"%s\"", $this->debugDescription, $key));
+        throw new UndefinedKeyException("$this->debugDescription is not key value coding compliant for the key \"$key\"");
     }
 
     #[Override]
@@ -394,7 +394,6 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
             return;
         }
         if ($this->hasProperty($key)) {
-            // Assigning a value is a setting, not a replacement: replacement describes an indexed element swapped inside a collection, which is what FaultingSet reports for its own mutations.
             $this->willChangeValueForKey($key, KeyValueChange::setting, $value);
             $this->$key = $value;
             $this->didChangeValueForKey($key, KeyValueChange::setting, $value);
@@ -487,7 +486,7 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
     #[Override]
     public function setNilValueForKey(string $key): void
     {
-        fatal_error(sprintf("%s attribute \"%s\" cannot be null", $this->debugDescription, $key));
+        fatal_error("$this->debugDescription attribute \"$key\" cannot be null");
     }
 
     #[Override]
