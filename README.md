@@ -125,7 +125,7 @@ $template->evaluate($employee, new Dictionary(["\$DEPT" => "eng"]));
 $template->withSubstitutionVariables(new Dictionary(["\$DEPT" => "eng"]))->evaluate($employee);
 ```
 
-**The dictionary keys keep the `$`.** This differs from `NSPredicate`, where the key is the bare name. A key written without it does not match the token, which leaves the variable unresolved — the predicate reads back as `dept = null` and answers `false` rather than raising.
+Two different things are being looked up here, and only one of them takes a `$`. `dept` is a key path, read off the object under evaluation. `$DEPT` is a substitution variable, and the `$` is part of its name — so **the key in the substitution dictionary keeps it**: `["$DEPT" => "eng"]`, not `["DEPT" => "eng"]`. A key written without the `$` matches no token, so the variable stays unresolved: the predicate reads back as `dept = null` and answers `false` rather than raising.
 
 Options survive the round trip, so a predicate reads back the way it was written:
 

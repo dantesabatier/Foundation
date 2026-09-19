@@ -96,10 +96,12 @@ symbols. Their operands are rounded to integers.
 - **`SELF`** — the object being evaluated.
 - **Substitution variables** — `$NAME`, resolved at evaluation time through
   `withSubstitutionVariables(…)`, or by passing the dictionary as the second argument to
-  `evaluate(…)`. Use these in saved fetch request templates. **The dictionary key keeps
-  the `$`** — `["$NAME" => …]`, not `["NAME" => …]`, which is where this departs from
-  `NSPredicate`. A key written without it leaves the token unresolved, and the predicate
-  answers `false` instead of raising.
+  `evaluate(…)`. Use these in saved fetch request templates. The `$` is part of the
+  variable's name, not punctuation around it, so **the key in the substitution dictionary
+  keeps it** — `["$NAME" => …]`, not `["NAME" => …]`. A key path is the other thing being
+  looked up and never takes one: it names a property of the object under evaluation. A
+  substitution key written without the `$` matches no token, so the variable stays
+  unresolved and the predicate answers `false` instead of raising.
 - **Format placeholders** — `%K` (key path), `%@` (object value), and the printf-style
   `%d`, `%f`, `%s`. These are filled positionally from the arguments passed when the
   predicate is built, so a template parsed without arguments must use `$VARIABLE`
