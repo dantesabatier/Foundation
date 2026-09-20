@@ -16,19 +16,19 @@ class Error extends ObjectClass
     private static ?Dictionary $userInfoProviders = null;
     /** @var string A string containing the localized description of the error. The object in the user info dictionary for the key {@see LocalizedDescriptionKey}. If the user info dictionary doesn't contain a value for {@see LocalizedDescriptionKey}, a default string is constructed from the domain and code. */
     public string $localizedDescription {
-        get => $this->userInfo?->valueForKey(LocalizedDescriptionKey) ?? localized_string("The operation couldn't be completed.") . " " . ($this->localizedFailureReason ?? "($this->domain error $this->code.)");
+        get => $this->userInfoValue(LocalizedDescriptionKey) ?? localized_string("The operation couldn't be completed.") . " " . ($this->localizedFailureReason ?? "($this->domain error $this->code.)");
     }
     /** @var ArrayClass<string>|null An array containing the localized titles of buttons appropriate for displaying in an alert panel. The object in the user info dictionary for the key {@see LocalizedRecoveryOptionsErrorKey}. If the user info dictionary doesn't contain a value for {@see LocalizedRecoveryOptionsErrorKey}, this property is null. The first string is the title of the right-most and default button, the second the one to the left of that, and so on. The recovery options should be appropriate for the localizedRecoverySuggestion property. If the user info dictionary doesn't contain a value for {@see LocalizedRecoveryOptionsErrorKey}, only an OK button is displayed. */
     public ?ArrayClass $localizedRecoveryOptions {
-        get => $this->userInfo?->valueForKey(LocalizedRecoveryOptionsErrorKey);
+        get => $this->userInfoValue(LocalizedRecoveryOptionsErrorKey);
     }
     /** @var string|null A string containing the localized recovery suggestion for the error. The object in the user info dictionary for the key {@see LocalizedRecoverySuggestionErrorKey}. If the user info dictionary doesn't contain a value for {@see LocalizedRecoverySuggestionErrorKey}, this property is null. The returned string is suitable for displaying as the secondary message in an alert panel. */
     public ?string $localizedRecoverySuggestion {
-        get => $this->userInfo?->valueForKey(LocalizedRecoverySuggestionErrorKey);
+        get => $this->userInfoValue(LocalizedRecoverySuggestionErrorKey);
     }
     /** @var string|null A string containing the localized explanation of the reason for the error. The object in the user info dictionary for the key {@see LocalizedFailureReasonErrorKey}. */
     public ?string $localizedFailureReason {
-        get => $this->userInfo?->valueForKey(LocalizedFailureReasonErrorKey) ?? match ($this->domain) {
+        get => $this->userInfoValue(LocalizedFailureReasonErrorKey) ?? match ($this->domain) {
             CocoaErrorDomain => match ($this->code) {
                 4, 260 => localized_string("The file doesn't exist."),
                 255 => localized_string("The file couldn't be locked."),
@@ -75,7 +75,7 @@ class Error extends ObjectClass
     }
     /** @var ErrorRecoveryAttempting|null The object in the user info dictionary corresponding to the {@see RecoveryAttempterErrorKey} key. If userInfo doesn't contain a value for {@see RecoveryAttempterErrorKey}, this property is null. */
     public ?ErrorRecoveryAttempting $recoveryAttempter {
-        get => $this->userInfo?->valueForKey(RecoveryAttempterErrorKey);
+        get => $this->userInfoValue(RecoveryAttempterErrorKey);
     }
     #[Override]
     public string $description {
@@ -108,6 +108,17 @@ class Error extends ObjectClass
     public static function setUserInfoValueProvider(string $errorDomain, Closure $provider): void
     {
         self::userInfoProviders()[$errorDomain] = $provider;
+    }
+
+    private function userInfoValue(string $key): mixed
+    {
+        if ($value = $this->userInfo?->valueForKey($key)) {
+            return $value;
+        }
+        if (!($provider = $this->userInfoValueProvider($this->domain))) {
+            return null;
+        }
+        return $provider($this, $key);
     }
 
     /**
