@@ -274,7 +274,11 @@ final class Bundle extends ObjectClass
                 $extensions->append($extension);
             }
         }
+        // The unlocalized pass is the empty language. Inference reads that default as the
+        // literal "" rather than a string, which makes the language branch below look
+        // unreachable on a parallel run and not on a serial one.
         $languages ??= new ArrayClass([""]);
+        /** @var ArrayClass<string> $languages */
         $matches = 0;
         $resources = $languages->flatMap(fn(string $language): ArrayClass => FileManager::default()->contentsOfDirectory($language ? $baseURL->appendingPathComponent($language) : $baseURL, null, DirectoryEnumerationOptions::skipsHiddenFiles))->filter(function (URL $url, int $idx, bool &$stop) use ($name, $extensions, $limit, &$matches): bool {
             $ok = ($name === null || $url->deletingPathExtension()->lastPathComponent === pathinfo($name, PATHINFO_FILENAME)) && (!$extensions instanceof ArrayClass || $extensions->isEmpty || $extensions->contains(fn(string $extension): bool => string_is_equal($url->pathExtension, $extension, CompareOptions::caseInsensitive)));
