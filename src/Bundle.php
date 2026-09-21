@@ -274,9 +274,6 @@ final class Bundle extends ObjectClass
                 $extensions->append($extension);
             }
         }
-        // The unlocalized pass is the empty language. Inference reads that default as the
-        // literal "" rather than a string, which makes the language branch below look
-        // unreachable on a parallel run and not on a serial one.
         $languages ??= new ArrayClass([""]);
         /** @var ArrayClass<string> $languages */
         $matches = 0;
