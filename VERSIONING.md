@@ -68,6 +68,23 @@ change. Publication turned each of these packages from a directory that could be
 edited freely into a dependency other people's deployments resolve. A break
 shipped in a minor version is a break in somebody's production.
 
+## Keeping the changelog
+
+A change visible to someone using the package is written into `CHANGELOG.md`
+under `## [Unreleased]` as part of making it, not gathered afterwards. The
+commit that changes behaviour is the only moment when what changed, and why,
+are both still known; reconstructing it from a range of commits at tag time
+produces entries nobody can verify.
+
+Visible means a consumer could notice: behaviour, a signature, a default, a
+message they read, the version a bundle reports. Test scaffolding, CI, analysis
+configuration and internal documentation are not, and a changelog that records
+them buries the entries that matter.
+
+Tagging then renames `## [Unreleased]` to `## [<version>] - <YYYY-MM-DD>` and
+opens an empty `## [Unreleased]` above it. That is an edit, not an act of
+recall.
+
 ## Before a release
 
 The checks below are what [`Tools/verify-release.sh`](Tools/verify-release.sh)
@@ -80,7 +97,8 @@ for reading it.
    and not a path repository. The two are not the same thing, and the
    difference is exactly what a consumer hits first.
 4. `CHANGELOG.md` has a section for the version, dated, under the headings
-   [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) uses.
+   [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) uses, and its
+   entries were written as the changes were made rather than assembled now.
 5. The tag matches the changelog entry, and is annotated.
 6. `Info.plist` carries the same version as the tag. `CFBundleShortVersionString`
    is the released version — `1.0.1`, never `v1.0.1` — and `CFBundleVersion` is

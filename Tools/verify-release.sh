@@ -121,6 +121,8 @@ echo "   checked"
 # Nothing derives CFBundleShortVersionString from the tag, so it only stays
 # correct while someone remembers to change it. Checked against the working
 # copy rather than the archive: Info.plist is what a release is cut from.
+published=${installed#v}
+
 if [ -f Info.plist ]; then
     say "Bundle version"
     short=$(php -r '
@@ -129,13 +131,26 @@ if [ -f Info.plist ]; then
         $n = new DOMXPath($d)->query("//key[text()=\"CFBundleShortVersionString\"]/following-sibling::string[1]");
         echo $n->length ? $n->item(0)->textContent : "";
     ')
-    published=${installed#v}
     if [ -z "$short" ]; then
         fail "Info.plist declares no CFBundleShortVersionString"
     elif [ "$short" != "$published" ]; then
         fail "Info.plist says $short, Packagist serves $published"
     fi
     echo "   Info.plist and the published version agree on $short"
+fi
+
+# ---------------------------------------------------------------------------
+# 6. The published version is described somewhere a reader can find it.
+# ---------------------------------------------------------------------------
+# Checked against the working copy, like the bundle version: a changelog is
+# written before the tag, so by the time a version is published its section
+# already exists or never will.
+if [ -f CHANGELOG.md ]; then
+    say "Changelog"
+    if ! grep -qE "^## \[${published}\] - [0-9]{4}-[0-9]{2}-[0-9]{2}" CHANGELOG.md; then
+        fail "CHANGELOG.md has no dated section for $published"
+    fi
+    echo "   $published is described, with a date"
 fi
 
 say "OK — $package $installed installs and runs as published"

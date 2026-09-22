@@ -91,6 +91,8 @@ Compare the covered and executable line counts for each area before and after a 
 
 **Verify the test actually catches the bug.** Revert the fix, confirm the new test fails, restore the fix, confirm it passes. A test written against already-fixed code frequently asserts nothing.
 
+**A change a consumer would notice goes in `CHANGELOG.md` under `## [Unreleased]`, in the same commit.** Behaviour, a signature, a default, a message they read. Not test scaffolding, CI or analysis configuration. Written now, while what changed and why are both still known; a release assembled from a range of commits afterwards is a release nobody can check.
+
 **Prefer making the code type-safe over suppressing the diagnostic.** `psalm.xml` suppresses a number of issue types for particular files, mostly in networking where CURL's shape defeats inference. Before adding to that list, check whether the code itself can be fixed instead.
 
 ## Conventions
