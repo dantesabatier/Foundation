@@ -82,6 +82,13 @@ for reading it.
 4. `CHANGELOG.md` has a section for the version, dated, under the headings
    [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) uses.
 5. The tag matches the changelog entry, and is annotated.
+6. `Info.plist` carries the same version as the tag. `CFBundleShortVersionString`
+   is the released version — `1.0.1`, never `v1.0.1` — and `CFBundleVersion` is
+   the build number, incremented once per release. Nothing derives one from the
+   other, so a release that skips this ships a bundle claiming a version it is
+   not; both packages that predate this rule had drifted, one of them by a whole
+   major. `composer.json` deliberately declares no `version`: Packagist reads
+   the tag, and a third copy is a third thing to forget.
 
 ## Working against a local checkout
 

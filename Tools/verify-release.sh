@@ -115,4 +115,27 @@ for unwanted in psalm.xml rector.php phpunit.xml CLAUDE.md AGENTS.md .github; do
 done
 echo "   checked"
 
+# ---------------------------------------------------------------------------
+# 5. The bundle claims the version that was actually published.
+# ---------------------------------------------------------------------------
+# Nothing derives CFBundleShortVersionString from the tag, so it only stays
+# correct while someone remembers to change it. Checked against the working
+# copy rather than the archive: Info.plist is what a release is cut from.
+if [ -f Info.plist ]; then
+    say "Bundle version"
+    short=$(php -r '
+        $d = new DOMDocument();
+        $d->load("Info.plist");
+        $n = new DOMXPath($d)->query("//key[text()=\"CFBundleShortVersionString\"]/following-sibling::string[1]");
+        echo $n->length ? $n->item(0)->textContent : "";
+    ')
+    published=${installed#v}
+    if [ -z "$short" ]; then
+        fail "Info.plist declares no CFBundleShortVersionString"
+    elif [ "$short" != "$published" ]; then
+        fail "Info.plist says $short, Packagist serves $published"
+    fi
+    echo "   Info.plist and the published version agree on $short"
+fi
+
 say "OK — $package $installed installs and runs as published"

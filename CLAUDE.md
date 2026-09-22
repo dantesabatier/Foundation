@@ -104,3 +104,9 @@ Collections are annotated with PHPDoc `@template` tags for Psalm/PHPStan inferen
 ### Static Analysis Suppressions
 
 `psalm.xml` suppresses ~30 specific issue types for particular files (mostly in networking code where CURL/HTTP complexity defeats inference). Before adding new suppressions, check whether the actual code can be made type-safe instead.
+
+## Releasing
+
+`Info.plist` carries the released version, and nothing derives it from the git tag. When a release is cut, `CFBundleShortVersionString` becomes the tagged version (`1.0.1`, never `v1.0.1`) and `CFBundleVersion` — the build number — is incremented. `composer.json` declares no `version`: Packagist reads the tag.
+
+The full policy, and what else runs before a tag, is in [VERSIONING.md](VERSIONING.md).

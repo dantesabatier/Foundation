@@ -44,3 +44,9 @@ Single-package repo, all code under `src/`:
 ## Autoloading
 
 Global helper files autoloaded via `files` in `composer.json`: `Constants.php`, `ConstantsInternal.php`, `KeyValueCodingInternal.php`, `StandardAdditions.php`, `URLAdditions.php`, `UUIDAdditions.php`, and others in `src/` and `src/Networking/`.
+
+## Releasing
+
+`Info.plist` carries the released version, and nothing derives it from the git tag. When a release is cut, `CFBundleShortVersionString` becomes the tagged version (`1.0.1`, never `v1.0.1`) and `CFBundleVersion` — the build number — is incremented. `composer.json` declares no `version`: Packagist reads the tag.
+
+The full policy, and what else runs before a tag, is in [VERSIONING.md](VERSIONING.md).
