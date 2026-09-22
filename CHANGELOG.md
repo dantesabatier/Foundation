@@ -4,6 +4,20 @@ All notable changes to this project are documented in this file.
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- `VERSIONING.md`, the versioning policy for the whole stack, and `Tools/verify-release.sh`, which installs a published package the way a consumer would and reports what they would actually get. The script now also checks that `Info.plist` claims the version Packagist serves, because nothing derives one from the other.
+
+### Changed
+
+- `Error`'s localized properties consult the registered user info provider for their domain when the user info dictionary has no value for the key. A domain that registers a provider no longer needs to populate every error it creates.
+
+### Fixed
+
+- A language passed to a bundle resource lookup is no longer typed by the empty default the lookup falls back to, which made the localized path branch read as unreachable under a parallel analysis.
+
 ## [1.0.0] - 2026-09-18
 
 First public release. The framework itself has been in use in private projects since 2022; the entries below record the work done to make it publishable, and are grouped by the area they touched rather than listed chronologically.
