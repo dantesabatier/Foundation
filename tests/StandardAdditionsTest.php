@@ -114,6 +114,14 @@ final class StandardAdditionsTest extends TestCase
         $this->assertFalse(string_is_equal("ma\xF1ana", "NULL", CompareOptions::caseInsensitive));
     }
 
+    public function testDiacriticInsensitiveOptionsLeaveInvalidUTF8Untouched(): void
+    {
+        $this->assertSame(0, string_compare("MA\xF1ANA", "ma\xF1ana", CompareOptions::caseInsensitive | CompareOptions::diacriticInsensitive), "invalid UTF-8 is not transliterated, so the comparison falls back to bytes instead of a fatal error");
+        $this->assertSame(0, string_compare("ma\xF1ana", "ma\xF1ana", CompareOptions::normalized), "normalized comparison of invalid UTF-8");
+        $this->assertTrue(string_contains("ma\xF1ana", "\xF1", CompareOptions::diacriticInsensitive), "string_contains goes through the same transformation");
+        $this->assertSame(0, string_compare("árbol", "ARBOL", CompareOptions::caseInsensitive | CompareOptions::diacriticInsensitive), "valid UTF-8 is still transliterated");
+    }
+
     public function testStringIsEqual(): void
     {
         $this->assertTrue(string_is_equal("HOLA", "hola", CompareOptions::caseInsensitive), "string_is_equal case-insensitive");
