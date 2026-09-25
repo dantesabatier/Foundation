@@ -138,6 +138,7 @@ final readonly class PropertyListSerializer
         return $dictionary;
     }
 
+    /** @noinspection PhpUnhandledExceptionInspection */
     public function data(/** @noinspection PhpUnusedParameterInspection */ mixed $plist, PropertyListSerializationFormat $format = PropertyListSerializationFormat::xml, int $options = 0): string
     {
         $this->append($plist, $this->document->documentElement);
