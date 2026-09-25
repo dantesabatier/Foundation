@@ -8,21 +8,21 @@ Sabatier Foundation is a PHP port of Apple's Foundation framework. It provides S
 
 ## Commands
 
-Development tools (Psalm, Rector) are installed **globally** via Composer (`%APPDATA%\Composer\vendor\bin`), not in the project's `vendor/` directory — `vendor/` only holds the autoloader. Do not run `composer install` to get them; invoke the global binaries directly:
+Development tools (PHPUnit, Psalm, Rector) are declared in `require-dev`. Always run the project's own `vendor/bin` binaries (after `composer install`), never the global Composer ones, which do not load this project's autoload:
 
 ```bash
 # Static analysis (configured via psalm.xml)
-psalm
+php vendor/bin/psalm
 
 # Rector dry-run — uses PHPStan as its inference engine, bundled in its own package
-rector process --dry-run
+php vendor/bin/rector process --dry-run
 
 # Test suite (all, or a single file)
-phpunit
-phpunit tests/DateTest.php
+php vendor/bin/phpunit
+php vendor/bin/phpunit tests/DateTest.php
 ```
 
-Correctness is enforced through static analysis (Psalm level 4) and the PHPUnit suite in `tests/`. PHPUnit is installed globally like the other tools and configured via `phpunit.xml` (bootstrap on `vendor/autoload.php`, `failOnWarning`/`failOnNotice` enabled, mirroring CoreData's setup). Run everything with `phpunit`; run a single suite with `phpunit tests/<Name>Test.php`. Suites are `TestCase` classes in the `Sabatier\Foundation\Tests` namespace; when fixing a bug, add a regression check to the matching suite — each suite's header docblock lists the regressions it guards.
+Correctness is enforced through static analysis (Psalm level 4) and the PHPUnit suite in `tests/`. PHPUnit is configured via `phpunit.xml` (bootstrap on `vendor/autoload.php`, `failOnWarning`/`failOnNotice` enabled, mirroring CoreData's setup). Run everything with `php vendor/bin/phpunit`; run a single suite with `php vendor/bin/phpunit tests/<Name>Test.php`. Suites are `TestCase` classes in the `Sabatier\Foundation\Tests` namespace; when fixing a bug, add a regression check to the matching suite — each suite's header docblock lists the regressions it guards.
 
 ## Architecture
 
