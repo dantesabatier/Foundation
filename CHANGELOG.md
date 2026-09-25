@@ -16,6 +16,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ### Fixed
 
+- `string_compare()` and `string_is_equal()` compare byte by byte a string the collator cannot read, such as invalid UTF-8, instead of throwing a `TypeError`. The collator answers `false` for such a string, and any option other than `none` reached it — including wrapping a client-supplied string in a `Value`.
 - A language passed to a bundle resource lookup is no longer typed by the empty default the lookup falls back to, which made the localized path branch read as unreachable under a parallel analysis.
 
 ## [1.0.0] - 2026-09-18

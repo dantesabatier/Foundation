@@ -107,6 +107,13 @@ final class StandardAdditionsTest extends TestCase
         $this->assertSame($before, $after, "NORMALIZATION_MODE must not leak between calls (before=$before, after=$after)");
     }
 
+    public function testStringCompareInvalidUTF8FallsBackToBytes(): void
+    {
+        $this->assertSame(-1, string_compare("ma\xF1ana", "NULL", CompareOptions::caseInsensitive), "invalid UTF-8 is compared byte by byte instead of raising a TypeError on false");
+        $this->assertSame(0, string_compare("MA\xF1ANA", "ma\xF1ana", CompareOptions::caseInsensitive), "the byte fallback keeps case insensitivity");
+        $this->assertFalse(string_is_equal("ma\xF1ana", "NULL", CompareOptions::caseInsensitive));
+    }
+
     public function testStringIsEqual(): void
     {
         $this->assertTrue(string_is_equal("HOLA", "hola", CompareOptions::caseInsensitive), "string_is_equal case-insensitive");

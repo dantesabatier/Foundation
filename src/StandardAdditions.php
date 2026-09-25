@@ -242,6 +242,7 @@ function in_string(string $string, string $substring, #[ExpectedValues(flagsFrom
 
 /**
  * Compares the string with the specified string using the given options.
+ * Strings the collator cannot read, such as invalid UTF-8, are compared byte by byte.
  * @param string $string The receiver string.
  * @param string $other The string with which to compare.
  * @param int $options Options for the comparison, you can combine any of the {@see CompareOptions} using a C bitwise OR operator.
@@ -266,9 +267,11 @@ function string_compare(string $string, string $other, #[ExpectedValues(flagsFro
                 } else {
                     $collator->setAttribute(Collator::NORMALIZATION_MODE, Collator::OFF);
                 }
-                return $collator->compare($string, $other)
-                        |> (fn(int $x): int => min($x, ComparisonResult::orderedDescending->value))
-                        |> (fn(int $x): int => max($x, ComparisonResult::orderedAscending->value));
+                if (($result = $collator->compare($string, $other)) !== false) {
+                    return $result
+                            |> (fn(int $x): int => min($x, ComparisonResult::orderedDescending->value))
+                            |> (fn(int $x): int => max($x, ComparisonResult::orderedAscending->value));
+                }
             }
         }
         $string = string_with_options($string, $options);
