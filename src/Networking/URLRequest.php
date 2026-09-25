@@ -102,8 +102,11 @@ class URLRequest extends ObjectClass
     public function setValueForHttpHeaderField(?string $value, string $field): void
     {
         $this->allHTTPHeaderFields ??= new Dictionary();
-        /** @psalm-suppress InvalidArgument */
-        $this->allHTTPHeaderFields[$field] = $value;
+        if ($value === null) {
+            $this->allHTTPHeaderFields->removeValueForKey($field);
+        } else {
+            $this->allHTTPHeaderFields[$field] = $value;
+        }
     }
 
     /**

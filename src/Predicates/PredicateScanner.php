@@ -470,6 +470,7 @@ final class PredicateScanner extends Scanner
                 } else {
                     $expression = $this->parseExpression();
                     assert($expression instanceof Expression);
+                    assert($left instanceof Expression);
                     $left = Expression::expressionForFunction("index:", new ArrayClass([$left, $expression]));
                 }
                 $this->scanString("]", $string) ?: fatal_error("Invalid argument: missing closing \"]\" at index $this->scanLocation");
@@ -525,6 +526,7 @@ final class PredicateScanner extends Scanner
         if ($this->scanString("**")) {
             $right = $this->parsePowerExpression();
             assert($right instanceof Expression);
+            assert($left instanceof Expression);
             return Expression::expressionForFunction("raise:toPower:", new ArrayClass([$left, $right]));
         }
         return $left;
@@ -540,14 +542,17 @@ final class PredicateScanner extends Scanner
             if ($this->scanString("*")) {
                 $right = $this->parsePowerExpression();
                 assert($right instanceof Expression);
+                assert($left instanceof Expression);
                 $left = Expression::expressionForFunction("multiply:by:", new ArrayClass([$left, $right]));
             } elseif ($this->scanString("/")) {
                 $right = $this->parsePowerExpression();
                 assert($right instanceof Expression);
+                assert($left instanceof Expression);
                 $left = Expression::expressionForFunction("divide:by:", new ArrayClass([$left, $right]));
             } elseif ($this->scanString("%")) {
                 $right = $this->parsePowerExpression();
                 assert($right instanceof Expression);
+                assert($left instanceof Expression);
                 $left = Expression::expressionForFunction("modulus:by:", new ArrayClass([$left, $right]));
             } else {
                 return $left;
@@ -565,10 +570,12 @@ final class PredicateScanner extends Scanner
             if ($this->scanString("+")) {
                 $right = $this->parseMultiplicationExpression();
                 assert($right instanceof Expression);
+                assert($left instanceof Expression);
                 $left = Expression::expressionForFunction("add:to:", new ArrayClass([$left, $right]));
             } elseif ($this->scanString("-")) {
                 $right = $this->parseMultiplicationExpression();
                 assert($right instanceof Expression);
+                assert($left instanceof Expression);
                 $left = Expression::expressionForFunction("from:subtract:", new ArrayClass([$left, $right]));
             } else {
                 return $left;
