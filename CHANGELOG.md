@@ -6,6 +6,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-09-25
+
 ### Added
 
 - `VERSIONING.md`, the versioning policy for the whole stack, and `Tools/verify-release.sh`, which installs a published package the way a consumer would and reports what they would actually get. The script now also checks that `Info.plist` claims the version Packagist serves, because nothing derives one from the other.
