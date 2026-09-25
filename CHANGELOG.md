@@ -6,6 +6,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
+## [1.1.1] - 2026-09-25
+
 ### Fixed
 
 - String comparison and search with `diacriticInsensitive` or `normalized` leave a string that is not valid UTF-8 untouched and compare it byte by byte, instead of ending the process with a fatal error when the transliterator rejects it.
