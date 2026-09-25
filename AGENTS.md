@@ -2,15 +2,15 @@
 
 ## Commands
 
-Tools are installed globally and available in PATH.
+Tools come from `require-dev`: always run the project's own `vendor/bin`, never the global Composer binaries, which do not load this project's autoload.
 
 ```bash
-psalm --show-info=true --force-jit  # Psalm level 4 (config: psalm.xml)
-rector process --dry-run            # Code quality check (config: rector.php)
-phpunit                             # Test suite (all, or a single file)
+php vendor/bin/psalm --show-info=true --force-jit  # Psalm level 4 (config: psalm.xml)
+php vendor/bin/rector process --dry-run            # Code quality check (config: rector.php)
+php vendor/bin/phpunit                             # Test suite (all, or a single file)
 ```
 
-All tools installed globally and available in PATH. There is no formatter — match the surrounding code (PSR-12, double-quoted strings, short array syntax).
+There is no formatter — match the surrounding code (PSR-12, double-quoted strings, short array syntax).
 
 ## PHP Requirements
 
