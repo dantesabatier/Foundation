@@ -110,6 +110,7 @@
             </errorLevel>
         </DocblockTypeContradiction>
         <InvalidAttribute errorLevel="suppress"/>
+        <OverriddenPropertyAccess errorLevel="suppress"/>
     </issueHandlers>
     <plugins>
         <pluginClass class="Sabatier\Foundation\Plugins\Psalm\Plugin"/>
