@@ -6,6 +6,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
+## [1.1.2] - 2026-10-03
+
 ### Fixed
 
 - `didChangeValueForKey()` reports the inserted or removed members as the new value of a collection mutation, as `KeyValueObservedChange` documents, instead of reading the whole collection back through `valueForKey()`. Reading it back made every insertion notification load the entire relationship it was announcing, and in Core Data it re-fired a to-one that had just been cleared, which brought back the value it had been cleared from.
