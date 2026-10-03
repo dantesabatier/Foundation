@@ -257,7 +257,11 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
                 $change = new KeyValueObservedChange();
                 $change->kind = $changeKind;
                 if ($options & KeyValueObservingOptions::new) {
-                    $change->newValue = $this->valueForKey($key);
+                    // A collection mutation reports the members inserted or removed, as KeyValueObservedChange documents, not the whole collection: reading it back faults in every member of a relationship that may never have been loaded.
+                    $change->newValue = match ($changeKind) {
+                        KeyValueChange::insertion, KeyValueChange::removal => $changedValue,
+                        default => $this->valueForKey($key)
+                    };
                 }
                 if ($options & KeyValueObservingOptions::old) {
                     // The value willChangeValueForKey() recorded, not $changedValue: callers pass the value being written, which is the new one, so reporting that here labeled the replacement as the replaced. A collection mutation is the exception — it has no scalar property to read back and passes the inserted or removed members as $changedValue, which is what "old" means for it.
