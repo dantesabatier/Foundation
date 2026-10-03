@@ -257,7 +257,7 @@ class ObjectClass implements ObjectProtocol, KeyValueObserving, KeyValueCoding, 
                 $change = new KeyValueObservedChange();
                 $change->kind = $changeKind;
                 if ($options & KeyValueObservingOptions::new) {
-                    // A collection mutation reports the members inserted or removed, as KeyValueObservedChange documents, not the whole collection: reading it back faults in every member of a relationship that may never have been loaded.
+                    // A collection mutation reports the members inserted or removed, as KeyValueObservedChange documents, not the whole collection: reading it back faults in every member of a relationship that may have never been loaded.
                     $change->newValue = match ($changeKind) {
                         KeyValueChange::insertion, KeyValueChange::removal => $changedValue,
                         default => $this->valueForKey($key)
