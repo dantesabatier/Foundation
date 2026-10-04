@@ -8,6 +8,7 @@ use Collator;
 use JetBrains\PhpStorm\Deprecated;
 use JetBrains\PhpStorm\ExpectedValues;
 use JetBrains\PhpStorm\Pure;
+use ReflectionMethod;
 use SensitiveParameter;
 
 /**
@@ -740,6 +741,45 @@ function is_equal(mixed $a, mixed $b): bool
         return $a == $b;
     }
     return false;
+}
+
+/**
+ * Returns the key under which a hash table can file a value, or null when only comparing it against every element can find its equal.
+ *
+ * The key honours {@see is_equal()}: two equal values always share it, while unequal values may collide and are told apart by is_equal(). A value gets one when its equality is known without asking it:
+ *  - null, booleans and strings, which are only equal to themselves;
+ *  - integers and floats, filed by their float value so that 1 and 1.0 meet;
+ *  - objects whose equality is their identity, because they do not adopt {@see Equatable} or inherit {@see ObjectClass::isEqual()} unchanged;
+ *  - {@see Hashable} values, through their hash value.
+ *
+ * Anything else — arrays, and any type that defines its own equality without adopting Hashable, such as {@see Number}, which is equal to scalars — answers null.
+ * @param mixed $value The value to file.
+ * @return string|null The value's key, or null when it has none.
+ */
+function hash_key(mixed $value): ?string
+{
+    /** @var array<class-string, bool> $identityEquality Whether each Equatable class still compares by identity, answered once per class. */
+    static $identityEquality = [];
+    if ($value instanceof Hashable) {
+        return "h$value->hashValue";
+    }
+    if (is_object($value)) {
+        if ($value instanceof Equatable) {
+            $identityEquality[$value::class] ??= $value instanceof ObjectClass && new ReflectionMethod($value, "isEqual")->class === ObjectClass::class;
+            if (!$identityEquality[$value::class]) {
+                return null;
+            }
+        }
+        return "o" . spl_object_id($value);
+    }
+    return match (true) {
+        $value === null => "z",
+        is_bool($value) => $value ? "b1" : "b0",
+        is_string($value) => "s$value",
+        // Adding 0.0 makes an int a float and turns -0.0, which equals 0.0 but packs differently, into 0.0.
+        is_int($value), is_float($value) => "n" . pack("e", $value + 0.0),
+        default => null,
+    };
 }
 
 /**

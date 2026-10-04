@@ -9,13 +9,19 @@ use PHPUnit\Framework\TestCase;
 use Sabatier\Foundation\Comparable;
 use Sabatier\Foundation\CompareOptions;
 use Sabatier\Foundation\ComparisonResult;
+use Sabatier\Foundation\Hashable;
+use Sabatier\Foundation\Number;
+use Sabatier\Foundation\ObjectClass;
 use Sabatier\Foundation\SearchMethod;
+use Sabatier\Foundation\Set;
+use stdClass;
 
 use function Sabatier\Foundation\array_remove;
 use function Sabatier\Foundation\base64_url_encode;
 use function Sabatier\Foundation\camelcase;
 use function Sabatier\Foundation\compare;
 use function Sabatier\Foundation\document_root_directory;
+use function Sabatier\Foundation\hash_key;
 use function Sabatier\Foundation\in_range;
 use function Sabatier\Foundation\is_directory_junction;
 use function Sabatier\Foundation\is_equal;
@@ -68,7 +74,10 @@ final class ComparableInt implements Comparable
  *    instead of raising a TypeError on false;
  *  - array_remove() re-indexes through is_sequential() (first key is an int),
  *    not array_is_list();
- *  - compare() must be antisymmetric when only one side implements Comparable.
+ *  - compare() must be antisymmetric when only one side implements Comparable;
+ *  - hash_key() never gives values that is_equal() considers equal different keys —
+ *    Set relies on it to search only the matching bucket — and answers null for any
+ *    value whose equality it cannot know without asking it.
  */
 final class StandardAdditionsTest extends TestCase
 {
@@ -278,6 +287,64 @@ final class StandardAdditionsTest extends TestCase
         $this->assertTrue(is_equal(1, 1.0), "int and float with the same value");
         $this->assertFalse(is_equal(1, "1"), "int and numeric string are not equal");
         $this->assertTrue(is_equal("a", "a"), "identical strings");
+    }
+
+    public function testHashKeyIsSharedByEqualScalars(): void
+    {
+        $this->assertSame(hash_key(1), hash_key(1.0), "1 and 1.0 are equal, so they share a key");
+        $this->assertSame(hash_key(0.0), hash_key(-0.0), "so do 0.0 and -0.0");
+        $this->assertSame(hash_key("a"), hash_key("a"));
+        $this->assertSame(hash_key(null), hash_key(null));
+    }
+
+    public function testHashKeySeparatesScalarsThatAreNotEqual(): void
+    {
+        $keys = new Set([hash_key(1), hash_key("1"), hash_key(true), hash_key(null), hash_key(""), hash_key("z"), hash_key(false), hash_key(0)]);
+
+        $this->assertSame(8, $keys->count, "an int, a numeric string, a Boolean, null and strings never meet");
+    }
+
+    public function testHashKeyFilesAnObjectComparedByIdentityByThatIdentity(): void
+    {
+        $object = new ObjectClass();
+
+        $this->assertNotNull(hash_key($object), "ObjectClass compares by identity, so its identity is a key");
+        $this->assertSame(hash_key($object), hash_key($object));
+        $this->assertNotSame(hash_key($object), hash_key(new ObjectClass()));
+        $this->assertNotNull(hash_key(new stdClass()), "is_equal() compares a value that is not Equatable by identity too");
+    }
+
+    public function testHashKeyHasNoKeyForAValueThatDefinesItsOwnEquality(): void
+    {
+        $this->assertNull(hash_key(new Number(1)), "a Number is equal to scalars, so no key can honour its equality");
+        $this->assertNull(hash_key(new ComparableInt(1)), "an Equatable outside ObjectClass decides for itself");
+        $this->assertNull(hash_key(new class extends ObjectClass {
+            #[Override]
+            public function isEqual(mixed $other): bool
+            {
+                return true;
+            }
+        }), "nor does an ObjectClass that overrides isEqual()");
+        $this->assertNull(hash_key([1, 2]), "an array is compared element by element");
+    }
+
+    public function testHashKeyFilesAHashableValueByItsHashValue(): void
+    {
+        $hashable = fn(string $hashValue): Hashable => new class($hashValue) implements Hashable {
+            public function __construct(public readonly string $hashValue)
+            {
+            }
+
+            #[Override]
+            public function isEqual(mixed $other): bool
+            {
+                return $other instanceof self && $other->hashValue === $this->hashValue;
+            }
+        };
+
+        $this->assertSame(hash_key($hashable("x")), hash_key($hashable("x")), "equal instances share a key without sharing an identity");
+        $this->assertNotSame(hash_key($hashable("x")), hash_key($hashable("y")));
+        $this->assertNotSame(hash_key($hashable("x")), hash_key("x"), "and never meet a string spelled like their hash value");
     }
 
     public function testInRange(): void

@@ -6,7 +6,18 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
+### Added
+
+- `Hashable`, for a type whose equality can be summarized in a `hashValue` that equal instances share. It is unrelated to `$hash`, which stays the instance identity.
+- `hash_key()`, the key under which a hash table can file a value: shared by any two values `is_equal()` considers equal, and null for a value whose equality it cannot know without asking it, such as a `Number` or an array.
+
+### Changed
+
+- `Set` searches through a hash index instead of comparing against every element, so building a set, `insert()`, `containsElement()`, `member()` and the set algebra built on them take linear rather than quadratic time: two sets of 2,000 integers are built and compared in about 15 ms instead of 22 seconds. Results are unchanged. A set holding an element without a hash key — a `Number`, an array, any type with its own `isEqual()` that does not adopt `Hashable` — still compares element by element. A subclass that stores one representation and answers another through `offsetGet()` or `current()` must store values without a hash key.
+
 ### Fixed
+
+- `Set::insert(null)` on a set already holding null reports that nothing was inserted, instead of reporting an insertion it did not make.
 
 - `Number::compare()` and `isEqual()` compare the number's value instead of first converting it to the operand's type. Against an integer the value was truncated, so `Number(1.5)` was equal to `1` and to `Number(1)` while `Number(1)` was not equal to `Number(1.5)`, and a `Set` of numbers kept or dropped members depending on the order they were inserted in. A large integer compared against a numeric string no longer loses precision through float. Comparing against a Boolean still asks only whether the number is non-zero.
 
