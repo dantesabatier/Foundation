@@ -10,6 +10,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 - `Hashable`, for a type whose equality can be summarized in a `hashValue` that equal instances share. It is unrelated to `$hash`, which stays the instance identity.
 - `hash_key()`, the key under which a hash table can file a value: shared by any two values `is_equal()` considers equal, and null for a value whose equality it cannot know without asking it, such as a `Number` or an array.
+- `UUID` adopts `Hashable` through its normalized `uuidString`, so a `Set` of UUIDs searches its index instead of comparing every member.
 
 ### Changed
 

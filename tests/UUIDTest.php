@@ -11,6 +11,7 @@ use Sabatier\Foundation\InternalInconsistencyException;
 use Sabatier\Foundation\Set;
 use Sabatier\Foundation\UUID;
 
+use function Sabatier\Foundation\hash_key;
 use function Sabatier\Foundation\nanotime;
 use function Sabatier\Foundation\read_time;
 use function Sabatier\Foundation\uuid_compare;
@@ -32,6 +33,8 @@ use const Sabatier\Foundation\UUID_NULL;
  *  - hash stays the inherited instance identity: like Number/Date/URL, UUID expresses
  *    conceptual equality through isEqual/compare only, so equal values collapse in Set
  *    without sharing a hash;
+ *  - UUID adopts Hashable through its normalized uuidString, so equal UUIDs share a
+ *    hashValue (never $hash) and a Set finds them through its index;
  *  - __unserialize validates its payload instead of accepting any string;
  *  - uuid_generate_time() encodes the actual wall-clock time: read_time()/nanotime()
  *    used to mix unscaled seconds and nanoseconds, producing garbage timestamps.
@@ -106,6 +109,28 @@ final class UUIDTest extends TestCase
         $lower = new UUID("e621e1f8-c36c-495a-93fc-0c247a3e6e5f");
         $this->assertNotSame($lower->hash, $upper->hash, "distinct instances keep distinct identity hashes even when equal");
         $this->assertSame(1, new Set([$upper, $lower])->count, "a Set still collapses equal UUID instances through isEqual");
+    }
+
+    public function testEqualUUIDsShareAHashValueWithoutSharingAnIdentity(): void
+    {
+        $upper = new UUID("E621E1F8-C36C-495A-93FC-0C247A3E6E5F");
+        $lower = new UUID("e621e1f8-c36c-495a-93fc-0c247a3e6e5f");
+
+        $this->assertSame($upper->hashValue, $lower->hashValue, "the hash value derives from the normalized string");
+        $this->assertNotSame($upper->hash, $lower->hash, "while hash stays the instance identity");
+        $this->assertNotSame($upper->hashValue, new UUID()->hashValue);
+        $this->assertNotNull(hash_key($upper), "so a Set files it instead of scanning");
+    }
+
+    public function testASetFindsAUUIDThroughItsHashValue(): void
+    {
+        $uuids = new Set([new UUID("E621E1F8-C36C-495A-93FC-0C247A3E6E5F"), new UUID(), new UUID()]);
+        $member = $uuids->first;
+
+        $this->assertSame($member, $uuids->member(new UUID(strtolower($member->uuidString))), "an equal instance finds the stored one");
+        $this->assertFalse($uuids->insert(new UUID("e621e1f8-c36c-495a-93fc-0c247a3e6e5f"))["inserted"]);
+        $this->assertFalse($uuids->containsElement("E621E1F8-C36C-495A-93FC-0C247A3E6E5F"), "a string spelled like a member is not that member");
+        $this->assertSame(3, $uuids->count);
     }
 
     public function testSerializationRoundTrip(): void

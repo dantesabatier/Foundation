@@ -9,10 +9,15 @@ use Override;
 /**
  * A universally unique value that can be used to identify types, interfaces, and other items.
  */
-final class UUID extends ObjectClass
+final class UUID extends ObjectClass implements Hashable
 {
     /** @var string Returns a string created from the UUID, such as "E621E1F8-C36C-495A-93FC-0C247A3E6E5F" */
     public readonly string $uuidString;
+    /** @var string The normalized uuidString: it is validated hexadecimal and stored uppercased, so two UUIDs are equal exactly when their strings are identical. */
+    #[Override]
+    public string $hashValue {
+        get => $this->uuidString;
+    }
     /** @var string A textual description of the UUID. */
     #[Override]
     public string $description {
