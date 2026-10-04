@@ -66,7 +66,7 @@ function uuid_compare(string $uu1, string $uu2): int
  */
 function uuid_validate(string $uuid): bool
 {
-    return preg_match("/^[a-f\d]{8}(-[a-f\d]{4}){4}[a-f\d]{8}$/i", $uuid) === 1;
+    return preg_match("/^[a-f\d]{8}(-[a-f\d]{4}){4}[a-f\d]{8}\z/i", $uuid) === 1;
 }
 
 /**

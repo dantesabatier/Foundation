@@ -36,6 +36,9 @@ use const Sabatier\Foundation\UUID_NULL;
  *  - UUID adopts Hashable through its normalized uuidString, so equal UUIDs share a
  *    hashValue (never $hash) and a Set finds them through its index;
  *  - __unserialize validates its payload instead of accepting any string;
+ *  - uuid_validate() anchors at the true end of the string: "$" also matched before a
+ *    final newline, so a UUID followed by "\n" validated and became a 37-character
+ *    uuidString unequal to the same UUID without it;
  *  - uuid_generate_time() encodes the actual wall-clock time: read_time()/nanotime()
  *    used to mix unscaled seconds and nanoseconds, producing garbage timestamps.
  */
@@ -77,6 +80,7 @@ final class UUIDTest extends TestCase
             ["E621E1F8C36C495A93FC0C247A3E6E5F"],
             ["E621E1F8-C36C-495A-93FC-0C247A3E6E5"],
             ["G621E1F8-C36C-495A-93FC-0C247A3E6E5F"],
+            ["E621E1F8-C36C-495A-93FC-0C247A3E6E5F\n"],
         ];
     }
 
@@ -151,6 +155,15 @@ final class UUIDTest extends TestCase
         unserialize($tampered);
     }
 
+    public function testUnserializeRejectsATrailingNewline(): void
+    {
+        $original = new UUID("E621E1F8-C36C-495A-93FC-0C247A3E6E5F");
+        $tampered = str_replace("s:36:\"$original->uuidString\"", "s:37:\"$original->uuidString\n\"", serialize($original));
+        $this->assertNotSame(serialize($original), $tampered, "the payload was rewritten");
+        $this->expectException(InternalInconsistencyException::class);
+        unserialize($tampered);
+    }
+
     public function testUuidValidate(): void
     {
         $this->assertTrue(uuid_validate("E621E1F8-C36C-495A-93FC-0C247A3E6E5F"), "uuid_validate accepts uppercase");
@@ -160,6 +173,8 @@ final class UUIDTest extends TestCase
         $this->assertFalse(uuid_validate("E621E1F8C36C495A93FC0C247A3E6E5F"), "uuid_validate rejects a string without dashes");
         $this->assertFalse(uuid_validate("E621E1F8-C36C-495A-93FC-0C247A3E6E5"), "uuid_validate rejects a truncated string");
         $this->assertFalse(uuid_validate("E621E1F8-C36C-495A-93FC-0C247A3E6E5F0"), "uuid_validate rejects trailing characters");
+        $this->assertFalse(uuid_validate("E621E1F8-C36C-495A-93FC-0C247A3E6E5F\n"), "uuid_validate rejects a trailing newline");
+        $this->assertFalse(uuid_validate("\nE621E1F8-C36C-495A-93FC-0C247A3E6E5F"), "uuid_validate rejects a leading newline");
         $this->assertFalse(uuid_validate("G621E1F8-C36C-495A-93FC-0C247A3E6E5F"), "uuid_validate rejects non-hex characters");
     }
 
