@@ -30,6 +30,10 @@ use Sabatier\Foundation\Set;
  *    compare against a string as text, so "9" sorted after 42 and a mixed collection
  *    ordered by spelling rather than by value — a Number that stops answering as a
  *    number for one operand type contradicts the only thing the class is for;
+ *  - compare() compares the value itself rather than casting it to the operand's type.
+ *    Against an int it compared intValue, so Number(1.5) equalled 1 and Number(2.5)
+ *    equalled Number(2) while Number(2) did not equal Number(2.5) — equality was not
+ *    symmetric, and a Set holding Numbers deduplicated differently by insertion order;
  *  - comparing against a bool still asks only whether the number is non-zero, and a
  *    string that is not numeric falls through to the parent;
  *  - an operand it cannot compare falls through to the parent, which answers a stable
@@ -95,6 +99,38 @@ final class NumberTest extends TestCase
         $this->assertSame(ComparisonResult::orderedSame, $number->compare("42"));
         $this->assertSame(ComparisonResult::orderedAscending, $number->compare("100"));
         $this->assertSame(ComparisonResult::orderedSame, new Number(1.5)->compare("1.50"), "the value is what counts, not its spelling");
+    }
+
+    public function testAFractionalValueIsNotTruncatedToTheOperandType(): void
+    {
+        $this->assertSame(ComparisonResult::orderedDescending, new Number(1.5)->compare(1), "1.5 is greater than 1, not truncated to it");
+        $this->assertFalse(new Number(1.5)->isEqual(1));
+        $this->assertFalse(new Number(0.5)->isEqual(0));
+        $this->assertFalse(new Number(2.5)->isEqual(new Number(2)), "nor when the operand is another Number");
+        $this->assertTrue(new Number(2.0)->isEqual(2), "an integral float still equals the integer");
+    }
+
+    /** @return iterable<string, array{Number, Number}> */
+    public static function symmetryProvider(): iterable
+    {
+        yield "fraction and integer" => [new Number(1.5), new Number(1)];
+        yield "integral float and integer" => [new Number(2.0), new Number(2)];
+        yield "equal integers" => [new Number(7), new Number(7)];
+        yield "numeric string and float" => [new Number("3.25"), new Number(3.25)];
+    }
+
+    #[DataProvider("symmetryProvider")]
+    public function testEqualityBetweenNumbersIsSymmetric(Number $a, Number $b): void
+    {
+        $this->assertSame($a->isEqual($b), $b->isEqual($a), "a equals b exactly when b equals a");
+    }
+
+    public function testALargeIntegerKeepsItsPrecisionAgainstANumericString(): void
+    {
+        $number = new Number(PHP_INT_MAX);
+
+        $this->assertSame(ComparisonResult::orderedDescending, $number->compare((string)(PHP_INT_MAX - 1)), "comparing through float would collapse both into the same value");
+        $this->assertFalse($number->isEqual((string)(PHP_INT_MAX - 1)));
     }
 
     public function testAStringThatIsNotANumberFallsThroughToTheParent(): void

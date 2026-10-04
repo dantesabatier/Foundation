@@ -58,17 +58,12 @@ final class Number extends Value
     #[Override]
     public function compare(mixed $other): ComparisonResult
     {
-        if (is_int($other)) {
-            return ComparisonResult::from($this->intValue <=> $other);
-        }
-        if (is_float($other)) {
-            return ComparisonResult::from($this->floatValue <=> $other);
-        }
         if (is_bool($other)) {
             return ComparisonResult::from($this->boolValue <=> $other);
         }
         if (is_numeric($other)) {
-            return ComparisonResult::from($this->floatValue <=> (float)$other);
+            $value = is_bool($this->value) ? (int)$this->value : $this->value;
+            return ComparisonResult::from($value <=> $other);
         }
         if ($other instanceof Number) {
             return $this->compare($other->value);

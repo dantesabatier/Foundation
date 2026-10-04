@@ -6,6 +6,10 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
+### Fixed
+
+- `Number::compare()` and `isEqual()` compare the number's value instead of first converting it to the operand's type. Against an integer the value was truncated, so `Number(1.5)` was equal to `1` and to `Number(1)` while `Number(1)` was not equal to `Number(1.5)`, and a `Set` of numbers kept or dropped members depending on the order they were inserted in. A large integer compared against a numeric string no longer loses precision through float. Comparing against a Boolean still asks only whether the number is non-zero.
+
 ## [1.1.2] - 2026-10-03
 
 ### Fixed
