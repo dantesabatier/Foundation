@@ -758,7 +758,7 @@ function is_equal(mixed $a, mixed $b): bool
  */
 function hash_key(mixed $value): ?string
 {
-    /** @var array<class-string, bool> $identityEquality Whether each Equatable class still compares by identity, answered once per class. */
+    /** @var array<class-string, bool> $identityEquality */
     static $identityEquality = [];
     if ($value instanceof Hashable) {
         return "h$value->hashValue";
@@ -776,7 +776,6 @@ function hash_key(mixed $value): ?string
         $value === null => "z",
         is_bool($value) => $value ? "b1" : "b0",
         is_string($value) => "s$value",
-        // Adding 0.0 makes an int a float and turns -0.0, which equals 0.0 but packs differently, into 0.0.
         is_int($value), is_float($value) => "n" . pack("e", $value + 0.0),
         default => null,
     };

@@ -8,13 +8,13 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ### Added
 
-- `Hashable`, for a type whose equality can be summarized in a `hashValue` that equal instances share. It is unrelated to `$hash`, which stays the instance identity.
+- `Hashable`, for a type whose equality can be summarized in a `hashValue` that equal instances share. It is unrelated to `$hash`, which stays the instance identity. A type whose hash value can change declares it through `keyPathsForValuesAffectingHashValue()` and announces it through key-value observing, and a `Set` holding the instance moves it to its new key.
 - `hash_key()`, the key under which a hash table can file a value: shared by any two values `is_equal()` considers equal, and null for a value whose equality it cannot know without asking it, such as a `Number` or an array.
 - `UUID` adopts `Hashable` through its normalized `uuidString`, so a `Set` of UUIDs searches its index instead of comparing every member.
 
 ### Changed
 
-- `Set` searches through a hash index instead of comparing against every element, so building a set, `insert()`, `containsElement()`, `member()` and the set algebra built on them take linear rather than quadratic time: two sets of 2,000 integers are built and compared in about 15 ms instead of 22 seconds. Results are unchanged. A set holding an element without a hash key — a `Number`, an array, any type with its own `isEqual()` that does not adopt `Hashable` — still compares element by element. A subclass that stores one representation and answers another through `offsetGet()` or `current()` must store values without a hash key.
+- `Set` searches through a hash index instead of comparing against every element, so building a set, `insert()`, `containsElement()`, `member()` and the set algebra built on them take linear rather than quadratic time: two sets of 2,000 integers are built and compared in about 15 ms instead of 22 seconds. Results are unchanged. A set holding an element without a hash key — a `Number`, an array, any type with its own `isEqual()` that does not adopt `Hashable` — still compares element by element. A subclass that stores one representation and answers another through `offsetGet()` or `current()` must search with the stored one.
 
 ### Fixed
 

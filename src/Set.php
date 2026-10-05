@@ -16,13 +16,14 @@ use Closure;
 use Iterator;
 use Override;
 use Sabatier\Foundation\Predicates\Predicate;
+use WeakReference;
 
 /**
  * An unordered collection of unique elements.
  *
  * Uniqueness is decided by {@see is_equal()}, never by identity hashes. To avoid comparing a search against every element, the set files its elements by {@see hash_key()} and compares only those sharing the searched element's key; the answer is the one a full scan would give, because equal values always share a key. Whenever the searched element or any element held has no key, the set falls back to the full scan.
  *
- * The index files the stored values, so a subclass that stores one representation and answers another through offsetGet() or current() must store values without a hash key.
+ * The index files the stored values, so a subclass that stores one representation and answers another through offsetGet() or current() must search with the stored one.
  * @template Element
  * @implements SetAlgebra<Element>
  * @implements Iterator<int, Element>
@@ -80,6 +81,7 @@ class Set extends ObjectClass implements SetAlgebra, ArrayAccess, Iterator
         isSubset as private setAlgebraIsSubset;
         isSuperset as private setAlgebraIsSuperset;
         isDisjoint as private setAlgebraIsDisjoint;
+        __clone as private sequenceClone;
     }
 
     use IteratorAlgorithms {
@@ -126,10 +128,12 @@ class Set extends ObjectClass implements SetAlgebra, ArrayAccess, Iterator
     public string $description {
         get => "[{$this->join(", ")}]";
     }
-    /** @var array<string, list<Element>>|null The stored elements filed by {@see hash_key()}, in storage order. Built on the first search, kept current by the single-element mutations, and dropped (null) whenever the storage is rearranged wholesale. */
+    /** @var array<string, list<Element>>|null */
     private ?array $buckets = null;
-    /** @var int<0, max> How many stored elements have no hash key. While any is held it could equal anything, so only a full scan can rule a match out. */
+    /** @var int<0, max> */
     private int $opaqueCount = 0;
+    /** @var array<int, KeyValueObservation> */
+    private array $hashValueObservations = [];
 
     /**
      * @param iterable<int, Element> $elements
@@ -140,15 +144,27 @@ class Set extends ObjectClass implements SetAlgebra, ArrayAccess, Iterator
             $this->reserved = $elements->array;
             return;
         }
-        // Inserts directly instead of calling formUnion() or insert(): an override of them would observe a mutation on an instance that is still initializing.
+        // Inserts directly instead of calling formUnion(): an override of it would observe a mutation on an instance that is still initializing.
         foreach ($elements as $element) {
             $this->insertElement($element);
         }
     }
 
+    public function __clone()
+    {
+        $this->sequenceClone();
+        $this->buckets = null;
+        $this->hashValueObservations = [];
+    }
+
+    public function __destruct()
+    {
+        $this->discardIndex();
+    }
+
     /**
      * @param Element $element
-     * @return list<Element>|null The equal element as a one-element list, an empty list when there is none, or null when the index cannot answer and a full scan must.
+     * @return list<Element>|null
      */
     private function indexedSearch(mixed $element): ?array
     {
@@ -167,7 +183,6 @@ class Set extends ObjectClass implements SetAlgebra, ArrayAccess, Iterator
             return null;
         }
         foreach ($this->buckets[$key] ?? [] as $member) {
-            // Same argument order as the full scan, so the stored element's isEqual() decides here too.
             if (is_equal($member, $element)) {
                 return [$member];
             }
@@ -181,6 +196,47 @@ class Set extends ObjectClass implements SetAlgebra, ArrayAccess, Iterator
         if ($this->buckets === null) {
             return;
         }
+        $this->addToBucket($element);
+        if ($element instanceof KeyValueObserving && $element instanceof Hashable && !$element::keyPathsForValuesAffectingValueForKey("hashValue")->isEmpty) {
+            $set = WeakReference::create($this);
+            $this->hashValueObservations[spl_object_id($element)] ??= $element->observe("hashValue", KeyValueObservingOptions::prior, static function (KeyValueObserving $element, KeyValueObservedChange $change) use ($set): void {
+                if ($change->isPrior) {
+                    $set->get()?->removeFromBucket($element);
+                } else {
+                    $set->get()?->addToBucket($element);
+                }
+            });
+        }
+    }
+
+    /** @param Element $element */
+    private function unfileElement(mixed $element): void
+    {
+        if ($this->buckets === null) {
+            return;
+        }
+        $this->removeFromBucket($element);
+        if (is_object($element) && isset($this->hashValueObservations[$id = spl_object_id($element)])) {
+            $this->hashValueObservations[$id]->invalidate();
+            unset($this->hashValueObservations[$id]);
+        }
+    }
+
+    private function discardIndex(): void
+    {
+        foreach ($this->hashValueObservations as $observation) {
+            $observation->invalidate();
+        }
+        $this->hashValueObservations = [];
+        $this->buckets = null;
+    }
+
+    /** @param Element $element */
+    private function addToBucket(mixed $element): void
+    {
+        if ($this->buckets === null) {
+            return;
+        }
         $key = hash_key($element);
         if ($key === null) {
             $this->opaqueCount += 1;
@@ -190,7 +246,7 @@ class Set extends ObjectClass implements SetAlgebra, ArrayAccess, Iterator
     }
 
     /** @param Element $element */
-    private function unfileElement(mixed $element): void
+    private function removeFromBucket(mixed $element): void
     {
         if ($this->buckets === null) {
             return;
@@ -203,7 +259,6 @@ class Set extends ObjectClass implements SetAlgebra, ArrayAccess, Iterator
         if (!isset($this->buckets[$key])) {
             return;
         }
-        // array_remove() searches by identity, which is what is wanted: the bucket may hold values that are equal to the element without being it.
         array_remove($this->buckets[$key], $element);
         if ($this->buckets[$key] === []) {
             unset($this->buckets[$key]);
@@ -412,7 +467,6 @@ class Set extends ObjectClass implements SetAlgebra, ArrayAccess, Iterator
     #[Override]
     public function indexOf(mixed $element): ?int
     {
-        // The index answers whether the element is held, not where, so it only spares the scan when the answer is no.
         if ($this->indexedSearch($element) === []) {
             return null;
         }
@@ -462,7 +516,7 @@ class Set extends ObjectClass implements SetAlgebra, ArrayAccess, Iterator
     #[Override]
     public function sort(?Closure $by = null): Set
     {
-        $this->buckets = null;
+        $this->discardIndex();
         return $this->collectionSort($by);
     }
 
@@ -537,7 +591,7 @@ class Set extends ObjectClass implements SetAlgebra, ArrayAccess, Iterator
      */
     public function reverse(): Set
     {
-        $this->buckets = null;
+        $this->discardIndex();
         return $this->bidirectionalCollectionReverse();
     }
 
@@ -564,7 +618,7 @@ class Set extends ObjectClass implements SetAlgebra, ArrayAccess, Iterator
     {
         if (!$this->containsElement($element)) {
             $this->mutableCollectionInsertAt($element, $at);
-            $this->buckets = null;
+            $this->discardIndex();
         }
     }
 
@@ -586,7 +640,7 @@ class Set extends ObjectClass implements SetAlgebra, ArrayAccess, Iterator
     public function removeAll(?Closure $where = null): void
     {
         $this->mutableCollectionRemoveAll($where);
-        $this->buckets = null;
+        $this->discardIndex();
     }
 
     #[Override]
@@ -690,7 +744,6 @@ class Set extends ObjectClass implements SetAlgebra, ArrayAccess, Iterator
             return null;
         }
         $member = $this[$index];
-        // Writes the storage directly: offsetSet() would find the equal member and keep it.
         $this->unfileElement($this->reserved[$index]);
         $this->reserved[$index] = $element;
         $this->fileElement($element);
@@ -847,7 +900,7 @@ class Set extends ObjectClass implements SetAlgebra, ArrayAccess, Iterator
     public function setSet(Set $set): void
     {
         $this->reserved = $set->array;
-        $this->buckets = null;
+        $this->discardIndex();
     }
 
     /**

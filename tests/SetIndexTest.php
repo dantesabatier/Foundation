@@ -4,12 +4,48 @@ declare(strict_types=1);
 
 namespace Sabatier\Foundation\Tests;
 
+use Override;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use ReflectionProperty;
 use Sabatier\Foundation\ArrayClass;
+use Sabatier\Foundation\Hashable;
 use Sabatier\Foundation\Number;
 use Sabatier\Foundation\ObjectClass;
 use Sabatier\Foundation\Set;
+use Sabatier\Foundation\UUID;
+
+final class RekeyableToken extends ObjectClass implements Hashable
+{
+    public string $code {
+        set {
+            $this->willChangeValueForKey(__PROPERTY__);
+            $this->code = $value;
+            $this->didChangeValueForKey(__PROPERTY__);
+        }
+    }
+    #[Override]
+    public string $hashValue {
+        get => $this->code;
+    }
+
+    public function __construct(string $code)
+    {
+        $this->code = $code;
+    }
+
+    /** @return Set<string> */
+    public static function keyPathsForValuesAffectingHashValue(): Set
+    {
+        return new Set(["code"]);
+    }
+
+    #[Override]
+    public function isEqual(mixed $other): bool
+    {
+        return $other instanceof RekeyableToken && $other->code === $this->code;
+    }
+}
 
 /**
  * Tests the hash index Set searches through, against the element-by-element scan it
@@ -27,7 +63,10 @@ use Sabatier\Foundation\Set;
  *    rearrangements (sort, reverse, insertAt, removeAll, setSet) never leave a stale
  *    answer behind;
  *  - copies do not share an index: mutating a clone or an unserialized copy leaves the
- *    original's answers alone.
+ *    original's answers alone;
+ *  - an element whose hash value changes while the set holds it is moved to its new key,
+ *    and a set stops observing an element once it lets it go or is destroyed, so a
+ *    long-lived element does not keep every set it was filed in alive.
  */
 final class SetIndexTest extends TestCase
 {
@@ -202,5 +241,70 @@ final class SetIndexTest extends TestCase
         $this->assertFalse(new Set([1, 2, 3])->isEqual(new Set([1, 2, "3"])));
         $this->assertTrue(new Set([1, 2])->isSubset(new Set([2, 1, 0])));
         $this->assertTrue(new Set([1, 2])->isDisjoint(new Set(["1", "2"])));
+    }
+
+    private static function observanceCount(ObjectClass $object): int
+    {
+        return count(new ReflectionProperty(ObjectClass::class, "observances")->getValue($object));
+    }
+
+    public function testAnElementWhoseHashValueChangesIsMovedToItsNewKey(): void
+    {
+        $token = new RekeyableToken("A");
+        $set = new Set([$token, new RekeyableToken("B")]);
+        $this->assertTrue($set->containsElement(new RekeyableToken("A")));
+
+        $token->code = "C";
+
+        $this->assertTrue($set->containsElement(new RekeyableToken("C")), "found under the key it now has");
+        $this->assertFalse($set->containsElement(new RekeyableToken("A")), "and no longer under the one it had");
+        $this->assertFalse($set->insert(new RekeyableToken("C"))["inserted"]);
+        $set->remove(new RekeyableToken("C"));
+        $this->assertFalse($set->containsElement($token));
+        $this->assertSame(1, $set->count);
+    }
+
+    public function testACopyMovesItsOwnIndex(): void
+    {
+        $token = new RekeyableToken("A");
+        $set = new Set([$token]);
+        $set->containsElement($token);
+        $copy = clone $set;
+        $copy->containsElement($token);
+
+        $token->code = "B";
+
+        $this->assertTrue($set->containsElement(new RekeyableToken("B")));
+        $this->assertTrue($copy->containsElement(new RekeyableToken("B")));
+    }
+
+    public function testASetStopsObservingAnElementItLetsGo(): void
+    {
+        $token = new RekeyableToken("A");
+        $baseline = self::observanceCount($token);
+        $set = new Set([$token]);
+        $set->containsElement($token);
+        $this->assertSame($baseline + 1, self::observanceCount($token), "filed, the element is observed");
+
+        $set->remove($token);
+        $this->assertSame($baseline, self::observanceCount($token), "removed, it no longer is");
+
+        $set->insert($token);
+        $set->removeAll();
+        $this->assertSame($baseline, self::observanceCount($token), "nor after the index is discarded");
+
+        $set = new Set([$token]);
+        $set->containsElement($token);
+        unset($set);
+        $this->assertSame($baseline, self::observanceCount($token), "nor once the set is destroyed");
+    }
+
+    public function testAnElementWithAnImmutableHashValueIsNotObserved(): void
+    {
+        $uuid = new UUID();
+        $set = new Set([$uuid]);
+        $set->containsElement($uuid);
+
+        $this->assertSame(0, self::observanceCount($uuid));
     }
 }

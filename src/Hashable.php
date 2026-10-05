@@ -11,7 +11,7 @@ namespace Sabatier\Foundation;
  *  - instances that are equal through {@see Equatable::isEqual()} have the same hash value; unequal instances may share one, at the cost of a comparison;
  *  - an instance is only ever equal to instances of its own kind, never to a scalar or to a value of another type;
  *  - equality is an equivalence: if a equals b and b equals c, a equals c;
- *  - the hash value never changes while the instance is held by a collection, which in practice means the type is immutable.
+ *  - a hash value that can change is declared through keyPathsForValuesAffectingHashValue() and announced through key-value observing; otherwise it never changes while a collection holds the instance.
  *
  * A type that cannot promise all of them simply does not adopt the protocol, and the collections keep comparing it element by element.
  */
