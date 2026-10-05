@@ -6,6 +6,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-10-05
+
 ### Added
 
 - `Hashable`, for a type whose equality can be summarized in a `hashValue` that equal instances share. It is unrelated to `$hash`, which stays the instance identity. A type whose hash value can change declares it through `keyPathsForValuesAffectingHashValue()` and announces it through key-value observing, and a `Set` holding the instance moves it to its new key.
