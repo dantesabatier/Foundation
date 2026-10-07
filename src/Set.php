@@ -467,10 +467,16 @@ class Set extends ObjectClass implements SetAlgebra, ArrayAccess, Iterator
     #[Override]
     public function indexOf(mixed $element): ?int
     {
-        if ($this->indexedSearch($element) === []) {
+        $match = $this->indexedSearch($element);
+        if ($match === null) {
+            return $this->collectionIndexOf($element);
+        }
+        if ($match === []) {
             return null;
         }
-        return $this->collectionIndexOf($element);
+        // The bucket already settled equality and handed back the stored member itself, so its position is found by identity instead of asking every element again.
+        $index = array_search($match[0], $this->reserved, true);
+        return $index === false ? null : $index;
     }
 
     /**

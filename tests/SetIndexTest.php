@@ -12,6 +12,7 @@ use Sabatier\Foundation\ArrayClass;
 use Sabatier\Foundation\Hashable;
 use Sabatier\Foundation\Number;
 use Sabatier\Foundation\ObjectClass;
+use Sabatier\Foundation\Range;
 use Sabatier\Foundation\Set;
 use Sabatier\Foundation\UUID;
 
@@ -47,6 +48,26 @@ final class RekeyableToken extends ObjectClass implements Hashable
     }
 }
 
+final class CountedToken extends ObjectClass implements Hashable
+{
+    public static int $comparisons = 0;
+    #[Override]
+    public string $hashValue {
+        get => $this->code;
+    }
+
+    public function __construct(public readonly string $code)
+    {
+    }
+
+    #[Override]
+    public function isEqual(mixed $other): bool
+    {
+        self::$comparisons += 1;
+        return $other instanceof CountedToken && $other->code === $this->code;
+    }
+}
+
 /**
  * Tests the hash index Set searches through, against the element-by-element scan it
  * replaces.
@@ -62,6 +83,8 @@ final class RekeyableToken extends ObjectClass implements Hashable
  *    be inserted again, one that is replaced is no longer found, and the wholesale
  *    rearrangements (sort, reverse, insertAt, removeAll, setSet) never leave a stale
  *    answer behind;
+ *  - indexOf, and the update and remove built on it, locate an indexed member by the
+ *    identity the bucket hands back instead of comparing it with every member again;
  *  - copies do not share an index: mutating a clone or an unserialized copy leaves the
  *    original's answers alone;
  *  - an element whose hash value changes while the set holds it is moved to its new key,
@@ -306,5 +329,21 @@ final class SetIndexTest extends TestCase
         $set->containsElement($uuid);
 
         $this->assertSame(0, self::observanceCount($uuid));
+    }
+
+    public function testLocatingAnIndexedElementDoesNotCompareItWithEveryMember(): void
+    {
+        $tokens = new ArrayClass(new Range(0, 200))->map(fn(int $i): CountedToken => new CountedToken("t$i"));
+        $set = new Set($tokens->array);
+        $set->containsElement(new CountedToken("t0"));
+        CountedToken::$comparisons = 0;
+
+        $this->assertSame(199, $set->indexOf(new CountedToken("t199")));
+        $set->update(new CountedToken("t198"));
+        $set->remove(new CountedToken("t197"));
+
+        $this->assertLessThanOrEqual(3, CountedToken::$comparisons, "indexOf, update and remove each settle equality in the bucket");
+        $this->assertSame(199, $set->count);
+        $this->assertFalse($set->containsElement(new CountedToken("t197")));
     }
 }

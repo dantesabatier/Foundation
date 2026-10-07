@@ -6,6 +6,10 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
+### Changed
+
+- `Set::indexOf()`, and the `update()` and `remove()` built on it, locate a member through the hash index when the element has a key. It found the member in its bucket and then compared it with every element again to learn its position, so updating or removing in a set of hashable elements stayed linear.
+
 ## [1.2.0] - 2026-10-05
 
 ### Added
