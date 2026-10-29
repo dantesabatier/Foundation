@@ -7,8 +7,7 @@ use Rector\CodeQuality\Rector\Class_\ConvertStaticToSelfRector;
 use Rector\CodeQuality\Rector\ClassMethod\ExplicitReturnNullRector;
 use Rector\CodeQuality\Rector\ClassMethod\LocallyCalledStaticMethodToNonStaticRector;
 use Rector\CodeQuality\Rector\Equal\UseIdenticalOverEqualWithSameTypeRector;
-use Rector\CodeQuality\Rector\Identical\FlipTypeControlToUseExclusiveTypeRector;
-use Rector\CodeQuality\Rector\If_\ObjectExplicitBoolCompareRector;
+use Rector\CodeQuality\Rector\If_\ExplicitNullableObjectInstanceRector;
 use Rector\Config\RectorConfig;
 use Rector\DeadCode\Rector\Cast\RecastingRemovalRector;
 use Rector\DeadCode\Rector\ClassMethod\RemoveEmptyClassMethodRector;
@@ -40,7 +39,6 @@ try {
         ])->withPhpSets()->withSkip([
             SensitiveConstantNameRector::class,
             ClassPropertyAssignToConstructorPromotionRector::class,
-            FlipTypeControlToUseExclusiveTypeRector::class,
             LocallyCalledStaticMethodToNonStaticRector::class,
             RemoveUnusedPrivateMethodRector::class,
             RemoveUnusedPrivatePropertyRector::class => [
@@ -54,6 +52,7 @@ try {
                 __DIR__ . "/src/StandardAdditions.php"
             ],
             ExplicitReturnNullRector::class,
+            ExplicitNullableObjectInstanceRector::class,
             RestoreDefaultNullToNullableTypePropertyRector::class,
             ReadOnlyPropertyRector::class,
             ClassOnThisVariableObjectRector::class,
@@ -84,7 +83,6 @@ try {
                 __DIR__ . "/tests/ConditionalAndBlockExpressionTest.php",
                 __DIR__ . "/tests/NotificationCenterTest.php"
             ],
-            ObjectExplicitBoolCompareRector::class
         ])->withPreparedSets(deadCode: true, codeQuality: true, earlyReturn: true);
 } catch (InvalidConfigurationException $e) {
     error_log($e->getMessage());
